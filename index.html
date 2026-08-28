@@ -8,6 +8,7 @@
   <style>
     .row-error { background-color: #fee2e2 !important; }
     .pay-paid { background-color: #22c55e; color: white; font-weight: bold; cursor: pointer; }
+    .transition-all { transition: all 0.2s ease-in-out; }
   </style>
 </head>
 <body class="bg-gray-100 text-gray-800 text-xs">
@@ -16,21 +17,21 @@
     <div class="flex flex-wrap justify-between items-center mb-4 gap-4 bg-white p-4 rounded shadow">
       <div>
         <h1 class="text-xl font-bold text-gray-800">Лист Договоров</h1>
-        <p class="text-xs text-gray-500">Система учета: надежное сохранение и быстрое копирование</p>
+        <p class="text-xs text-gray-500">История изменений активна (Любое действие можно отменить)</p>
       </div>
       <div class="flex items-center gap-2">
-        <button type="button" id="undoBtn" onclick="undoLastAction()" disabled class="bg-gray-300 text-gray-600 font-medium px-3 py-2 rounded text-xs cursor-not-allowed transition">
-          ↺ Отменить удаление
+        <button type="button" id="undoBtn" onclick="undoLastAction()" disabled class="bg-gray-300 text-gray-600 font-medium px-3 py-2 rounded text-xs cursor-not-allowed transition-all">
+          ↺ Шаг назад
         </button>
-        <button type="button" onclick="exportData()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-3 py-2 rounded text-xs transition">
+        <button type="button" onclick="exportData()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-3 py-2 rounded text-xs transition-all">
           💾 Скачать базу
         </button>
         <input type="file" id="importFile" onchange="importData(event)" class="hidden" accept=".json">
-        <button type="button" onclick="document.getElementById('importFile').click()" class="bg-gray-600 hover:bg-gray-700 text-white font-medium px-3 py-2 rounded text-xs transition">
+        <button type="button" onclick="document.getElementById('importFile').click()" class="bg-gray-600 hover:bg-gray-700 text-white font-medium px-3 py-2 rounded text-xs transition-all">
           📂 Загрузить базу
         </button>
-        <input type="text" id="searchInput" oninput="filterContracts()" placeholder="Поиск по ФИО или номеру..." class="p-2 border rounded w-52">
-        <button type="button" onclick="openCreateModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded transition">
+        <input type="text" id="searchInput" oninput="filterContracts()" placeholder="Поиск (ФИО, номер)..." class="p-2 border rounded w-52">
+        <button type="button" onclick="openCreateModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded transition-all">
           + Новый Договор
         </button>
       </div>
@@ -60,20 +61,19 @@
             <th class="p-2 border text-center sticky right-0 bg-gray-200 min-w-[210px]">Действия</th>
           </tr>
         </thead>
-        <tbody id="contractsTable">
-          </tbody>
+        <tbody id="contractsTable"></tbody>
       </table>
     </div>
   </div>
 
   <div id="modal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-      <h2 id="modalTitle" class="text-lg font-bold mb-4 border-b pb-2 text-blue-700">Оформление нового договора</h2>
+      <h2 id="modalTitle" class="text-lg font-bold mb-4 border-b pb-2 text-blue-700">Оформление договора</h2>
       <form id="contractForm" class="space-y-4">
         <input type="hidden" id="editDocId">
 
         <div class="bg-gray-50 p-3 rounded border">
-          <h3 class="font-bold uppercase text-gray-600 mb-2">1. Данные Покупателя</h3>
+          <h3 class="font-bold uppercase text-gray-600 mb-2 italic text-[10px]">1. Данные Покупателя</h3>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
             <input type="text" id="fio" placeholder="ФИО Покупателя *" required class="p-2 border rounded col-span-2">
             <input type="date" id="birthDate" title="Дата рождения" class="p-2 border rounded">
@@ -85,36 +85,22 @@
         </div>
 
         <div class="bg-gray-50 p-3 rounded border">
-          <h3 class="font-bold uppercase text-gray-600 mb-2">2. Условия и Учёт</h3>
+          <h3 class="font-bold uppercase text-gray-600 mb-2 italic text-[10px]">2. Условия Рассрочки</h3>
           <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-            <div>
-              <label class="block text-gray-500">Дата покупки *</label>
-              <input type="date" id="buyDate" required class="p-2 border rounded w-full">
-            </div>
-            <div>
-              <label class="block text-gray-500">График оплаты (день) *</label>
-              <input type="date" id="payDate" required class="p-2 border rounded w-full">
-            </div>
-            <div>
-              <label class="block text-gray-500">Срок (месяцев) *</label>
-              <input type="number" id="monthsCount" placeholder="6" required class="p-2 border rounded w-full">
-            </div>
-            <div>
-              <label class="block text-gray-500">Ежемесячный платеж *</label>
-              <input type="number" id="monthlyPay" placeholder="₽" required class="p-2 border rounded w-full">
-            </div>
-            <div>
-              <label class="block text-gray-500">Общая сумма рассрочки *</label>
-              <input type="number" id="totalCost" placeholder="₽" required class="p-2 border rounded w-full">
-            </div>
-            <div>
-              <label class="block text-gray-500">Предоплата (если есть)</label>
-              <input type="number" id="downPayment" placeholder="0 ₽" value="0" class="p-2 border rounded w-full">
-            </div>
-            <div>
-              <label class="block text-gray-500">Себестоимость *</label>
-              <input type="number" id="costPrice" placeholder="₽" required class="p-2 border rounded w-full">
-            </div>
+            <div><label class="block text-gray-500 scale-75 origin-left">Дата покупки</label>
+                 <input type="date" id="buyDate" required class="p-2 border rounded w-full"></div>
+            <div><label class="block text-gray-500 scale-75 origin-left">График оплаты (день)</label>
+                 <input type="date" id="payDate" required class="p-2 border rounded w-full"></div>
+            <div><label class="block text-gray-500 scale-75 origin-left">Срок (мес)</label>
+                 <input type="number" id="monthsCount" placeholder="6" required class="p-2 border rounded w-full"></div>
+            <div><label class="block text-gray-500 scale-75 origin-left">Мес. платеж</label>
+                 <input type="number" id="monthlyPay" placeholder="₽" required class="p-2 border rounded w-full"></div>
+            <div><label class="block text-gray-500 scale-75 origin-left">Общая сумма</label>
+                 <input type="number" id="totalCost" placeholder="₽" required class="p-2 border rounded w-full"></div>
+            <div><label class="block text-gray-500 scale-75 origin-left">Предоплата</label>
+                 <input type="number" id="downPayment" placeholder="0 ₽" value="0" class="p-2 border rounded w-full"></div>
+            <div><label class="block text-gray-500 scale-75 origin-left">Себестоимость</label>
+                 <input type="number" id="costPrice" placeholder="₽" required class="p-2 border rounded w-full"></div>
             <div class="flex items-center gap-2 pt-4">
               <input type="checkbox" id="shopPaid" class="w-4 h-4">
               <label for="shopPaid" class="font-bold text-gray-700">Отметка «Д»</label>
@@ -124,53 +110,47 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div class="bg-gray-50 p-3 rounded border">
-            <h3 class="font-bold uppercase text-gray-600 mb-2">3. Товар и Магазин</h3>
-            <div class="space-y-2">
-              <input type="text" id="product" placeholder="Товар" class="p-2 border rounded w-full">
-              <input type="text" id="store" placeholder="Магазин" class="p-2 border rounded w-full">
-            </div>
+            <h3 class="font-bold uppercase text-gray-600 mb-2 italic text-[10px]">3. Товар</h3>
+            <input type="text" id="product" placeholder="Товар" class="p-2 border rounded w-full mb-2">
+            <input type="text" id="store" placeholder="Магазин" class="p-2 border rounded w-full">
           </div>
           <div class="bg-gray-50 p-3 rounded border">
-            <h3 class="font-bold uppercase text-gray-600 mb-2">4. Поручитель</h3>
-            <div class="space-y-2">
-              <input type="text" id="guarantorFio" placeholder="ФИО Поручителя" class="p-2 border rounded w-full">
-              <input type="text" id="guarantorPhone" placeholder="Телефон Поручителя" class="p-2 border rounded w-full">
-            </div>
+            <h3 class="font-bold uppercase text-gray-600 mb-2 italic text-[10px]">4. Поручитель</h3>
+            <input type="text" id="guarantorFio" placeholder="ФИО Поручителя" class="p-2 border rounded w-full mb-2">
+            <input type="text" id="guarantorPhone" placeholder="Телефон Поручителя" class="p-2 border rounded w-full">
           </div>
         </div>
 
         <div class="flex justify-end gap-2 pt-2 border-t">
           <button type="button" onclick="closeModal()" class="px-4 py-2 border rounded bg-gray-100">Отмена</button>
-          <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium transition">Сохранить</button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium">Сохранить</button>
         </div>
       </form>
     </div>
   </div>
 
   <div id="payModal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-lg p-5 max-w-sm w-full shadow-xl">
-      <h3 class="font-bold text-sm mb-3 text-blue-700">Внести оплату</h3>
+    <div class="bg-white rounded-lg p-5 max-w-sm w-full shadow-xl text-xs">
+      <h3 class="font-bold mb-3 text-blue-700 uppercase">Внести оплату</h3>
       <form id="payForm" class="space-y-3">
         <input type="hidden" id="payContractId">
         <div>
-          <label class="block text-gray-500 mb-1">Номер взноса (1-15)</label>
+          <label class="text-gray-500">Номер взноса</label>
           <select id="payIndex" class="p-2 border rounded w-full">
-            <script>
-              for(let i=1; i<=15; i++) document.write(`<option value="${i}">${i}-й взнос</option>`);
-            </script>
+            <script>for(let i=1; i<=15; i++) document.write(`<option value="${i}">${i}-й взнос</option>`);</script>
           </select>
         </div>
         <div>
-          <label class="block text-gray-500 mb-1">Сумма оплаты (₽)</label>
+          <label class="text-gray-500">Сумма (₽)</label>
           <input type="number" id="payAmount" required class="p-2 border rounded w-full">
         </div>
         <div>
-          <label class="block text-gray-500 mb-1">Дата оплаты</label>
+          <label class="text-gray-500">Дата</label>
           <input type="date" id="payDateVal" required class="p-2 border rounded w-full">
         </div>
         <div class="flex justify-end gap-2 pt-2">
           <button type="button" onclick="closePayModal()" class="px-3 py-1 border rounded">Отмена</button>
-          <button type="submit" class="px-3 py-1 bg-green-600 text-white rounded transition">Сохранить взнос</button>
+          <button type="submit" class="px-3 py-1 bg-green-600 text-white rounded">Сохранить</button>
         </div>
       </form>
     </div>
@@ -178,28 +158,31 @@
 
   <script>
     let allContracts = JSON.parse(localStorage.getItem('contracts_db') || '[]');
-    let deletedHistory = [];
+    let historyStack = []; // Стек для ПОЛНОЙ отмены любого действия
 
-    // Сохранение в память браузера
+    // --- Функция записи истории ПЕРЕД изменением ---
+    function recordHistory() {
+      // Сохраняем глубокую копию текущего состояния
+      historyStack.push(JSON.parse(JSON.stringify(allContracts)));
+      if (historyStack.length > 50) historyStack.shift(); // Храним только 50 шагов
+      updateUndoBtn();
+    }
+
     function saveToStorage() {
       localStorage.setItem('contracts_db', JSON.stringify(allContracts));
       renderTable(allContracts);
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      renderTable(allContracts);
-    });
+    document.addEventListener('DOMContentLoaded', () => renderTable(allContracts));
 
+    // --- Управление модалками ---
     const modal = document.getElementById('modal');
-
-    // --- Функции управления модалками ---
     function openCreateModal() {
       document.getElementById('contractForm').reset();
       document.getElementById('editDocId').value = '';
       document.getElementById('modalTitle').innerText = 'Оформление нового договора';
       modal.classList.remove('hidden');
     }
-
     function closeModal() { modal.classList.add('hidden'); }
     function closePayModal() { document.getElementById('payModal').classList.add('hidden'); }
 
@@ -212,37 +195,23 @@
     function openEditModal(id) {
       const contract = allContracts.find(c => c.id === id);
       if(!contract) return;
-
       document.getElementById('editDocId').value = id;
-      document.getElementById('modalTitle').innerText = `Редактирование договора №${contract.contractNum}`;
-
-      document.getElementById('fio').value = contract.fio || '';
-      document.getElementById('birthDate').value = contract.birthDate || '';
-      document.getElementById('passport').value = contract.passport || '';
-      document.getElementById('phone').value = contract.phone || '';
-      document.getElementById('extraPhone').value = contract.extraPhone || '';
-      document.getElementById('address').value = contract.address || '';
-      document.getElementById('buyDate').value = contract.buyDate || '';
-      document.getElementById('payDate').value = contract.payDate || '';
-      document.getElementById('monthsCount').value = contract.monthsCount || '';
-      document.getElementById('monthlyPay').value = contract.monthlyPay || '';
-      document.getElementById('totalCost').value = contract.totalCost || '';
-      document.getElementById('downPayment').value = contract.downPayment || 0;
-      document.getElementById('costPrice').value = contract.costPrice || '';
+      document.getElementById('modalTitle').innerText = `Редактирование №${contract.contractNum}`;
+      // Заполнение полей
+      const fields = ['fio','birthDate','passport','phone','extraPhone','address','buyDate','payDate','monthsCount','monthlyPay','totalCost','downPayment','costPrice','product','store','guarantorFio','guarantorPhone'];
+      fields.forEach(f => document.getElementById(f).value = contract[f] || (f === 'downPayment' ? 0 : ''));
       document.getElementById('shopPaid').checked = !!contract.shopPaid;
-      document.getElementById('product').value = contract.product || '';
-      document.getElementById('store').value = contract.store || '';
-      document.getElementById('guarantorFio').value = contract.guarantorFio || '';
-      document.getElementById('guarantorPhone').value = contract.guarantorPhone || '';
-
       modal.classList.remove('hidden');
     }
 
-    // --- Сохранение Договора ---
+    // --- ОСНОВНЫЕ ДЕЙСТВИЯ (с записью истории) ---
+
+    // Сохранение/Редактирование
     document.getElementById('contractForm').addEventListener('submit', (e) => {
       e.preventDefault();
-      const editId = document.getElementById('editDocId').value;
+      recordHistory(); // Записываем состояние ДО изменений
 
+      const editId = document.getElementById('editDocId').value;
       const formData = {
         fio: document.getElementById('fio').value,
         birthDate: document.getElementById('birthDate').value || '',
@@ -265,28 +234,26 @@
       };
 
       if (editId) {
-        const index = allContracts.findIndex(c => c.id === editId);
-        if (index !== -1) {
-          allContracts[index] = { ...allContracts[index], ...formData };
-        }
+        const idx = allContracts.findIndex(c => c.id === editId);
+        if (idx !== -1) allContracts[idx] = { ...allContracts[idx], ...formData };
       } else {
         const maxNum = allContracts.reduce((max, c) => (c.contractNum > max ? c.contractNum : max), 0);
-        const newContract = {
-          id: 'doc_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+        allContracts.push({
+          id: 'doc_' + Date.now(),
           contractNum: maxNum + 1,
           installments: {},
           ...formData
-        };
-        allContracts.push(newContract);
+        });
       }
-
       saveToStorage();
       closeModal();
     });
 
-    // --- Внесение оплаты ---
+    // Внесение оплаты
     document.getElementById('payForm').addEventListener('submit', (e) => {
       e.preventDefault();
+      recordHistory(); // Записываем ПЕРЕД оплатой
+
       const id = document.getElementById('payContractId').value;
       const idx = document.getElementById('payIndex').value;
       const amount = Number(document.getElementById('payAmount').value);
@@ -298,123 +265,115 @@
         contract.installments[idx] = { amount, date };
         saveToStorage();
         closePayModal();
-        document.getElementById('payForm').reset();
       }
     });
 
-    // --- Копирование в буфер ---
-    function copyTextToClipboard(text, btnElement) {
-      navigator.clipboard.writeText(text).then(() => {
-        const origText = btnElement.innerText;
-        btnElement.innerText = "✓ Скопировано";
-        btnElement.classList.add("bg-green-700");
-        setTimeout(() => {
-          btnElement.innerText = origText;
-          btnElement.classList.remove("bg-green-700");
-        }, 1200);
-      });
-    }
-
-    function copyContractWithHistory(id, btnElement) {
+    // Изменение статуса "Д" напрямую
+    function toggleShopPaid(id) {
+      recordHistory(); // Записываем ПЕРЕД сменой статуса
       const contract = allContracts.find(c => c.id === id);
-      if (!contract) return;
-      let historyText = "";
-      const insts = contract.installments || {};
-      const keys = Object.keys(insts).sort((a,b) => Number(a) - Number(b));
-      if (keys.length === 0) { historyText = "Взносы пока не поступали."; } 
-      else {
-        keys.forEach(k => {
-          const item = insts[k];
-          historyText += `${k}-й взнос: ${item.amount} ₽ (Дата: ${item.date || '—'})\n`;
-        });
+      if (contract) {
+        contract.shopPaid = !contract.shopPaid;
+        saveToStorage();
       }
-      const textToCopy = `Договор №: ${contract.contractNum}\nФИО: ${contract.fio}\n\nИстория оплат:\n${historyText}`;
-      copyTextToClipboard(textToCopy, btnElement);
     }
 
-    function copyContractWithGuarantor(id, btnElement) {
-      const contract = allContracts.find(c => c.id === id);
-      if (!contract) return;
-      const gFio = contract.guarantorFio || "не указано";
-      const gPhone = contract.guarantorPhone ? ` (${contract.guarantorPhone})` : "";
-      const textToCopy = `Договор №: ${contract.contractNum}\nФИО Покупателя: ${contract.fio}\nФИО Поручителя: ${gFio}${gPhone}`;
-      copyTextToClipboard(textToCopy, btnElement);
-    }
-
-    // --- Удаление и Отмена ---
+    // Удаление
     function deleteContract(id) {
       const contract = allContracts.find(c => c.id === id);
       if (!contract) return;
       if (confirm(`Удалить договор №${contract.contractNum} (${contract.fio})?`)) {
-        const confirmText = prompt(`Введите слово "УДАЛИТЬ" для подтверждения:`);
-        if (confirmText === "УДАЛИТЬ") {
-          deletedHistory.push(contract);
+        const check = prompt(`Введите слово "УДАЛИТЬ":`);
+        if (check === "УДАЛИТЬ") {
+          recordHistory(); // Записываем ПЕРЕД удалением
           allContracts = allContracts.filter(c => c.id !== id);
           saveToStorage();
-          updateUndoBtn();
         }
       }
     }
 
+    // --- ФУНКЦИЯ ШАГ НАЗАД ---
     function undoLastAction() {
-      if (deletedHistory.length === 0) return;
-      const restored = deletedHistory.pop();
-      allContracts.push(restored);
-      allContracts.sort((a,b) => a.contractNum - b.contractNum);
-      saveToStorage();
+      if (historyStack.length === 0) return;
+      // Возвращаем базу к последнему сохраненному состоянию
+      allContracts = historyStack.pop();
+      saveToStorage(); // Отрисовываем и сохраняем
       updateUndoBtn();
     }
 
     function updateUndoBtn() {
       const btn = document.getElementById('undoBtn');
-      btn.disabled = deletedHistory.length === 0;
+      btn.disabled = historyStack.length === 0;
       if (!btn.disabled) {
-        btn.classList.remove('bg-gray-300', 'text-gray-600', 'cursor-not-allowed');
-        btn.classList.add('bg-amber-500', 'hover:bg-amber-600', 'text-white', 'cursor-pointer');
+        btn.classList.remove('bg-gray-300','text-gray-600','cursor-not-allowed');
+        btn.classList.add('bg-amber-500','hover:bg-amber-600','text-white','cursor-pointer');
       } else {
-        btn.classList.add('bg-gray-300', 'text-gray-600', 'cursor-not-allowed');
-        btn.classList.remove('bg-amber-500', 'hover:bg-amber-600', 'text-white', 'cursor-pointer');
+        btn.classList.add('bg-gray-300','text-gray-600','cursor-not-allowed');
+        btn.classList.remove('bg-amber-500','hover:bg-amber-600','text-white','cursor-pointer');
       }
     }
 
-    // --- Отрисовка Таблицы ---
-    function renderTable(contracts) {
+    // --- Копирование ---
+    function copyText(text, btn) {
+      navigator.clipboard.writeText(text).then(() => {
+        const old = btn.innerText;
+        btn.innerText = "✓";
+        setTimeout(() => btn.innerText = old, 1000);
+      });
+    }
+
+    function copyHistory(id, btn) {
+      const c = allContracts.find(x => x.id === id);
+      let h = "";
+      const insts = c.installments || {};
+      Object.keys(insts).sort((a,b)=>a-b).forEach(k => {
+        h += `${k}-й взнос: ${insts[k].amount} ₽ (${insts[k].date})\n`;
+      });
+      copyText(`Договор №${c.contractNum}\nФИО: ${c.fio}\n\nОплаты:\n${h || 'Нет оплат'}`, btn);
+    }
+
+    function copyGuarantor(id, btn) {
+      const c = allContracts.find(x => x.id === id);
+      copyText(`Договор №${c.contractNum}\nКлиент: ${c.fio}\nПоручитель: ${c.guarantorFio || '—'} (${c.guarantorPhone || '—'})`, btn);
+    }
+
+    // --- Отрисовка таблицы ---
+    function renderTable(data) {
       const tbody = document.getElementById('contractsTable');
       tbody.innerHTML = '';
-      contracts.forEach(item => {
+      data.forEach(item => {
         const insts = item.installments || {};
-        let totalPaid = 0;
-        Object.values(insts).forEach(p => { if(p && p.amount) totalPaid += Number(p.amount); });
-        const rest = item.totalCost - (item.downPayment || 0) - totalPaid;
-        const isError = (item.costPrice > item.totalCost);
+        let paid = 0; Object.values(insts).forEach(v => paid += Number(v.amount));
+        const rest = item.totalCost - (item.downPayment || 0) - paid;
         const tr = document.createElement('tr');
-        if (isError) tr.classList.add('row-error');
-        let installmentsHtml = '';
+        if (item.costPrice > item.totalCost) tr.classList.add('row-error');
+        
+        let instHtml = '';
         for(let i=1; i<=15; i++) {
-          const inst = insts[i];
-          if(inst) { installmentsHtml += `<td class="p-1 border text-center pay-paid" title="Дата оплаты: ${inst.date || '—'}">${inst.amount}₽</td>`; } 
-          else { installmentsHtml += `<td class="p-1 border text-center text-gray-300">—</td>`; }
+          const v = insts[i];
+          instHtml += `<td class="p-1 border text-center ${v?'pay-paid':''}" title="${v?v.date:''}"> ${v ? v.amount+'₽' : '—'} </td>`;
         }
+
         tr.innerHTML = `
           <td class="p-2 border font-bold text-blue-700">${item.contractNum}</td>
           <td class="p-2 border font-medium">${item.fio}</td>
           <td class="p-2 border">${item.phone}</td>
-          <td class="p-2 border">${item.buyDate || ''}<br><span class="text-blue-600 font-bold">${item.payDate || ''}</span></td>
+          <td class="p-2 border">${item.buyDate}<br><span class="text-blue-600 font-bold">${item.payDate}</span></td>
           <td class="p-2 border font-bold">${item.monthlyPay} ₽</td>
-          ${installmentsHtml}
+          ${instHtml}
           <td class="p-2 border text-red-600 font-bold">0 ₽</td>
-          <td class="p-2 border font-bold ${rest <= 0 ? 'text-green-600' : 'text-orange-600'}">${rest} ₽</td>
-          <td class="p-2 border">${item.totalCost} ₽ / <span class="text-gray-500">${item.downPayment || 0} ₽</span></td>
-          <td class="p-2 border">${item.costPrice} ₽</td>
-          <td class="p-2 border text-center font-bold ${item.shopPaid ? 'text-green-600' : 'text-gray-400'}">${item.shopPaid ? 'Д' : '—'}</td>
+          <td class="p-2 border font-bold ${rest<=0?'text-green-600':'text-orange-600'}">${rest} ₽</td>
+          <td class="p-2 border">${item.totalCost} / ${item.downPayment}</td>
+          <td class="p-2 border">${item.costPrice}</td>
+          <td class="p-2 border text-center cursor-pointer select-none font-bold ${item.shopPaid?'text-green-600':'text-gray-300'}" onclick="toggleShopPaid('${item.id}')">${item.shopPaid?'Д':'—'}</td>
           <td class="p-2 border">${item.product || '—'}</td>
           <td class="p-2 border">${item.guarantorFio || '—'}</td>
-          <td class="p-2 border text-center space-x-1 sticky right-0 bg-white">
-            <button onclick="openPayModal('${item.id}')" class="bg-green-600 hover:bg-green-700 text-white px-1.5 py-1 rounded text-[10px]">+Взнос</button>
-            <button onclick="copyContractWithHistory('${item.id}', this)" class="bg-slate-600 hover:bg-slate-700 text-white px-1.5 py-1 rounded text-[10px]">📋 Оплаты</button>
-            <button onclick="copyContractWithGuarantor('${item.id}', this)" class="bg-indigo-600 hover:bg-indigo-700 text-white px-1.5 py-1 rounded text-[10px]">👥 Поруч.</button>
-            <button onclick="openEditModal('${item.id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-1.5 py-1 rounded text-[10px]">✏️</button>
-            <button onclick="deleteContract('${item.id}')" class="bg-red-500 hover:bg-red-600 text-white px-1.5 py-1 rounded text-[10px]">🗑️</button>
+          <td class="p-2 border text-center space-x-1 sticky right-0 bg-white shadow-l">
+            <button onclick="openPayModal('${item.id}')" class="bg-green-600 text-white px-1 rounded text-[9px] hover:bg-green-700 transition-all">+Взнос</button>
+            <button onclick="copyHistory('${item.id}', this)" class="bg-slate-500 text-white px-1 rounded text-[9px] hover:bg-slate-600 transition-all">📋 Оплаты</button>
+            <button onclick="copyGuarantor('${item.id}', this)" class="bg-indigo-500 text-white px-1 rounded text-[9px] hover:bg-indigo-600 transition-all">👥 Пор.</button>
+            <button onclick="openEditModal('${item.id}')" class="bg-blue-500 text-white px-1 rounded text-[9px] hover:bg-blue-600 transition-all">✏️</button>
+            <button onclick="deleteContract('${item.id}')" class="bg-red-500 text-white px-1 rounded text-[9px] hover:bg-red-600 transition-all">🗑️</button>
           </td>
         `;
         tbody.appendChild(tr);
@@ -423,55 +382,35 @@
 
     function filterContracts() {
       const q = document.getElementById('searchInput').value.toLowerCase();
-      const filtered = allContracts.filter(c => 
-        (c.fio && c.fio.toLowerCase().includes(q)) || (String(c.contractNum).includes(q))
-      );
-      renderTable(filtered);
+      renderTable(allContracts.filter(c => (c.fio && c.fio.toLowerCase().includes(q)) || String(c.contractNum).includes(q)));
     }
 
-    // --- ОБНОВЛЕННЫЕ ФУНКЦИИ СКАЧИВАНИЯ И ЗАГРУЗКИ ---
+    // Экспорт / Импорт
     function exportData() {
-      try {
-        if (allContracts.length === 0) {
-          alert("База пуста, нечего скачивать.");
-          return;
-        }
-        const dataStr = JSON.stringify(allContracts, null, 2);
-        const blob = new Blob([dataStr], { type: "application/json" });
-        const url = window.URL.createObjectURL(blob);
-        const downloadAnchor = document.createElement('a');
-        downloadAnchor.href = url;
-        const fileName = `BAZA_DOGOVOROV_${new Date().toISOString().slice(0,10)}.json`;
-        downloadAnchor.download = fileName;
-        document.body.appendChild(downloadAnchor);
-        downloadAnchor.click();
-        document.body.removeChild(downloadAnchor);
-        window.URL.revokeObjectURL(url);
-      } catch (err) {
-        alert("Ошибка при создании файла базы: " + err);
-      }
+      if (!allContracts.length) return alert("Пусто.");
+      const blob = new Blob([JSON.stringify(allContracts, null, 2)], { type: "application/json" });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `BAZA_${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      window.URL.revokeObjectURL(url);
     }
 
-    function importData(event) {
-      const file = event.target.files[0];
+    function importData(e) {
+      const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = function(event) {
         try {
-          const importedData = JSON.parse(e.target.result);
-          if (Array.isArray(importedData)) {
-            if (confirm(`Вы собираетесь загрузить ${importedData.length} договоров. Это заменит текущие данные. Продолжить?`)) {
-              allContracts = importedData;
-              saveToStorage();
-              alert("База успешно загружена и сохранена!");
-            }
-          } else {
-            alert("Файл имеет неправильный формат!");
+          const data = JSON.parse(event.target.result);
+          if (confirm("Заменить текущую базу?")) {
+            recordHistory(); // Можно будет отменить даже загрузку базы!
+            allContracts = data;
+            saveToStorage();
           }
-        } catch(err) {
-          alert("Ошибка: файл поврежден или это не база договоров!");
-        }
-        event.target.value = ""; // Сброс поля выбора файла
+        } catch(err) { alert("Ошибка файла."); }
+        e.target.value = "";
       };
       reader.readAsText(file);
     }
