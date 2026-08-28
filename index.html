@@ -3,157 +3,192 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Учет Договоров (Улучшенный)</title>
+  <title>Учет Договоров</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
   <style>
-    .row-error { background-color: #fecaca !important; }
-    .bg-status-green { background-color: #22c55e; color: white; }
-    .bg-status-blue { background-color: #3b82f6; color: white; }
-    .bg-status-red { background-color: #ef4444; color: white; }
+    .row-error { background-color: #fee2e2 !important; }
+    .pay-paid { background-color: #22c55e; color: white; }
+    .pay-near { background-color: #3b82f6; color: white; }
+    .pay-overdue { background-color: #ef4444; color: white; }
   </style>
 </head>
-<body class="bg-gray-100 text-gray-800 text-sm">
+<body class="bg-gray-100 text-gray-800 text-xs">
 
   <div class="p-4 max-w-[100vw]">
     <div class="flex flex-wrap justify-between items-center mb-4 gap-4 bg-white p-4 rounded shadow">
       <div>
         <h1 class="text-xl font-bold text-gray-800">Лист Договоров</h1>
-        <p class="text-xs text-gray-500">Управление рассрочками и взносами клиентов</p>
+        <p class="text-xs text-gray-500">Система учета рассрочек и взносов</p>
       </div>
       <div class="flex items-center gap-3">
-        <input type="text" id="searchInput" oninput="filterContracts()" placeholder="Поиск по ФИО или телефону..." class="p-2 border rounded w-64 text-xs">
-        <button type="button" id="openModalBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded text-xs transition">
+        <input type="text" id="searchInput" oninput="filterContracts()" placeholder="Поиск по ФИО или номеру..." class="p-2 border rounded w-64">
+        <button type="button" id="openModalBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded transition">
           + Новый Договор
         </button>
       </div>
     </div>
 
     <!-- Таблица -->
-    <div class="bg-white shadow rounded overflow-x-auto">
-      <table class="min-w-full text-left border-collapse text-xs">
-        <thead class="bg-gray-200 uppercase font-semibold text-gray-700 sticky top-0">
+    <div class="bg-white shadow rounded overflow-x-auto max-h-[80vh]">
+      <table class="min-w-full text-left border-collapse">
+        <thead class="bg-gray-200 uppercase font-semibold text-gray-700 sticky top-0 z-10">
           <tr>
             <th class="p-2 border">№</th>
-            <th class="p-2 border">ФИО Покупателя</th>
-            <th class="p-2 border">Контакты</th>
-            <th class="p-2 border">Даты (Покупка / Оплата)</th>
-            <th class="p-2 border">Мес. Оплата</th>
+            <th class="p-2 border min-w-[150px]">ФИО Покупателя</th>
+            <th class="p-2 border">Телефон</th>
+            <th class="p-2 border">Дата Покупки / Оплаты</th>
+            <th class="p-2 border">Мес. Платеж</th>
+            <!-- Столбцы для 15 взносов -->
+            <script>
+              for(let i=1; i<=15; i++) {
+                document.write(`<th class="p-2 border text-center min-w-[70px]">${i}-й взнос</th>`);
+              }
+            </script>
             <th class="p-2 border">Просрочка</th>
             <th class="p-2 border">Остаток</th>
             <th class="p-2 border">Рассрочка / Предоплата</th>
             <th class="p-2 border">Себестоимость</th>
-            <th class="p-2 border text-center">Магазин «Д»</th>
+            <th class="p-2 border text-center">«Д»</th>
             <th class="p-2 border">Товар / Магазин</th>
             <th class="p-2 border">Поручитель</th>
-            <th class="p-2 border text-center">Действия</th>
+            <th class="p-2 border text-center sticky right-0 bg-gray-200">Действия</th>
           </tr>
         </thead>
         <tbody id="contractsTable">
-          <!-- Данные рендерятся из Firebase -->
+          <!-- Загружается из Firebase -->
         </tbody>
       </table>
     </div>
   </div>
 
-  <!-- Модальное окно добавления договора -->
+  <!-- Модальное окно: Создание договора -->
   <div id="modal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
       <h2 class="text-lg font-bold mb-4 border-b pb-2 text-blue-700">Оформление нового договора</h2>
       <form id="contractForm" class="space-y-4">
         
-        <!-- Блок Покупателя -->
         <div class="bg-gray-50 p-3 rounded border">
-          <h3 class="font-bold text-xs uppercase text-gray-600 mb-2">1. Данные Покупателя</h3>
+          <h3 class="font-bold uppercase text-gray-600 mb-2">1. Данные Покупателя</h3>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
             <input type="text" id="fio" placeholder="ФИО Покупателя *" required class="p-2 border rounded col-span-2">
             <input type="date" id="birthDate" title="Дата рождения" class="p-2 border rounded">
-            <input type="text" id="passport" placeholder="Серия и номер паспорта" class="p-2 border rounded">
-            <input type="text" id="phone" placeholder="Основной телефон *" required class="p-2 border rounded">
-            <input type="text" id="extraPhone" placeholder="Доп. телефон для связи" class="p-2 border rounded">
+            <input type="text" id="passport" placeholder="Паспортные данные" class="p-2 border rounded">
+            <input type="text" id="phone" placeholder="Телефон *" required class="p-2 border rounded">
+            <input type="text" id="extraPhone" placeholder="Доп. телефон" class="p-2 border rounded">
             <input type="text" id="address" placeholder="Адрес проживания" class="p-2 border rounded col-span-3">
           </div>
         </div>
 
-        <!-- Блок Финансов и Дат -->
         <div class="bg-gray-50 p-3 rounded border">
-          <h3 class="font-bold text-xs uppercase text-gray-600 mb-2">2. Условия Рассрочки и Даты</h3>
+          <h3 class="font-bold uppercase text-gray-600 mb-2">2. Условия и Учёт</h3>
           <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
             <div>
-              <label class="block text-[10px] text-gray-500">Дата покупки *</label>
+              <label class="block text-gray-500">Дата покупки *</label>
               <input type="date" id="buyDate" required class="p-2 border rounded w-full">
             </div>
             <div>
-              <label class="block text-[10px] text-gray-500">График оплаты (день) *</label>
+              <label class="block text-gray-500">График оплаты (день) *</label>
               <input type="date" id="payDate" required class="p-2 border rounded w-full">
             </div>
             <div>
-              <label class="block text-[10px] text-gray-500">Срок (в месяцах) *</label>
-              <input type="number" id="monthsCount" placeholder="Например: 6" required class="p-2 border rounded w-full">
+              <label class="block text-gray-500">Срок (месяцев) *</label>
+              <input type="number" id="monthsCount" placeholder="6" required class="p-2 border rounded w-full">
             </div>
             <div>
-              <label class="block text-[10px] text-gray-500">Ежемесячный платеж *</label>
+              <label class="block text-gray-500">Ежемесячный платеж *</label>
               <input type="number" id="monthlyPay" placeholder="₽" required class="p-2 border rounded w-full">
             </div>
             <div>
-              <label class="block text-[10px] text-gray-500">Общая стоимость (Рассрочка) *</label>
+              <label class="block text-gray-500">Общая сумма рассрочки *</label>
               <input type="number" id="totalCost" placeholder="₽" required class="p-2 border rounded w-full">
             </div>
             <div>
-              <label class="block text-[10px] text-gray-500">Предоплата (необязательно)</label>
+              <label class="block text-gray-500">Предоплата (если есть)</label>
               <input type="number" id="downPayment" placeholder="0 ₽" value="0" class="p-2 border rounded w-full">
             </div>
             <div>
-              <label class="block text-[10px] text-gray-500">Себестоимость *</label>
+              <label class="block text-gray-500">Себестоимость *</label>
               <input type="number" id="costPrice" placeholder="₽" required class="p-2 border rounded w-full">
             </div>
             <div class="flex items-center gap-2 pt-4">
-              <input type="checkbox" id="shopPaid" class="w-4 h-4 text-blue-600">
-              <label for="shopPaid" class="text-xs font-bold text-gray-700">Отметка «Д» (Оплачено в магазин)</label>
+              <input type="checkbox" id="shopPaid" class="w-4 h-4">
+              <label for="shopPaid" class="font-bold text-gray-700">Отметка «Д»</label>
             </div>
           </div>
         </div>
 
-        <!-- Блок Товара и Поручителя -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div class="bg-gray-50 p-3 rounded border">
-            <h3 class="font-bold text-xs uppercase text-gray-600 mb-2">3. Товар и Магазин</h3>
+            <h3 class="font-bold uppercase text-gray-600 mb-2">3. Товар и Магазин</h3>
             <div class="space-y-2">
-              <input type="text" id="product" placeholder="Наименование товара" class="p-2 border rounded w-full">
-              <input type="text" id="store" placeholder="Название магазина" class="p-2 border rounded w-full">
-              <input type="text" id="manager" placeholder="Менеджер" class="p-2 border rounded w-full">
+              <input type="text" id="product" placeholder="Товар" class="p-2 border rounded w-full">
+              <input type="text" id="store" placeholder="Магазин" class="p-2 border rounded w-full">
             </div>
           </div>
-
           <div class="bg-gray-50 p-3 rounded border">
-            <h3 class="font-bold text-xs uppercase text-gray-600 mb-2">4. Данные Поручителя</h3>
+            <h3 class="font-bold uppercase text-gray-600 mb-2">4. Поручитель</h3>
             <div class="space-y-2">
               <input type="text" id="guarantorFio" placeholder="ФИО Поручителя" class="p-2 border rounded w-full">
               <input type="text" id="guarantorPhone" placeholder="Телефон Поручителя" class="p-2 border rounded w-full">
-              <input type="text" id="guarantorPassport" placeholder="Паспорт Поручителя" class="p-2 border rounded w-full">
-              <input type="text" id="guarantorAddress" placeholder="Адрес Поручителя" class="p-2 border rounded w-full">
             </div>
           </div>
         </div>
 
-        <!-- Кнопки -->
         <div class="flex justify-end gap-2 pt-2 border-t">
-          <button type="button" id="closeModalBtn" class="px-5 py-2 border rounded bg-gray-100 hover:bg-gray-200">Отмена</button>
-          <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium">Сохранить договор</button>
+          <button type="button" id="closeModalBtn" class="px-4 py-2 border rounded bg-gray-100">Отмена</button>
+          <button type="submit" id="saveBtn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium">Сохранить договор</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Модальное окно: Внесение оплаты -->
+  <div id="payModal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-lg p-5 max-w-sm w-full shadow-xl">
+      <h3 class="font-bold text-sm mb-3 text-blue-700">Внести оплату по договору</h3>
+      <form id="payForm" class="space-y-3">
+        <input type="hidden" id="payContractId">
+        <div>
+          <label class="block text-gray-500 mb-1">Номер взноса (1-15)</label>
+          <select id="payIndex" class="p-2 border rounded w-full required">
+            <script>
+              for(let i=1; i<=15; i++) document.write(`<option value="${i}">${i}-й взнос</option>`);
+            </script>
+          </select>
+        </div>
+        <div>
+          <label class="block text-gray-500 mb-1">Сумма оплаты (₽)</label>
+          <input type="number" id="payAmount" required class="p-2 border rounded w-full">
+        </div>
+        <div>
+          <label class="block text-gray-500 mb-1">Дата оплаты</label>
+          <input type="date" id="payDateVal" required class="p-2 border rounded w-full">
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closePayModal()" class="px-3 py-1 border rounded">Отмена</button>
+          <button type="submit" class="px-3 py-1 bg-green-600 text-white rounded">Сохранить взнос</button>
         </div>
       </form>
     </div>
   </div>
 
   <script>
-    // 1. Модальное окно
+    // 1. Управление модальными окнами
     const modal = document.getElementById('modal');
     document.getElementById('openModalBtn').addEventListener('click', () => modal.classList.remove('hidden'));
     document.getElementById('closeModalBtn').addEventListener('click', () => modal.classList.add('hidden'));
 
-    // 2. Firebase Конфигурация (Укажи свои ключи)
+    function openPayModal(contractId) {
+      document.getElementById('payContractId').value = contractId;
+      document.getElementById('payDateVal').valueAsDate = new Date();
+      document.getElementById('payModal').classList.remove('hidden');
+    }
+    function closePayModal() { document.getElementById('payModal').classList.add('hidden'); }
+
+    // 2. Инициализация Firebase
     const firebaseConfig = {
       apiKey: "YOUR_API_KEY",
       authDomain: "YOUR_PROJECT.firebaseapp.com",
@@ -174,49 +209,75 @@
       console.error("Укажите правильные ключи Firebase!", e);
     }
 
-    // 3. Сохранение договора
+    // 3. Автонумерация и Сохранение договора
     document.getElementById('contractForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      if (!db) { alert("Ошибка подключения к Firebase!"); return; }
+      const saveBtn = document.getElementById('saveBtn');
+      saveBtn.disabled = true; // Защита от дублирования
 
-      const contractNum = "№" + Math.floor(10000 + Math.random() * 90000);
-      const downPaymentVal = Number(document.getElementById('downPayment').value) || 0;
+      if (!db) { alert("Ошибка подключения!"); saveBtn.disabled = false; return; }
 
-      const newContract = {
-        contractNum,
-        fio: document.getElementById('fio').value,
-        birthDate: document.getElementById('birthDate').value || '',
-        passport: document.getElementById('passport').value || '',
-        phone: document.getElementById('phone').value,
-        extraPhone: document.getElementById('extraPhone').value || '',
-        address: document.getElementById('address').value || '',
-        buyDate: document.getElementById('buyDate').value,
-        payDate: document.getElementById('payDate').value,
-        monthsCount: Number(document.getElementById('monthsCount').value),
-        monthlyPay: Number(document.getElementById('monthlyPay').value),
-        totalCost: Number(document.getElementById('totalCost').value),
-        downPayment: downPaymentVal,
-        costPrice: Number(document.getElementById('costPrice').value),
-        shopPaid: document.getElementById('shopPaid').checked,
-        product: document.getElementById('product').value || '',
-        store: document.getElementById('store').value || '',
-        manager: document.getElementById('manager').value || '',
-        guarantorFio: document.getElementById('guarantorFio').value || '',
-        guarantorPhone: document.getElementById('guarantorPhone').value || '',
-        guarantorPassport: document.getElementById('guarantorPassport').value || '',
-        guarantorAddress: document.getElementById('guarantorAddress').value || '',
-        payments: [],
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      };
+      try {
+        // Порядковый номер договора: считаем общее число записей
+        const snap = await db.collection('contracts').get();
+        const nextNum = snap.size + 1;
 
-      await db.collection('contracts').add(newContract);
-      modal.classList.add('hidden');
-      document.getElementById('contractForm').reset();
+        const newContract = {
+          contractNum: nextNum, // Нумерация 1, 2, 3...
+          fio: document.getElementById('fio').value,
+          birthDate: document.getElementById('birthDate').value || '',
+          passport: document.getElementById('passport').value || '',
+          phone: document.getElementById('phone').value,
+          extraPhone: document.getElementById('extraPhone').value || '',
+          address: document.getElementById('address').value || '',
+          buyDate: document.getElementById('buyDate').value,
+          payDate: document.getElementById('payDate').value,
+          monthsCount: Number(document.getElementById('monthsCount').value),
+          monthlyPay: Number(document.getElementById('monthlyPay').value),
+          totalCost: Number(document.getElementById('totalCost').value),
+          downPayment: Number(document.getElementById('downPayment').value) || 0,
+          costPrice: Number(document.getElementById('costPrice').value),
+          shopPaid: document.getElementById('shopPaid').checked,
+          product: document.getElementById('product').value || '',
+          store: document.getElementById('store').value || '',
+          guarantorFio: document.getElementById('guarantorFio').value || '',
+          guarantorPhone: document.getElementById('guarantorPhone').value || '',
+          installments: {}, // Объект хранения 15 взносов
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        await db.collection('contracts').add(newContract);
+        
+        // Автоматический выход из редактора
+        modal.classList.add('hidden');
+        document.getElementById('contractForm').reset();
+      } catch(err) {
+        alert("Ошибка при сохранении: " + err.message);
+      } finally {
+        saveBtn.disabled = false;
+      }
     });
 
-    // 4. Отрисовка данных таблицы в реальном времени
+    // 4. Внесение взноса (1–15)
+    document.getElementById('payForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('payContractId').value;
+      const idx = document.getElementById('payIndex').value;
+      const amount = Number(document.getElementById('payAmount').value);
+      const date = document.getElementById('payDateVal').value;
+
+      if(db && id) {
+        await db.collection('contracts').doc(id).update({
+          [`installments.${idx}`]: { amount, date }
+        });
+        closePayModal();
+        document.getElementById('payForm').reset();
+      }
+    });
+
+    // 5. Вывод таблицы в реальном времени
     function initRealtimeTable() {
-      db.collection('contracts').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
+      db.collection('contracts').orderBy('contractNum', 'asc').onSnapshot(snapshot => {
         allContracts = [];
         snapshot.forEach(doc => allContracts.push({ id: doc.id, ...doc.data() }));
         renderTable(allContracts);
@@ -228,32 +289,48 @@
       tbody.innerHTML = '';
 
       contracts.forEach(item => {
-        const totalPaid = (item.payments || []).reduce((sum, p) => sum + p.amount, 0);
+        const insts = item.installments || {};
+        let totalPaid = 0;
+        
+        // Подсчет внесенных взносов
+        Object.values(insts).forEach(p => { if(p && p.amount) totalPaid += Number(p.amount); });
+
         const rest = item.totalCost - (item.downPayment || 0) - totalPaid;
         const isError = (item.costPrice > item.totalCost);
 
         const tr = document.createElement('tr');
         if (isError) tr.classList.add('row-error');
 
+        let installmentsHtml = '';
+        for(let i=1; i<=15; i++) {
+          const inst = insts[i];
+          if(inst) {
+            installmentsHtml += `<td class="p-1 border text-center pay-paid" title="${inst.date}">${inst.amount}₽</td>`;
+          } else {
+            installmentsHtml += `<td class="p-1 border text-center text-gray-300">—</td>`;
+          }
+        }
+
         tr.innerHTML = `
-          <td class="p-2 border font-bold text-blue-700">${item.contractNum || ''}</td>
-          <td class="p-2 border font-medium">${item.fio}<br><span class="text-[10px] text-gray-500">${item.address || ''}</span></td>
-          <td class="p-2 border">${item.phone}${item.extraPhone ? '<br>' + item.extraPhone : ''}</td>
+          <td class="p-2 border font-bold text-blue-700">${item.contractNum}</td>
+          <td class="p-2 border font-medium">${item.fio}</td>
+          <td class="p-2 border">${item.phone}</td>
           <td class="p-2 border">${item.buyDate || ''}<br><span class="text-blue-600 font-bold">${item.payDate || ''}</span></td>
           <td class="p-2 border font-bold">${item.monthlyPay} ₽</td>
+          ${installmentsHtml}
           <td class="p-2 border text-red-600 font-bold">0 ₽</td>
           <td class="p-2 border font-bold ${rest <= 0 ? 'text-green-600' : 'text-orange-600'}">${rest} ₽</td>
           <td class="p-2 border">${item.totalCost} ₽ / <span class="text-gray-500">${item.downPayment || 0} ₽</span></td>
           <td class="p-2 border">${item.costPrice} ₽</td>
           <td class="p-2 border text-center font-bold ${item.shopPaid ? 'text-green-600' : 'text-gray-400'}">${item.shopPaid ? 'Д' : '—'}</td>
-          <td class="p-2 border">${item.product || '—'}<br><span class="text-[10px] text-gray-500">${item.store || ''}</span></td>
-          <td class="p-2 border">${item.guarantorFio || '—'}<br><span class="text-[10px] text-gray-500">${item.guarantorPhone || ''}</span></td>
-          <td class="p-2 border text-center space-x-1">
-            <button onclick="toggleShopPaid('${item.id}', ${!item.shopPaid})" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded border text-[10px]" title="Сменить «Д»">
-              Д
+          <td class="p-2 border">${item.product || '—'}</td>
+          <td class="p-2 border">${item.guarantorFio || '—'}</td>
+          <td class="p-2 border text-center space-x-1 sticky right-0 bg-white">
+            <button onclick="openPayModal('${item.id}')" class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-[10px]" title="Внести взнос">
+              + Взнос
             </button>
-            <button onclick="deleteContract('${item.id}')" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-[10px]" title="Удалить договор">
-              Удалить
+            <button onclick="deleteContract('${item.id}')" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-[10px]" title="Удалить">
+              ✕
             </button>
           </td>
         `;
@@ -261,23 +338,17 @@
       });
     }
 
-    // 5. Удаление и смена статуса магазина
     async function deleteContract(id) {
-      if (confirm("Вы уверены, что хотите полностью удалить этот договор?")) {
+      if (confirm("Удалить этот договор?")) {
         await db.collection('contracts').doc(id).delete();
       }
     }
 
-    async function toggleShopPaid(id, status) {
-      await db.collection('contracts').doc(id).update({ shopPaid: status });
-    }
-
-    // 6. Поиск по ФИО и телефону
     function filterContracts() {
       const q = document.getElementById('searchInput').value.toLowerCase();
       const filtered = allContracts.filter(c => 
         (c.fio && c.fio.toLowerCase().includes(q)) || 
-        (c.phone && c.phone.includes(q))
+        (String(c.contractNum).includes(q))
       );
       renderTable(filtered);
     }
