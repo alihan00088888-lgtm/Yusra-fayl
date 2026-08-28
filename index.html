@@ -16,17 +16,17 @@
     <div class="flex flex-wrap justify-between items-center mb-4 gap-4 bg-white p-4 rounded shadow">
       <div>
         <h1 class="text-xl font-bold text-gray-800">Лист Договоров</h1>
-        <p class="text-xs text-gray-500">Быстрое копирование в 2 клика без всплывающих окон</p>
+        <p class="text-xs text-gray-500">Система учета: надежное сохранение и быстрое копирование</p>
       </div>
       <div class="flex items-center gap-2">
         <button type="button" id="undoBtn" onclick="undoLastAction()" disabled class="bg-gray-300 text-gray-600 font-medium px-3 py-2 rounded text-xs cursor-not-allowed transition">
           ↺ Отменить удаление
         </button>
-        <button type="button" onclick="exportData()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-3 py-2 rounded text-xs">
+        <button type="button" onclick="exportData()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-3 py-2 rounded text-xs transition">
           💾 Скачать базу
         </button>
-        <input type="file" id="importFile" onchange="importData(event)" class="hidden">
-        <button type="button" onclick="document.getElementById('importFile').click()" class="bg-gray-600 hover:bg-gray-700 text-white font-medium px-3 py-2 rounded text-xs">
+        <input type="file" id="importFile" onchange="importData(event)" class="hidden" accept=".json">
+        <button type="button" onclick="document.getElementById('importFile').click()" class="bg-gray-600 hover:bg-gray-700 text-white font-medium px-3 py-2 rounded text-xs transition">
           📂 Загрузить базу
         </button>
         <input type="text" id="searchInput" oninput="filterContracts()" placeholder="Поиск по ФИО или номеру..." class="p-2 border rounded w-52">
@@ -36,7 +36,6 @@
       </div>
     </div>
 
-    <!-- Таблица -->
     <div class="bg-white shadow rounded overflow-x-auto max-h-[80vh]">
       <table class="min-w-full text-left border-collapse">
         <thead class="bg-gray-200 uppercase font-semibold text-gray-700 sticky top-0 z-10">
@@ -62,13 +61,11 @@
           </tr>
         </thead>
         <tbody id="contractsTable">
-          <!-- Загрузка из локальной базы -->
-        </tbody>
+          </tbody>
       </table>
     </div>
   </div>
 
-  <!-- Модальное окно: Создание / Редактирование -->
   <div id="modal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
       <h2 id="modalTitle" class="text-lg font-bold mb-4 border-b pb-2 text-blue-700">Оформление нового договора</h2>
@@ -144,13 +141,12 @@
 
         <div class="flex justify-end gap-2 pt-2 border-t">
           <button type="button" onclick="closeModal()" class="px-4 py-2 border rounded bg-gray-100">Отмена</button>
-          <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium">Сохранить</button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium transition">Сохранить</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Модальное окно: Оплата -->
   <div id="payModal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-lg p-5 max-w-sm w-full shadow-xl">
       <h3 class="font-bold text-sm mb-3 text-blue-700">Внести оплату</h3>
@@ -174,7 +170,7 @@
         </div>
         <div class="flex justify-end gap-2 pt-2">
           <button type="button" onclick="closePayModal()" class="px-3 py-1 border rounded">Отмена</button>
-          <button type="submit" class="px-3 py-1 bg-green-600 text-white rounded">Сохранить взнос</button>
+          <button type="submit" class="px-3 py-1 bg-green-600 text-white rounded transition">Сохранить взнос</button>
         </div>
       </form>
     </div>
@@ -184,6 +180,7 @@
     let allContracts = JSON.parse(localStorage.getItem('contracts_db') || '[]');
     let deletedHistory = [];
 
+    // Сохранение в память браузера
     function saveToStorage() {
       localStorage.setItem('contracts_db', JSON.stringify(allContracts));
       renderTable(allContracts);
@@ -195,6 +192,7 @@
 
     const modal = document.getElementById('modal');
 
+    // --- Функции управления модалками ---
     function openCreateModal() {
       document.getElementById('contractForm').reset();
       document.getElementById('editDocId').value = '';
@@ -240,7 +238,7 @@
       modal.classList.remove('hidden');
     }
 
-    // Сохранение / Редактирование
+    // --- Сохранение Договора ---
     document.getElementById('contractForm').addEventListener('submit', (e) => {
       e.preventDefault();
       const editId = document.getElementById('editDocId').value;
@@ -286,7 +284,7 @@
       closeModal();
     });
 
-    // Внесение взноса с хранением даты
+    // --- Внесение оплаты ---
     document.getElementById('payForm').addEventListener('submit', (e) => {
       e.preventDefault();
       const id = document.getElementById('payContractId').value;
@@ -304,7 +302,7 @@
       }
     });
 
-    // Вспомогательная функция скопировать без всплывающего окна
+    // --- Копирование в буфер ---
     function copyTextToClipboard(text, btnElement) {
       navigator.clipboard.writeText(text).then(() => {
         const origText = btnElement.innerText;
@@ -317,45 +315,36 @@
       });
     }
 
-    // Вариант 1: Копирование ФИО + № Договора + История оплат
     function copyContractWithHistory(id, btnElement) {
       const contract = allContracts.find(c => c.id === id);
       if (!contract) return;
-
       let historyText = "";
       const insts = contract.installments || {};
       const keys = Object.keys(insts).sort((a,b) => Number(a) - Number(b));
-
-      if (keys.length === 0) {
-        historyText = "Взносы пока не поступали.";
-      } else {
+      if (keys.length === 0) { historyText = "Взносы пока не поступали."; } 
+      else {
         keys.forEach(k => {
           const item = insts[k];
-          historyText += `${k}-й взнос: ${item.amount} ₽ (Дата: ${item.date || 'не указана'})\n`;
+          historyText += `${k}-й взнос: ${item.amount} ₽ (Дата: ${item.date || '—'})\n`;
         });
       }
-
       const textToCopy = `Договор №: ${contract.contractNum}\nФИО: ${contract.fio}\n\nИстория оплат:\n${historyText}`;
       copyTextToClipboard(textToCopy, btnElement);
     }
 
-    // Вариант 2: Копирование ФИО Клиента + № Договора + ФИО Поручителя
     function copyContractWithGuarantor(id, btnElement) {
       const contract = allContracts.find(c => c.id === id);
       if (!contract) return;
-
       const gFio = contract.guarantorFio || "не указано";
       const gPhone = contract.guarantorPhone ? ` (${contract.guarantorPhone})` : "";
-
       const textToCopy = `Договор №: ${contract.contractNum}\nФИО Покупателя: ${contract.fio}\nФИО Поручителя: ${gFio}${gPhone}`;
       copyTextToClipboard(textToCopy, btnElement);
     }
 
-    // Безопасное удаление
+    // --- Удаление и Отмена ---
     function deleteContract(id) {
       const contract = allContracts.find(c => c.id === id);
       if (!contract) return;
-
       if (confirm(`Удалить договор №${contract.contractNum} (${contract.fio})?`)) {
         const confirmText = prompt(`Введите слово "УДАЛИТЬ" для подтверждения:`);
         if (confirmText === "УДАЛИТЬ") {
@@ -367,7 +356,6 @@
       }
     }
 
-    // Отмена удаления
     function undoLastAction() {
       if (deletedHistory.length === 0) return;
       const restored = deletedHistory.pop();
@@ -382,39 +370,31 @@
       btn.disabled = deletedHistory.length === 0;
       if (!btn.disabled) {
         btn.classList.remove('bg-gray-300', 'text-gray-600', 'cursor-not-allowed');
-        btn.classList.add('bg-amber-500', 'hover:bg-amber-600', 'text-white');
+        btn.classList.add('bg-amber-500', 'hover:bg-amber-600', 'text-white', 'cursor-pointer');
       } else {
         btn.classList.add('bg-gray-300', 'text-gray-600', 'cursor-not-allowed');
-        btn.classList.remove('bg-amber-500', 'hover:bg-amber-600', 'text-white');
+        btn.classList.remove('bg-amber-500', 'hover:bg-amber-600', 'text-white', 'cursor-pointer');
       }
     }
 
-    // Вывод таблицы
+    // --- Отрисовка Таблицы ---
     function renderTable(contracts) {
       const tbody = document.getElementById('contractsTable');
       tbody.innerHTML = '';
-
       contracts.forEach(item => {
         const insts = item.installments || {};
         let totalPaid = 0;
         Object.values(insts).forEach(p => { if(p && p.amount) totalPaid += Number(p.amount); });
-
         const rest = item.totalCost - (item.downPayment || 0) - totalPaid;
         const isError = (item.costPrice > item.totalCost);
-
         const tr = document.createElement('tr');
         if (isError) tr.classList.add('row-error');
-
         let installmentsHtml = '';
         for(let i=1; i<=15; i++) {
           const inst = insts[i];
-          if(inst) {
-            installmentsHtml += `<td class="p-1 border text-center pay-paid" title="Дата оплаты: ${inst.date || '—'}">${inst.amount}₽</td>`;
-          } else {
-            installmentsHtml += `<td class="p-1 border text-center text-gray-300">—</td>`;
-          }
+          if(inst) { installmentsHtml += `<td class="p-1 border text-center pay-paid" title="Дата оплаты: ${inst.date || '—'}">${inst.amount}₽</td>`; } 
+          else { installmentsHtml += `<td class="p-1 border text-center text-gray-300">—</td>`; }
         }
-
         tr.innerHTML = `
           <td class="p-2 border font-bold text-blue-700">${item.contractNum}</td>
           <td class="p-2 border font-medium">${item.fio}</td>
@@ -431,8 +411,8 @@
           <td class="p-2 border">${item.guarantorFio || '—'}</td>
           <td class="p-2 border text-center space-x-1 sticky right-0 bg-white">
             <button onclick="openPayModal('${item.id}')" class="bg-green-600 hover:bg-green-700 text-white px-1.5 py-1 rounded text-[10px]">+Взнос</button>
-            <button onclick="copyContractWithHistory('${item.id}', this)" class="bg-slate-600 hover:bg-slate-700 text-white px-1.5 py-1 rounded text-[10px]" title="Скопировать ФИО, № договора и историю оплат">📋 Оплаты</button>
-            <button onclick="copyContractWithGuarantor('${item.id}', this)" class="bg-indigo-600 hover:bg-indigo-700 text-white px-1.5 py-1 rounded text-[10px]" title="Скопировать ФИО, № договора и ФИО поручителя">👥 Поруч.</button>
+            <button onclick="copyContractWithHistory('${item.id}', this)" class="bg-slate-600 hover:bg-slate-700 text-white px-1.5 py-1 rounded text-[10px]">📋 Оплаты</button>
+            <button onclick="copyContractWithGuarantor('${item.id}', this)" class="bg-indigo-600 hover:bg-indigo-700 text-white px-1.5 py-1 rounded text-[10px]">👥 Поруч.</button>
             <button onclick="openEditModal('${item.id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-1.5 py-1 rounded text-[10px]">✏️</button>
             <button onclick="deleteContract('${item.id}')" class="bg-red-500 hover:bg-red-600 text-white px-1.5 py-1 rounded text-[10px]">🗑️</button>
           </td>
@@ -444,20 +424,32 @@
     function filterContracts() {
       const q = document.getElementById('searchInput').value.toLowerCase();
       const filtered = allContracts.filter(c => 
-        (c.fio && c.fio.toLowerCase().includes(q)) || 
-        (String(c.contractNum).includes(q))
+        (c.fio && c.fio.toLowerCase().includes(q)) || (String(c.contractNum).includes(q))
       );
       renderTable(filtered);
     }
 
+    // --- ОБНОВЛЕННЫЕ ФУНКЦИИ СКАЧИВАНИЯ И ЗАГРУЗКИ ---
     function exportData() {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allContracts));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `contracts_backup_${new Date().toISOString().slice(0,10)}.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
+      try {
+        if (allContracts.length === 0) {
+          alert("База пуста, нечего скачивать.");
+          return;
+        }
+        const dataStr = JSON.stringify(allContracts, null, 2);
+        const blob = new Blob([dataStr], { type: "application/json" });
+        const url = window.URL.createObjectURL(blob);
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.href = url;
+        const fileName = `BAZA_DOGOVOROV_${new Date().toISOString().slice(0,10)}.json`;
+        downloadAnchor.download = fileName;
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        document.body.removeChild(downloadAnchor);
+        window.URL.revokeObjectURL(url);
+      } catch (err) {
+        alert("Ошибка при создании файла базы: " + err);
+      }
     }
 
     function importData(event) {
@@ -466,12 +458,20 @@
       const reader = new FileReader();
       reader.onload = function(e) {
         try {
-          allContracts = JSON.parse(e.target.result);
-          saveToStorage();
-          alert("База успешно загружена!");
+          const importedData = JSON.parse(e.target.result);
+          if (Array.isArray(importedData)) {
+            if (confirm(`Вы собираетесь загрузить ${importedData.length} договоров. Это заменит текущие данные. Продолжить?`)) {
+              allContracts = importedData;
+              saveToStorage();
+              alert("База успешно загружена и сохранена!");
+            }
+          } else {
+            alert("Файл имеет неправильный формат!");
+          }
         } catch(err) {
-          alert("Ошибка чтения файла базы!");
+          alert("Ошибка: файл поврежден или это не база договоров!");
         }
+        event.target.value = ""; // Сброс поля выбора файла
       };
       reader.readAsText(file);
     }
