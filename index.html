@@ -3,14 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Учет Договоров</title>
+  <title>Учет Договоров (Надежное Хранение)</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
   <style>
     .row-error { background-color: #fee2e2 !important; }
-    .pay-paid { background-color: #22c55e; color: white; }
+    .pay-paid { background-color: #22c55e; color: white; font-weight: bold; }
   </style>
 </head>
 <body class="bg-gray-100 text-gray-800 text-xs">
@@ -19,15 +16,21 @@
     <div class="flex flex-wrap justify-between items-center mb-4 gap-4 bg-white p-4 rounded shadow">
       <div>
         <h1 class="text-xl font-bold text-gray-800">Лист Договоров</h1>
-        <p class="text-xs text-gray-500">Система учета рассрочек и взносов</p>
+        <p class="text-xs text-gray-500">Данные автоматически сохраняются в браузере</p>
       </div>
-      <div class="flex items-center gap-3">
-        <!-- Кнопка Шаг Назад -->
+      <div class="flex items-center gap-2">
         <button type="button" id="undoBtn" onclick="undoLastAction()" disabled class="bg-gray-300 text-gray-600 font-medium px-3 py-2 rounded text-xs cursor-not-allowed transition">
-          ↺ Отменить действие
+          ↺ Отменить удаление
         </button>
-        <input type="text" id="searchInput" oninput="filterContracts()" placeholder="Поиск по ФИО или номеру..." class="p-2 border rounded w-64">
-        <button type="button" id="openModalBtn" onclick="openCreateModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded transition">
+        <button type="button" onclick="exportData()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-3 py-2 rounded text-xs">
+          💾 Скачать базу
+        </button>
+        <input type="file" id="importFile" onchange="importData(event)" class="hidden">
+        <button type="button" onclick="document.getElementById('importFile').click()" class="bg-gray-600 hover:bg-gray-700 text-white font-medium px-3 py-2 rounded text-xs">
+          📂 Загрузить базу
+        </button>
+        <input type="text" id="searchInput" oninput="filterContracts()" placeholder="Поиск по ФИО или номеру..." class="p-2 border rounded w-52">
+        <button type="button" onclick="openCreateModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded transition">
           + Новый Договор
         </button>
       </div>
@@ -43,7 +46,6 @@
             <th class="p-2 border">Телефон</th>
             <th class="p-2 border">Даты (Покупка / График)</th>
             <th class="p-2 border">Мес. Платеж</th>
-            <!-- 15 взносов -->
             <script>
               for(let i=1; i<=15; i++) {
                 document.write(`<th class="p-2 border text-center min-w-[65px]">${i}-й</th>`);
@@ -60,13 +62,13 @@
           </tr>
         </thead>
         <tbody id="contractsTable">
-          <!-- Динамическая загрузка -->
+          <!-- Загрузка из localStorage -->
         </tbody>
       </table>
     </div>
   </div>
 
-  <!-- Модальное окно: Создание / Редактирование договора -->
+  <!-- Модальное окно: Создание / Редактирование -->
   <div id="modal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
       <h2 id="modalTitle" class="text-lg font-bold mb-4 border-b pb-2 text-blue-700">Оформление нового договора</h2>
@@ -142,13 +144,13 @@
 
         <div class="flex justify-end gap-2 pt-2 border-t">
           <button type="button" onclick="closeModal()" class="px-4 py-2 border rounded bg-gray-100">Отмена</button>
-          <button type="submit" id="saveBtn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium">Сохранить</button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium">Сохранить</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Модальное окно: Внесение оплаты -->
+  <!-- Модальное окно: Оплата -->
   <div id="payModal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-lg p-5 max-w-sm w-full shadow-xl">
       <h3 class="font-bold text-sm mb-3 text-blue-700">Внести оплату</h3>
@@ -179,30 +181,22 @@
   </div>
 
   <script>
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
-    };
+    // Загрузка и сохранeние базы в браузер
+    let allContracts = JSON.parse(localStorage.getItem('contracts_db') || '[]');
+    let deletedHistory = [];
 
-    let db;
-    let allContracts = [];
-    let historyStack = []; // Стек для отмены действий (Undo)
-
-    try {
-      firebase.initializeApp(firebaseConfig);
-      db = firebase.firestore();
-      initRealtimeTable();
-    } catch (e) {
-      console.error("Укажите ключи Firebase!", e);
+    function saveToStorage() {
+      localStorage.setItem('contracts_db', JSON.stringify(allContracts));
+      renderTable(allContracts);
     }
 
-    // --- Управление Модальными окнами ---
+    // Инициализация при старте
+    document.addEventListener('DOMContentLoaded', () => {
+      renderTable(allContracts);
+    });
+
     const modal = document.getElementById('modal');
-    
+
     function openCreateModal() {
       document.getElementById('contractForm').reset();
       document.getElementById('editDocId').value = '';
@@ -213,13 +207,13 @@
     function closeModal() { modal.classList.add('hidden'); }
     function closePayModal() { document.getElementById('payModal').classList.add('hidden'); }
 
-    function openPayModal(contractId) {
-      document.getElementById('payContractId').value = contractId;
+    function openPayModal(id) {
+      document.getElementById('payContractId').value = id;
       document.getElementById('payDateVal').valueAsDate = new Date();
       document.getElementById('payModal').classList.remove('hidden');
     }
 
-    // --- Редактирование договора ---
+    // Открытие окна редактирования
     function openEditModal(id) {
       const contract = allContracts.find(c => c.id === id);
       if(!contract) return;
@@ -249,15 +243,12 @@
       modal.classList.remove('hidden');
     }
 
-    // --- Сохранение (Создание или Обновление) ---
-    document.getElementById('contractForm').addEventListener('submit', async (e) => {
+    // Создание и Редактирование
+    document.getElementById('contractForm').addEventListener('submit', (e) => {
       e.preventDefault();
-      const saveBtn = document.getElementById('saveBtn');
-      saveBtn.disabled = true;
-
       const editId = document.getElementById('editDocId').value;
 
-      const data = {
+      const formData = {
         fio: document.getElementById('fio').value,
         birthDate: document.getElementById('birthDate').value || '',
         passport: document.getElementById('passport').value || '',
@@ -278,99 +269,85 @@
         guarantorPhone: document.getElementById('guarantorPhone').value || ''
       };
 
-      try {
-        if(editId) {
-          // Редактирование
-          await db.collection('contracts').doc(editId).update(data);
-        } else {
-          // Создание нового с нумерацией 1, 2, 3...
-          const snap = await db.collection('contracts').get();
-          data.contractNum = snap.size + 1;
-          data.installments = {};
-          data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-          await db.collection('contracts').add(data);
+      if (editId) {
+        // Изменение существующего договора
+        const index = allContracts.findIndex(c => c.id === editId);
+        if (index !== -1) {
+          allContracts[index] = { ...allContracts[index], ...formData };
         }
-        closeModal();
-      } catch(err) {
-        alert("Ошибка при сохранении: " + err.message);
-      } finally {
-        saveBtn.disabled = false;
+      } else {
+        // Создание нового с уникальным ID и правильным номером
+        const maxNum = allContracts.reduce((max, c) => (c.contractNum > max ? c.contractNum : max), 0);
+        const newContract = {
+          id: 'doc_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+          contractNum: maxNum + 1,
+          installments: {},
+          ...formData
+        };
+        allContracts.push(newContract);
       }
+
+      saveToStorage();
+      closeModal();
     });
 
-    // --- Безопасное удаление договора ---
-    async function deleteContract(id) {
-      const contract = allContracts.find(c => c.id === id);
-      if(!contract) return;
-
-      const confirmFirst = confirm(`Вы точно хотите удалить договор №${contract.contractNum} (${contract.fio})?`);
-      if(!confirmFirst) return;
-
-      const confirmSecond = prompt(`Двойная проверка безопасности:\nВведите слово "УДАЛИТЬ", чтобы подтвердить удаление договора №${contract.contractNum}:`);
-      if(confirmSecond === "УДАЛИТЬ") {
-        // Запоминаем удаленный объект для возможности отмены
-        historyStack.push({ type: 'delete', data: contract });
-        updateUndoButton();
-
-        await db.collection('contracts').doc(id).delete();
-      } else {
-        alert("Удаление отменено.");
-      }
-    }
-
-    // --- Отмена последнего действия (Undo) ---
-    async function undoLastAction() {
-      if(historyStack.length === 0) return;
-      const lastAction = historyStack.pop();
-
-      if(lastAction.type === 'delete') {
-        const item = lastAction.data;
-        const id = item.id;
-        delete item.id;
-        await db.collection('contracts').doc(id).set(item);
-      }
-      updateUndoButton();
-    }
-
-    function updateUndoButton() {
-      const undoBtn = document.getElementById('undoBtn');
-      if(historyStack.length > 0) {
-        undoBtn.disabled = false;
-        undoBtn.classList.remove('bg-gray-300', 'text-gray-600', 'cursor-not-allowed');
-        undoBtn.classList.add('bg-amber-500', 'hover:bg-amber-600', 'text-white', 'cursor-pointer');
-      } else {
-        undoBtn.disabled = true;
-        undoBtn.classList.remove('bg-amber-500', 'hover:bg-amber-600', 'text-white', 'cursor-pointer');
-        undoBtn.classList.add('bg-gray-300', 'text-gray-600', 'cursor-not-allowed');
-      }
-    }
-
-    // --- Внесение взноса ---
-    document.getElementById('payForm').addEventListener('submit', async (e) => {
+    // Внесение оплаты
+    document.getElementById('payForm').addEventListener('submit', (e) => {
       e.preventDefault();
       const id = document.getElementById('payContractId').value;
       const idx = document.getElementById('payIndex').value;
       const amount = Number(document.getElementById('payAmount').value);
       const date = document.getElementById('payDateVal').value;
 
-      if(db && id) {
-        await db.collection('contracts').doc(id).update({
-          [`installments.${idx}`]: { amount, date }
-        });
+      const contract = allContracts.find(c => c.id === id);
+      if (contract) {
+        if (!contract.installments) contract.installments = {};
+        contract.installments[idx] = { amount, date };
+        saveToStorage();
         closePayModal();
         document.getElementById('payForm').reset();
       }
     });
 
-    // --- Вывод таблицы ---
-    function initRealtimeTable() {
-      db.collection('contracts').orderBy('contractNum', 'asc').onSnapshot(snapshot => {
-        allContracts = [];
-        snapshot.forEach(doc => allContracts.push({ id: doc.id, ...doc.data() }));
-        renderTable(allContracts);
-      });
+    // Безопасное удаление
+    function deleteContract(id) {
+      const contract = allContracts.find(c => c.id === id);
+      if (!contract) return;
+
+      if (confirm(`Удалить договор №${contract.contractNum} (${contract.fio})?`)) {
+        const confirmText = prompt(`Введите слово "УДАЛИТЬ" для подтверждения:`);
+        if (confirmText === "УДАЛИТЬ") {
+          deletedHistory.push(contract);
+          allContracts = allContracts.filter(c => c.id !== id);
+          saveToStorage();
+          updateUndoBtn();
+        }
+      }
     }
 
+    // Отмена удаления
+    function undoLastAction() {
+      if (deletedHistory.length === 0) return;
+      const restored = deletedHistory.pop();
+      allContracts.push(restored);
+      allContracts.sort((a,b) => a.contractNum - b.contractNum);
+      saveToStorage();
+      updateUndoBtn();
+    }
+
+    function updateUndoBtn() {
+      const btn = document.getElementById('undoBtn');
+      btn.disabled = deletedHistory.length === 0;
+      if (!btn.disabled) {
+        btn.classList.remove('bg-gray-300', 'text-gray-600', 'cursor-not-allowed');
+        btn.classList.add('bg-amber-500', 'hover:bg-amber-600', 'text-white');
+      } else {
+        btn.classList.add('bg-gray-300', 'text-gray-600', 'cursor-not-allowed');
+        btn.classList.remove('bg-amber-500', 'hover:bg-amber-600', 'text-white');
+      }
+    }
+
+    // Вывод таблицы
     function renderTable(contracts) {
       const tbody = document.getElementById('contractsTable');
       tbody.innerHTML = '';
@@ -411,15 +388,16 @@
           <td class="p-2 border">${item.product || '—'}</td>
           <td class="p-2 border">${item.guarantorFio || '—'}</td>
           <td class="p-2 border text-center space-x-1 sticky right-0 bg-white">
-            <button onclick="openPayModal('${item.id}')" class="bg-green-600 hover:bg-green-700 text-white px-1.5 py-1 rounded text-[10px]" title="Внести взнос">+Взнос</button>
-            <button onclick="openEditModal('${item.id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-1.5 py-1 rounded text-[10px]" title="Редактировать">✏️</button>
-            <button onclick="deleteContract('${item.id}')" class="bg-red-500 hover:bg-red-600 text-white px-1.5 py-1 rounded text-[10px]" title="Удалить">🗑️</button>
+            <button onclick="openPayModal('${item.id}')" class="bg-green-600 hover:bg-green-700 text-white px-1.5 py-1 rounded text-[10px]">+Взнос</button>
+            <button onclick="openEditModal('${item.id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-1.5 py-1 rounded text-[10px]">✏️</button>
+            <button onclick="deleteContract('${item.id}')" class="bg-red-500 hover:bg-red-600 text-white px-1.5 py-1 rounded text-[10px]">🗑️</button>
           </td>
         `;
         tbody.appendChild(tr);
       });
     }
 
+    // Поиск
     function filterContracts() {
       const q = document.getElementById('searchInput').value.toLowerCase();
       const filtered = allContracts.filter(c => 
@@ -427,6 +405,33 @@
         (String(c.contractNum).includes(q))
       );
       renderTable(filtered);
+    }
+
+    // Экспорт / Импорт файла базы
+    function exportData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allContracts));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `contracts_backup_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          allContracts = JSON.parse(e.target.result);
+          saveToStorage();
+          alert("База успешно загружена!");
+        } catch(err) {
+          alert("Ошибка чтения файла базы!");
+        }
+      };
+      reader.readAsText(file);
     }
   </script>
 </body>
