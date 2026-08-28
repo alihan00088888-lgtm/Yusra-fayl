@@ -8,174 +8,239 @@
   <style>
     .row-error { background-color: #fee2e2 !important; }
     .pay-paid { background-color: #22c55e; color: white; font-weight: bold; cursor: pointer; }
-    .transition-all { transition: all 0.2s ease-in-out; }
+    /* Стили для активных кнопок истории */
+    .btn-history-active { background-color: #f59e0b !important; color: white !important; cursor: pointer !important; }
+    .btn-history-active:hover { background-color: #d97706 !important; }
   </style>
 </head>
 <body class="bg-gray-100 text-gray-800 text-xs">
 
   <div class="p-4 max-w-[100vw]">
-    <div class="flex flex-wrap justify-between items-center mb-4 gap-4 bg-white p-4 rounded shadow">
+    <div class="flex flex-wrap justify-between items-center mb-4 gap-4 bg-white p-4 rounded shadow border-b-2 border-blue-500">
       <div>
         <h1 class="text-xl font-bold text-gray-800">Лист Договоров</h1>
-        <p class="text-xs text-gray-500">История изменений активна (Любое действие можно отменить)</p>
+        <p class="text-[10px] text-gray-500 uppercase font-semibold tracking-wider">История изменений (Undo/Redo) включена</p>
       </div>
+      
       <div class="flex items-center gap-2">
-        <button type="button" id="undoBtn" onclick="undoLastAction()" disabled class="bg-gray-300 text-gray-600 font-medium px-3 py-2 rounded text-xs cursor-not-allowed transition-all">
-          ↺ Шаг назад
-        </button>
-        <button type="button" onclick="exportData()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-3 py-2 rounded text-xs transition-all">
+        <div class="flex bg-gray-200 rounded p-1 gap-1 mr-2">
+          <button type="button" id="undoBtn" onclick="undo()" disabled title="Шаг назад (Ctrl+Z)" 
+            class="px-3 py-2 rounded text-xs font-bold text-gray-400 bg-gray-100 cursor-not-allowed transition">
+            ↺ Назад
+          </button>
+          <button type="button" id="redoBtn" onclick="redo()" disabled title="Шаг вперед (Ctrl+Y)" 
+            class="px-3 py-2 rounded text-xs font-bold text-gray-400 bg-gray-100 cursor-not-allowed transition">
+            ↻ Вперед
+          </button>
+        </div>
+
+        <button type="button" onclick="exportData()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-3 py-2 rounded text-xs transition shadow-sm">
           💾 Скачать базу
         </button>
         <input type="file" id="importFile" onchange="importData(event)" class="hidden" accept=".json">
-        <button type="button" onclick="document.getElementById('importFile').click()" class="bg-gray-600 hover:bg-gray-700 text-white font-medium px-3 py-2 rounded text-xs transition-all">
+        <button type="button" onclick="document.getElementById('importFile').click()" class="bg-gray-600 hover:bg-gray-700 text-white font-medium px-3 py-2 rounded text-xs transition shadow-sm">
           📂 Загрузить базу
         </button>
-        <input type="text" id="searchInput" oninput="filterContracts()" placeholder="Поиск (ФИО, номер)..." class="p-2 border rounded w-52">
-        <button type="button" onclick="openCreateModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded transition-all">
+        
+        <input type="text" id="searchInput" oninput="filterContracts()" placeholder="Поиск (ФИО, №)..." class="p-2 border rounded w-48 focus:ring-2 focus:ring-blue-400 outline-none">
+        
+        <button type="button" onclick="openCreateModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded shadow-md transition">
           + Новый Договор
         </button>
       </div>
     </div>
 
-    <div class="bg-white shadow rounded overflow-x-auto max-h-[80vh]">
+    <div class="bg-white shadow-xl rounded-lg overflow-x-auto max-h-[80vh] border">
       <table class="min-w-full text-left border-collapse">
-        <thead class="bg-gray-200 uppercase font-semibold text-gray-700 sticky top-0 z-10">
+        <thead class="bg-slate-700 text-white uppercase font-bold text-[10px] sticky top-0 z-20">
           <tr>
-            <th class="p-2 border">№</th>
-            <th class="p-2 border min-w-[150px]">ФИО Покупателя</th>
-            <th class="p-2 border">Телефон</th>
-            <th class="p-2 border">Даты (Покупка / График)</th>
-            <th class="p-2 border">Мес. Платеж</th>
+            <th class="p-3 border-r border-slate-600">№</th>
+            <th class="p-3 border-r border-slate-600 min-w-[150px]">ФИО Покупателя</th>
+            <th class="p-3 border-r border-slate-600">Телефон</th>
+            <th class="p-3 border-r border-slate-600">Даты (Покупка / График)</th>
+            <th class="p-3 border-r border-slate-600">Мес. Платеж</th>
             <script>
               for(let i=1; i<=15; i++) {
-                document.write(`<th class="p-2 border text-center min-w-[65px]">${i}-й</th>`);
+                document.write(`<th class="p-1 border-r border-slate-600 text-center min-w-[65px]">${i}-й</th>`);
               }
             </script>
-            <th class="p-2 border">Просрочка</th>
-            <th class="p-2 border">Остаток</th>
-            <th class="p-2 border">Рассрочка / Предоплата</th>
-            <th class="p-2 border">Себестоимость</th>
-            <th class="p-2 border text-center">«Д»</th>
-            <th class="p-2 border">Товар / Магазин</th>
-            <th class="p-2 border">Поручитель</th>
-            <th class="p-2 border text-center sticky right-0 bg-gray-200 min-w-[210px]">Действия</th>
+            <th class="p-3 border-r border-slate-600">Просрочка</th>
+            <th class="p-3 border-r border-slate-600">Остаток</th>
+            <th class="p-3 border-r border-slate-600">Рассрочка / Пред.</th>
+            <th class="p-3 border-r border-slate-600">Себест.</th>
+            <th class="p-3 border-r border-slate-600 text-center">«Д»</th>
+            <th class="p-3 border-r border-slate-600">Товар / Магазин</th>
+            <th class="p-3 border-r border-slate-600">Поручитель</th>
+            <th class="p-3 text-center sticky right-0 bg-slate-800 min-w-[210px]">Действия</th>
           </tr>
         </thead>
-        <tbody id="contractsTable"></tbody>
+        <tbody id="contractsTable" class="divide-y">
+        </tbody>
       </table>
     </div>
   </div>
 
   <div id="modal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-      <h2 id="modalTitle" class="text-lg font-bold mb-4 border-b pb-2 text-blue-700">Оформление договора</h2>
+    <div class="bg-white rounded-xl p-6 max-w-4xl w-full max-h-[95vh] overflow-y-auto shadow-2xl">
+      <h2 id="modalTitle" class="text-xl font-bold mb-4 border-b-2 pb-2 text-blue-700 uppercase tracking-tight">Новый договор</h2>
       <form id="contractForm" class="space-y-4">
         <input type="hidden" id="editDocId">
 
-        <div class="bg-gray-50 p-3 rounded border">
-          <h3 class="font-bold uppercase text-gray-600 mb-2 italic text-[10px]">1. Данные Покупателя</h3>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
-            <input type="text" id="fio" placeholder="ФИО Покупателя *" required class="p-2 border rounded col-span-2">
-            <input type="date" id="birthDate" title="Дата рождения" class="p-2 border rounded">
-            <input type="text" id="passport" placeholder="Паспортные данные" class="p-2 border rounded">
-            <input type="text" id="phone" placeholder="Телефон *" required class="p-2 border rounded">
-            <input type="text" id="extraPhone" placeholder="Доп. телефон" class="p-2 border rounded">
-            <input type="text" id="address" placeholder="Адрес проживания" class="p-2 border rounded col-span-3">
+        <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+          <h3 class="font-black text-[10px] uppercase text-slate-400 mb-3 tracking-widest">1. Личные данные клиента</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <input type="text" id="fio" placeholder="ФИО Покупателя *" required class="p-2 border rounded-md col-span-2 focus:border-blue-500 outline-none">
+            <input type="date" id="birthDate" title="Дата рождения" class="p-2 border rounded-md outline-none">
+            <input type="text" id="passport" placeholder="Паспортные данные" class="p-2 border rounded-md outline-none">
+            <input type="text" id="phone" placeholder="Телефон *" required class="p-2 border rounded-md outline-none">
+            <input type="text" id="extraPhone" placeholder="Доп. номер" class="p-2 border rounded-md outline-none">
+            <input type="text" id="address" placeholder="Адрес проживания" class="p-2 border rounded-md col-span-3 outline-none">
           </div>
         </div>
 
-        <div class="bg-gray-50 p-3 rounded border">
-          <h3 class="font-bold uppercase text-gray-600 mb-2 italic text-[10px]">2. Условия Рассрочки</h3>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-            <div><label class="block text-gray-500 scale-75 origin-left">Дата покупки</label>
-                 <input type="date" id="buyDate" required class="p-2 border rounded w-full"></div>
-            <div><label class="block text-gray-500 scale-75 origin-left">График оплаты (день)</label>
-                 <input type="date" id="payDate" required class="p-2 border rounded w-full"></div>
-            <div><label class="block text-gray-500 scale-75 origin-left">Срок (мес)</label>
-                 <input type="number" id="monthsCount" placeholder="6" required class="p-2 border rounded w-full"></div>
-            <div><label class="block text-gray-500 scale-75 origin-left">Мес. платеж</label>
-                 <input type="number" id="monthlyPay" placeholder="₽" required class="p-2 border rounded w-full"></div>
-            <div><label class="block text-gray-500 scale-75 origin-left">Общая сумма</label>
-                 <input type="number" id="totalCost" placeholder="₽" required class="p-2 border rounded w-full"></div>
-            <div><label class="block text-gray-500 scale-75 origin-left">Предоплата</label>
-                 <input type="number" id="downPayment" placeholder="0 ₽" value="0" class="p-2 border rounded w-full"></div>
-            <div><label class="block text-gray-500 scale-75 origin-left">Себестоимость</label>
-                 <input type="number" id="costPrice" placeholder="₽" required class="p-2 border rounded w-full"></div>
-            <div class="flex items-center gap-2 pt-4">
-              <input type="checkbox" id="shopPaid" class="w-4 h-4">
-              <label for="shopPaid" class="font-bold text-gray-700">Отметка «Д»</label>
+        <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+          <h3 class="font-black text-[10px] uppercase text-blue-400 mb-3 tracking-widest">2. Финансовые условия</h3>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div>
+              <label class="block text-[9px] font-bold text-blue-800 uppercase mb-1">Дата покупки</label>
+              <input type="date" id="buyDate" required class="p-2 border rounded w-full">
+            </div>
+            <div>
+              <label class="block text-[9px] font-bold text-blue-800 uppercase mb-1">График платежа</label>
+              <input type="date" id="payDate" required class="p-2 border rounded w-full">
+            </div>
+            <div>
+              <label class="block text-[9px] font-bold text-blue-800 uppercase mb-1">Срок (мес.)</label>
+              <input type="number" id="monthsCount" required class="p-2 border rounded w-full">
+            </div>
+            <div>
+              <label class="block text-[9px] font-bold text-blue-800 uppercase mb-1">Мес. платеж</label>
+              <input type="number" id="monthlyPay" required class="p-2 border rounded w-full">
+            </div>
+            <div>
+              <label class="block text-[9px] font-bold text-blue-800 uppercase mb-1">Сумма рассрочки</label>
+              <input type="number" id="totalCost" required class="p-2 border rounded w-full">
+            </div>
+            <div>
+              <label class="block text-[9px] font-bold text-blue-800 uppercase mb-1">Предоплата</label>
+              <input type="number" id="downPayment" value="0" class="p-2 border rounded w-full">
+            </div>
+            <div>
+              <label class="block text-[9px] font-bold text-blue-800 uppercase mb-1">Себестоимость</label>
+              <input type="number" id="costPrice" required class="p-2 border rounded w-full">
+            </div>
+            <div class="flex items-center gap-2 pt-5">
+              <input type="checkbox" id="shopPaid" class="w-5 h-5 cursor-pointer">
+              <label for="shopPaid" class="text-[10px] font-black uppercase text-slate-700">Оплачено «Д»</label>
             </div>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div class="bg-gray-50 p-3 rounded border">
-            <h3 class="font-bold uppercase text-gray-600 mb-2 italic text-[10px]">3. Товар</h3>
-            <input type="text" id="product" placeholder="Товар" class="p-2 border rounded w-full mb-2">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-gray-50 p-4 rounded-lg border">
+            <h3 class="font-black text-[10px] uppercase text-gray-400 mb-3 tracking-widest">3. Описание товара</h3>
+            <input type="text" id="product" placeholder="Наименование товара" class="p-2 border rounded w-full mb-2">
             <input type="text" id="store" placeholder="Магазин" class="p-2 border rounded w-full">
           </div>
-          <div class="bg-gray-50 p-3 rounded border">
-            <h3 class="font-bold uppercase text-gray-600 mb-2 italic text-[10px]">4. Поручитель</h3>
+          <div class="bg-gray-50 p-4 rounded-lg border">
+            <h3 class="font-black text-[10px] uppercase text-gray-400 mb-3 tracking-widest">4. Поручитель</h3>
             <input type="text" id="guarantorFio" placeholder="ФИО Поручителя" class="p-2 border rounded w-full mb-2">
-            <input type="text" id="guarantorPhone" placeholder="Телефон Поручителя" class="p-2 border rounded w-full">
+            <input type="text" id="guarantorPhone" placeholder="Телефон поручителя" class="p-2 border rounded w-full">
           </div>
         </div>
 
-        <div class="flex justify-end gap-2 pt-2 border-t">
-          <button type="button" onclick="closeModal()" class="px-4 py-2 border rounded bg-gray-100">Отмена</button>
-          <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium">Сохранить</button>
+        <div class="flex justify-end gap-3 pt-4 border-t-2">
+          <button type="button" onclick="closeModal()" class="px-6 py-2 border-2 rounded-lg font-bold hover:bg-gray-100 transition">Отмена</button>
+          <button type="submit" class="px-8 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 shadow-lg transition">Сохранить</button>
         </div>
       </form>
     </div>
   </div>
 
   <div id="payModal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-lg p-5 max-w-sm w-full shadow-xl text-xs">
-      <h3 class="font-bold mb-3 text-blue-700 uppercase">Внести оплату</h3>
-      <form id="payForm" class="space-y-3">
+    <div class="bg-white rounded-xl p-5 max-w-sm w-full shadow-2xl border-t-4 border-green-500">
+      <h3 class="font-black text-xs uppercase text-slate-500 mb-4 tracking-widest">Регистрация оплаты</h3>
+      <form id="payForm" class="space-y-4">
         <input type="hidden" id="payContractId">
         <div>
-          <label class="text-gray-500">Номер взноса</label>
-          <select id="payIndex" class="p-2 border rounded w-full">
+          <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase">Выберите номер взноса</label>
+          <select id="payIndex" class="p-2 border rounded-md w-full bg-slate-50 font-bold outline-none">
             <script>for(let i=1; i<=15; i++) document.write(`<option value="${i}">${i}-й взнос</option>`);</script>
           </select>
         </div>
         <div>
-          <label class="text-gray-500">Сумма (₽)</label>
-          <input type="number" id="payAmount" required class="p-2 border rounded w-full">
+          <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase">Сумма платежа (₽)</label>
+          <input type="number" id="payAmount" required class="p-2 border rounded-md w-full text-lg font-bold text-green-700 outline-none">
         </div>
         <div>
-          <label class="text-gray-500">Дата</label>
-          <input type="date" id="payDateVal" required class="p-2 border rounded w-full">
+          <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase">Дата внесения</label>
+          <input type="date" id="payDateVal" required class="p-2 border rounded-md w-full">
         </div>
         <div class="flex justify-end gap-2 pt-2">
-          <button type="button" onclick="closePayModal()" class="px-3 py-1 border rounded">Отмена</button>
-          <button type="submit" class="px-3 py-1 bg-green-600 text-white rounded">Сохранить</button>
+          <button type="button" onclick="closePayModal()" class="px-4 py-2 text-slate-500 font-bold">Отмена</button>
+          <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 transition shadow-md">Внести</button>
         </div>
       </form>
     </div>
   </div>
 
   <script>
+    // --- ГЛОБАЛЬНЫЕ ДАННЫЕ И ИСТОРИЯ ---
     let allContracts = JSON.parse(localStorage.getItem('contracts_db') || '[]');
-    let historyStack = []; // Стек для ПОЛНОЙ отмены любого действия
+    let undoStack = []; // Стек для "Шаг назад"
+    let redoStack = []; // Стек для "Шаг вперед"
 
-    // --- Функция записи истории ПЕРЕД изменением ---
-    function recordHistory() {
-      // Сохраняем глубокую копию текущего состояния
-      historyStack.push(JSON.parse(JSON.stringify(allContracts)));
-      if (historyStack.length > 50) historyStack.shift(); // Храним только 50 шагов
-      updateUndoBtn();
+    // Сохранение состояния перед изменением
+    function saveState() {
+      // Клонируем данные, чтобы избежать прямой ссылки
+      undoStack.push(JSON.stringify(allContracts));
+      if (undoStack.length > 50) undoStack.shift(); // Ограничение истории (50 шагов)
+      redoStack = []; // При новом действии ветка "вперед" сбрасывается
+      updateHistoryButtons();
     }
 
+    // Функция "Шаг назад"
+    function undo() {
+      if (undoStack.length === 0) return;
+      redoStack.push(JSON.stringify(allContracts)); // Сохраняем текущее для "вперед"
+      allContracts = JSON.parse(undoStack.pop());
+      finishAction();
+    }
+
+    // Функция "Шаг вперед"
+    function redo() {
+      if (redoStack.length === 0) return;
+      undoStack.push(JSON.stringify(allContracts)); // Сохраняем текущее для "назад"
+      allContracts = JSON.parse(redoStack.pop());
+      finishAction();
+    }
+
+    // Завершение действия истории (сохранение и рендер)
+    function finishAction() {
+      localStorage.setItem('contracts_db', JSON.stringify(allContracts));
+      renderTable(allContracts);
+      updateHistoryButtons();
+    }
+
+    function updateHistoryButtons() {
+      const uBtn = document.getElementById('undoBtn');
+      const rBtn = document.getElementById('redoBtn');
+      
+      uBtn.disabled = undoStack.length === 0;
+      uBtn.className = uBtn.disabled ? "px-3 py-2 rounded text-xs font-bold text-gray-400 bg-gray-100 cursor-not-allowed transition" : "px-3 py-2 rounded text-xs font-bold btn-history-active transition";
+      
+      rBtn.disabled = redoStack.length === 0;
+      rBtn.className = rBtn.disabled ? "px-3 py-2 rounded text-xs font-bold text-gray-400 bg-gray-100 cursor-not-allowed transition" : "px-3 py-2 rounded text-xs font-bold btn-history-active transition";
+    }
+
+    // Сохранение в LocalStorage (после обычных действий)
     function saveToStorage() {
       localStorage.setItem('contracts_db', JSON.stringify(allContracts));
       renderTable(allContracts);
+      updateHistoryButtons();
     }
 
-    document.addEventListener('DOMContentLoaded', () => renderTable(allContracts));
-
-    // --- Управление модалками ---
+    // --- МОДАЛЬНЫЕ ОКНА ---
     const modal = document.getElementById('modal');
     function openCreateModal() {
       document.getElementById('contractForm').reset();
@@ -197,19 +262,33 @@
       if(!contract) return;
       document.getElementById('editDocId').value = id;
       document.getElementById('modalTitle').innerText = `Редактирование №${contract.contractNum}`;
-      // Заполнение полей
-      const fields = ['fio','birthDate','passport','phone','extraPhone','address','buyDate','payDate','monthsCount','monthlyPay','totalCost','downPayment','costPrice','product','store','guarantorFio','guarantorPhone'];
-      fields.forEach(f => document.getElementById(f).value = contract[f] || (f === 'downPayment' ? 0 : ''));
+      document.getElementById('fio').value = contract.fio || '';
+      document.getElementById('birthDate').value = contract.birthDate || '';
+      document.getElementById('passport').value = contract.passport || '';
+      document.getElementById('phone').value = contract.phone || '';
+      document.getElementById('extraPhone').value = contract.extraPhone || '';
+      document.getElementById('address').value = contract.address || '';
+      document.getElementById('buyDate').value = contract.buyDate || '';
+      document.getElementById('payDate').value = contract.payDate || '';
+      document.getElementById('monthsCount').value = contract.monthsCount || '';
+      document.getElementById('monthlyPay').value = contract.monthlyPay || '';
+      document.getElementById('totalCost').value = contract.totalCost || '';
+      document.getElementById('downPayment').value = contract.downPayment || 0;
+      document.getElementById('costPrice').value = contract.costPrice || '';
       document.getElementById('shopPaid').checked = !!contract.shopPaid;
+      document.getElementById('product').value = contract.product || '';
+      document.getElementById('store').value = contract.store || '';
+      document.getElementById('guarantorFio').value = contract.guarantorFio || '';
+      document.getElementById('guarantorPhone').value = contract.guarantorPhone || '';
       modal.classList.remove('hidden');
     }
 
-    // --- ОСНОВНЫЕ ДЕЙСТВИЯ (с записью истории) ---
+    // --- ОСНОВНЫЕ ДЕЙСТВИЯ ---
 
-    // Сохранение/Редактирование
+    // Сохранение Договора
     document.getElementById('contractForm').addEventListener('submit', (e) => {
       e.preventDefault();
-      recordHistory(); // Записываем состояние ДО изменений
+      saveState(); // Пишем историю
 
       const editId = document.getElementById('editDocId').value;
       const formData = {
@@ -234,8 +313,8 @@
       };
 
       if (editId) {
-        const idx = allContracts.findIndex(c => c.id === editId);
-        if (idx !== -1) allContracts[idx] = { ...allContracts[idx], ...formData };
+        const index = allContracts.findIndex(c => c.id === editId);
+        if (index !== -1) allContracts[index] = { ...allContracts[index], ...formData };
       } else {
         const maxNum = allContracts.reduce((max, c) => (c.contractNum > max ? c.contractNum : max), 0);
         allContracts.push({
@@ -252,128 +331,97 @@
     // Внесение оплаты
     document.getElementById('payForm').addEventListener('submit', (e) => {
       e.preventDefault();
-      recordHistory(); // Записываем ПЕРЕД оплатой
-
       const id = document.getElementById('payContractId').value;
-      const idx = document.getElementById('payIndex').value;
-      const amount = Number(document.getElementById('payAmount').value);
-      const date = document.getElementById('payDateVal').value;
-
       const contract = allContracts.find(c => c.id === id);
       if (contract) {
+        saveState(); // Пишем историю
+        const idx = document.getElementById('payIndex').value;
         if (!contract.installments) contract.installments = {};
-        contract.installments[idx] = { amount, date };
+        contract.installments[idx] = { 
+          amount: Number(document.getElementById('payAmount').value), 
+          date: document.getElementById('payDateVal').value 
+        };
         saveToStorage();
         closePayModal();
+        document.getElementById('payForm').reset();
       }
     });
-
-    // Изменение статуса "Д" напрямую
-    function toggleShopPaid(id) {
-      recordHistory(); // Записываем ПЕРЕД сменой статуса
-      const contract = allContracts.find(c => c.id === id);
-      if (contract) {
-        contract.shopPaid = !contract.shopPaid;
-        saveToStorage();
-      }
-    }
 
     // Удаление
     function deleteContract(id) {
       const contract = allContracts.find(c => c.id === id);
-      if (!contract) return;
-      if (confirm(`Удалить договор №${contract.contractNum} (${contract.fio})?`)) {
-        const check = prompt(`Введите слово "УДАЛИТЬ":`);
-        if (check === "УДАЛИТЬ") {
-          recordHistory(); // Записываем ПЕРЕД удалением
+      if (confirm(`Удалить договор №${contract.contractNum}?`)) {
+        if (prompt('Введите "УДАЛИТЬ" для подтверждения:') === "УДАЛИТЬ") {
+          saveState(); // Пишем историю
           allContracts = allContracts.filter(c => c.id !== id);
           saveToStorage();
         }
       }
     }
 
-    // --- ФУНКЦИЯ ШАГ НАЗАД ---
-    function undoLastAction() {
-      if (historyStack.length === 0) return;
-      // Возвращаем базу к последнему сохраненному состоянию
-      allContracts = historyStack.pop();
-      saveToStorage(); // Отрисовываем и сохраняем
-      updateUndoBtn();
-    }
-
-    function updateUndoBtn() {
-      const btn = document.getElementById('undoBtn');
-      btn.disabled = historyStack.length === 0;
-      if (!btn.disabled) {
-        btn.classList.remove('bg-gray-300','text-gray-600','cursor-not-allowed');
-        btn.classList.add('bg-amber-500','hover:bg-amber-600','text-white','cursor-pointer');
-      } else {
-        btn.classList.add('bg-gray-300','text-gray-600','cursor-not-allowed');
-        btn.classList.remove('bg-amber-500','hover:bg-amber-600','text-white','cursor-pointer');
-      }
-    }
-
-    // --- Копирование ---
-    function copyText(text, btn) {
+    // --- КОПИРОВАНИЕ ---
+    function copyToClip(text, btn) {
       navigator.clipboard.writeText(text).then(() => {
-        const old = btn.innerText;
-        btn.innerText = "✓";
-        setTimeout(() => btn.innerText = old, 1000);
+        const oldText = btn.innerText;
+        btn.innerText = "✓ Готово";
+        btn.classList.add("bg-green-700");
+        setTimeout(() => { btn.innerText = oldText; btn.classList.remove("bg-green-700"); }, 1000);
       });
     }
 
     function copyHistory(id, btn) {
-      const c = allContracts.find(x => x.id === id);
-      let h = "";
-      const insts = c.installments || {};
-      Object.keys(insts).sort((a,b)=>a-b).forEach(k => {
-        h += `${k}-й взнос: ${insts[k].amount} ₽ (${insts[k].date})\n`;
+      const c = allContracts.find(i => i.id === id);
+      let log = `Договор №${c.contractNum}\nФИО: ${c.fio}\n\nОплаты:\n`;
+      Object.keys(c.installments || {}).sort((a,b)=>a-b).forEach(k => {
+        log += `${k}-й: ${c.installments[k].amount}₽ (${c.installments[k].date})\n`;
       });
-      copyText(`Договор №${c.contractNum}\nФИО: ${c.fio}\n\nОплаты:\n${h || 'Нет оплат'}`, btn);
+      copyToClip(log, btn);
     }
 
     function copyGuarantor(id, btn) {
-      const c = allContracts.find(x => x.id === id);
-      copyText(`Договор №${c.contractNum}\nКлиент: ${c.fio}\nПоручитель: ${c.guarantorFio || '—'} (${c.guarantorPhone || '—'})`, btn);
+      const c = allContracts.find(i => i.id === id);
+      copyToClip(`Договор №${c.contractNum}\nКлиент: ${c.fio}\nПоручитель: ${c.guarantorFio || '—'} (${c.guarantorPhone || '—'})`, btn);
     }
 
-    // --- Отрисовка таблицы ---
-    function renderTable(data) {
+    // --- ТАБЛИЦА ---
+    function renderTable(contracts) {
       const tbody = document.getElementById('contractsTable');
       tbody.innerHTML = '';
-      data.forEach(item => {
+      contracts.forEach(item => {
         const insts = item.installments || {};
-        let paid = 0; Object.values(insts).forEach(v => paid += Number(v.amount));
-        const rest = item.totalCost - (item.downPayment || 0) - paid;
+        let totalPaid = 0;
+        Object.values(insts).forEach(p => totalPaid += Number(p.amount));
+        const rest = item.totalCost - (item.downPayment || 0) - totalPaid;
+        
         const tr = document.createElement('tr');
-        if (item.costPrice > item.totalCost) tr.classList.add('row-error');
+        if (item.costPrice > item.totalCost) tr.className = 'row-error';
         
         let instHtml = '';
         for(let i=1; i<=15; i++) {
           const v = insts[i];
-          instHtml += `<td class="p-1 border text-center ${v?'pay-paid':''}" title="${v?v.date:''}"> ${v ? v.amount+'₽' : '—'} </td>`;
+          instHtml += v ? `<td class="p-1 border-r text-center pay-paid" title="Дата: ${v.date}">${v.amount}</td>` : `<td class="p-1 border-r text-center text-gray-300">—</td>`;
         }
 
         tr.innerHTML = `
-          <td class="p-2 border font-bold text-blue-700">${item.contractNum}</td>
-          <td class="p-2 border font-medium">${item.fio}</td>
-          <td class="p-2 border">${item.phone}</td>
-          <td class="p-2 border">${item.buyDate}<br><span class="text-blue-600 font-bold">${item.payDate}</span></td>
-          <td class="p-2 border font-bold">${item.monthlyPay} ₽</td>
+          <td class="p-2 border-r font-bold text-blue-700 text-center">${item.contractNum}</td>
+          <td class="p-2 border-r font-bold">${item.fio}</td>
+          <td class="p-2 border-r text-[10px]">${item.phone}</td>
+          <td class="p-2 border-r text-[10px]">${item.buyDate}<br><b class="text-blue-600">${item.payDate}</b></td>
+          <td class="p-2 border-r font-bold text-center">${item.monthlyPay}</td>
           ${instHtml}
-          <td class="p-2 border text-red-600 font-bold">0 ₽</td>
-          <td class="p-2 border font-bold ${rest<=0?'text-green-600':'text-orange-600'}">${rest} ₽</td>
-          <td class="p-2 border">${item.totalCost} / ${item.downPayment}</td>
-          <td class="p-2 border">${item.costPrice}</td>
-          <td class="p-2 border text-center cursor-pointer select-none font-bold ${item.shopPaid?'text-green-600':'text-gray-300'}" onclick="toggleShopPaid('${item.id}')">${item.shopPaid?'Д':'—'}</td>
-          <td class="p-2 border">${item.product || '—'}</td>
-          <td class="p-2 border">${item.guarantorFio || '—'}</td>
-          <td class="p-2 border text-center space-x-1 sticky right-0 bg-white shadow-l">
-            <button onclick="openPayModal('${item.id}')" class="bg-green-600 text-white px-1 rounded text-[9px] hover:bg-green-700 transition-all">+Взнос</button>
-            <button onclick="copyHistory('${item.id}', this)" class="bg-slate-500 text-white px-1 rounded text-[9px] hover:bg-slate-600 transition-all">📋 Оплаты</button>
-            <button onclick="copyGuarantor('${item.id}', this)" class="bg-indigo-500 text-white px-1 rounded text-[9px] hover:bg-indigo-600 transition-all">👥 Пор.</button>
-            <button onclick="openEditModal('${item.id}')" class="bg-blue-500 text-white px-1 rounded text-[9px] hover:bg-blue-600 transition-all">✏️</button>
-            <button onclick="deleteContract('${item.id}')" class="bg-red-500 text-white px-1 rounded text-[9px] hover:bg-red-600 transition-all">🗑️</button>
+          <td class="p-2 border-r text-red-600 font-bold text-center">0</td>
+          <td class="p-2 border-r font-bold text-center ${rest <= 0 ? 'text-green-600' : 'text-orange-600'}">${rest}</td>
+          <td class="p-2 border-r text-[10px] text-center">${item.totalCost} / ${item.downPayment}</td>
+          <td class="p-2 border-r text-center">${item.costPrice}</td>
+          <td class="p-2 border-r text-center font-black ${item.shopPaid ? 'text-green-600' : 'text-gray-300'}">${item.shopPaid ? 'Д' : '—'}</td>
+          <td class="p-2 border-r text-[10px]">${item.product || '—'}</td>
+          <td class="p-2 border-r text-[10px]">${item.guarantorFio || '—'}</td>
+          <td class="p-2 text-center space-x-1 sticky right-0 bg-white shadow-[-5px_0_10px_rgba(0,0,0,0.05)]">
+            <button onclick="openPayModal('${item.id}')" class="bg-green-600 text-white px-1 py-0.5 rounded text-[9px] font-bold">+Взнос</button>
+            <button onclick="copyHistory('${item.id}', this)" class="bg-slate-500 text-white px-1 py-0.5 rounded text-[9px]">📋 Опл.</button>
+            <button onclick="copyGuarantor('${item.id}', this)" class="bg-indigo-500 text-white px-1 py-0.5 rounded text-[9px]">👥 Пор.</button>
+            <button onclick="openEditModal('${item.id}')" class="bg-blue-500 text-white px-1 py-0.5 rounded text-[9px]">✏️</button>
+            <button onclick="deleteContract('${item.id}')" class="bg-red-500 text-white px-1 py-0.5 rounded text-[9px]">🗑️</button>
           </td>
         `;
         tbody.appendChild(tr);
@@ -382,38 +430,46 @@
 
     function filterContracts() {
       const q = document.getElementById('searchInput').value.toLowerCase();
-      renderTable(allContracts.filter(c => (c.fio && c.fio.toLowerCase().includes(q)) || String(c.contractNum).includes(q)));
+      renderTable(allContracts.filter(c => c.fio.toLowerCase().includes(q) || String(c.contractNum).includes(q)));
     }
 
-    // Экспорт / Импорт
+    // --- ИМПОРТ/ЭКСПОРТ ---
     function exportData() {
-      if (!allContracts.length) return alert("Пусто.");
       const blob = new Blob([JSON.stringify(allContracts, null, 2)], { type: "application/json" });
-      const url = window.URL.createObjectURL(blob);
+      const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       a.download = `BAZA_${new Date().toISOString().slice(0,10)}.json`;
       a.click();
-      window.URL.revokeObjectURL(url);
+      URL.revokeObjectURL(url);
     }
 
     function importData(e) {
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = function(event) {
+      reader.onload = (ev) => {
         try {
-          const data = JSON.parse(event.target.result);
-          if (confirm("Заменить текущую базу?")) {
-            recordHistory(); // Можно будет отменить даже загрузку базы!
+          const data = JSON.parse(ev.target.result);
+          if (confirm(`Загрузить ${data.length} договоров? Это заменит текущую базу.`)) {
+            saveState(); // Пишем историю перед импортом
             allContracts = data;
             saveToStorage();
           }
-        } catch(err) { alert("Ошибка файла."); }
-        e.target.value = "";
+        } catch { alert("Ошибка файла!"); }
       };
       reader.readAsText(file);
     }
+
+    // Слушатели горячих клавиш
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && (e.key === 'z' || e.key === 'я')) { e.preventDefault(); undo(); }
+      if (e.ctrlKey && (e.key === 'y' || e.key === 'н')) { e.preventDefault(); redo(); }
+    });
+
+    // Первичный рендер
+    renderTable(allContracts);
+    updateHistoryButtons();
   </script>
 </body>
 </html>
