@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Учет Договоров</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<style>
+.bg-pay-green { background-color: #22c55e !important; color: white; }
+.bg-pay-purple { background-color: #a855f7 !important; color: white; }
+.bg-pay-blue { background-color: #3b82f6 !important; color: white; }
+.bg-pay-red { background-color: #ef4444 !important; color: white; }
+.row-error { background-color: #fee2e2 !important; }
+</style>
+</head>
+<body class="bg-gray-100 text-gray-800 text-sm">
+
+<div class="p-4 max-w-[100vw] overflow-x-auto">
+<div class="flex justify-between items-center mb-4 gap-4">
+<h1 class="text-xl font-bold">Лист Договоров</h1>
+<button onclick="openModal()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
++ Новый Договор
+</button>
+</div>
+
+<!-- Таблица -->
+<div class="bg-white shadow rounded overflow-x-auto">
+<table class="min-w-full text-left border-collapse text-xs">
+<thead class="bg-gray-200 uppercase font-semibold">
+<tr>
+<th class="p-2 border">№ Договора</th>
+<th class="p-2 border">ФИО Клиента</th>
+<th class="p-2 border">Дата Покупки</th>
+<th class="p-2 border">Дата Оплаты</th>
+<th class="p-2 border">Месячная Оплата</th>
+<th class="p-2 border">Просрочка</th>
+<th class="p-2 border">Остаток</th>
+<th class="p-2 border">Рассрочка</th>
+<th class="p-2 border">Предоплата</th>
+<th class="p-2 border">Магазин «Д»</th>
+<th class="p-2 border">Товар / Магазин</th>
+<th class="p-2 border">Поручитель</th>
+<th class="p-2 border">Действие</th>
+</tr>
+</thead>
+<tbody id="contractsTable">
+<!-- Загружается из Firebase -->
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- Модальное окно добавления договора -->
+<div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4">
+<div class="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+<h2 class="text-lg font-bold mb-4">Добавить новый договор</h2>
+<form id="contractForm" onsubmit="saveContract(event)" class="grid grid-cols-2 gap-3">
+<input type="text" id="fio" placeholder="ФИО Клиента" required class="p-2 border rounded col-span-2">
+<div>
+<label class="block text-xs text-gray-500">Дата покупки</label>
+<input type="date" id="buyDate" required class="p-2 border rounded w-full">
+</div>
+<div>
+<label class="block text-xs text-gray-500">График оплаты (день)</label>
+<input type="date" id="payDate" required class="p-2 border rounded w-full">
+</div>
+<input type="number" id="monthlyPay" placeholder="Ежемесячный платеж" required class="p-2 border rounded">
+<input type="number" id="totalCost" placeholder="Общая сумма рассрочки" required class="p-2 border rounded">
+<input type="number" id="downPayment" placeholder="Предоплата" required class="p-2 border rounded">
+<input type="number" id="costPrice" placeholder="Себестоимость" required class="p-2 border rounded">
+<input type="text" id="product" placeholder="Товар" class="p-2 border rounded">
+<input type="text" id="store" placeholder="Магазин" class="p-2 border rounded">
+<input type="text" id="guarantorFio" placeholder="ФИО Поручителя" class="p-2 border rounded col-span-2">
+<div class="col-span-2 flex justify-end gap-2 mt-4">
+<button type="button" onclick="closeModal()" class="px-4 py-2 border rounded">Отмена</button>
+<button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Сохранить</button>
+</div>
+</form>
+</div>
+</div>
+
+<script>
+// Вставьте ваши данные из Firebase Console
+const firebaseConfig = {
+apiKey: "YOUR_API_KEY",
+authDomain: "YOUR_PROJECT.firebaseapp.com",
+projectId: "YOUR_PROJECT_ID",
+storageBucket: "YOUR_PROJECT.appspot.com",
+messagingSenderId: "YOUR_SENDER_ID",
+appId: "YOUR_APP_ID"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// Открытие/закрытие модалки
+function openModal() { document.getElementById('modal').classList.remove('hidden'); }
+function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+
+// Сохранение нового договора
+async function saveContract(e) {
+e.preventDefault();
+const fio = document.getElementById('fio').value;
+const contractNum = "№" + Math.floor(1000 + Math.random() * 9000); // Авто-номер
+
+const newDoc = {
+contractNum,
+fio,
+buyDate: document.getElementById('buyDate').value,
+payDate: document.getElementById('payDate').value,
+monthlyPay: Number(document.getElementById('monthlyPay').value),
+totalCost: Number(document.getElementById('totalCost').value),
+downPayment: Number(document.getElementById('downPayment').value),
+costPrice: Number(document.getElementById('costPrice').value),
+product: document.getElementById('product').value,
+store: document.getElementById('store').value,
+guarantorFio: document.getElementById('guarantorFio').value,
+shopPaid: false,
+payments: [],
+createdAt: firebase.firestore.FieldValue.serverTimestamp()
+};
+
+await db.collection('contracts').add(newDoc);
+closeModal();
+document.getElementById('contractForm').reset();
+}
+
+// Рендер таблицы в реальном времени (Firebase Realtime)
+db.collection('contracts').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
+const tbody = document.getElementById('contractsTable');
+tbody.innerHTML = '';
+
+snapshot.forEach(doc => {
+const data = doc.data();
+const totalPaid = (data.payments || []).reduce((sum, p) => sum + p.amount, 0);
+const rest = data.totalCost - data.downPayment - totalPaid;
+
+// Математическая проверка ошибок
+const isError = (data.costPrice > data.totalCost);
+
+const tr = document.createElement('tr');
+if (isError) tr.classList.add('row-error');
+
+tr.innerHTML = &lt;td class="p-2 border font-bold"&gt;${data.contractNum || ''}</td>
+<td class="p-2 border">${data.fio}&lt;/td&gt; &lt;td class="p-2 border"&gt;${data.buyDate || ''}</td>
+<td class="p-2 border">${data.payDate || ''}&lt;/td&gt; &lt;td class="p-2 border"&gt;${data.monthlyPay} ₽</td>
+<td class="p-2 border text-red-600 font-bold">0 ₽</td>
+<td class="p-2 border font-bold ${rest &lt;= 0 ? 'text-green-600' : ''}"&gt;${rest} ₽</td>
+<td class="p-2 border">${data.totalCost} ₽&lt;/td&gt; &lt;td class="p-2 border"&gt;${data.downPayment} ₽</td>
+<td class="p-2 border text-center font-bold">${data.shopPaid ? 'Д' : ''}&lt;/td&gt; &lt;td class="p-2 border"&gt;${data.product || ''} (${data.store || ''})&lt;/td&gt; &lt;td class="p-2 border"&gt;${data.guarantorFio || ''}</td>
+<td class="p-2 border">
+<button onclick="toggleShopPaid('${doc.id}', ${!data.shopPaid})" class="text-xs bg-gray-200 p-1 rounded"&gt; Отметка Д &lt;/button&gt; &lt;/td&gt;;
+tbody.appendChild(tr);
+});
+});
+
+async function toggleShopPaid(id, currentStatus) {
+await db.collection('contracts').doc(id).update({ shopPaid: currentStatus });
+}
+</script>
+</body>
+</html>
