@@ -12,7 +12,12 @@
     .btn-history-active:hover { background-color: #d97706 !important; }
     .input-error { border: 2px solid #ef4444 !important; background-color: #fef2f2 !important; }
     
-    /* Стилилизация Excel-таблицы */
+    .tab-btn.active {
+      background-color: #2563eb;
+      color: #ffffff;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
     .excel-table td, .excel-table th {
       border: 1px solid #cbd5e1;
       padding: 4px 6px;
@@ -20,27 +25,14 @@
     .bg-excel-header { background-color: #e2e8f0; font-weight: bold; }
     .bg-excel-yellow { background-color: #fef08a; }
     .bg-excel-green { background-color: #86efac; }
-    .bg-excel-red { background-color: #fca5a5 !important; color: #7f1d1d; font-weight: bold; }
-
-    .tab-btn-bottom.active {
-      background-color: #ffffff;
-      color: #2563eb;
-      border-top: 3px solid #2563eb;
-      font-weight: bold;
-    }
+    .bg-excel-red { background-color: #fca5a5; color: #7f1d1d; font-weight: bold; }
   </style>
 </head>
-<body class="bg-slate-100 text-gray-800 text-xs min-h-screen pb-16">
+<body class="bg-slate-100 text-gray-800 text-xs min-h-screen flex flex-col justify-between">
 
-  <!-- ВЕРХНЯЯ ПАНЕЛЬ ДЕЙСТВИЙ И УПРАВЛЕНИЯ -->
+  <!-- ВЕРХНЯЯ ПАНЕЛЬ ДЕЙСТВИЙ (БЕЗ ВКЛАДОК) -->
   <div class="sticky top-0 z-40 bg-white shadow-md border-b">
     <div class="p-3 max-w-[100vw] flex flex-wrap justify-between items-center gap-4">
-      
-      <div class="font-bold text-sm text-slate-700 flex items-center gap-2">
-        📂 <span>Финансовый учёт</span>
-      </div>
-
-      <!-- Кнопки управления Undo/Redo и Базой -->
       <div class="flex items-center gap-2 flex-wrap">
         <div class="flex bg-slate-200 rounded-lg p-1 gap-1">
           <button type="button" id="undoBtn" onclick="undo()" disabled title="Шаг назад (Ctrl+Z)" 
@@ -62,8 +54,10 @@
         </button>
 
         <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Поиск..." class="p-1.5 border rounded-lg w-40 focus:ring-2 focus:ring-blue-400 outline-none">
+      </div>
 
-        <!-- Динамические кнопки добавления -->
+      <!-- Кнопки добавления -->
+      <div>
         <button type="button" id="addContractBtn" onclick="openCreateModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1.5 rounded-lg shadow transition">
           + Новый Договор
         </button>
@@ -77,11 +71,11 @@
     </div>
   </div>
 
-  <div class="p-4 max-w-[100vw]">
+  <div class="p-4 max-w-[100vw] mb-12 flex-1">
     
     <!-- ================= Лист 1: Договоры ================= -->
     <div id="contractsTabContent" class="space-y-4">
-      <div class="bg-white shadow-xl rounded-xl overflow-x-auto max-h-[75vh] border">
+      <div class="bg-white shadow-xl rounded-xl overflow-x-auto max-h-[78vh] border">
         <table class="min-w-full text-left border-collapse">
           <thead class="bg-slate-800 text-white uppercase font-bold text-[10px] sticky top-0 z-20">
             <tr>
@@ -183,9 +177,7 @@
                   <td></td>
                 </tr>
               </tbody>
-              <tbody id="takenRowsTable">
-                <!-- Динамические строки операций Взяли/Положили -->
-              </tbody>
+              <tbody id="takenRowsTable"></tbody>
             </table>
           </div>
 
@@ -212,7 +204,7 @@
           </div>
 
           <!-- Правый блок: Таблица счетов / карт -->
-          <div class="flex-1 min-w-[550px]">
+          <div class="flex-1 min-w-[500px]">
             <div class="mb-2 flex justify-between items-center">
               <span class="font-bold uppercase text-[10px] text-slate-500">Счета и Карты</span>
               <button onclick="addNewAccountPrompt()" class="bg-slate-700 hover:bg-slate-800 text-white font-bold px-2 py-1 rounded text-[10px]">+ Добавить счет</button>
@@ -221,19 +213,16 @@
               <table class="w-full border-collapse excel-table text-center">
                 <thead>
                   <tr class="bg-excel-header font-bold text-[10px]">
-                    <th>Касса</th>
+                    <th>Счет</th>
                     <th id="accountsGrandTotal">0</th>
-                    <th>кол-во вход. в месяц</th>
+                    <th>кол-во вход.</th>
                     <th>приход в месяц</th>
-                    <th>кол-во исх. в месяц</th>
+                    <th>кол-во исх.</th>
                     <th>расход в месяц</th>
-                    <th>кол-во перевод</th>
-                    <th class="w-20">Управление</th>
+                    <th>Действия</th>
                   </tr>
                 </thead>
-                <tbody id="accountsTableBody">
-                  <!-- Динамические строки счетов -->
-                </tbody>
+                <tbody id="accountsTableBody"></tbody>
               </table>
             </div>
           </div>
@@ -244,15 +233,15 @@
 
   </div>
 
-  <!-- НИЖНЯЯ ПАНЕЛЬ ПЕРЕКЛЮЧЕНИЯ ЛИСТОВ (EXCEL-СТИЛЬ) -->
-  <div class="fixed bottom-0 left-0 right-0 bg-slate-200 border-t z-50 flex items-center px-4 gap-1 h-10">
-    <button type="button" onclick="switchTab('contracts')" id="tabBtnContracts" class="tab-btn-bottom active h-full px-5 flex items-center text-slate-700 text-xs font-semibold hover:bg-white/50 transition">
+  <!-- НИЖНЯЯ ПАНЕЛЬ ПЕРЕКЛЮЧЕНИЯ ЛИСТОВ (КАК В EXCEL) -->
+  <div class="fixed bottom-0 left-0 right-0 z-50 bg-slate-800 text-white px-4 py-2 flex items-center gap-2 border-t border-slate-700 shadow-lg">
+    <button type="button" onclick="switchTab('contracts')" id="tabBtnContracts" class="tab-btn active px-4 py-1.5 rounded-md font-bold text-xs transition">
       📋 Договоры
     </button>
-    <button type="button" onclick="switchTab('accounting')" id="tabBtnAccounting" class="tab-btn-bottom h-full px-5 flex items-center text-slate-700 text-xs font-semibold hover:bg-white/50 transition">
+    <button type="button" onclick="switchTab('accounting')" id="tabBtnAccounting" class="tab-btn px-4 py-1.5 rounded-md font-bold text-xs transition text-slate-300 hover:text-white">
       📊 Учет
     </button>
-    <button type="button" onclick="switchTab('taken')" id="tabBtnTaken" class="tab-btn-bottom h-full px-5 flex items-center text-slate-700 text-xs font-semibold hover:bg-white/50 transition">
+    <button type="button" onclick="switchTab('taken')" id="tabBtnTaken" class="tab-btn px-4 py-1.5 rounded-md font-bold text-xs transition text-slate-300 hover:text-white">
       📙 Взяли
     </button>
   </div>
@@ -305,7 +294,7 @@
               <input type="number" id="totalCost" required oninput="validateFinance()" class="p-2 border rounded w-full">
             </div>
             <div>
-              <label class="block text-[9px] font-bold text-blue-800 uppercase mb-1">Предоплата (1-й взнос)</label>
+              <label class="block text-[9px] font-bold text-blue-800 uppercase mb-1">Предоплата</label>
               <input type="number" id="downPayment" value="0" oninput="validateFinance()" class="p-2 border rounded w-full">
             </div>
             <div>
@@ -396,7 +385,7 @@
           <input type="text" id="accNote" placeholder="Например: Перенос или Оплата товара" class="p-2 border rounded-md w-full outline-none">
         </div>
         <div>
-          <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Счет / Источник (карта)</label>
+          <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Счет / Источник</label>
           <input type="text" id="accAccount" placeholder="Например: S1, N, C1..." class="p-2 border rounded-md w-full outline-none">
         </div>
 
@@ -450,15 +439,10 @@
     let allTaken = JSON.parse(localStorage.getItem('taken_db') || '[]');
     let customAccounts = JSON.parse(localStorage.getItem('accounts_db') || 'null');
 
-    // Настройка карт/счетов (имя + цвет)
-    if (!customAccounts) {
-      const defaultList = ['N', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12', 'T13', 'T14', 'T15', 'T16', 'B1', 'B2', 'B3', 'B4'];
-      customAccounts = defaultList.map(name => ({ name, color: '' }));
-    } else {
-      // Поддержка старого формата массив строк
-      if (typeof customAccounts[0] === 'string') {
-        customAccounts = customAccounts.map(name => ({ name, color: '' }));
-      }
+    // Счета по умолчанию в формате объектов с поддержкой цвета
+    if (!customAccounts || !Array.isArray(customAccounts) || typeof customAccounts[0] === 'string') {
+      const defaultNames = ['N', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12', 'T13', 'T14', 'T15', 'T16', 'B1', 'B2', 'B3', 'B4'];
+      customAccounts = defaultNames.map(name => ({ name: name, color: '#ffffff' }));
     }
 
     let activeTab = 'contracts';
@@ -480,7 +464,6 @@
       const addA = document.getElementById('addAccBtn');
       const addT = document.getElementById('addTakenBtn');
 
-      // Сброс видимости
       cTab.classList.add('hidden');
       aTab.classList.add('hidden');
       tTab.classList.add('hidden');
@@ -488,21 +471,21 @@
       addA.classList.add('hidden');
       addT.classList.add('hidden');
 
-      cBtn.className = "tab-btn-bottom h-full px-5 flex items-center text-slate-700 text-xs font-semibold hover:bg-white/50 transition";
-      aBtn.className = "tab-btn-bottom h-full px-5 flex items-center text-slate-700 text-xs font-semibold hover:bg-white/50 transition";
-      tBtn.className = "tab-btn-bottom h-full px-5 flex items-center text-slate-700 text-xs font-semibold hover:bg-white/50 transition";
+      cBtn.className = "tab-btn px-4 py-1.5 rounded-md font-bold text-xs transition text-slate-300 hover:text-white";
+      aBtn.className = "tab-btn px-4 py-1.5 rounded-md font-bold text-xs transition text-slate-300 hover:text-white";
+      tBtn.className = "tab-btn px-4 py-1.5 rounded-md font-bold text-xs transition text-slate-300 hover:text-white";
 
       if (tab === 'contracts') {
         cTab.classList.remove('hidden');
-        cBtn.className = "tab-btn-bottom active h-full px-5 flex items-center text-xs font-bold transition";
+        cBtn.className = "tab-btn active px-4 py-1.5 rounded-md font-bold text-xs transition";
         addC.classList.remove('hidden');
       } else if (tab === 'accounting') {
         aTab.classList.remove('hidden');
-        aBtn.className = "tab-btn-bottom active h-full px-5 flex items-center text-xs font-bold transition";
+        aBtn.className = "tab-btn active px-4 py-1.5 rounded-md font-bold text-xs transition";
         addA.classList.remove('hidden');
       } else if (tab === 'taken') {
         tTab.classList.remove('hidden');
-        tBtn.className = "tab-btn-bottom active h-full px-5 flex items-center text-xs font-bold transition";
+        tBtn.className = "tab-btn active px-4 py-1.5 rounded-md font-bold text-xs transition";
         addT.classList.remove('hidden');
         renderTakenSheet();
       }
@@ -987,18 +970,29 @@
       }
     }
 
+    // --- УПРАВЛЕНИЕ КАРТАМИИИ СЧЕТАМИ (УДАЛЕНИЕ, ЦВЕТ, ПОРЯДОК) ---
     function addNewAccountPrompt() {
       const accName = prompt('Введите название нового счета/карты (например: S3, A1):');
       if (accName && accName.trim()) {
         const cleanName = accName.trim();
         if(!customAccounts.some(a => a.name.toLowerCase() === cleanName.toLowerCase())) {
           saveState();
-          customAccounts.push({ name: cleanName, color: '' });
+          customAccounts.push({ name: cleanName, color: '#ffffff' });
           saveToStorage();
         } else {
           alert('Такой счет уже существует!');
         }
       }
+    }
+
+    function moveAccount(index, direction) {
+      const targetIndex = index + direction;
+      if (targetIndex < 0 || targetIndex >= customAccounts.length) return;
+      saveState();
+      const temp = customAccounts[index];
+      customAccounts[index] = customAccounts[targetIndex];
+      customAccounts[targetIndex] = temp;
+      saveToStorage();
     }
 
     function changeAccountColor(index, color) {
@@ -1007,7 +1001,7 @@
       saveToStorage();
     }
 
-    function deleteAccount(index) {
+    function removeAccount(index) {
       if (confirm(`Удалить карту "${customAccounts[index].name}"?`)) {
         saveState();
         customAccounts.splice(index, 1);
@@ -1016,7 +1010,7 @@
     }
 
     function renderTakenSheet() {
-      // 1. Расчет таблицы Взяли / Положили
+      // 1. Таблица Взяли / Положили
       const rowsTbody = document.getElementById('takenRowsTable');
       rowsTbody.innerHTML = '';
 
@@ -1046,9 +1040,8 @@
       document.getElementById('takenTotalSum').innerText = sumTaken.toLocaleString('ru-RU');
       document.getElementById('putTotalSum').innerText = sumPut.toLocaleString('ru-RU');
 
-      // 2. РАСЧЕТ КАССЫ И УЧЕТА ПО ТРЕБУЕМОЙ ЛОГИКЕ
-      
-      // А) Учет: Чистый доход из Листа Учет (Доходы - Расходы) - Взяли + Положили
+      // --- ЛОГИКА КАССЫ И УЧЕТА ---
+      // УЧЕТ = Доход (из листа Учет) - Расход (из листа Учет) - Взяли + Положили
       let totalUchetIncome = 0;
       let totalUchetExpense = 0;
       allAccounting.forEach(a => {
@@ -1056,38 +1049,27 @@
         totalUchetExpense += Number(a.expense || 0);
       });
 
-      const pureUchetBalance = totalUchetIncome - totalUchetExpense;
-      const uchetFinal = pureUchetBalance - sumTaken + sumPut;
+      const uchetBalance = totalUchetIncome - totalUchetExpense - sumTaken + sumPut;
+      document.getElementById('kassaUchet').innerText = uchetBalance.toLocaleString('ru-RU');
 
-      // Б) Касса: 
-      // + Доходы от договоров (Первый взнос + все остальные платежи)
-      // + Доходы из Листа Учет
-      // + Положили из Взяли
-      // - Себестоимость договоров
-      // - Расходы из Листа Учет
-      // - Взяли из Взяли
-      let contractsIncomeSum = 0;
-      let contractsCostPriceSum = 0;
+      // КАССА = (Предоплаты по договорам + Все Взносы по договорам - Себестоимость товаров) - Взяли + Положили
+      let contractsIncome = 0;
+      let contractsExpense = 0;
 
       allContracts.forEach(c => {
-        contractsIncomeSum += Number(c.downPayment || 0);
-        contractsCostPriceSum += Number(c.costPrice || 0);
-
-        if (c.installments) {
-          Object.values(c.installments).forEach(p => {
-            contractsIncomeSum += Number(p.amount || 0);
-          });
-        }
+        contractsIncome += Number(c.downPayment || 0);
+        contractsExpense += Number(c.costPrice || 0);
+        
+        const insts = c.installments || {};
+        Object.values(insts).forEach(p => {
+          contractsIncome += Number(p.amount || 0);
+        });
       });
 
-      const totalKassaPlus = contractsIncomeSum + totalUchetIncome + sumPut;
-      const totalKassaMinus = contractsCostPriceSum + totalUchetExpense + sumTaken;
-      const kassaFinal = totalKassaPlus - totalKassaMinus;
+      const kassaTotal = (contractsIncome - contractsExpense) - sumTaken + sumPut;
+      document.getElementById('kassaTotal').innerText = kassaTotal.toLocaleString('ru-RU');
 
-      document.getElementById('kassaTotal').innerText = kassaFinal.toLocaleString('ru-RU');
-      document.getElementById('kassaUchet').innerText = uchetFinal.toLocaleString('ru-RU');
-
-      // 3. Статистика Договоров
+      // 2. Расчет Статистики Договоров
       const now = new Date();
       const todayStr = now.toISOString().slice(0, 10);
 
@@ -1136,7 +1118,7 @@
       document.getElementById('statFactTodaySum').innerText = factTodaySum.toLocaleString('ru-RU') + ' ₽';
       document.getElementById('statFactTodayCount').innerText = factTodayCount;
 
-      // 4. Расчет Правой Таблицы Счетов / Карт
+      // 3. Таблица Счетов / Карт
       const accountsBody = document.getElementById('accountsTableBody');
       accountsBody.innerHTML = '';
 
@@ -1145,8 +1127,10 @@
 
       let accountsGrandTotalSum = 0;
 
-      customAccounts.forEach((accObj, idx) => {
-        const accName = accObj.name;
+      customAccounts.forEach((accObj, index) => {
+        const accName = typeof accObj === 'string' ? accObj : accObj.name;
+        const accColor = (typeof accObj === 'object' && accObj.color) ? accObj.color : '#ffffff';
+
         let accBalance = 0;
         let incCountMonth = 0;
         let incSumMonth = 0;
@@ -1177,33 +1161,25 @@
 
         accountsGrandTotalSum += accBalance;
 
-        // Лимит 400 000 рублей на приход или уход в месяц
         const isOverLimit = (incSumMonth >= 400000 || expSumMonth >= 400000);
-        
-        let rowStyle = '';
-        let rowClass = isOverLimit ? 'bg-excel-red' : '';
-
-        if (!isOverLimit && accObj.color) {
-          rowStyle = `style="background-color: ${accObj.color};"`;
-        } else if (!isOverLimit && accBalance > 0) {
-          rowClass = 'bg-excel-green';
-        }
 
         const tr = document.createElement('tr');
-        if (rowClass) tr.className = rowClass;
-        if (rowStyle) tr.setAttribute('style', rowStyle.replace('style="', '').replace('"', ''));
+        tr.style.backgroundColor = accColor;
 
         tr.innerHTML = `
-          <td class="font-bold">${accName}</td>
+          <td class="font-bold flex items-center justify-between px-2 gap-1">
+            <span>${accName}</span>
+            <input type="color" value="${accColor}" onchange="changeAccountColor(${index}, this.value)" class="w-4 h-4 p-0 border-0 cursor-pointer bg-transparent" title="Изменить цвет">
+          </td>
           <td class="font-bold">${accBalance.toLocaleString('ru-RU')}</td>
           <td>${incCountMonth}</td>
-          <td class="${incSumMonth >= 400000 ? 'text-red-800 font-black' : ''}">${incSumMonth.toLocaleString('ru-RU')}</td>
+          <td class="${incSumMonth >= 400000 ? 'bg-excel-red' : ''}">${incSumMonth.toLocaleString('ru-RU')}</td>
           <td>${expCountMonth}</td>
-          <td class="${expSumMonth >= 400000 ? 'text-red-800 font-black' : ''}">${expSumMonth.toLocaleString('ru-RU')}</td>
-          <td>0</td>
-          <td class="space-x-1">
-            <input type="color" value="${accObj.color || '#ffffff'}" onchange="changeAccountColor(${idx}, this.value)" title="Изменить цвет" class="w-5 h-5 cursor-pointer align-middle border-none bg-transparent">
-            <button onclick="deleteAccount(${idx})" class="text-red-600 font-bold hover:text-red-800" title="Удалить карту">🗑️</button>
+          <td class="${expSumMonth >= 400000 ? 'bg-excel-red' : ''}">${expSumMonth.toLocaleString('ru-RU')}</td>
+          <td class="space-x-1 min-w-[70px]">
+            <button onclick="moveAccount(${index}, -1)" class="font-bold text-slate-600 hover:text-black">▲</button>
+            <button onclick="moveAccount(${index}, 1)" class="font-bold text-slate-600 hover:text-black">▼</button>
+            <button onclick="removeAccount(${index})" class="text-red-600 font-bold ml-1">🗑️</button>
           </td>
         `;
         accountsBody.appendChild(tr);
@@ -1277,14 +1253,7 @@
               allContracts = data.contracts || [];
               allAccounting = data.accounting || [];
               allTaken = data.taken || [];
-              
-              if (data.accounts) {
-                if (typeof data.accounts[0] === 'string') {
-                  customAccounts = data.accounts.map(name => ({ name, color: '' }));
-                } else {
-                  customAccounts = data.accounts;
-                }
-              }
+              customAccounts = data.accounts || customAccounts;
             }
             saveToStorage();
           }
@@ -1299,7 +1268,7 @@
       if (e.ctrlKey && (e.key === 'y' || e.key === 'н')) { e.preventDefault(); redo(); }
     });
 
-    // Инициализация
+    // Первичная инициализация
     renderTable(allContracts);
     renderAccountingTable(allAccounting);
     renderTakenSheet();
