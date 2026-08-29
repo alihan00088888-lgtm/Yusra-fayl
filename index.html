@@ -11,7 +11,6 @@
     .btn-history-active { background-color: #f59e0b !important; color: white !important; cursor: pointer !important; }
     .btn-history-active:hover { background-color: #d97706 !important; }
     .input-error { border: 2px solid #ef4444 !important; background-color: #fef2f2 !important; }
-    .limit-exceeded { background-color: #fee2e2 !important; color: #dc2626 !important; font-weight: bold; }
     
     /* Стилизация вкладок */
     .tab-btn.active {
@@ -19,6 +18,16 @@
       color: #ffffff;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
+
+    /* Специфичные стили для Excel-дизайна листа Взяли */
+    .excel-table td, .excel-table th {
+      border: 1px solid #cbd5e1;
+      padding: 4px 6px;
+    }
+    .bg-excel-header { background-color: #e2e8f0; font-weight: bold; }
+    .bg-excel-yellow { background-color: #fef08a; }
+    .bg-excel-green { background-color: #86efac; }
+    .bg-excel-red { background-color: #fca5a5; color: #7f1d1d; font-weight: bold; }
   </style>
 </head>
 <body class="bg-slate-100 text-gray-800 text-xs min-h-screen">
@@ -28,7 +37,7 @@
     <div class="p-3 max-w-[100vw] flex flex-wrap justify-between items-center gap-4">
       
       <!-- Переключение листов -->
-      <div class="flex items-center gap-2 bg-slate-200 p-1 rounded-xl flex-wrap">
+      <div class="flex items-center gap-2 bg-slate-200 p-1 rounded-xl">
         <button type="button" onclick="switchTab('contracts')" id="tabBtnContracts" class="tab-btn active px-4 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2">
           📋 Договоры
         </button>
@@ -36,7 +45,7 @@
           📊 Учет
         </button>
         <button type="button" onclick="switchTab('taken')" id="tabBtnTaken" class="tab-btn px-4 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
-          🏦 Взяли / Касса
+          📙 Взяли
         </button>
       </div>
 
@@ -70,8 +79,8 @@
         <button type="button" id="addAccBtn" onclick="openAccModal()" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-lg shadow transition">
           + Новая Запись Учета
         </button>
-        <button type="button" id="addTakenBtn" onclick="openTakenModal()" class="hidden bg-purple-600 hover:bg-purple-700 text-white font-bold px-3 py-1.5 rounded-lg shadow transition">
-          + Запись (Взял / Положил)
+        <button type="button" id="addTakenBtn" onclick="openTakenModal()" class="hidden bg-amber-600 hover:bg-amber-700 text-white font-bold px-3 py-1.5 rounded-lg shadow transition">
+          + Запись Взяли / Положили
         </button>
       </div>
     </div>
@@ -111,8 +120,6 @@
 
     <!-- ================= Лист 2: Учет ================= -->
     <div id="accountingTabContent" class="hidden space-y-4">
-      
-      <!-- Дашборд доходов и расходов -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="bg-white p-4 rounded-xl border-l-4 border-emerald-500 shadow-md flex justify-between items-center">
           <div>
@@ -130,7 +137,6 @@
         </div>
       </div>
 
-      <!-- Таблица учета -->
       <div class="bg-white shadow-xl rounded-xl overflow-x-auto max-h-[68vh] border">
         <table class="min-w-full text-left border-collapse">
           <thead class="bg-slate-800 text-white uppercase font-bold text-[10px] sticky top-0 z-20">
@@ -148,62 +154,99 @@
       </div>
     </div>
 
-    <!-- ================= Лист 3: Взяли / Касса ================= -->
+    <!-- ================= Лист 3: Взяли ================= -->
     <div id="takenTabContent" class="hidden space-y-4">
-      
-      <!-- Карточки статистики по счетам и общему балансу кассы -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div class="bg-white p-4 rounded-xl border-l-4 border-amber-500 shadow-md">
-          <p class="text-[10px] uppercase font-bold text-gray-400">Общая сумма ВЗЯЛИ</p>
-          <h3 id="statTotalTaken" class="text-xl font-black text-amber-600">0 ₽</h3>
-        </div>
-        <div class="bg-white p-4 rounded-xl border-l-4 border-indigo-500 shadow-md">
-          <p class="text-[10px] uppercase font-bold text-gray-400">Общая сумма ПОЛОЖИЛ</p>
-          <h3 id="statTotalPut" class="text-xl font-black text-indigo-600">0 ₽</h3>
-        </div>
-        <div class="bg-white p-4 rounded-xl border-l-4 border-blue-500 shadow-md">
-          <p class="text-[10px] uppercase font-bold text-gray-400">Чистый Баланс Кассы</p>
-          <h3 id="statNetBalance" class="text-xl font-black text-blue-600">0 ₽</h3>
-        </div>
-        <div class="bg-white p-4 rounded-xl border-l-4 border-green-500 shadow-md">
-          <p class="text-[10px] uppercase font-bold text-gray-400">Договоры (Всего / Закрыто / План сегодня)</p>
-          <h3 id="statContractsSummary" class="text-sm font-black text-gray-700">0 / 0 / 0 ₽</h3>
-        </div>
-      </div>
+      <div class="bg-white shadow-xl rounded-xl p-4 overflow-x-auto border">
+        <div class="flex flex-wrap lg:flex-nowrap gap-6">
+          
+          <!-- Левый блок: Касса, Взяли, Положили -->
+          <div class="flex-1 min-w-[550px]">
+            <table class="w-full text-left border-collapse excel-table bg-amber-50/20">
+              <thead>
+                <tr class="bg-excel-header text-center font-bold">
+                  <th class="w-24">Касса</th>
+                  <th class="w-28">Взяли</th>
+                  <th>Описание</th>
+                  <th class="w-28">Положили</th>
+                  <th>Описание</th>
+                  <th class="w-16">Действия</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="bg-excel-yellow font-bold text-center">
+                  <td id="kassaTotal" class="text-sm">0</td>
+                  <td id="takenTotalSum" class="text-sm">0</td>
+                  <td></td>
+                  <td id="putTotalSum" class="text-sm">0</td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr class="bg-excel-yellow font-bold text-center">
+                  <td>Учет</td>
+                  <td colspan="4"></td>
+                  <td></td>
+                </tr>
+                <tr class="bg-excel-yellow font-bold text-center">
+                  <td id="kassaUchet">0</td>
+                  <td colspan="4"></td>
+                  <td></td>
+                </tr>
+              </tbody>
+              <tbody id="takenRowsTable">
+                <!-- Динамические строки операций Взяли/Положили -->
+              </tbody>
+            </table>
+          </div>
 
-      <!-- Таблица Счетов / Карт (S1, S2, S3, N...) -->
-      <div class="bg-white p-4 rounded-xl shadow-md border space-y-2">
-        <h3 class="font-bold text-sm text-slate-800 uppercase tracking-tight">Состояние Счетов (Месячный лимит 400 000 ₽)</h3>
-        <div class="overflow-x-auto">
-          <table class="min-w-full text-left border-collapse">
-            <thead class="bg-slate-700 text-white font-bold text-[10px] uppercase">
-              <tr>
-                <th class="p-2 border border-slate-600">Счет</th>
-                <th class="p-2 border border-slate-600">Текущий Баланс</th>
-                <th class="p-2 border border-slate-600">Приход за месяц</th>
-                <th class="p-2 border border-slate-600">Расход за месяц</th>
-                <th class="p-2 border border-slate-600">Статус Лимита (400k)</th>
-              </tr>
-            </thead>
-            <tbody id="accountsSummaryTable" class="divide-y font-medium text-xs"></tbody>
-          </table>
-        </div>
-      </div>
+          <!-- Блок по центру: Статистика Договоров -->
+          <div class="w-64 shrink-0">
+            <table class="w-full border-collapse excel-table text-center">
+              <tbody>
+                <tr class="bg-excel-header font-bold"><td class="p-2">Количество договоров</td></tr>
+                <tr><td id="statTotalContracts" class="font-bold text-sm">0</td></tr>
+                <tr class="bg-excel-header font-bold"><td class="p-2">Закрытые договора</td></tr>
+                <tr><td id="statClosedContracts" class="font-bold text-sm">0</td></tr>
+                <tr class="bg-excel-header font-bold"><td class="p-2">Актуальные договора</td></tr>
+                <tr><td id="statActiveContracts" class="font-bold text-sm text-blue-600">0</td></tr>
+                <tr class="bg-excel-header font-bold"><td class="p-2">Оплаты Сегодня (план)</td></tr>
+                <tr><td id="statPlanTodaySum" class="font-bold text-sm text-amber-600">0</td></tr>
+                <tr class="bg-excel-header"><td class="text-[10px] uppercase font-bold">Количество</td></tr>
+                <tr><td id="statPlanTodayCount" class="font-bold">0</td></tr>
+                <tr class="bg-excel-header font-bold"><td class="p-2">Оплаты Сегодня (факт)</td></tr>
+                <tr><td id="statFactTodaySum" class="font-bold text-sm text-emerald-600">0</td></tr>
+                <tr class="bg-excel-header"><td class="text-[10px] uppercase font-bold">Количество</td></tr>
+                <tr><td id="statFactTodayCount" class="font-bold">0</td></tr>
+              </tbody>
+            </table>
+          </div>
 
-      <!-- Таблица Изъятий и Внесений средств -->
-      <div class="bg-white shadow-xl rounded-xl overflow-x-auto max-h-[50vh] border">
-        <table class="min-w-full text-left border-collapse">
-          <thead class="bg-slate-800 text-white uppercase font-bold text-[10px] sticky top-0 z-20">
-            <tr>
-              <th class="p-3 border-r border-slate-700">Дата</th>
-              <th class="p-3 border-r border-slate-700">Тип Операции</th>
-              <th class="p-3 border-r border-slate-700">Сумма</th>
-              <th class="p-3 border-r border-slate-700">Описание / Причина</th>
-              <th class="p-3 text-center sticky right-0 bg-slate-900 w-[80px]">Действие</th>
-            </tr>
-          </thead>
-          <tbody id="takenTable" class="divide-y"></tbody>
-        </table>
+          <!-- Правый блок: Таблица счетов / карт -->
+          <div class="flex-1 min-w-[500px]">
+            <div class="mb-2 flex justify-between items-center">
+              <span class="font-bold uppercase text-[10px] text-slate-500">Счета и Карты</span>
+              <button onclick="addNewAccountPrompt()" class="bg-slate-700 hover:bg-slate-800 text-white font-bold px-2 py-1 rounded text-[10px]">+ Добавить счет</button>
+            </div>
+            <div class="max-h-[70vh] overflow-y-auto">
+              <table class="w-full border-collapse excel-table text-center">
+                <thead>
+                  <tr class="bg-excel-header font-bold text-[10px]">
+                    <th>Касса</th>
+                    <th id="accountsGrandTotal">0</th>
+                    <th>кол-во вход. в месяц</th>
+                    <th>приход в месяц</th>
+                    <th>кол-во исх. в месяц</th>
+                    <th>расход в месяц</th>
+                    <th>кол-во перевод в месяц</th>
+                  </tr>
+                </thead>
+                <tbody id="accountsTableBody">
+                  <!-- Динамические строки счетов S1, S2, N... -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
 
@@ -349,7 +392,7 @@
         </div>
         <div>
           <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Счет / Источник</label>
-          <input type="text" id="accAccount" placeholder="Например: S1, N, A1..." class="p-2 border rounded-md w-full outline-none">
+          <input type="text" id="accAccount" placeholder="Например: S1, N, C1..." class="p-2 border rounded-md w-full outline-none">
         </div>
 
         <div class="flex justify-end gap-2 pt-4 border-t">
@@ -360,34 +403,36 @@
     </div>
   </div>
 
-  <!-- Модальное окно ВЗЯЛИ / ПОЛОЖИЛ -->
+  <!-- Модальное окно Взяли / Положили -->
   <div id="takenModal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl border-t-4 border-purple-500">
-      <h3 class="font-bold text-base text-slate-800 mb-4 border-b pb-2 uppercase">Операция Кассы (Взял / Положил)</h3>
+    <div class="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl border-t-4 border-amber-500">
+      <h3 id="takenModalTitle" class="font-bold text-base text-slate-800 mb-4 border-b pb-2 uppercase">Запись Взяли / Положили</h3>
       <form id="takenForm" class="space-y-3">
-        <div>
-          <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Тип операции</label>
-          <select id="takenType" class="p-2 border rounded-md w-full font-bold outline-none">
-            <option value="taken">ВЗЯЛ (Снять с учёта и кассы)</option>
-            <option value="put">ПОЛОЖИЛ (Добавить в учёт и кассу)</option>
-          </select>
+        <input type="hidden" id="takenEditId">
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[10px] font-bold text-amber-700 uppercase mb-1">Взяли (₽)</label>
+            <input type="number" id="takenAmount" value="0" min="0" class="p-2 border rounded-md w-full font-bold text-amber-700 outline-none">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Описание (Взяли)</label>
+            <input type="text" id="takenDesc" placeholder="Например: Рамзан" class="p-2 border rounded-md w-full outline-none">
+          </div>
         </div>
-        <div>
-          <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Дата</label>
-          <input type="date" id="takenDate" required class="p-2 border rounded-md w-full outline-none">
-        </div>
-        <div>
-          <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Сумма (₽)</label>
-          <input type="number" id="takenAmount" min="1" required class="p-2 border rounded-md w-full font-bold text-purple-700 text-lg outline-none">
-        </div>
-        <div>
-          <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Описание (Причина)</label>
-          <input type="text" id="takenNote" placeholder="Например: Личные нужды / Возврат" required class="p-2 border rounded-md w-full outline-none">
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[10px] font-bold text-emerald-600 uppercase mb-1">Положили (₽)</label>
+            <input type="number" id="putAmount" value="0" min="0" class="p-2 border rounded-md w-full font-bold text-emerald-600 outline-none">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Описание (Положили)</label>
+            <input type="text" id="putDesc" placeholder="Описание" class="p-2 border rounded-md w-full outline-none">
+          </div>
         </div>
 
         <div class="flex justify-end gap-2 pt-4 border-t">
           <button type="button" onclick="closeTakenModal()" class="px-4 py-2 text-slate-500 font-bold">Отмена</button>
-          <button type="submit" class="px-6 py-2 bg-purple-600 text-white rounded-lg font-bold hover:bg-purple-700 transition shadow">Провести</button>
+          <button type="submit" class="px-6 py-2 bg-amber-600 text-white rounded-lg font-bold hover:bg-amber-700 transition shadow">Сохранить</button>
         </div>
       </form>
     </div>
@@ -398,6 +443,12 @@
     let allContracts = JSON.parse(localStorage.getItem('contracts_db') || '[]');
     let allAccounting = JSON.parse(localStorage.getItem('accounting_db') || '[]');
     let allTaken = JSON.parse(localStorage.getItem('taken_db') || '[]');
+    let customAccounts = JSON.parse(localStorage.getItem('accounts_db') || 'null');
+
+    // Счета по умолчанию как на вашем скрине
+    if (!customAccounts) {
+      customAccounts = ['N', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12', 'T13', 'T14', 'T15', 'T16', 'B1', 'B2', 'B3', 'B4'];
+    }
 
     let activeTab = 'contracts';
     let undoStack = [];
@@ -418,17 +469,17 @@
       const addA = document.getElementById('addAccBtn');
       const addT = document.getElementById('addTakenBtn');
 
+      // Сброс видимости
       cTab.classList.add('hidden');
       aTab.classList.add('hidden');
       tTab.classList.add('hidden');
+      addC.classList.add('hidden');
+      addA.classList.add('hidden');
+      addT.classList.add('hidden');
 
       cBtn.className = "tab-btn px-4 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       aBtn.className = "tab-btn px-4 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       tBtn.className = "tab-btn px-4 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
-
-      addC.classList.add('hidden');
-      addA.classList.add('hidden');
-      addT.classList.add('hidden');
 
       if (tab === 'contracts') {
         cTab.classList.remove('hidden');
@@ -442,6 +493,7 @@
         tTab.classList.remove('hidden');
         tBtn.className = "tab-btn active px-4 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
         addT.classList.remove('hidden');
+        renderTakenSheet();
       }
       handleSearch();
     }
@@ -451,7 +503,8 @@
       const stateSnapshot = {
         contracts: JSON.parse(JSON.stringify(allContracts)),
         accounting: JSON.parse(JSON.stringify(allAccounting)),
-        taken: JSON.parse(JSON.stringify(allTaken))
+        taken: JSON.parse(JSON.stringify(allTaken)),
+        accounts: JSON.parse(JSON.stringify(customAccounts))
       };
       undoStack.push(JSON.stringify(stateSnapshot));
       if (undoStack.length > 50) undoStack.shift();
@@ -464,7 +517,8 @@
       const currentState = {
         contracts: JSON.parse(JSON.stringify(allContracts)),
         accounting: JSON.parse(JSON.stringify(allAccounting)),
-        taken: JSON.parse(JSON.stringify(allTaken))
+        taken: JSON.parse(JSON.stringify(allTaken)),
+        accounts: JSON.parse(JSON.stringify(customAccounts))
       };
       redoStack.push(JSON.stringify(currentState));
       
@@ -472,6 +526,7 @@
       allContracts = previousState.contracts;
       allAccounting = previousState.accounting;
       allTaken = previousState.taken || [];
+      customAccounts = previousState.accounts || customAccounts;
       finishAction();
     }
 
@@ -480,7 +535,8 @@
       const currentState = {
         contracts: JSON.parse(JSON.stringify(allContracts)),
         accounting: JSON.parse(JSON.stringify(allAccounting)),
-        taken: JSON.parse(JSON.stringify(allTaken))
+        taken: JSON.parse(JSON.stringify(allTaken)),
+        accounts: JSON.parse(JSON.stringify(customAccounts))
       };
       undoStack.push(JSON.stringify(currentState));
       
@@ -488,6 +544,7 @@
       allContracts = nextState.contracts;
       allAccounting = nextState.accounting;
       allTaken = nextState.taken || [];
+      customAccounts = nextState.accounts || customAccounts;
       finishAction();
     }
 
@@ -495,9 +552,10 @@
       localStorage.setItem('contracts_db', JSON.stringify(allContracts));
       localStorage.setItem('accounting_db', JSON.stringify(allAccounting));
       localStorage.setItem('taken_db', JSON.stringify(allTaken));
+      localStorage.setItem('accounts_db', JSON.stringify(customAccounts));
       renderTable(allContracts);
       renderAccountingTable(allAccounting);
-      renderTakenTable(allTaken);
+      renderTakenSheet();
       updateHistoryButtons();
     }
 
@@ -516,13 +574,14 @@
       localStorage.setItem('contracts_db', JSON.stringify(allContracts));
       localStorage.setItem('accounting_db', JSON.stringify(allAccounting));
       localStorage.setItem('taken_db', JSON.stringify(allTaken));
+      localStorage.setItem('accounts_db', JSON.stringify(customAccounts));
       renderTable(allContracts);
       renderAccountingTable(allAccounting);
-      renderTakenTable(allTaken);
+      renderTakenSheet();
       updateHistoryButtons();
     }
 
-    // --- ЛИСТ 1: ДОГОВОРЫ (ВАЛИДАЦИЯ И УПРАВЛЕНИЕ) ---
+    // --- ЛИСТ 1: ДОГОВОРЫ ---
     function validateFinance() {
       const months = Number(document.getElementById('monthsCount').value) || 0;
       const monthly = Number(document.getElementById('monthlyPay').value) || 0;
@@ -764,7 +823,7 @@
       });
     }
 
-    // --- ЛИСТ 2: УЧЕТ (ЛОГИКА И РЕНДЕР) ---
+    // --- ЛИСТ 2: УЧЕТ ---
     const accModal = document.getElementById('accModal');
     
     function openAccModal() {
@@ -800,7 +859,7 @@
         income: Number(document.getElementById('accIncome').value) || 0,
         expense: Number(document.getElementById('accExpense').value) || 0,
         note: document.getElementById('accNote').value || '—',
-        account: document.getElementById('accAccount').value || '—',
+        account: (document.getElementById('accAccount').value || '—').trim(),
         createdAt: editId ? (allAccounting.find(a => a.id === editId)?.createdAt || Date.now()) : Date.now()
       };
 
@@ -833,7 +892,6 @@
       let incomeSum = 0;
       let expenseSum = 0;
 
-      // Новые записи сверху
       const sorted = [...items].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
       sorted.forEach(item => {
@@ -859,173 +917,232 @@
       document.getElementById('totalExpense').innerText = expenseSum.toLocaleString('ru-RU') + ' ₽';
     }
 
-    // --- ЛИСТ 3: ВЗЯЛИ / КАССА (ЛОГИКА И РЕНДЕР) ---
+    // --- ЛИСТ 3: ВЗЯЛИ / ПОЛОЖИЛИ И АНАЛИТИКА ---
     const takenModal = document.getElementById('takenModal');
 
     function openTakenModal() {
       document.getElementById('takenForm').reset();
-      document.getElementById('takenDate').valueAsDate = new Date();
+      document.getElementById('takenEditId').value = '';
+      document.getElementById('takenModalTitle').innerText = 'Новая запись Взяли / Положили';
       takenModal.classList.remove('hidden');
     }
 
     function closeTakenModal() { takenModal.classList.add('hidden'); }
 
+    function openEditTakenModal(id) {
+      const item = allTaken.find(t => t.id === id);
+      if(!item) return;
+      document.getElementById('takenEditId').value = item.id;
+      document.getElementById('takenModalTitle').innerText = 'Редактировать Взяли / Положили';
+      document.getElementById('takenAmount').value = item.takenAmount || 0;
+      document.getElementById('takenDesc').value = item.takenDesc || '';
+      document.getElementById('putAmount').value = item.putAmount || 0;
+      document.getElementById('putDesc').value = item.putDesc || '';
+      takenModal.classList.remove('hidden');
+    }
+
     document.getElementById('takenForm').addEventListener('submit', (e) => {
       e.preventDefault();
       saveState();
 
-      const type = document.getElementById('takenType').value;
-      const date = document.getElementById('takenDate').value;
-      const amount = Number(document.getElementById('takenAmount').value) || 0;
-      const note = document.getElementById('takenNote').value || '';
+      const editId = document.getElementById('takenEditId').value;
+      const formData = {
+        takenAmount: Number(document.getElementById('takenAmount').value) || 0,
+        takenDesc: document.getElementById('takenDesc').value || '',
+        putAmount: Number(document.getElementById('putAmount').value) || 0,
+        putDesc: document.getElementById('putDesc').value || '',
+        createdAt: editId ? (allTaken.find(t => t.id === editId)?.createdAt || Date.now()) : Date.now()
+      };
 
-      const takenId = 'taken_' + Date.now();
-
-      // Добавляем операцию в лист Взяли
-      allTaken.unshift({
-        id: takenId,
-        type: type,
-        date: date,
-        amount: amount,
-        note: note
-      });
-
-      // Автоматическая синхронизация с Учетом
-      allAccounting.unshift({
-        id: 'acc_sync_' + Date.now(),
-        takenRefId: takenId,
-        date: date,
-        income: type === 'put' ? amount : 0,
-        expense: type === 'taken' ? amount : 0,
-        note: (type === 'taken' ? 'Снято (Взяли): ' : 'Возврат (Положил): ') + note,
-        account: 'Касса',
-        createdAt: Date.now()
-      });
+      if (editId) {
+        const idx = allTaken.findIndex(t => t.id === editId);
+        if (idx !== -1) allTaken[idx] = { ...allTaken[idx], ...formData };
+      } else {
+        allTaken.push({
+          id: 'taken_' + Date.now(),
+          ...formData
+        });
+      }
 
       saveToStorage();
       closeTakenModal();
     });
 
     function deleteTakenItem(id) {
-      if (confirm('Удалить эту операцию? Она также снимет коррекцию с Учета.')) {
+      if(confirm('Удалить эту строку?')) {
         saveState();
         allTaken = allTaken.filter(t => t.id !== id);
-        allAccounting = allAccounting.filter(a => a.takenRefId !== id);
         saveToStorage();
       }
     }
 
-    function renderTakenTable(items) {
-      const tbody = document.getElementById('takenTable');
-      tbody.innerHTML = '';
-
-      let totalTaken = 0;
-      let totalPut = 0;
-
-      items.forEach(item => {
-        if (item.type === 'taken') totalTaken += item.amount;
-        if (item.type === 'put') totalPut += item.amount;
-
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td class="p-2 border-r font-medium">${item.date}</td>
-          <td class="p-2 border-r font-bold ${item.type === 'taken' ? 'text-amber-600' : 'text-indigo-600'}">
-            ${item.type === 'taken' ? 'ВЗЯЛ' : 'ПОЛОЖИЛ'}
-          </td>
-          <td class="p-2 border-r font-bold ${item.type === 'taken' ? 'text-red-600' : 'text-emerald-600'}">
-            ${item.amount.toLocaleString('ru-RU')} ₽
-          </td>
-          <td class="p-2 border-r font-medium">${item.note}</td>
-          <td class="p-2 text-center sticky right-0 bg-white shadow-[-5px_0_10px_rgba(0,0,0,0.05)]">
-            <button onclick="deleteTakenItem('${item.id}')" class="bg-red-500 text-white px-1.5 py-0.5 rounded text-[9px]">🗑️</button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-
-      document.getElementById('statTotalTaken').innerText = totalTaken.toLocaleString('ru-RU') + ' ₽';
-      document.getElementById('statTotalPut').innerText = totalPut.toLocaleString('ru-RU') + ' ₽';
-      
-      const netCash = totalPut - totalTaken;
-      document.getElementById('statNetBalance').innerText = netCash.toLocaleString('ru-RU') + ' ₽';
-
-      // Расчет статистики договоров
-      const totalContractsCount = allContracts.length;
-      let closedContractsCount = 0;
-      let todayPlannedAmount = 0;
-
-      const todayStr = new Date().toISOString().slice(0,10);
-
-      allContracts.forEach(c => {
-        let paid = 0;
-        Object.values(c.installments || {}).forEach(p => paid += Number(p.amount));
-        const rest = c.totalCost - (c.downPayment || 0) - paid;
-        if (rest <= 0) closedContractsCount++;
-
-        if (c.payDate === todayStr) {
-          todayPlannedAmount += Number(c.monthlyPay || 0);
+    function addNewAccountPrompt() {
+      const accName = prompt('Введите название нового счета/карты (например: S3, A1):');
+      if (accName && accName.trim()) {
+        const cleanName = accName.trim();
+        if(!customAccounts.includes(cleanName)) {
+          saveState();
+          customAccounts.push(cleanName);
+          saveToStorage();
+        } else {
+          alert('Такой счет уже существует!');
         }
-      });
-
-      document.getElementById('statContractsSummary').innerText = `${totalContractsCount} / ${closedContractsCount} / ${todayPlannedAmount.toLocaleString('ru-RU')} ₽`;
-
-      // Расчет и отображение счетов (S1, S2, S3, N...) с лимитом 400 000 ₽
-      renderAccountsSummary();
+      }
     }
 
-    function renderAccountsSummary() {
-      const summaryTable = document.getElementById('accountsSummaryTable');
-      summaryTable.innerHTML = '';
+    function renderTakenSheet() {
+      // 1. Расчет таблицы Взяли / Положили
+      const rowsTbody = document.getElementById('takenRowsTable');
+      rowsTbody.innerHTML = '';
 
-      const now = new Date();
-      const currentYear = now.getFullYear();
-      const currentMonth = now.getMonth();
+      let sumTaken = 0;
+      let sumPut = 0;
 
-      const accountsMap = {};
-
-      allAccounting.forEach(a => {
-        const acc = (a.account || 'Разное').trim().toUpperCase();
-        if (!accountsMap[acc]) {
-          accountsMap[acc] = { balance: 0, monthIncome: 0, monthExpense: 0 };
-        }
-
-        const inc = Number(a.income || 0);
-        const exp = Number(a.expense || 0);
-
-        accountsMap[acc].balance += (inc - exp);
-
-        if (a.date) {
-          const d = new Date(a.date);
-          if (d.getFullYear() === currentYear && d.getMonth() === currentMonth) {
-            accountsMap[acc].monthIncome += inc;
-            accountsMap[acc].monthExpense += exp;
-          }
-        }
-      });
-
-      // Всегда гарантируем наличие ключевых карт в списке
-      ['S1', 'S2', 'S3', 'N'].forEach(k => {
-        if (!accountsMap[k]) accountsMap[k] = { balance: 0, monthIncome: 0, monthExpense: 0 };
-      });
-
-      Object.keys(accountsMap).sort().forEach(accName => {
-        const accData = accountsMap[accName];
-        const isIncOver = accData.monthIncome >= 400000;
-        const isExpOver = accData.monthExpense >= 400000;
-        const isLimitExceeded = isIncOver || isExpOver;
+      allTaken.forEach(item => {
+        sumTaken += Number(item.takenAmount || 0);
+        sumPut += Number(item.putAmount || 0);
 
         const tr = document.createElement('tr');
-        if (isLimitExceeded) tr.className = 'limit-exceeded';
-
+        tr.className = "text-center";
         tr.innerHTML = `
-          <td class="p-2 border font-bold">${accName}</td>
-          <td class="p-2 border font-bold ${accData.balance >= 0 ? 'text-emerald-600' : 'text-red-600'}">${accData.balance.toLocaleString('ru-RU')} ₽</td>
-          <td class="p-2 border ${isIncOver ? 'bg-red-200 text-red-800 font-bold' : ''}">${accData.monthIncome.toLocaleString('ru-RU')} ₽</td>
-          <td class="p-2 border ${isExpOver ? 'bg-red-200 text-red-800 font-bold' : ''}">${accData.monthExpense.toLocaleString('ru-RU')} ₽</td>
-          <td class="p-2 border font-bold">${isLimitExceeded ? '⚠️ Лимит 400k Превышен!' : '✓ В норме'}</td>
+          <td></td>
+          <td class="font-bold text-amber-700">${item.takenAmount || ''}</td>
+          <td class="text-left">${item.takenDesc || ''}</td>
+          <td class="font-bold text-emerald-600">${item.putAmount || ''}</td>
+          <td class="text-left">${item.putDesc || ''}</td>
+          <td class="space-x-1">
+            <button onclick="openEditTakenModal('${item.id}')" class="text-blue-600 font-bold">✏️</button>
+            <button onclick="deleteTakenItem('${item.id}')" class="text-red-600 font-bold">🗑️</button>
+          </td>
         `;
-        summaryTable.appendChild(tr);
+        rowsTbody.appendChild(tr);
       });
+
+      document.getElementById('takenTotalSum').innerText = sumTaken.toLocaleString('ru-RU');
+      document.getElementById('putTotalSum').innerText = sumPut.toLocaleString('ru-RU');
+
+      // Общий доход и расход из Листа Учет
+      let totalUchetIncome = 0;
+      let totalUchetExpense = 0;
+      allAccounting.forEach(a => {
+        totalUchetIncome += Number(a.income || 0);
+        totalUchetExpense += Number(a.expense || 0);
+      });
+
+      const totalKassa = totalUchetIncome - totalUchetExpense - sumTaken + sumPut;
+      const uchetBalance = totalUchetIncome - totalUchetExpense;
+
+      document.getElementById('kassaTotal').innerText = totalKassa.toLocaleString('ru-RU');
+      document.getElementById('kassaUchet').innerText = uchetBalance.toLocaleString('ru-RU');
+
+      // 2. Расчет Статистики Договоров
+      const now = new Date();
+      const todayStr = now.toISOString().slice(0, 10);
+
+      let totalContracts = allContracts.length;
+      let closedContracts = 0;
+      let activeContracts = 0;
+
+      let planTodaySum = 0;
+      let planTodayCount = 0;
+      let factTodaySum = 0;
+      let factTodayCount = 0;
+
+      allContracts.forEach(c => {
+        const insts = c.installments || {};
+        let paidSum = 0;
+        let hasPaidToday = false;
+
+        Object.values(insts).forEach(p => {
+          paidSum += Number(p.amount);
+          if (p.date === todayStr) {
+            factTodaySum += Number(p.amount);
+            hasPaidToday = true;
+          }
+        });
+
+        if (hasPaidToday) factTodayCount++;
+
+        const rest = c.totalCost - (c.downPayment || 0) - paidSum;
+        if (rest <= 0) {
+          closedContracts++;
+        } else {
+          activeContracts++;
+        }
+
+        // План оплаты на сегодня (по дате графика)
+        if (c.payDate === todayStr) {
+          planTodaySum += Number(c.monthlyPay || 0);
+          planTodayCount++;
+        }
+      });
+
+      document.getElementById('statTotalContracts').innerText = totalContracts;
+      document.getElementById('statClosedContracts').innerText = closedContracts;
+      document.getElementById('statActiveContracts').innerText = activeContracts;
+      document.getElementById('statPlanTodaySum').innerText = planTodaySum.toLocaleString('ru-RU') + ' ₽';
+      document.getElementById('statPlanTodayCount').innerText = planTodayCount;
+      document.getElementById('statFactTodaySum').innerText = factTodaySum.toLocaleString('ru-RU') + ' ₽';
+      document.getElementById('statFactTodayCount').innerText = factTodayCount;
+
+      // 3. Расчет Правой Таблицы Счетов / Карт
+      const accountsBody = document.getElementById('accountsTableBody');
+      accountsBody.innerHTML = '';
+
+      const currentMonth = now.getMonth();
+      const currentYear = now.getFullYear();
+
+      let accountsGrandTotalSum = 0;
+
+      customAccounts.forEach(acc => {
+        let accBalance = 0;
+        let incCountMonth = 0;
+        let incSumMonth = 0;
+        let expCountMonth = 0;
+        let expSumMonth = 0;
+
+        allAccounting.forEach(a => {
+          if (a.account && a.account.trim().toLowerCase() === acc.toLowerCase()) {
+            const inc = Number(a.income || 0);
+            const exp = Number(a.expense || 0);
+            accBalance += (inc - exp);
+
+            if (a.date) {
+              const d = new Date(a.date);
+              if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
+                if (inc > 0) {
+                  incCountMonth++;
+                  incSumMonth += inc;
+                }
+                if (exp > 0) {
+                  expCountMonth++;
+                  expSumMonth += exp;
+                }
+              }
+            }
+          }
+        });
+
+        accountsGrandTotalSum += accBalance;
+
+        const isOverLimit = (incSumMonth >= 400000 || expSumMonth >= 400000);
+        const rowBgClass = isOverLimit ? 'bg-excel-red' : (accBalance > 0 ? 'bg-excel-green' : '');
+
+        const tr = document.createElement('tr');
+        tr.className = rowBgClass;
+        tr.innerHTML = `
+          <td class="font-bold">${acc}</td>
+          <td class="font-bold">${accBalance.toLocaleString('ru-RU')}</td>
+          <td>${incCountMonth}</td>
+          <td>${incSumMonth.toLocaleString('ru-RU')}</td>
+          <td>${expCountMonth}</td>
+          <td>${expSumMonth.toLocaleString('ru-RU')}</td>
+          <td>0</td>
+        `;
+        accountsBody.appendChild(tr);
+      });
+
+      document.getElementById('accountsGrandTotal').innerText = accountsGrandTotalSum.toLocaleString('ru-RU');
     }
 
     // --- ПОИСК И ЭКСПОРТ/ИМПОРТ ---
@@ -1036,15 +1153,38 @@
       } else if (activeTab === 'accounting') {
         renderAccountingTable(allAccounting.filter(a => a.note.toLowerCase().includes(q) || a.account.toLowerCase().includes(q) || a.date.includes(q)));
       } else if (activeTab === 'taken') {
-        renderTakenTable(allTaken.filter(t => t.note.toLowerCase().includes(q) || t.date.includes(q)));
+        const filtered = allTaken.filter(t => (t.takenDesc && t.takenDesc.toLowerCase().includes(q)) || (t.putDesc && t.putDesc.toLowerCase().includes(q)));
+        renderTakenFiltered(filtered);
       }
+    }
+
+    function renderTakenFiltered(items) {
+      const rowsTbody = document.getElementById('takenRowsTable');
+      rowsTbody.innerHTML = '';
+      items.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = "text-center";
+        tr.innerHTML = `
+          <td></td>
+          <td class="font-bold text-amber-700">${item.takenAmount || ''}</td>
+          <td class="text-left">${item.takenDesc || ''}</td>
+          <td class="font-bold text-emerald-600">${item.putAmount || ''}</td>
+          <td class="text-left">${item.putDesc || ''}</td>
+          <td class="space-x-1">
+            <button onclick="openEditTakenModal('${item.id}')" class="text-blue-600 font-bold">✏️</button>
+            <button onclick="deleteTakenItem('${item.id}')" class="text-red-600 font-bold">🗑️</button>
+          </td>
+        `;
+        rowsTbody.appendChild(tr);
+      });
     }
 
     function exportData() {
       const exportObject = {
         contracts: allContracts,
         accounting: allAccounting,
-        taken: allTaken
+        taken: allTaken,
+        accounts: customAccounts
       };
       const blob = new Blob([JSON.stringify(exportObject, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
@@ -1065,14 +1205,12 @@
           if (confirm(`Загрузить данные из файла? Это заменит текущую базу.`)) {
             saveState();
             if (Array.isArray(data)) {
-              // Поддержка старого формата экспорта
               allContracts = data;
-              allAccounting = [];
-              allTaken = [];
             } else {
               allContracts = data.contracts || [];
               allAccounting = data.accounting || [];
               allTaken = data.taken || [];
+              customAccounts = data.accounts || customAccounts;
             }
             saveToStorage();
           }
@@ -1090,7 +1228,7 @@
     // Первичная инициализация
     renderTable(allContracts);
     renderAccountingTable(allAccounting);
-    renderTakenTable(allTaken);
+    renderTakenSheet();
     updateHistoryButtons();
   </script>
 </body>
