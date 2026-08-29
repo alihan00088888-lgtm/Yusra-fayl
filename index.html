@@ -11,137 +11,142 @@
     .btn-history-active { background-color: #f59e0b !important; color: white !important; cursor: pointer !important; }
     .btn-history-active:hover { background-color: #d97706 !important; }
     .input-error { border: 2px solid #ef4444 !important; background-color: #fef2f2 !important; }
-    /* Кастомный скроллбар для удобства навигации */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #f1f5f9; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    
+    /* Стилизация вкладок */
+    .tab-btn.active {
+      background-color: #2563eb;
+      color: #ffffff;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
   </style>
 </head>
-<body class="bg-slate-100 text-gray-800 text-xs font-sans min-h-screen flex flex-col justify-between">
+<body class="bg-slate-100 text-gray-800 text-xs min-h-screen">
 
-  <div class="p-4 max-w-[100vw] flex-grow">
-    
-    <!-- Вкладки листов -->
-    <div class="flex items-center gap-2 mb-3 border-b border-slate-300 pb-2">
-      <button id="tabContracts" onclick="switchTab('contracts')" class="px-5 py-2 rounded-t-lg font-bold transition flex items-center gap-2 bg-blue-600 text-white shadow">
-        📄 Договоры
-      </button>
-      <button id="tabAccounting" onclick="switchTab('accounting')" class="px-5 py-2 rounded-t-lg font-bold transition flex items-center gap-2 bg-slate-200 text-slate-700 hover:bg-slate-300">
-        📊 Учет
-      </button>
-    </div>
-
-    <!-- Общая Шапка управления -->
-    <div class="flex flex-wrap justify-between items-center mb-4 gap-4 bg-white p-4 rounded-xl shadow-md border border-slate-200">
-      <div>
-        <h1 id="pageTitle" class="text-xl font-black text-slate-800 tracking-tight">Лист Договоров</h1>
-        <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">История изменений (Undo/Redo) включена</p>
-      </div>
+  <!-- ВЕРХНЯЯ ПАНЕЛЬ ПЕРЕКЛЮЧЕНИЯ ЛИСТОВ И ДЕЙСТВИЙ -->
+  <div class="sticky top-0 z-40 bg-white shadow-md border-b">
+    <div class="p-3 max-w-[100vw] flex flex-wrap justify-between items-center gap-4">
       
+      <!-- Переключение листов -->
+      <div class="flex items-center gap-2 bg-slate-200 p-1 rounded-xl">
+        <button type="button" onclick="switchTab('contracts')" id="tabBtnContracts" class="tab-btn active px-4 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2">
+          📋 Договоры
+        </button>
+        <button type="button" onclick="switchTab('accounting')" id="tabBtnAccounting" class="tab-btn px-4 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
+          📊 Учет
+        </button>
+      </div>
+
+      <!-- Кнопки управления Undo/Redo и Базой -->
       <div class="flex items-center gap-2 flex-wrap">
-        <div class="flex bg-slate-100 rounded-lg p-1 gap-1 border border-slate-200">
+        <div class="flex bg-slate-200 rounded-lg p-1 gap-1">
           <button type="button" id="undoBtn" onclick="undo()" disabled title="Шаг назад (Ctrl+Z)" 
-            class="px-3 py-1.5 rounded-md text-xs font-bold text-gray-400 bg-gray-50 cursor-not-allowed transition">
+            class="px-3 py-1.5 rounded text-xs font-bold text-gray-400 bg-gray-100 cursor-not-allowed transition">
             ↺ Назад
           </button>
           <button type="button" id="redoBtn" onclick="redo()" disabled title="Шаг вперед (Ctrl+Y)" 
-            class="px-3 py-1.5 rounded-md text-xs font-bold text-gray-400 bg-gray-50 cursor-not-allowed transition">
+            class="px-3 py-1.5 rounded text-xs font-bold text-gray-400 bg-gray-100 cursor-not-allowed transition">
             ↻ Вперед
           </button>
         </div>
 
-        <button type="button" onclick="exportData()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-2 rounded-lg text-xs transition shadow-sm">
+        <button type="button" onclick="exportData()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-3 py-1.5 rounded-lg text-xs transition shadow-sm">
           💾 Скачать базу
         </button>
         <input type="file" id="importFile" onchange="importData(event)" class="hidden" accept=".json">
-        <button type="button" onclick="document.getElementById('importFile').click()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold px-3 py-2 rounded-lg text-xs transition shadow-sm">
+        <button type="button" onclick="document.getElementById('importFile').click()" class="bg-slate-600 hover:bg-slate-700 text-white font-medium px-3 py-1.5 rounded-lg text-xs transition shadow-sm">
           📂 Загрузить базу
         </button>
-        
-        <input type="text" id="searchInput" oninput="filterData()" placeholder="Поиск..." class="p-2 border rounded-lg w-48 focus:ring-2 focus:ring-blue-400 outline-none border-slate-300">
-        
-        <button id="actionBtn" type="button" onclick="openCreateModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-black px-4 py-2 rounded-lg shadow-md transition">
+
+        <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Поиск..." class="p-1.5 border rounded-lg w-40 focus:ring-2 focus:ring-blue-400 outline-none">
+
+        <!-- Динамические кнопки добавления -->
+        <button type="button" id="addContractBtn" onclick="openCreateModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1.5 rounded-lg shadow transition">
           + Новый Договор
+        </button>
+        <button type="button" id="addAccBtn" onclick="openAccModal()" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-lg shadow transition">
+          + Новая Запись Учета
         </button>
       </div>
     </div>
+  </div>
 
-    <!-- ЛИСТ 1: ДОГОВОРЫ -->
-    <div id="contractsView" class="bg-white shadow-xl rounded-xl overflow-x-auto max-h-[78vh] border border-slate-200">
-      <table class="min-w-full text-left border-collapse">
-        <thead class="bg-slate-800 text-white uppercase font-bold text-[10px] sticky top-0 z-20 shadow">
-          <tr>
-            <th class="p-3 border-r border-slate-700">№</th>
-            <th class="p-3 border-r border-slate-700 min-w-[150px]">ФИО Покупателя</th>
-            <th class="p-3 border-r border-slate-700 min-w-[170px]">Телефон / Уведомления</th>
-            <th class="p-3 border-r border-slate-700">Даты (Покупка / График)</th>
-            <th class="p-3 border-r border-slate-700">Мес. Платеж</th>
-            <script>
-              for(let i=1; i<=15; i++) {
-                document.write(`<th class="p-1 border-r border-slate-700 text-center min-w-[65px]">${i}-й</th>`);
-              }
-            </script>
-            <th class="p-3 border-r border-slate-700">Просрочка</th>
-            <th class="p-3 border-r border-slate-700">Остаток</th>
-            <th class="p-3 border-r border-slate-700">Рассрочка / Пред.</th>
-            <th class="p-3 border-r border-slate-700">Себест.</th>
-            <th class="p-3 border-r border-slate-700 text-center">«Д»</th>
-            <th class="p-3 border-r border-slate-700">Товар / Магазин</th>
-            <th class="p-3 border-r border-slate-700">Поручитель</th>
-            <th class="p-3 text-center sticky right-0 bg-slate-900 min-w-[210px]">Действия</th>
-          </tr>
-        </thead>
-        <tbody id="contractsTable" class="divide-y divide-slate-200">
-        </tbody>
-      </table>
-    </div>
-
-    <!-- ЛИСТ 2: УЧЕТ -->
-    <div id="accountingView" class="hidden space-y-4">
-      <!-- Сводная аналитика -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl shadow-sm flex justify-between items-center">
-          <div>
-            <span class="text-[10px] font-black uppercase text-emerald-600 tracking-widest block">Общий Доход</span>
-            <span id="totalIncome" class="text-2xl font-black text-emerald-700">0 ₽</span>
-          </div>
-          <span class="text-3xl">📥</span>
-        </div>
-        <div class="bg-rose-50 border border-rose-200 p-4 rounded-xl shadow-sm flex justify-between items-center">
-          <div>
-            <span class="text-[10px] font-black uppercase text-rose-600 tracking-widest block">Общий Расход</span>
-            <span id="totalExpense" class="text-2xl font-black text-rose-700">0 ₽</span>
-          </div>
-          <span class="text-3xl">📤</span>
-        </div>
-      </div>
-
-      <!-- Таблица Учета -->
-      <div class="bg-white shadow-xl rounded-xl overflow-x-auto max-h-[70vh] border border-slate-200">
+  <div class="p-4 max-w-[100vw]">
+    
+    <!-- ================= Лист 1: Договоры ================= -->
+    <div id="contractsTabContent" class="space-y-4">
+      <div class="bg-white shadow-xl rounded-xl overflow-x-auto max-h-[78vh] border">
         <table class="min-w-full text-left border-collapse">
           <thead class="bg-slate-800 text-white uppercase font-bold text-[10px] sticky top-0 z-20">
             <tr>
-              <th class="p-3 border-r border-slate-700 min-w-[110px]">Дата</th>
-              <th class="p-3 border-r border-slate-700 text-emerald-400 min-w-[120px]">Поступило</th>
-              <th class="p-3 border-r border-slate-700 text-rose-400 min-w-[120px]">Ушло</th>
-              <th class="p-3 border-r border-slate-700">Отметки (Назначение)</th>
-              <th class="p-3 border-r border-slate-700 min-w-[100px]">Счет</th>
-              <th class="p-3 text-center sticky right-0 bg-slate-900 min-w-[100px]">Действия</th>
+              <th class="p-3 border-r border-slate-700 min-w-[150px]">ФИО Покупателя</th>
+              <th class="p-3 border-r border-slate-700">Телефон</th>
+              <th class="p-3 border-r border-slate-700">Даты (Покупка / График)</th>
+              <th class="p-3 border-r border-slate-700">Мес. Платеж</th>
+              <script>
+                for(let i=1; i<=15; i++) {
+                  document.write(`<th class="p-1 border-r border-slate-700 text-center min-w-[65px]">${i}-й</th>`);
+                }
+              </script>
+              <th class="p-3 border-r border-slate-700">Просрочка</th>
+              <th class="p-3 border-r border-slate-700">Остаток</th>
+              <th class="p-3 border-r border-slate-700">Рассрочка / Пред.</th>
+              <th class="p-3 border-r border-slate-700">Себест.</th>
+              <th class="p-3 border-r border-slate-700 text-center">«Д»</th>
+              <th class="p-3 border-r border-slate-700">Товар / Магазин</th>
+              <th class="p-3 border-r border-slate-700">Поручитель</th>
+              <th class="p-3 text-center sticky right-0 bg-slate-900 min-w-[210px]">Действия</th>
             </tr>
           </thead>
-          <tbody id="accountingTable" class="divide-y divide-slate-200 font-medium">
-          </tbody>
+          <tbody id="contractsTable" class="divide-y"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ================= Лист 2: Учет ================= -->
+    <div id="accountingTabContent" class="hidden space-y-4">
+      
+      <!-- Дашборд доходов и расходов -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-white p-4 rounded-xl border-l-4 border-emerald-500 shadow-md flex justify-between items-center">
+          <div>
+            <p class="text-[10px] uppercase font-bold text-gray-400">Общий доход</p>
+            <h3 id="totalIncome" class="text-xl font-black text-emerald-600">0 ₽</h3>
+          </div>
+          <span class="text-2xl">📈</span>
+        </div>
+        <div class="bg-white p-4 rounded-xl border-l-4 border-red-500 shadow-md flex justify-between items-center">
+          <div>
+            <p class="text-[10px] uppercase font-bold text-gray-400">Общий расход</p>
+            <h3 id="totalExpense" class="text-xl font-black text-red-600">0 ₽</h3>
+          </div>
+          <span class="text-2xl">📉</span>
+        </div>
+      </div>
+
+      <!-- Таблица учета -->
+      <div class="bg-white shadow-xl rounded-xl overflow-x-auto max-h-[68vh] border">
+        <table class="min-w-full text-left border-collapse">
+          <thead class="bg-slate-800 text-white uppercase font-bold text-[10px] sticky top-0 z-20">
+            <tr>
+              <th class="p-3 border-r border-slate-700 min-w-[100px]">Дата</th>
+              <th class="p-3 border-r border-slate-700 text-emerald-400 min-w-[120px]">Поступило</th>
+              <th class="p-3 border-r border-slate-700 text-red-400 min-w-[120px]">Расход</th>
+              <th class="p-3 border-r border-slate-700">Отметка</th>
+              <th class="p-3 border-r border-slate-700 min-w-[100px]">Счет</th>
+              <th class="p-3 text-center sticky right-0 bg-slate-900 w-[100px]">Действия</th>
+            </tr>
+          </thead>
+          <tbody id="accountingTable" class="divide-y"></tbody>
         </table>
       </div>
     </div>
 
   </div>
 
-  <!-- МОДАЛЬНОЕ ОКНО: ДОГОВОР -->
-  <div id="modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-2xl p-6 max-w-4xl w-full max-h-[95vh] overflow-y-auto shadow-2xl border border-slate-100">
-      <h2 id="modalTitle" class="text-xl font-black mb-4 border-b pb-2 text-blue-700 uppercase tracking-tight">Новый договор</h2>
+  <!-- Модальное окно договора -->
+  <div id="modal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-xl p-6 max-w-4xl w-full max-h-[95vh] overflow-y-auto shadow-2xl">
+      <h2 id="modalTitle" class="text-xl font-bold mb-4 border-b-2 pb-2 text-blue-700 uppercase tracking-tight">Новый договор</h2>
       
       <div id="errorBanner" class="hidden mb-4 p-3 bg-red-100 text-red-700 rounded-lg font-bold text-center border border-red-300">
         ⚠️ Ошибка в расчетах! Проверьте соответствие сумм или себестоимость.
@@ -150,163 +155,189 @@
       <form id="contractForm" class="space-y-4">
         <input type="hidden" id="editDocId">
 
-        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+        <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
           <h3 class="font-black text-[10px] uppercase text-slate-400 mb-3 tracking-widest">1. Личные данные клиента</h3>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <input type="text" id="fio" placeholder="ФИО Покупателя *" required class="p-2.5 border rounded-lg col-span-2 outline-none focus:ring-2 focus:ring-blue-400">
-            <input type="date" id="birthDate" title="Дата рождения" class="p-2.5 border rounded-lg outline-none">
-            <input type="text" id="passport" placeholder="Паспортные данные" class="p-2.5 border rounded-lg outline-none">
-            <input type="text" id="phone" placeholder="Телефон *" required class="p-2.5 border rounded-lg outline-none focus:ring-2 focus:ring-blue-400">
-            <input type="text" id="extraPhone" placeholder="Доп. номер" class="p-2.5 border rounded-lg outline-none">
-            <input type="text" id="address" placeholder="Адрес проживания" class="p-2.5 border rounded-lg col-span-3 outline-none">
+            <input type="text" id="fio" placeholder="ФИО Покупателя *" required class="p-2 border rounded-md col-span-2 focus:border-blue-500 outline-none">
+            <input type="date" id="birthDate" title="Дата рождения" class="p-2 border rounded-md outline-none">
+            <input type="text" id="passport" placeholder="Паспортные данные" class="p-2 border rounded-md outline-none">
+            <input type="text" id="phone" placeholder="Телефон *" required class="p-2 border rounded-md outline-none">
+            <input type="text" id="extraPhone" placeholder="Доп. номер" class="p-2 border rounded-md outline-none">
+            <input type="text" id="address" placeholder="Адрес проживания" class="p-2 border rounded-md col-span-3 outline-none">
           </div>
         </div>
 
-        <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100">
-          <h3 class="font-black text-[10px] uppercase text-blue-500 mb-3 tracking-widest">2. Финансовые условия</h3>
+        <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+          <h3 class="font-black text-[10px] uppercase text-blue-400 mb-3 tracking-widest">2. Финансовые условия</h3>
           <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div>
-              <label class="block text-[9px] font-bold text-blue-900 uppercase mb-1">Дата покупки</label>
-              <input type="date" id="buyDate" required class="p-2 border rounded-lg w-full">
+              <label class="block text-[9px] font-bold text-blue-800 uppercase mb-1">Дата покупки</label>
+              <input type="date" id="buyDate" required class="p-2 border rounded w-full">
             </div>
             <div>
-              <label class="block text-[9px] font-bold text-blue-900 uppercase mb-1">График платежа</label>
-              <input type="date" id="payDate" required class="p-2 border rounded-lg w-full">
+              <label class="block text-[9px] font-bold text-blue-800 uppercase mb-1">График платежа</label>
+              <input type="date" id="payDate" required class="p-2 border rounded w-full">
             </div>
             <div>
-              <label class="block text-[9px] font-bold text-blue-900 uppercase mb-1">Срок (мес.) *</label>
-              <input type="number" id="monthsCount" required oninput="validateFinance()" class="p-2 border rounded-lg w-full">
+              <label class="block text-[9px] font-bold text-blue-800 uppercase mb-1">Срок (мес.) *</label>
+              <input type="number" id="monthsCount" required oninput="validateFinance()" class="p-2 border rounded w-full">
             </div>
             <div>
-              <label class="block text-[9px] font-bold text-blue-900 uppercase mb-1">Мес. платеж *</label>
-              <input type="number" id="monthlyPay" required oninput="validateFinance()" class="p-2 border rounded-lg w-full">
+              <label class="block text-[9px] font-bold text-blue-800 uppercase mb-1">Мес. платеж *</label>
+              <input type="number" id="monthlyPay" required oninput="validateFinance()" class="p-2 border rounded w-full">
             </div>
             <div>
-              <label class="block text-[9px] font-bold text-blue-900 uppercase mb-1">Сумма рассрочки *</label>
-              <input type="number" id="totalCost" required oninput="validateFinance()" class="p-2 border rounded-lg w-full">
+              <label class="block text-[9px] font-bold text-blue-800 uppercase mb-1">Сумма рассрочки *</label>
+              <input type="number" id="totalCost" required oninput="validateFinance()" class="p-2 border rounded w-full">
             </div>
             <div>
-              <label class="block text-[9px] font-bold text-blue-900 uppercase mb-1">Предоплата</label>
-              <input type="number" id="downPayment" value="0" oninput="validateFinance()" class="p-2 border rounded-lg w-full">
+              <label class="block text-[9px] font-bold text-blue-800 uppercase mb-1">Предоплата</label>
+              <input type="number" id="downPayment" value="0" oninput="validateFinance()" class="p-2 border rounded w-full">
             </div>
             <div>
-              <label class="block text-[9px] font-bold text-blue-900 uppercase mb-1">Себестоимость *</label>
-              <input type="number" id="costPrice" required oninput="validateFinance()" class="p-2 border rounded-lg w-full">
+              <label class="block text-[9px] font-bold text-blue-800 uppercase mb-1">Себестоимость *</label>
+              <input type="number" id="costPrice" required oninput="validateFinance()" class="p-2 border rounded w-full">
             </div>
             <div class="flex items-center gap-2 pt-5">
-              <input type="checkbox" id="shopPaid" class="w-5 h-5 cursor-pointer accent-blue-600">
+              <input type="checkbox" id="shopPaid" class="w-5 h-5 cursor-pointer">
               <label for="shopPaid" class="text-[10px] font-black uppercase text-slate-700">Оплачено «Д»</label>
             </div>
           </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-            <h3 class="font-black text-[10px] uppercase text-slate-400 mb-3 tracking-widest">3. Описание товара</h3>
-            <input type="text" id="product" placeholder="Наименование товара" class="p-2.5 border rounded-lg w-full mb-2 outline-none">
-            <input type="text" id="store" placeholder="Магазин" class="p-2.5 border rounded-lg w-full outline-none">
+          <div class="bg-gray-50 p-4 rounded-lg border">
+            <h3 class="font-black text-[10px] uppercase text-gray-400 mb-3 tracking-widest">3. Описание товара</h3>
+            <input type="text" id="product" placeholder="Наименование товара" class="p-2 border rounded w-full mb-2">
+            <input type="text" id="store" placeholder="Магазин" class="p-2 border rounded w-full">
           </div>
-          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-            <h3 class="font-black text-[10px] uppercase text-slate-400 mb-3 tracking-widest">4. Поручитель</h3>
-            <input type="text" id="guarantorFio" placeholder="ФИО Поручителя" class="p-2.5 border rounded-lg w-full mb-2 outline-none">
-            <input type="text" id="guarantorPhone" placeholder="Телефон поручителя" class="p-2.5 border rounded-lg w-full outline-none">
+          <div class="bg-gray-50 p-4 rounded-lg border">
+            <h3 class="font-black text-[10px] uppercase text-gray-400 mb-3 tracking-widest">4. Поручитель</h3>
+            <input type="text" id="guarantorFio" placeholder="ФИО Поручителя" class="p-2 border rounded w-full mb-2">
+            <input type="text" id="guarantorPhone" placeholder="Телефон поручителя" class="p-2 border rounded w-full">
           </div>
         </div>
 
-        <div class="flex justify-end gap-3 pt-4 border-t">
-          <button type="button" onclick="closeModal()" class="px-6 py-2 border rounded-lg font-bold text-slate-600 hover:bg-slate-100 transition">Отмена</button>
-          <button type="submit" id="saveBtn" class="px-8 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 shadow-md transition">Сохранить</button>
+        <div class="flex justify-end gap-3 pt-4 border-t-2">
+          <button type="button" onclick="closeModal()" class="px-6 py-2 border-2 rounded-lg font-bold hover:bg-gray-100 transition">Отмена</button>
+          <button type="submit" id="saveBtn" class="px-8 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 shadow-lg transition">Сохранить</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- МОДАЛЬНОЕ ОКНО: ВЗНОС -->
-  <div id="payModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-2xl p-5 max-w-sm w-full shadow-2xl border-t-4 border-emerald-500">
+  <!-- Модальное окно взноса -->
+  <div id="payModal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-xl p-5 max-w-sm w-full shadow-2xl border-t-4 border-green-500">
       <h3 class="font-black text-xs uppercase text-slate-500 mb-4 tracking-widest">Регистрация оплаты</h3>
       <form id="payForm" class="space-y-4">
         <input type="hidden" id="payContractId">
         <div>
           <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase">Выберите номер взноса</label>
-          <select id="payIndex" class="p-2.5 border rounded-lg w-full bg-slate-50 font-bold outline-none">
+          <select id="payIndex" class="p-2 border rounded-md w-full bg-slate-50 font-bold outline-none">
             <script>for(let i=1; i<=15; i++) document.write(`<option value="${i}">${i}-й взнос</option>`);</script>
           </select>
         </div>
         <div>
           <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase">Сумма платежа (₽)</label>
-          <input type="number" id="payAmount" required class="p-2.5 border rounded-lg w-full text-lg font-bold text-emerald-600 outline-none">
+          <input type="number" id="payAmount" required class="p-2 border rounded-md w-full text-lg font-bold text-green-700 outline-none">
         </div>
         <div>
           <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase">Дата внесения</label>
-          <input type="date" id="payDateVal" required class="p-2.5 border rounded-lg w-full">
+          <input type="date" id="payDateVal" required class="p-2 border rounded-md w-full">
         </div>
         <div class="flex justify-between items-center pt-2">
-          <button type="button" onclick="deleteInstallment()" class="px-3 py-2 bg-rose-50 text-rose-600 font-bold rounded-lg hover:bg-rose-100 transition text-[11px]">🗑 Удалить</button>
+          <button type="button" onclick="deleteInstallment()" class="px-3 py-2 bg-red-100 text-red-600 font-bold rounded hover:bg-red-200 transition text-[11px]">🗑 Удалить взнос</button>
           <div class="flex gap-2">
             <button type="button" onclick="closePayModal()" class="px-3 py-2 text-slate-500 font-bold">Отмена</button>
-            <button type="submit" class="px-5 py-2 bg-emerald-600 text-white rounded-lg font-bold hover:bg-emerald-700 transition shadow-md">Внести</button>
+            <button type="submit" class="px-5 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 transition shadow-md">Внести</button>
           </div>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- МОДАЛЬНОЕ ОКНО: ЗАПИСЬ УЧЕТА -->
-  <div id="accountingModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-slate-100">
-      <h2 id="accModalTitle" class="text-lg font-black mb-4 border-b pb-2 text-slate-800 uppercase tracking-tight">Добавить операцию</h2>
-      <form id="accountingForm" class="space-y-3">
-        <input type="hidden" id="editAccId">
+  <!-- Модальное окно учета -->
+  <div id="accModal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl border-t-4 border-emerald-500">
+      <h3 id="accModalTitle" class="font-bold text-base text-slate-800 mb-4 border-b pb-2 uppercase">Запись учета</h3>
+      <form id="accForm" class="space-y-3">
+        <input type="hidden" id="accEditId">
         <div>
-          <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase">Дата</label>
-          <input type="date" id="accDate" required class="p-2.5 border rounded-lg w-full outline-none">
+          <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Дата</label>
+          <input type="date" id="accDate" required class="p-2 border rounded-md w-full outline-none">
         </div>
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block text-[10px] font-bold text-emerald-600 mb-1 uppercase">Поступило (₽)</label>
-            <input type="number" id="accIncome" placeholder="0" min="0" class="p-2.5 border border-emerald-200 rounded-lg w-full font-bold text-emerald-600 outline-none">
+            <label class="block text-[10px] font-bold text-emerald-600 uppercase mb-1">Поступило (₽)</label>
+            <input type="number" id="accIncome" value="0" min="0" class="p-2 border rounded-md w-full font-bold text-emerald-600 outline-none">
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-rose-600 mb-1 uppercase">Ушло (₽)</label>
-            <input type="number" id="accExpense" placeholder="0" min="0" class="p-2.5 border border-rose-200 rounded-lg w-full font-bold text-rose-600 outline-none">
+            <label class="block text-[10px] font-bold text-red-600 uppercase mb-1">Расход (₽)</label>
+            <input type="number" id="accExpense" value="0" min="0" class="p-2 border rounded-md w-full font-bold text-red-600 outline-none">
           </div>
         </div>
         <div>
-          <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase">Отметки (Назначение / Описание)</label>
-          <input type="text" id="accNotes" placeholder="Причина или описание" required class="p-2.5 border rounded-lg w-full outline-none">
+          <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Отметка (Назначение / Комментарий)</label>
+          <input type="text" id="accNote" placeholder="Например: Перенос или Оплата товара" class="p-2 border rounded-md w-full outline-none">
         </div>
         <div>
-          <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase">Счет (Куда/Откуда)</label>
-          <input type="text" id="accAccount" placeholder="S1, N, A1..." required class="p-2.5 border rounded-lg w-full outline-none">
+          <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Счет / Источник</label>
+          <input type="text" id="accAccount" placeholder="Например: S1, N, A1..." class="p-2 border rounded-md w-full outline-none">
         </div>
-        <div class="flex justify-end gap-3 pt-3 border-t">
-          <button type="button" onclick="closeAccountingModal()" class="px-5 py-2 border rounded-lg font-bold text-slate-600 hover:bg-slate-100 transition">Отмена</button>
-          <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 shadow-md transition">Сохранить</button>
+
+        <div class="flex justify-end gap-2 pt-4 border-t">
+          <button type="button" onclick="closeAccModal()" class="px-4 py-2 text-slate-500 font-bold">Отмена</button>
+          <button type="submit" class="px-6 py-2 bg-emerald-600 text-white rounded-lg font-bold hover:bg-emerald-700 transition shadow">Сохранить</button>
         </div>
       </form>
     </div>
   </div>
 
   <script>
-    // --- ГЛОБАЛЬНОЕ СОСТОЯНИЕ (Единая база данных) ---
-    let appState = JSON.parse(localStorage.getItem('app_full_db') || 'null') || {
-      contracts: JSON.parse(localStorage.getItem('contracts_db') || '[]'),
-      accounting: []
-    };
+    // --- ДАННЫЕ И СОСТОЯНИЕ ---
+    let allContracts = JSON.parse(localStorage.getItem('contracts_db') || '[]');
+    let allAccounting = JSON.parse(localStorage.getItem('accounting_db') || '[]');
 
-    let currentTab = 'contracts';
+    let activeTab = 'contracts';
     let undoStack = [];
     let redoStack = [];
 
-    // Сохранение и синхронизация
-    function persistData() {
-      localStorage.setItem('app_full_db', JSON.stringify(appState));
-      localStorage.setItem('contracts_db', JSON.stringify(appState.contracts)); // Для обратной совместимости
+    // --- ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ---
+    function switchTab(tab) {
+      activeTab = tab;
+      const cTab = document.getElementById('contractsTabContent');
+      const aTab = document.getElementById('accountingTabContent');
+      const cBtn = document.getElementById('tabBtnContracts');
+      const aBtn = document.getElementById('tabBtnAccounting');
+      const addC = document.getElementById('addContractBtn');
+      const addA = document.getElementById('addAccBtn');
+
+      if (tab === 'contracts') {
+        cTab.classList.remove('hidden');
+        aTab.classList.add('hidden');
+        cBtn.className = "tab-btn active px-4 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
+        aBtn.className = "tab-btn px-4 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
+        addC.classList.remove('hidden');
+        addA.classList.add('hidden');
+      } else {
+        cTab.classList.add('hidden');
+        aTab.classList.remove('hidden');
+        aBtn.className = "tab-btn active px-4 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
+        cBtn.className = "tab-btn px-4 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
+        addC.classList.add('hidden');
+        addA.classList.remove('hidden');
+      }
+      handleSearch();
     }
 
+    // --- ИСТОРИЯ ИЗМЕНЕНИЙ (UNDO / REDO) ---
     function saveState() {
-      undoStack.push(JSON.stringify(appState));
+      const stateSnapshot = {
+        contracts: JSON.parse(JSON.stringify(allContracts)),
+        accounting: JSON.parse(JSON.stringify(allAccounting))
+      };
+      undoStack.push(JSON.stringify(stateSnapshot));
       if (undoStack.length > 50) undoStack.shift();
       redoStack = [];
       updateHistoryButtons();
@@ -314,21 +345,37 @@
 
     function undo() {
       if (undoStack.length === 0) return;
-      redoStack.push(JSON.stringify(appState));
-      appState = JSON.parse(undoStack.pop());
+      const currentState = {
+        contracts: JSON.parse(JSON.stringify(allContracts)),
+        accounting: JSON.parse(JSON.stringify(allAccounting))
+      };
+      redoStack.push(JSON.stringify(currentState));
+      
+      const previousState = JSON.parse(undoStack.pop());
+      allContracts = previousState.contracts;
+      allAccounting = previousState.accounting;
       finishAction();
     }
 
     function redo() {
       if (redoStack.length === 0) return;
-      undoStack.push(JSON.stringify(appState));
-      appState = JSON.parse(redoStack.pop());
+      const currentState = {
+        contracts: JSON.parse(JSON.stringify(allContracts)),
+        accounting: JSON.parse(JSON.stringify(allAccounting))
+      };
+      undoStack.push(JSON.stringify(currentState));
+      
+      const nextState = JSON.parse(redoStack.pop());
+      allContracts = nextState.contracts;
+      allAccounting = nextState.accounting;
       finishAction();
     }
 
     function finishAction() {
-      persistData();
-      renderCurrentTab();
+      localStorage.setItem('contracts_db', JSON.stringify(allContracts));
+      localStorage.setItem('accounting_db', JSON.stringify(allAccounting));
+      renderTable(allContracts);
+      renderAccountingTable(allAccounting);
       updateHistoryButtons();
     }
 
@@ -337,60 +384,21 @@
       const rBtn = document.getElementById('redoBtn');
       
       uBtn.disabled = undoStack.length === 0;
-      uBtn.className = uBtn.disabled ? "px-3 py-1.5 rounded-md text-xs font-bold text-gray-400 bg-gray-50 cursor-not-allowed transition" : "px-3 py-1.5 rounded-md text-xs font-bold btn-history-active transition";
+      uBtn.className = uBtn.disabled ? "px-3 py-1.5 rounded text-xs font-bold text-gray-400 bg-gray-100 cursor-not-allowed transition" : "px-3 py-1.5 rounded text-xs font-bold btn-history-active transition";
       
       rBtn.disabled = redoStack.length === 0;
-      rBtn.className = rBtn.disabled ? "px-3 py-1.5 rounded-md text-xs font-bold text-gray-400 bg-gray-50 cursor-not-allowed transition" : "px-3 py-1.5 rounded-md text-xs font-bold btn-history-active transition";
+      rBtn.className = rBtn.disabled ? "px-3 py-1.5 rounded text-xs font-bold text-gray-400 bg-gray-100 cursor-not-allowed transition" : "px-3 py-1.5 rounded text-xs font-bold btn-history-active transition";
     }
 
-    // --- ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ---
-    function switchTab(tab) {
-      currentTab = tab;
-      const tabC = document.getElementById('tabContracts');
-      const tabA = document.getElementById('tabAccounting');
-      const viewC = document.getElementById('contractsView');
-      const viewA = document.getElementById('accountingView');
-      const title = document.getElementById('pageTitle');
-      const actionBtn = document.getElementById('actionBtn');
-
-      if (tab === 'contracts') {
-        tabC.className = "px-5 py-2 rounded-t-lg font-bold transition flex items-center gap-2 bg-blue-600 text-white shadow";
-        tabA.className = "px-5 py-2 rounded-t-lg font-bold transition flex items-center gap-2 bg-slate-200 text-slate-700 hover:bg-slate-300";
-        viewC.classList.remove('hidden');
-        viewA.classList.add('hidden');
-        title.innerText = 'Лист Договоров';
-        actionBtn.innerText = '+ Новый Договор';
-        actionBtn.onclick = openCreateModal;
-      } else {
-        tabA.className = "px-5 py-2 rounded-t-lg font-bold transition flex items-center gap-2 bg-blue-600 text-white shadow";
-        tabC.className = "px-5 py-2 rounded-t-lg font-bold transition flex items-center gap-2 bg-slate-200 text-slate-700 hover:bg-slate-300";
-        viewA.classList.remove('hidden');
-        viewC.classList.add('hidden');
-        title.innerText = 'Учет Движения Средств';
-        actionBtn.innerText = '+ Новая Запись Учета';
-        actionBtn.onclick = openAccountingModal;
-      }
-      filterData();
+    function saveToStorage() {
+      localStorage.setItem('contracts_db', JSON.stringify(allContracts));
+      localStorage.setItem('accounting_db', JSON.stringify(allAccounting));
+      renderTable(allContracts);
+      renderAccountingTable(allAccounting);
+      updateHistoryButtons();
     }
 
-    function renderCurrentTab() {
-      if (currentTab === 'contracts') {
-        renderContractsTable(appState.contracts);
-      } else {
-        renderAccountingTable(appState.accounting);
-      }
-    }
-
-    function filterData() {
-      const q = document.getElementById('searchInput').value.toLowerCase();
-      if (currentTab === 'contracts') {
-        renderContractsTable(appState.contracts.filter(c => c.fio.toLowerCase().includes(q) || String(c.contractNum).includes(q)));
-      } else {
-        renderAccountingTable(appState.accounting.filter(a => a.notes.toLowerCase().includes(q) || a.account.toLowerCase().includes(q)));
-      }
-    }
-
-    // --- ЛИСТ 1: ЖЕСТКАЯ ВАЛИДАЦИЯ И ЛОГИКА ДОГОВОРОВ ---
+    // --- ЛИСТ 1: ДОГОВОРЫ (ВАЛИДАЦИЯ И УПРАВЛЕНИЕ) ---
     function validateFinance() {
       const months = Number(document.getElementById('monthsCount').value) || 0;
       const monthly = Number(document.getElementById('monthlyPay').value) || 0;
@@ -438,7 +446,7 @@
     }
 
     function openEditModal(id) {
-      const contract = appState.contracts.find(c => c.id === id);
+      const contract = allContracts.find(c => c.id === id);
       if(!contract) return;
       document.getElementById('editDocId').value = id;
       document.getElementById('modalTitle').innerText = `Редактирование №${contract.contractNum}`;
@@ -467,6 +475,7 @@
     document.getElementById('contractForm').addEventListener('submit', (e) => {
       e.preventDefault();
       if (!validateFinance()) return;
+      
       saveState();
 
       const editId = document.getElementById('editDocId').value;
@@ -492,25 +501,25 @@
       };
 
       if (editId) {
-        const index = appState.contracts.findIndex(c => c.id === editId);
-        if (index !== -1) appState.contracts[index] = { ...appState.contracts[index], ...formData };
+        const index = allContracts.findIndex(c => c.id === editId);
+        if (index !== -1) allContracts[index] = { ...allContracts[index], ...formData };
       } else {
-        const maxNum = appState.contracts.reduce((max, c) => (c.contractNum > max ? c.contractNum : max), 0);
-        appState.contracts.push({
+        const maxNum = allContracts.reduce((max, c) => (c.contractNum > max ? c.contractNum : max), 0);
+        allContracts.push({
           id: 'doc_' + Date.now(),
           contractNum: maxNum + 1,
           installments: {},
           ...formData
         });
       }
-      finishAction();
+      saveToStorage();
       closeModal();
     });
 
     document.getElementById('payForm').addEventListener('submit', (e) => {
       e.preventDefault();
       const id = document.getElementById('payContractId').value;
-      const contract = appState.contracts.find(c => c.id === id);
+      const contract = allContracts.find(c => c.id === id);
       if (!contract) return;
 
       const inputDateVal = document.getElementById('payDateVal').value;
@@ -520,7 +529,8 @@
       const isDifferentMonth = (inputDate.getFullYear() !== today.getFullYear()) || (inputDate.getMonth() !== today.getMonth());
 
       if (isDifferentMonth) {
-        if (!confirm(`Внимание! Дата платежа (${inputDateVal}) относится НЕ к текущему месяцу.\n\nСохранить?`)) return;
+        const confirmed = confirm(`Внимание! Дата платежа (${inputDateVal}) относится НЕ к текущему месяцу.\n\nВы уверены, что хотите сохранить эту дату?`);
+        if (!confirmed) return;
       }
 
       saveState();
@@ -530,7 +540,7 @@
         amount: Number(document.getElementById('payAmount').value), 
         date: inputDateVal 
       };
-      finishAction();
+      saveToStorage();
       closePayModal();
       document.getElementById('payForm').reset();
     });
@@ -538,13 +548,13 @@
     function deleteInstallment() {
       const id = document.getElementById('payContractId').value;
       const idx = document.getElementById('payIndex').value;
-      const contract = appState.contracts.find(c => c.id === id);
+      const contract = allContracts.find(c => c.id === id);
 
       if (contract && contract.installments && contract.installments[idx]) {
         if (confirm(`Удалить ${idx}-й взнос на сумму ${contract.installments[idx].amount} ₽?`)) {
           saveState();
           delete contract.installments[idx];
-          finishAction();
+          saveToStorage();
           closePayModal();
           document.getElementById('payForm').reset();
         }
@@ -554,32 +564,40 @@
     }
 
     function deleteContract(id) {
-      const contract = appState.contracts.find(c => c.id === id);
+      const contract = allContracts.find(c => c.id === id);
       if (confirm(`Удалить договор №${contract.contractNum}?`)) {
         if (prompt('Введите "УДАЛИТЬ" для подтверждения:') === "УДАЛИТЬ") {
           saveState();
-          appState.contracts = appState.contracts.filter(c => c.id !== id);
-          finishAction();
+          allContracts = allContracts.filter(c => c.id !== id);
+          saveToStorage();
         }
       }
     }
 
-    // --- РАССЫЛКА WHATSAPP ---
-    function sendWhatsApp(phone, type) {
-      const cleanPhone = phone.replace(/\D/g, '');
-      if (!cleanPhone) {
-        alert("Укажите корректный номер телефона!");
-        return;
-      }
-      let text = type === 'today' 
-        ? "Здравствуйте! Напоминаем, что сегодня у вас день оплаты по договору рассрочки." 
-        : "Здравствуйте! Напоминаем, что через 3 дня у вас срок очередного платежа по договору рассрочки.";
-      
-      window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`, '_blank');
+    function copyToClip(text, btn) {
+      navigator.clipboard.writeText(text).then(() => {
+        const oldText = btn.innerText;
+        btn.innerText = "✓ Готово";
+        btn.classList.add("bg-green-700");
+        setTimeout(() => { btn.innerText = oldText; btn.classList.remove("bg-green-700"); }, 1000);
+      });
     }
 
-    // --- ОТРЕНДЕРИТЬ ТАБЛИЦУ ДОГОВОРОВ ---
-    function renderContractsTable(contracts) {
+    function copyHistory(id, btn) {
+      const c = allContracts.find(i => i.id === id);
+      let log = `Договор №${c.contractNum}\nФИО: ${c.fio}\n\nОплаты:\n`;
+      Object.keys(c.installments || {}).sort((a,b)=>a-b).forEach(k => {
+        log += `${k}-й: ${c.installments[k].amount}₽ (${c.installments[k].date})\n`;
+      });
+      copyToClip(log, btn);
+    }
+
+    function copyGuarantor(id, btn) {
+      const c = allContracts.find(i => i.id === id);
+      copyToClip(`Договор №${c.contractNum}\nКлиент: ${c.fio}\nПоручитель: ${c.guarantorFio || '—'} (${c.guarantorPhone || '—'})`, btn);
+    }
+
+    function renderTable(contracts) {
       const tbody = document.getElementById('contractsTable');
       tbody.innerHTML = '';
       contracts.forEach(item => {
@@ -589,104 +607,98 @@
         const rest = item.totalCost - (item.downPayment || 0) - totalPaid;
         
         const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-50 transition";
         if (item.costPrice > item.totalCost) tr.className = 'row-error';
         
         let instHtml = '';
         for(let i=1; i<=15; i++) {
           const v = insts[i];
-          instHtml += v ? `<td class="p-1 border-r text-center pay-paid" title="Дата: ${v.date}">${v.amount}</td>` : `<td class="p-1 border-r text-center text-slate-300">—</td>`;
+          instHtml += v ? `<td class="p-1 border-r text-center pay-paid" title="Дата: ${v.date}">${v.amount}</td>` : `<td class="p-1 border-r text-center text-gray-300">—</td>`;
         }
 
         tr.innerHTML = `
-          <td class="p-2 border-r font-bold text-blue-700 text-center">${item.contractNum}</td>
           <td class="p-2 border-r font-bold">${item.fio}</td>
-          <td class="p-2 border-r text-[10px]">
-            <div class="font-bold mb-1">${item.phone}</div>
-            <div class="flex gap-1">
-              <button onclick="sendWhatsApp('${item.phone}', 'today')" class="bg-emerald-500 hover:bg-emerald-600 text-white px-1.5 py-0.5 rounded text-[8px] font-bold">Сегодня</button>
-              <button onclick="sendWhatsApp('${item.phone}', '3days')" class="bg-amber-500 hover:bg-amber-600 text-white px-1.5 py-0.5 rounded text-[8px] font-bold">3 Дня</button>
-            </div>
-          </td>
+          <td class="p-2 border-r text-[10px]">${item.phone}</td>
           <td class="p-2 border-r text-[10px]">${item.buyDate}<br><b class="text-blue-600">${item.payDate}</b></td>
           <td class="p-2 border-r font-bold text-center">${item.monthlyPay}</td>
           ${instHtml}
-          <td class="p-2 border-r text-rose-600 font-bold text-center">0</td>
-          <td class="p-2 border-r font-bold text-center ${rest <= 0 ? 'text-emerald-600' : 'text-amber-600'}">${rest}</td>
+          <td class="p-2 border-r text-red-600 font-bold text-center">0</td>
+          <td class="p-2 border-r font-bold text-center ${rest <= 0 ? 'text-green-600' : 'text-orange-600'}">${rest}</td>
           <td class="p-2 border-r text-[10px] text-center">${item.totalCost} / ${item.downPayment}</td>
           <td class="p-2 border-r text-center">${item.costPrice}</td>
-          <td class="p-2 border-r text-center font-black ${item.shopPaid ? 'text-emerald-600' : 'text-slate-300'}">${item.shopPaid ? 'Д' : '—'}</td>
+          <td class="p-2 border-r text-center font-black ${item.shopPaid ? 'text-green-600' : 'text-gray-300'}">${item.shopPaid ? 'Д' : '—'}</td>
           <td class="p-2 border-r text-[10px]">${item.product || '—'}</td>
           <td class="p-2 border-r text-[10px]">${item.guarantorFio || '—'}</td>
           <td class="p-2 text-center space-x-1 sticky right-0 bg-white shadow-[-5px_0_10px_rgba(0,0,0,0.05)]">
-            <button onclick="openPayModal('${item.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-1.5 py-0.5 rounded text-[9px] font-bold">+Взнос</button>
-            <button onclick="copyHistory('${item.id}', this)" class="bg-slate-500 hover:bg-slate-600 text-white px-1.5 py-0.5 rounded text-[9px]">📋 Опл.</button>
-            <button onclick="copyGuarantor('${item.id}', this)" class="bg-indigo-500 hover:bg-indigo-600 text-white px-1.5 py-0.5 rounded text-[9px]">👥 Пор.</button>
-            <button onclick="openEditModal('${item.id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-1.5 py-0.5 rounded text-[9px]">✏️</button>
-            <button onclick="deleteContract('${item.id}')" class="bg-rose-500 hover:bg-rose-600 text-white px-1.5 py-0.5 rounded text-[9px]">🗑️</button>
+            <button onclick="openPayModal('${item.id}')" class="bg-green-600 text-white px-1 py-0.5 rounded text-[9px] font-bold">+Взнос</button>
+            <button onclick="copyHistory('${item.id}', this)" class="bg-slate-500 text-white px-1 py-0.5 rounded text-[9px]">📋 Опл.</button>
+            <button onclick="copyGuarantor('${item.id}', this)" class="bg-indigo-500 text-white px-1 py-0.5 rounded text-[9px]">👥 Пор.</button>
+            <button onclick="openEditModal('${item.id}')" class="bg-blue-500 text-white px-1 py-0.5 rounded text-[9px]">✏️</button>
+            <button onclick="deleteContract('${item.id}')" class="bg-red-500 text-white px-1 py-0.5 rounded text-[9px]">🗑️</button>
           </td>
         `;
         tbody.appendChild(tr);
       });
     }
 
-    // --- ЛИСТ 2: ЛОГИКА И ОТРЕНДЕРЕНИЕ УЧЕТА ---
-    const accountingModal = document.getElementById('accountingModal');
-    function openAccountingModal() {
-      document.getElementById('accountingForm').reset();
-      document.getElementById('editAccId').value = '';
+    // --- ЛИСТ 2: УЧЕТ (ЛОГИКА И РЕНДЕР) ---
+    const accModal = document.getElementById('accModal');
+    
+    function openAccModal() {
+      document.getElementById('accForm').reset();
+      document.getElementById('accEditId').value = '';
+      document.getElementById('accModalTitle').innerText = 'Новая запись учета';
       document.getElementById('accDate').valueAsDate = new Date();
-      document.getElementById('accModalTitle').innerText = 'Добавить запись учета';
-      accountingModal.classList.remove('hidden');
+      accModal.classList.remove('hidden');
     }
-    function closeAccountingModal() { accountingModal.classList.add('hidden'); }
 
-    function openEditAccountingModal(id) {
-      const item = appState.accounting.find(a => a.id === id);
+    function closeAccModal() { accModal.classList.add('hidden'); }
+
+    function openEditAccModal(id) {
+      const item = allAccounting.find(a => a.id === id);
       if (!item) return;
-      document.getElementById('editAccId').value = item.id;
+      document.getElementById('accEditId').value = item.id;
+      document.getElementById('accModalTitle').innerText = 'Редактирование записи';
       document.getElementById('accDate').value = item.date;
-      document.getElementById('accIncome').value = item.income || '';
-      document.getElementById('accExpense').value = item.expense || '';
-      document.getElementById('accNotes').value = item.notes;
-      document.getElementById('accAccount').value = item.account;
-      document.getElementById('accModalTitle').innerText = 'Редактировать запись учета';
-      accountingModal.classList.remove('hidden');
+      document.getElementById('accIncome').value = item.income || 0;
+      document.getElementById('accExpense').value = item.expense || 0;
+      document.getElementById('accNote').value = item.note || '';
+      document.getElementById('accAccount').value = item.account || '';
+      accModal.classList.remove('hidden');
     }
 
-    document.getElementById('accountingForm').addEventListener('submit', (e) => {
+    document.getElementById('accForm').addEventListener('submit', (e) => {
       e.preventDefault();
       saveState();
 
-      const editId = document.getElementById('editAccId').value;
-      const data = {
+      const editId = document.getElementById('accEditId').value;
+      const formData = {
         date: document.getElementById('accDate').value,
         income: Number(document.getElementById('accIncome').value) || 0,
         expense: Number(document.getElementById('accExpense').value) || 0,
-        notes: document.getElementById('accNotes').value,
-        account: document.getElementById('accAccount').value
+        note: document.getElementById('accNote').value || '—',
+        account: document.getElementById('accAccount').value || '—',
+        createdAt: editId ? (allAccounting.find(a => a.id === editId)?.createdAt || Date.now()) : Date.now()
       };
 
       if (editId) {
-        const index = appState.accounting.findIndex(a => a.id === editId);
-        if (index !== -1) appState.accounting[index] = { ...appState.accounting[index], ...data };
+        const idx = allAccounting.findIndex(a => a.id === editId);
+        if (idx !== -1) allAccounting[idx] = { ...allAccounting[idx], ...formData };
       } else {
-        // Новая запись ставится ВВЕРХ списка (unshift)
-        appState.accounting.unshift({
+        allAccounting.unshift({
           id: 'acc_' + Date.now(),
-          ...data
+          ...formData
         });
       }
 
-      finishAction();
-      closeAccountingModal();
+      saveToStorage();
+      closeAccModal();
     });
 
-    function deleteAccounting(id) {
-      if (confirm('Удалить эту запись учета?')) {
+    function deleteAccItem(id) {
+      if (confirm('Удалить эту запись из учета?')) {
         saveState();
-        appState.accounting = appState.accounting.filter(a => a.id !== id);
-        finishAction();
+        allAccounting = allAccounting.filter(a => a.id !== id);
+        saveToStorage();
       }
     }
 
@@ -694,64 +706,55 @@
       const tbody = document.getElementById('accountingTable');
       tbody.innerHTML = '';
       
-      let totIncome = 0;
-      let totExpense = 0;
+      let incomeSum = 0;
+      let expenseSum = 0;
 
-      items.forEach(item => {
-        totIncome += Number(item.income || 0);
-        totExpense += Number(item.expense || 0);
+      // Новые записи сверху
+      const sorted = [...items].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+      sorted.forEach(item => {
+        incomeSum += Number(item.income || 0);
+        expenseSum += Number(item.expense || 0);
 
         const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-50 transition";
         tr.innerHTML = `
-          <td class="p-3 border-r font-bold text-slate-600">${item.date}</td>
-          <td class="p-3 border-r font-black text-emerald-600 bg-emerald-50/30">${item.income ? item.income + ' ₽' : '—'}</td>
-          <td class="p-3 border-r font-black text-rose-600 bg-rose-50/30">${item.expense ? item.expense + ' ₽' : '—'}</td>
-          <td class="p-3 border-r font-medium text-slate-800">${item.notes}</td>
-          <td class="p-3 border-r font-bold text-blue-600 uppercase">${item.account}</td>
-          <td class="p-3 text-center space-x-1 sticky right-0 bg-white shadow-[-5px_0_10px_rgba(0,0,0,0.05)]">
-            <button onclick="openEditAccountingModal('${item.id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-[10px] font-bold">✏️</button>
-            <button onclick="deleteAccounting('${item.id}')" class="bg-rose-500 hover:bg-rose-600 text-white px-2 py-1 rounded text-[10px] font-bold">🗑️</button>
+          <td class="p-2 border-r font-medium">${item.date}</td>
+          <td class="p-2 border-r font-bold ${item.income > 0 ? 'text-emerald-600 bg-emerald-50/50' : 'text-slate-300'}">${item.income > 0 ? item.income + ' ₽' : '—'}</td>
+          <td class="p-2 border-r font-bold ${item.expense > 0 ? 'text-red-600 bg-red-50/50' : 'text-slate-300'}">${item.expense > 0 ? item.expense + ' ₽' : '—'}</td>
+          <td class="p-2 border-r text-slate-700 font-medium">${item.note}</td>
+          <td class="p-2 border-r font-bold text-blue-700">${item.account}</td>
+          <td class="p-2 text-center space-x-1 sticky right-0 bg-white shadow-[-5px_0_10px_rgba(0,0,0,0.05)]">
+            <button onclick="openEditAccModal('${item.id}')" class="bg-blue-500 text-white px-1.5 py-0.5 rounded text-[9px]">✏️</button>
+            <button onclick="deleteAccItem('${item.id}')" class="bg-red-500 text-white px-1.5 py-0.5 rounded text-[9px]">🗑️</button>
           </td>
         `;
         tbody.appendChild(tr);
       });
 
-      document.getElementById('totalIncome').innerText = `${totIncome.toLocaleString('ru-RU')} ₽`;
-      document.getElementById('totalExpense').innerText = `${totExpense.toLocaleString('ru-RU')} ₽`;
+      document.getElementById('totalIncome').innerText = incomeSum.toLocaleString('ru-RU') + ' ₽';
+      document.getElementById('totalExpense').innerText = expenseSum.toLocaleString('ru-RU') + ' ₽';
     }
 
-    // --- ВСПУЧИВАНИЕ/КОПИРОВАНИЕ ---
-    function copyToClip(text, btn) {
-      navigator.clipboard.writeText(text).then(() => {
-        const oldText = btn.innerText;
-        btn.innerText = "✓ Готово";
-        btn.classList.add("bg-emerald-700");
-        setTimeout(() => { btn.innerText = oldText; btn.classList.remove("bg-emerald-700"); }, 1000);
-      });
+    // --- ПОИСК И ЭКСПОРТ/ИМПОРТ ---
+    function handleSearch() {
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      if (activeTab === 'contracts') {
+        renderTable(allContracts.filter(c => c.fio.toLowerCase().includes(q) || String(c.contractNum).includes(q)));
+      } else {
+        renderAccountingTable(allAccounting.filter(a => a.note.toLowerCase().includes(q) || a.account.toLowerCase().includes(q) || a.date.includes(q)));
+      }
     }
 
-    function copyHistory(id, btn) {
-      const c = appState.contracts.find(i => i.id === id);
-      let log = `Договор №${c.contractNum}\nФИО: ${c.fio}\n\nОплаты:\n`;
-      Object.keys(c.installments || {}).sort((a,b)=>a-b).forEach(k => {
-        log += `${k}-й: ${c.installments[k].amount}₽ (${c.installments[k].date})\n`;
-      });
-      copyToClip(log, btn);
-    }
-
-    function copyGuarantor(id, btn) {
-      const c = appState.contracts.find(i => i.id === id);
-      copyToClip(`Договор №${c.contractNum}\nКлиент: ${c.fio}\nПоручитель: ${c.guarantorFio || '—'} (${c.guarantorPhone || '—'})`, btn);
-    }
-
-    // --- ИМПОРТ И ЭКСПОРТ (Общая Единая База) ---
     function exportData() {
-      const blob = new Blob([JSON.stringify(appState, null, 2)], { type: "application/json" });
+      const exportObject = {
+        contracts: allContracts,
+        accounting: allAccounting
+      };
+      const blob = new Blob([JSON.stringify(exportObject, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `FULL_BAZA_${new Date().toISOString().slice(0,10)}.json`;
+      a.download = `BAZA_FULL_${new Date().toISOString().slice(0,10)}.json`;
       a.click();
       URL.revokeObjectURL(url);
     }
@@ -763,28 +766,31 @@
       reader.onload = (ev) => {
         try {
           const data = JSON.parse(ev.target.result);
-          if (confirm(`Загрузить базу данных? Это заменит текущие записи.`)) {
+          if (confirm(`Загрузить данные из файла? Это заменит текущую базу.`)) {
             saveState();
             if (Array.isArray(data)) {
-              appState.contracts = data; // Обработка старого формата
+              // Поддержка старого формата экспорта
+              allContracts = data;
             } else {
-              appState = data;
+              allContracts = data.contracts || [];
+              allAccounting = data.accounting || [];
             }
-            finishAction();
+            saveToStorage();
           }
-        } catch { alert("Ошибка структуры файла!"); }
+        } catch { alert("Ошибка при чтении файла!"); }
       };
       reader.readAsText(file);
     }
 
-    // Горячие клавиши Undo/Redo
+    // Горячие клавиши
     document.addEventListener('keydown', (e) => {
       if (e.ctrlKey && (e.key === 'z' || e.key === 'я')) { e.preventDefault(); undo(); }
       if (e.ctrlKey && (e.key === 'y' || e.key === 'н')) { e.preventDefault(); redo(); }
     });
 
-    // Инициализация
-    renderCurrentTab();
+    // Первичная инициализация
+    renderTable(allContracts);
+    renderAccountingTable(allAccounting);
     updateHistoryButtons();
   </script>
 </body>
