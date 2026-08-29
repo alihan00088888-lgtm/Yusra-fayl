@@ -12,27 +12,43 @@
     .btn-history-active:hover { background-color: #d97706 !important; }
     .input-error { border: 2px solid #ef4444 !important; background-color: #fef2f2 !important; }
     
-    .tab-btn.active {
-      background-color: #2563eb;
-      color: #ffffff;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    /* Стилизация нижних вкладок в стиле Excel */
+    .tab-btn-bottom {
+      padding: 8px 16px;
+      font-weight: bold;
+      font-size: 12px;
+      border-top: 3px solid transparent;
+      color: #475569;
+      background-color: #f1f5f9;
+      transition: all 0.2s;
+    }
+    .tab-btn-bottom.active {
+      background-color: #ffffff;
+      color: #2563eb;
+      border-top-color: #2563eb;
+      box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
     }
 
+    /* Excel-стили */
     .excel-table td, .excel-table th {
       border: 1px solid #cbd5e1;
       padding: 4px 6px;
     }
     .bg-excel-header { background-color: #e2e8f0; font-weight: bold; }
     .bg-excel-yellow { background-color: #fef08a; }
-    .bg-excel-green { background-color: #86efac; }
-    .bg-excel-red { background-color: #fca5a5; color: #7f1d1d; font-weight: bold; }
+    .bg-excel-red { background-color: #fca5a5 !important; color: #7f1d1d !important; font-weight: bold; }
+    
+    .draggable-row { cursor: grab; }
+    .draggable-row:active { cursor: grabbing; opacity: 0.6; }
   </style>
 </head>
-<body class="bg-slate-100 text-gray-800 text-xs min-h-screen flex flex-col justify-between">
+<body class="bg-slate-100 text-gray-800 text-xs min-h-screen pb-16">
 
   <!-- ВЕРХНЯЯ ПАНЕЛЬ ДЕЙСТВИЙ (БЕЗ ВКЛАДОК) -->
   <div class="sticky top-0 z-40 bg-white shadow-md border-b">
     <div class="p-3 max-w-[100vw] flex flex-wrap justify-between items-center gap-4">
+      
+      <!-- Управление отменой (Undo/Redo) и Базой -->
       <div class="flex items-center gap-2 flex-wrap">
         <div class="flex bg-slate-200 rounded-lg p-1 gap-1">
           <button type="button" id="undoBtn" onclick="undo()" disabled title="Шаг назад (Ctrl+Z)" 
@@ -57,7 +73,7 @@
       </div>
 
       <!-- Кнопки добавления -->
-      <div>
+      <div class="flex items-center gap-2">
         <button type="button" id="addContractBtn" onclick="openCreateModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1.5 rounded-lg shadow transition">
           + Новый Договор
         </button>
@@ -71,11 +87,11 @@
     </div>
   </div>
 
-  <div class="p-4 max-w-[100vw] mb-12 flex-1">
+  <div class="p-4 max-w-[100vw]">
     
     <!-- ================= Лист 1: Договоры ================= -->
     <div id="contractsTabContent" class="space-y-4">
-      <div class="bg-white shadow-xl rounded-xl overflow-x-auto max-h-[78vh] border">
+      <div class="bg-white shadow-xl rounded-xl overflow-x-auto max-h-[75vh] border">
         <table class="min-w-full text-left border-collapse">
           <thead class="bg-slate-800 text-white uppercase font-bold text-[10px] sticky top-0 z-20">
             <tr>
@@ -122,7 +138,7 @@
         </div>
       </div>
 
-      <div class="bg-white shadow-xl rounded-xl overflow-x-auto max-h-[68vh] border">
+      <div class="bg-white shadow-xl rounded-xl overflow-x-auto max-h-[65vh] border">
         <table class="min-w-full text-left border-collapse">
           <thead class="bg-slate-800 text-white uppercase font-bold text-[10px] sticky top-0 z-20">
             <tr>
@@ -130,7 +146,7 @@
               <th class="p-3 border-r border-slate-700 text-emerald-400 min-w-[120px]">Поступило</th>
               <th class="p-3 border-r border-slate-700 text-red-400 min-w-[120px]">Расход</th>
               <th class="p-3 border-r border-slate-700">Отметка</th>
-              <th class="p-3 border-r border-slate-700 min-w-[100px]">Счет</th>
+              <th class="p-3 border-r border-slate-700 min-w-[100px]">Счет / Карта</th>
               <th class="p-3 text-center sticky right-0 bg-slate-900 w-[100px]">Действия</th>
             </tr>
           </thead>
@@ -145,7 +161,7 @@
         <div class="flex flex-wrap lg:flex-nowrap gap-6">
           
           <!-- Левый блок: Касса, Взяли, Положили -->
-          <div class="flex-1 min-w-[550px]">
+          <div class="flex-1 min-w-[500px]">
             <table class="w-full text-left border-collapse excel-table bg-amber-50/20">
               <thead>
                 <tr class="bg-excel-header text-center font-bold">
@@ -177,12 +193,14 @@
                   <td></td>
                 </tr>
               </tbody>
-              <tbody id="takenRowsTable"></tbody>
+              <tbody id="takenRowsTable">
+                <!-- Динамические строки операций Взяли/Положили -->
+              </tbody>
             </table>
           </div>
 
           <!-- Блок по центру: Статистика Договоров -->
-          <div class="w-64 shrink-0">
+          <div class="w-60 shrink-0">
             <table class="w-full border-collapse excel-table text-center">
               <tbody>
                 <tr class="bg-excel-header font-bold"><td class="p-2">Количество договоров</td></tr>
@@ -203,26 +221,29 @@
             </table>
           </div>
 
-          <!-- Правый блок: Таблица счетов / карт -->
-          <div class="flex-1 min-w-[500px]">
-            <div class="mb-2 flex justify-between items-center">
-              <span class="font-bold uppercase text-[10px] text-slate-500">Счета и Карты</span>
-              <button onclick="addNewAccountPrompt()" class="bg-slate-700 hover:bg-slate-800 text-white font-bold px-2 py-1 rounded text-[10px]">+ Добавить счет</button>
+          <!-- Правый блок: Настраиваемые Счета / Карты с Drag-and-Drop -->
+          <div class="flex-1 min-w-[520px]">
+            <div class="mb-2 flex justify-between items-center bg-slate-100 p-2 rounded-lg border">
+              <span class="font-bold uppercase text-[10px] text-slate-700">Управление картами / счетами</span>
+              <button onclick="addNewAccountPrompt()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1 rounded text-[10px] shadow">+ Добавить карту</button>
             </div>
-            <div class="max-h-[70vh] overflow-y-auto">
+            <div class="max-h-[65vh] overflow-y-auto">
               <table class="w-full border-collapse excel-table text-center">
                 <thead>
                   <tr class="bg-excel-header font-bold text-[10px]">
-                    <th>Счет</th>
+                    <th class="w-8">≡</th>
+                    <th>Карта</th>
                     <th id="accountsGrandTotal">0</th>
                     <th>кол-во вход.</th>
-                    <th>приход в месяц</th>
+                    <th>приход в мес.</th>
                     <th>кол-во исх.</th>
-                    <th>расход в месяц</th>
-                    <th>Действия</th>
+                    <th>расход в мес.</th>
+                    <th>Опции</th>
                   </tr>
                 </thead>
-                <tbody id="accountsTableBody"></tbody>
+                <tbody id="accountsTableBody">
+                  <!-- Карты с возможностью перетаскивания и смены цвета -->
+                </tbody>
               </table>
             </div>
           </div>
@@ -234,14 +255,14 @@
   </div>
 
   <!-- НИЖНЯЯ ПАНЕЛЬ ПЕРЕКЛЮЧЕНИЯ ЛИСТОВ (КАК В EXCEL) -->
-  <div class="fixed bottom-0 left-0 right-0 z-50 bg-slate-800 text-white px-4 py-2 flex items-center gap-2 border-t border-slate-700 shadow-lg">
-    <button type="button" onclick="switchTab('contracts')" id="tabBtnContracts" class="tab-btn active px-4 py-1.5 rounded-md font-bold text-xs transition">
+  <div class="fixed bottom-0 left-0 right-0 bg-slate-200 border-t z-50 flex items-center px-4 shadow-lg">
+    <button type="button" onclick="switchTab('contracts')" id="tabBtnContracts" class="tab-btn-bottom active">
       📋 Договоры
     </button>
-    <button type="button" onclick="switchTab('accounting')" id="tabBtnAccounting" class="tab-btn px-4 py-1.5 rounded-md font-bold text-xs transition text-slate-300 hover:text-white">
+    <button type="button" onclick="switchTab('accounting')" id="tabBtnAccounting" class="tab-btn-bottom">
       📊 Учет
     </button>
-    <button type="button" onclick="switchTab('taken')" id="tabBtnTaken" class="tab-btn px-4 py-1.5 rounded-md font-bold text-xs transition text-slate-300 hover:text-white">
+    <button type="button" onclick="switchTab('taken')" id="tabBtnTaken" class="tab-btn-bottom">
       📙 Взяли
     </button>
   </div>
@@ -294,7 +315,7 @@
               <input type="number" id="totalCost" required oninput="validateFinance()" class="p-2 border rounded w-full">
             </div>
             <div>
-              <label class="block text-[9px] font-bold text-blue-800 uppercase mb-1">Предоплата</label>
+              <label class="block text-[9px] font-bold text-blue-800 uppercase mb-1">Предоплата (Первый взнос)</label>
               <input type="number" id="downPayment" value="0" oninput="validateFinance()" class="p-2 border rounded w-full">
             </div>
             <div>
@@ -437,19 +458,19 @@
     let allContracts = JSON.parse(localStorage.getItem('contracts_db') || '[]');
     let allAccounting = JSON.parse(localStorage.getItem('accounting_db') || '[]');
     let allTaken = JSON.parse(localStorage.getItem('taken_db') || '[]');
-    let customAccounts = JSON.parse(localStorage.getItem('accounts_db') || 'null');
+    let customAccounts = JSON.parse(localStorage.getItem('accounts_db_v2') || 'null');
 
-    // Счета по умолчанию в формате объектов с поддержкой цвета
-    if (!customAccounts || !Array.isArray(customAccounts) || typeof customAccounts[0] === 'string') {
+    // Настраиваемые карты по умолчанию (с цветами)
+    if (!customAccounts) {
       const defaultNames = ['N', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12', 'T13', 'T14', 'T15', 'T16', 'B1', 'B2', 'B3', 'B4'];
-      customAccounts = defaultNames.map(name => ({ name: name, color: '#ffffff' }));
+      customAccounts = defaultNames.map(name => ({ name, color: '#ffffff' }));
     }
 
     let activeTab = 'contracts';
     let undoStack = [];
     let redoStack = [];
 
-    // --- ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ---
+    // --- ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК (СНИЗУ) ---
     function switchTab(tab) {
       activeTab = tab;
       const cTab = document.getElementById('contractsTabContent');
@@ -471,21 +492,21 @@
       addA.classList.add('hidden');
       addT.classList.add('hidden');
 
-      cBtn.className = "tab-btn px-4 py-1.5 rounded-md font-bold text-xs transition text-slate-300 hover:text-white";
-      aBtn.className = "tab-btn px-4 py-1.5 rounded-md font-bold text-xs transition text-slate-300 hover:text-white";
-      tBtn.className = "tab-btn px-4 py-1.5 rounded-md font-bold text-xs transition text-slate-300 hover:text-white";
+      cBtn.className = "tab-btn-bottom";
+      aBtn.className = "tab-btn-bottom";
+      tBtn.className = "tab-btn-bottom";
 
       if (tab === 'contracts') {
         cTab.classList.remove('hidden');
-        cBtn.className = "tab-btn active px-4 py-1.5 rounded-md font-bold text-xs transition";
+        cBtn.className = "tab-btn-bottom active";
         addC.classList.remove('hidden');
       } else if (tab === 'accounting') {
         aTab.classList.remove('hidden');
-        aBtn.className = "tab-btn active px-4 py-1.5 rounded-md font-bold text-xs transition";
+        aBtn.className = "tab-btn-bottom active";
         addA.classList.remove('hidden');
       } else if (tab === 'taken') {
         tTab.classList.remove('hidden');
-        tBtn.className = "tab-btn active px-4 py-1.5 rounded-md font-bold text-xs transition";
+        tBtn.className = "tab-btn-bottom active";
         addT.classList.remove('hidden');
         renderTakenSheet();
       }
@@ -546,7 +567,7 @@
       localStorage.setItem('contracts_db', JSON.stringify(allContracts));
       localStorage.setItem('accounting_db', JSON.stringify(allAccounting));
       localStorage.setItem('taken_db', JSON.stringify(allTaken));
-      localStorage.setItem('accounts_db', JSON.stringify(customAccounts));
+      localStorage.setItem('accounts_db_v2', JSON.stringify(customAccounts));
       renderTable(allContracts);
       renderAccountingTable(allAccounting);
       renderTakenSheet();
@@ -568,7 +589,7 @@
       localStorage.setItem('contracts_db', JSON.stringify(allContracts));
       localStorage.setItem('accounting_db', JSON.stringify(allAccounting));
       localStorage.setItem('taken_db', JSON.stringify(allTaken));
-      localStorage.setItem('accounts_db', JSON.stringify(customAccounts));
+      localStorage.setItem('accounts_db_v2', JSON.stringify(customAccounts));
       renderTable(allContracts);
       renderAccountingTable(allAccounting);
       renderTakenSheet();
@@ -699,23 +720,12 @@
       const contract = allContracts.find(c => c.id === id);
       if (!contract) return;
 
-      const inputDateVal = document.getElementById('payDateVal').value;
-      const inputDate = new Date(inputDateVal);
-      const today = new Date();
-      
-      const isDifferentMonth = (inputDate.getFullYear() !== today.getFullYear()) || (inputDate.getMonth() !== today.getMonth());
-
-      if (isDifferentMonth) {
-        const confirmed = confirm(`Внимание! Дата платежа (${inputDateVal}) относится НЕ к текущему месяцу.\n\nВы уверены, что хотите сохранить эту дату?`);
-        if (!confirmed) return;
-      }
-
       saveState();
       const idx = document.getElementById('payIndex').value;
       if (!contract.installments) contract.installments = {};
       contract.installments[idx] = { 
         amount: Number(document.getElementById('payAmount').value), 
-        date: inputDateVal 
+        date: document.getElementById('payDateVal').value 
       };
       saveToStorage();
       closePayModal();
@@ -735,8 +745,6 @@
           closePayModal();
           document.getElementById('payForm').reset();
         }
-      } else {
-        alert("Этот взнос еще не был внесен.");
       }
     }
 
@@ -911,7 +919,7 @@
       document.getElementById('totalExpense').innerText = expenseSum.toLocaleString('ru-RU') + ' ₽';
     }
 
-    // --- ЛИСТ 3: ВЗЯЛИ / ПОЛОЖИЛИ И АНАЛИТИКА ---
+    // --- ЛИСТ 3: ВЗЯЛИ / ПОЛОЖИЛИ И НАСТРАИВАЕМЫЕ КАРТЫ ---
     const takenModal = document.getElementById('takenModal');
 
     function openTakenModal() {
@@ -970,29 +978,24 @@
       }
     }
 
-    // --- УПРАВЛЕНИЕ КАРТАМИИИ СЧЕТАМИ (УДАЛЕНИЕ, ЦВЕТ, ПОРЯДОК) ---
+    // Управление картами (Редактирование, цвет, перетаскивание)
     function addNewAccountPrompt() {
-      const accName = prompt('Введите название нового счета/карты (например: S3, A1):');
-      if (accName && accName.trim()) {
-        const cleanName = accName.trim();
-        if(!customAccounts.some(a => a.name.toLowerCase() === cleanName.toLowerCase())) {
-          saveState();
-          customAccounts.push({ name: cleanName, color: '#ffffff' });
-          saveToStorage();
-        } else {
-          alert('Такой счет уже существует!');
-        }
+      const name = prompt('Введите название новой карты / счета:');
+      if (name && name.trim()) {
+        saveState();
+        customAccounts.push({ name: name.trim(), color: '#ffffff' });
+        saveToStorage();
       }
     }
 
-    function moveAccount(index, direction) {
-      const targetIndex = index + direction;
-      if (targetIndex < 0 || targetIndex >= customAccounts.length) return;
-      saveState();
-      const temp = customAccounts[index];
-      customAccounts[index] = customAccounts[targetIndex];
-      customAccounts[targetIndex] = temp;
-      saveToStorage();
+    function editAccountName(index) {
+      const oldName = customAccounts[index].name;
+      const newName = prompt('Новое название карты:', oldName);
+      if (newName && newName.trim() && newName.trim() !== oldName) {
+        saveState();
+        customAccounts[index].name = newName.trim();
+        saveToStorage();
+      }
     }
 
     function changeAccountColor(index, color) {
@@ -1001,7 +1004,7 @@
       saveToStorage();
     }
 
-    function removeAccount(index) {
+    function deleteAccount(index) {
       if (confirm(`Удалить карту "${customAccounts[index].name}"?`)) {
         saveState();
         customAccounts.splice(index, 1);
@@ -1009,8 +1012,32 @@
       }
     }
 
+    // Drag-and-Drop Перетаскивание Карт
+    let draggedIdx = null;
+
+    function handleDragStart(e, index) {
+      draggedIdx = index;
+      e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+    }
+
+    function handleDrop(e, targetIdx) {
+      e.preventDefault();
+      if (draggedIdx !== null && draggedIdx !== targetIdx) {
+        saveState();
+        const movedItem = customAccounts.splice(draggedIdx, 1)[0];
+        customAccounts.splice(targetIdx, 0, movedItem);
+        draggedIdx = null;
+        saveToStorage();
+      }
+    }
+
     function renderTakenSheet() {
-      // 1. Таблица Взяли / Положили
+      // 1. Таблица строк Взяли / Положили
       const rowsTbody = document.getElementById('takenRowsTable');
       rowsTbody.innerHTML = '';
 
@@ -1040,36 +1067,40 @@
       document.getElementById('takenTotalSum').innerText = sumTaken.toLocaleString('ru-RU');
       document.getElementById('putTotalSum').innerText = sumPut.toLocaleString('ru-RU');
 
-      // --- ЛОГИКА КАССЫ И УЧЕТА ---
-      // УЧЕТ = Доход (из листа Учет) - Расход (из листа Учет) - Взяли + Положили
-      let totalUchetIncome = 0;
-      let totalUchetExpense = 0;
+      // 2. Логика Расчета Кассы и Учета
+      // Лист Учета: чистые Доходы и Расходы
+      let uchetIncomeTotal = 0;
+      let uchetExpenseTotal = 0;
       allAccounting.forEach(a => {
-        totalUchetIncome += Number(a.income || 0);
-        totalUchetExpense += Number(a.expense || 0);
+        uchetIncomeTotal += Number(a.income || 0);
+        uchetExpenseTotal += Number(a.expense || 0);
       });
 
-      const uchetBalance = totalUchetIncome - totalUchetExpense - sumTaken + sumPut;
-      document.getElementById('kassaUchet').innerText = uchetBalance.toLocaleString('ru-RU');
-
-      // КАССА = (Предоплаты по договорам + Все Взносы по договорам - Себестоимость товаров) - Взяли + Положили
-      let contractsIncome = 0;
-      let contractsExpense = 0;
+      // Лист Договоры: Платежи, Предоплаты и Себестоимость
+      let contractsIncomeTotal = 0;
+      let contractsCostTotal = 0;
 
       allContracts.forEach(c => {
-        contractsIncome += Number(c.downPayment || 0);
-        contractsExpense += Number(c.costPrice || 0);
+        contractsIncomeTotal += Number(c.downPayment || 0);
+        contractsCostTotal += Number(c.costPrice || 0);
         
         const insts = c.installments || {};
         Object.values(insts).forEach(p => {
-          contractsIncome += Number(p.amount || 0);
+          contractsIncomeTotal += Number(p.amount || 0);
         });
       });
 
-      const kassaTotal = (contractsIncome - contractsExpense) - sumTaken + sumPut;
-      document.getElementById('kassaTotal').innerText = kassaTotal.toLocaleString('ru-RU');
+      // ИТОГОВЫЕ ЗНАЧЕНИЯ:
+      // Учет = Доход_Учета - Расход_Учета - Взяли + Положили
+      const finalUchet = uchetIncomeTotal - uchetExpenseTotal - sumTaken + sumPut;
+      
+      // Касса = (Взносы + Предоплаты) - Себестоимость - Взяли + Положили
+      const finalKassa = contractsIncomeTotal - contractsCostTotal - sumTaken + sumPut;
 
-      // 2. Расчет Статистики Договоров
+      document.getElementById('kassaTotal').innerText = finalKassa.toLocaleString('ru-RU');
+      document.getElementById('kassaUchet').innerText = finalUchet.toLocaleString('ru-RU');
+
+      // 3. Расчет Статистики Договоров
       const now = new Date();
       const todayStr = now.toISOString().slice(0, 10);
 
@@ -1118,7 +1149,7 @@
       document.getElementById('statFactTodaySum').innerText = factTodaySum.toLocaleString('ru-RU') + ' ₽';
       document.getElementById('statFactTodayCount').innerText = factTodayCount;
 
-      // 3. Таблица Счетов / Карт
+      // 4. Правая таблица настраиваемых карт (Счета/Карты)
       const accountsBody = document.getElementById('accountsTableBody');
       accountsBody.innerHTML = '';
 
@@ -1127,10 +1158,8 @@
 
       let accountsGrandTotalSum = 0;
 
-      customAccounts.forEach((accObj, index) => {
-        const accName = typeof accObj === 'string' ? accObj : accObj.name;
-        const accColor = (typeof accObj === 'object' && accObj.color) ? accObj.color : '#ffffff';
-
+      customAccounts.forEach((accObj, idx) => {
+        const accName = accObj.name;
         let accBalance = 0;
         let incCountMonth = 0;
         let incSumMonth = 0;
@@ -1161,25 +1190,30 @@
 
         accountsGrandTotalSum += accBalance;
 
+        // Подсветка красным при 400 000 ₽ прихода ИЛИ ухода за месяц
         const isOverLimit = (incSumMonth >= 400000 || expSumMonth >= 400000);
 
         const tr = document.createElement('tr');
-        tr.style.backgroundColor = accColor;
+        tr.draggable = true;
+        tr.className = `draggable-row ${isOverLimit ? 'bg-excel-red' : ''}`;
+        tr.style.backgroundColor = isOverLimit ? '' : (accObj.color || '#ffffff');
+
+        tr.ondragstart = (e) => handleDragStart(e, idx);
+        tr.ondragover = (e) => handleDragOver(e);
+        tr.ondrop = (e) => handleDrop(e, idx);
 
         tr.innerHTML = `
-          <td class="font-bold flex items-center justify-between px-2 gap-1">
-            <span>${accName}</span>
-            <input type="color" value="${accColor}" onchange="changeAccountColor(${index}, this.value)" class="w-4 h-4 p-0 border-0 cursor-pointer bg-transparent" title="Изменить цвет">
-          </td>
+          <td class="text-slate-400 font-bold select-none cursor-grab">⋮⋮</td>
+          <td class="font-bold cursor-pointer hover:underline" onclick="editAccountName(${idx})">${accName}</td>
           <td class="font-bold">${accBalance.toLocaleString('ru-RU')}</td>
           <td>${incCountMonth}</td>
-          <td class="${incSumMonth >= 400000 ? 'bg-excel-red' : ''}">${incSumMonth.toLocaleString('ru-RU')}</td>
+          <td>${incSumMonth.toLocaleString('ru-RU')}</td>
           <td>${expCountMonth}</td>
-          <td class="${expSumMonth >= 400000 ? 'bg-excel-red' : ''}">${expSumMonth.toLocaleString('ru-RU')}</td>
-          <td class="space-x-1 min-w-[70px]">
-            <button onclick="moveAccount(${index}, -1)" class="font-bold text-slate-600 hover:text-black">▲</button>
-            <button onclick="moveAccount(${index}, 1)" class="font-bold text-slate-600 hover:text-black">▼</button>
-            <button onclick="removeAccount(${index})" class="text-red-600 font-bold ml-1">🗑️</button>
+          <td>${expSumMonth.toLocaleString('ru-RU')}</td>
+          <td class="space-x-1">
+            <input type="color" value="${accObj.color || '#ffffff'}" onchange="changeAccountColor(${idx}, this.value)" class="w-4 h-4 rounded cursor-pointer border align-middle" title="Изменить цвет">
+            <button onclick="editAccountName(${idx})" class="text-blue-600 font-bold" title="Редактировать">✏️</button>
+            <button onclick="deleteAccount(${idx})" class="text-red-600 font-bold" title="Удалить карту">🗑️</button>
           </td>
         `;
         accountsBody.appendChild(tr);
@@ -1262,7 +1296,7 @@
       reader.readAsText(file);
     }
 
-    // Горячие клавиши
+    // Горячие клавиши Undo / Redo
     document.addEventListener('keydown', (e) => {
       if (e.ctrlKey && (e.key === 'z' || e.key === 'я')) { e.preventDefault(); undo(); }
       if (e.ctrlKey && (e.key === 'y' || e.key === 'н')) { e.preventDefault(); redo(); }
