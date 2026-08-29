@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Учет Договоров</title>
+  <title>Учет Договоров и Финансов</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .row-error { background-color: #fee2e2 !important; }
@@ -11,14 +11,26 @@
     .btn-history-active { background-color: #f59e0b !important; color: white !important; cursor: pointer !important; }
     .btn-history-active:hover { background-color: #d97706 !important; }
     .input-error { border: 2px solid #ef4444 !important; background-color: #fef2f2 !important; }
+    .tab-active { background-color: #2563eb !important; color: white !important; font-weight: bold; }
   </style>
 </head>
 <body class="bg-gray-100 text-gray-800 text-xs">
 
   <div class="p-4 max-w-[100vw]">
+    <!-- Навигационные вкладки -->
+    <div class="flex gap-2 mb-3">
+      <button type="button" id="tabContractsBtn" onclick="switchTab('contracts')" class="px-5 py-2 rounded-t-lg bg-gray-200 text-gray-700 font-bold transition tab-active">
+        📋 Лист Договоров
+      </button>
+      <button type="button" id="tabAccountingBtn" onclick="switchTab('accounting')" class="px-5 py-2 rounded-t-lg bg-gray-200 text-gray-700 font-bold transition">
+        📊 Лист Учет
+      </button>
+    </div>
+
+    <!-- Верхняя панель управления -->
     <div class="flex flex-wrap justify-between items-center mb-4 gap-4 bg-white p-4 rounded shadow border-b-2 border-blue-500">
       <div>
-        <h1 class="text-xl font-bold text-gray-800">Лист Договоров</h1>
+        <h1 id="pageTitle" class="text-xl font-bold text-gray-800">Лист Договоров</h1>
         <p class="text-[10px] text-gray-500 uppercase font-semibold tracking-wider">История изменений (Undo/Redo) включена</p>
       </div>
       
@@ -42,15 +54,18 @@
           📂 Загрузить базу
         </button>
         
-        <input type="text" id="searchInput" oninput="filterContracts()" placeholder="Поиск (ФИО, №)..." class="p-2 border rounded w-48 focus:ring-2 focus:ring-blue-400 outline-none">
-        
-        <button type="button" onclick="openCreateModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded shadow-md transition">
+        <div id="contractsSearchBlock">
+          <input type="text" id="searchInput" oninput="filterContracts()" placeholder="Поиск (ФИО, №)..." class="p-2 border rounded w-48 focus:ring-2 focus:ring-blue-400 outline-none">
+        </div>
+
+        <button type="button" id="mainAddBtn" onclick="openCreateModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded shadow-md transition">
           + Новый Договор
         </button>
       </div>
     </div>
 
-    <div class="bg-white shadow-xl rounded-lg overflow-x-auto max-h-[80vh] border">
+    <!-- Раздел: ЛИСТ ДОГОВОРОВ -->
+    <div id="contractsView" class="bg-white shadow-xl rounded-lg overflow-x-auto max-h-[80vh] border">
       <table class="min-w-full text-left border-collapse">
         <thead class="bg-slate-700 text-white uppercase font-bold text-[10px] sticky top-0 z-20">
           <tr>
@@ -78,8 +93,28 @@
         </tbody>
       </table>
     </div>
+
+    <!-- Раздел: ЛИСТ УЧЕТ -->
+    <div id="accountingView" class="hidden bg-white shadow-xl rounded-lg overflow-x-auto max-h-[80vh] border">
+      <table class="min-w-full text-left border-collapse">
+        <thead class="bg-slate-700 text-white uppercase font-bold text-[10px] sticky top-0 z-20">
+          <tr>
+            <th class="p-3 border-r border-slate-600 w-32">Дата</th>
+            <th class="p-3 border-r border-slate-600 text-emerald-300 w-36">Поступило (₽)</th>
+            <th class="p-3 border-r border-slate-600 text-rose-300 w-36">Ушло (₽)</th>
+            <th class="p-3 border-r border-slate-600">Отметка / Описание</th>
+            <th class="p-3 border-r border-slate-600 w-32">Счет</th>
+            <th class="p-3 text-center w-24">Действия</th>
+          </tr>
+        </thead>
+        <tbody id="accountingTable" class="divide-y">
+        </tbody>
+      </table>
+    </div>
+
   </div>
 
+  <!-- Модальное окно: Создание/Редактирование Договора -->
   <div id="modal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-xl p-6 max-w-4xl w-full max-h-[95vh] overflow-y-auto shadow-2xl">
       <h2 id="modalTitle" class="text-xl font-bold mb-4 border-b-2 pb-2 text-blue-700 uppercase tracking-tight">Новый договор</h2>
@@ -162,6 +197,7 @@
     </div>
   </div>
 
+  <!-- Модальное окно: Регистрация Оплаты -->
   <div id="payModal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-xl p-5 max-w-sm w-full shadow-2xl border-t-4 border-green-500">
       <h3 class="font-black text-xs uppercase text-slate-500 mb-4 tracking-widest">Регистрация оплаты</h3>
@@ -192,12 +228,83 @@
     </div>
   </div>
 
+  <!-- Модальное окно: Добавление записи в Лист Учет -->
+  <div id="accountingModal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl border-t-4 border-blue-600">
+      <h3 class="font-black text-sm uppercase text-slate-700 mb-4 tracking-widest">Новая запись учета</h3>
+      <form id="accountingForm" class="space-y-3">
+        <div>
+          <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Дата *</label>
+          <input type="date" id="accDate" required class="p-2 border rounded-md w-full outline-none">
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Тип операции *</label>
+          <select id="accType" required class="p-2 border rounded-md w-full font-bold outline-none">
+            <option value="income">Поступило (Зеленый)</option>
+            <option value="expense">Ушло (Красный)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Сумма (₽) *</label>
+          <input type="number" id="accAmount" required class="p-2 border rounded-md w-full text-lg font-bold outline-none">
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Отметка / Описание</label>
+          <input type="text" id="accNote" placeholder="Например: Перенос, Расход, Д323" class="p-2 border rounded-md w-full outline-none">
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Счет *</label>
+          <input type="text" id="accAccount" placeholder="Например: S1, N, A1" required class="p-2 border rounded-md w-full outline-none">
+        </div>
+        <div class="flex justify-end gap-2 pt-3 border-t">
+          <button type="button" onclick="closeAccountingModal()" class="px-4 py-2 border rounded-lg font-bold text-slate-500 hover:bg-slate-100">Отмена</button>
+          <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 shadow-md">Сохранить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
+    let currentTab = 'contracts';
     let allContracts = JSON.parse(localStorage.getItem('contracts_db') || '[]');
+    let allAccounting = JSON.parse(localStorage.getItem('accounting_db') || '[]');
+    
     let undoStack = [];
     let redoStack = [];
 
-    // --- ЖЕСТКАЯ ВАЛИДАЦИЯ ФИНАНСОВ ---
+    // --- ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ---
+    function switchTab(tab) {
+      currentTab = tab;
+      const cView = document.getElementById('contractsView');
+      const aView = document.getElementById('accountingView');
+      const cBtn = document.getElementById('tabContractsBtn');
+      const aBtn = document.getElementById('tabAccountingBtn');
+      const mainBtn = document.getElementById('mainAddBtn');
+      const searchBlock = document.getElementById('contractsSearchBlock');
+      const pageTitle = document.getElementById('pageTitle');
+
+      if (tab === 'contracts') {
+        cView.classList.remove('hidden');
+        aView.classList.add('hidden');
+        cBtn.classList.add('tab-active');
+        aBtn.classList.remove('tab-active');
+        searchBlock.classList.remove('hidden');
+        mainBtn.innerText = '+ Новый Договор';
+        mainBtn.onclick = openCreateModal;
+        pageTitle.innerText = 'Лист Договоров';
+      } else {
+        cView.classList.add('hidden');
+        aView.classList.remove('hidden');
+        cBtn.classList.remove('tab-active');
+        aBtn.classList.add('tab-active');
+        searchBlock.classList.add('hidden');
+        mainBtn.innerText = '+ Запись Учета';
+        mainBtn.onclick = openAccountingModal;
+        pageTitle.innerText = 'Лист Учет';
+      }
+    }
+
+    // --- ВАЛИДАЦИЯ ФИНАНСОВ ДОГОВОРА ---
     function validateFinance() {
       const months = Number(document.getElementById('monthsCount').value) || 0;
       const monthly = Number(document.getElementById('monthlyPay').value) || 0;
@@ -227,8 +334,13 @@
       return !hasError;
     }
 
+    // --- УПРАВЛЕНИЕ ИСТОРИЕЙ (UNDO / REDO) ---
+    function getFullState() {
+      return JSON.stringify({ contracts: allContracts, accounting: allAccounting });
+    }
+
     function saveState() {
-      undoStack.push(JSON.stringify(allContracts));
+      undoStack.push(getFullState());
       if (undoStack.length > 50) undoStack.shift();
       redoStack = [];
       updateHistoryButtons();
@@ -236,21 +348,27 @@
 
     function undo() {
       if (undoStack.length === 0) return;
-      redoStack.push(JSON.stringify(allContracts));
-      allContracts = JSON.parse(undoStack.pop());
+      redoStack.push(getFullState());
+      const state = JSON.parse(undoStack.pop());
+      allContracts = state.contracts || [];
+      allAccounting = state.accounting || [];
       finishAction();
     }
 
     function redo() {
       if (redoStack.length === 0) return;
-      undoStack.push(JSON.stringify(allContracts));
-      allContracts = JSON.parse(redoStack.pop());
+      undoStack.push(getFullState());
+      const state = JSON.parse(redoStack.pop());
+      allContracts = state.contracts || [];
+      allAccounting = state.accounting || [];
       finishAction();
     }
 
     function finishAction() {
       localStorage.setItem('contracts_db', JSON.stringify(allContracts));
+      localStorage.setItem('accounting_db', JSON.stringify(allAccounting));
       renderTable(allContracts);
+      renderAccountingTable(allAccounting);
       updateHistoryButtons();
     }
 
@@ -267,10 +385,13 @@
 
     function saveToStorage() {
       localStorage.setItem('contracts_db', JSON.stringify(allContracts));
+      localStorage.setItem('accounting_db', JSON.stringify(allAccounting));
       renderTable(allContracts);
+      renderAccountingTable(allAccounting);
       updateHistoryButtons();
     }
 
+    // --- МОДАЛЬНЫЕ ОКНА ДОГОВОРОВ ---
     const modal = document.getElementById('modal');
     function openCreateModal() {
       document.getElementById('contractForm').reset();
@@ -359,7 +480,6 @@
       closeModal();
     });
 
-    // --- ПРОВЕРКА ДАТЫ И ВНЕСЕНИЕ ВЗНОСА ---
     document.getElementById('payForm').addEventListener('submit', (e) => {
       e.preventDefault();
       const id = document.getElementById('payContractId').value;
@@ -389,7 +509,6 @@
       document.getElementById('payForm').reset();
     });
 
-    // --- УДАЛЕНИЕ ВЗНОСА ---
     function deleteInstallment() {
       const id = document.getElementById('payContractId').value;
       const idx = document.getElementById('payIndex').value;
@@ -491,8 +610,82 @@
       renderTable(allContracts.filter(c => c.fio.toLowerCase().includes(q) || String(c.contractNum).includes(q)));
     }
 
+    // --- ФУНКЦИОНАЛ ЛИСТА УЧЕТ ---
+    function openAccountingModal() {
+      document.getElementById('accountingForm').reset();
+      document.getElementById('accDate').valueAsDate = new Date();
+      document.getElementById('accountingModal').classList.remove('hidden');
+    }
+
+    function closeAccountingModal() {
+      document.getElementById('accountingModal').classList.add('hidden');
+    }
+
+    document.getElementById('accountingForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      saveState();
+
+      const type = document.getElementById('accType').value;
+      const amount = Number(document.getElementById('accAmount').value);
+
+      const newItem = {
+        id: 'acc_' + Date.now(),
+        date: document.getElementById('accDate').value,
+        income: type === 'income' ? amount : 0,
+        expense: type === 'expense' ? amount : 0,
+        note: document.getElementById('accNote').value || '—',
+        account: document.getElementById('accAccount').value || '—'
+      };
+
+      allAccounting.push(newItem);
+      saveToStorage();
+      closeAccountingModal();
+    });
+
+    function deleteAccountingItem(id) {
+      if (confirm('Удалить эту запись из учета?')) {
+        saveState();
+        allAccounting = allAccounting.filter(a => a.id !== id);
+        saveToStorage();
+      }
+    }
+
+    function renderAccountingTable(items) {
+      const tbody = document.getElementById('accountingTable');
+      tbody.innerHTML = '';
+      
+      items.forEach(item => {
+        const tr = document.createElement('tr');
+        
+        const incomeCell = item.income > 0 
+          ? `<td class="p-2 border-r font-bold text-emerald-600 bg-emerald-50">${item.income}</td>` 
+          : `<td class="p-2 border-r text-gray-300">—</td>`;
+          
+        const expenseCell = item.expense > 0 
+          ? `<td class="p-2 border-r font-bold text-rose-600 bg-rose-50">${item.expense}</td>` 
+          : `<td class="p-2 border-r text-gray-300">—</td>`;
+
+        tr.innerHTML = `
+          <td class="p-2 border-r font-medium">${item.date}</td>
+          ${incomeCell}
+          ${expenseCell}
+          <td class="p-2 border-r">${item.note}</td>
+          <td class="p-2 border-r font-bold text-slate-700">${item.account}</td>
+          <td class="p-2 text-center">
+            <button onclick="deleteAccountingItem('${item.id}')" class="bg-red-500 text-white px-2 py-0.5 rounded text-[10px]">🗑️</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // --- ЭКСПОРТ И ИМПОРТ ОБЩЕЙ БАЗЫ ---
     function exportData() {
-      const blob = new Blob([JSON.stringify(allContracts, null, 2)], { type: "application/json" });
+      const dataToExport = {
+        contracts: allContracts,
+        accounting: allAccounting
+      };
+      const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -508,9 +701,15 @@
       reader.onload = (ev) => {
         try {
           const data = JSON.parse(ev.target.result);
-          if (confirm(`Загрузить ${data.length} договоров? Это заменит текущую базу.`)) {
+          if (confirm(`Загрузить базу? Это заменит текущие данные.`)) {
             saveState();
-            allContracts = data;
+            if (Array.isArray(data)) {
+              allContracts = data;
+              allAccounting = [];
+            } else {
+              allContracts = data.contracts || [];
+              allAccounting = data.accounting || [];
+            }
             saveToStorage();
           }
         } catch { alert("Ошибка файла!"); }
@@ -518,12 +717,15 @@
       reader.readAsText(file);
     }
 
+    // --- ГОРЯЧИЕ КЛАВИШИ ---
     document.addEventListener('keydown', (e) => {
       if (e.ctrlKey && (e.key === 'z' || e.key === 'я')) { e.preventDefault(); undo(); }
       if (e.ctrlKey && (e.key === 'y' || e.key === 'н')) { e.preventDefault(); redo(); }
     });
 
+    // Инициализация
     renderTable(allContracts);
+    renderAccountingTable(allAccounting);
     updateHistoryButtons();
   </script>
 </body>
