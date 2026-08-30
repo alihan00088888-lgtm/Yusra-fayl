@@ -457,13 +457,15 @@
   </div>
 
   <script>
-    // --- ДАННЫЕ И СОСТОЯНИЕ ---
+    // ================================================================
+    // 1. ДАННЫЕ И СОСТОЯНИЕ
+    // ================================================================
     let allContracts = JSON.parse(localStorage.getItem('contracts_db') || '[]');
     let allAccounting = JSON.parse(localStorage.getItem('accounting_db') || '[]');
     let allTaken = JSON.parse(localStorage.getItem('taken_db') || '[]');
     let customAccounts = JSON.parse(localStorage.getItem('accounts_db') || 'null');
 
-    // Счета по умолчанию с поддержкой кастомных цветов
+    // Инициализация счетов по умолчанию
     if (!customAccounts) {
       const defaultNames = ['N', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12', 'T13', 'T14', 'T15', 'T16', 'B1', 'B2', 'B3', 'B4'];
       customAccounts = defaultNames.map(name => ({
@@ -477,11 +479,16 @@
       }));
     }
 
+    // Обновляем localStorage если структура изменилась
+    localStorage.setItem('accounts_db', JSON.stringify(customAccounts));
+
     let activeTab = 'contracts';
     let undoStack = [];
     let redoStack = [];
 
-    // --- ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ---
+    // ================================================================
+    // 2. ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
+    // ================================================================
     function switchTab(tab) {
       activeTab = tab;
       const cTab = document.getElementById('contractsTabContent');
@@ -524,7 +531,9 @@
       handleSearch();
     }
 
-    // --- ИСТОРИЯ ИЗМЕНЕНИЙ (UNDO / REDO) ---
+    // ================================================================
+    // 3. ИСТОРИЯ (UNDO / REDO)
+    // ================================================================
     function saveState() {
       const stateSnapshot = {
         contracts: JSON.parse(JSON.stringify(allContracts)),
@@ -607,7 +616,9 @@
       updateHistoryButtons();
     }
 
-    // --- ЛИСТ 1: ДОГОВОРЫ ---
+    // ================================================================
+    // 4. ЛИСТ 1: ДОГОВОРЫ
+    // ================================================================
     function validateFinance() {
       const months = Number(document.getElementById('monthsCount').value) || 0;
       const monthly = Number(document.getElementById('monthlyPay').value) || 0;
@@ -849,7 +860,9 @@
       });
     }
 
-    // --- ЛИСТ 2: УЧЕТ ---
+    // ================================================================
+    // 5. ЛИСТ 2: УЧЕТ
+    // ================================================================
     const accModal = document.getElementById('accModal');
     
     function openAccModal() {
@@ -860,7 +873,9 @@
       accModal.classList.remove('hidden');
     }
 
-    function closeAccModal() { accModal.classList.add('hidden'); }
+    function closeAccModal() { 
+      accModal.classList.add('hidden'); 
+    }
 
     function openEditAccModal(id) {
       const item = allAccounting.find(a => a.id === id);
@@ -900,7 +915,7 @@
       }
 
       saveToStorage();
-      closeAccModal();
+      closeAccModal(); // <-- ОБЯЗАТЕЛЬНО ЗАКРЫВАЕМ МОДАЛКУ
     });
 
     function deleteAccItem(id) {
@@ -943,7 +958,9 @@
       document.getElementById('totalExpense').innerText = expenseSum.toLocaleString('ru-RU') + ' ₽';
     }
 
-    // --- ЛИСТ 3: ВЗЯЛИ / ПОЛОЖИЛИ И АНАЛИТИКА ---
+    // ================================================================
+    // 6. ЛИСТ 3: ВЗЯЛИ / ПОЛОЖИЛИ
+    // ================================================================
     const takenModal = document.getElementById('takenModal');
 
     function openTakenModal() {
@@ -1003,16 +1020,19 @@
     }
 
     // ================================================================
-    // ФУНКЦИИ ДЛЯ РАБОТЫ СО СЧЕТАМИ (С РЕДАКТИРОВАНИЕМ НАЗВАНИЯ)
+    // 7. УПРАВЛЕНИЕ СЧЕТАМИ (ИСПРАВЛЕНО)
     // ================================================================
     function addNewAccountPrompt() {
       const accName = prompt('Введите название нового счета/карты (например: S3, A1):');
       if (accName && accName.trim()) {
         const cleanName = accName.trim();
+        // Проверяем уникальность
         if (!customAccounts.some(a => a.name.toLowerCase() === cleanName.toLowerCase())) {
           saveState();
           customAccounts.push({ name: cleanName, color: '' });
           saveToStorage();
+          // Принудительно обновляем таблицу счетов
+          renderTakenSheet();
         } else {
           alert('Такой счет уже существует!');
         }
@@ -1024,6 +1044,8 @@
         saveState();
         customAccounts.splice(index, 1);
         saveToStorage();
+        // Принудительно обновляем таблицу счетов
+        renderTakenSheet();
       }
     }
 
@@ -1031,27 +1053,37 @@
       saveState();
       customAccounts[index].color = color;
       saveToStorage();
+      // Принудительно обновляем таблицу счетов
+      renderTakenSheet();
     }
 
     function renameAccount(index, newName) {
       const trimmedName = newName.trim();
       if (!trimmedName) {
         alert('Название не может быть пустым!');
+        // Возвращаем старое название
+        renderTakenSheet();
         return;
       }
       // Проверяем, не занято ли имя другим счетом
       const duplicate = customAccounts.some((a, i) => i !== index && a.name.toLowerCase() === trimmedName.toLowerCase());
       if (duplicate) {
         alert('Счет с таким названием уже существует!');
+        renderTakenSheet();
         return;
       }
       saveState();
       customAccounts[index].name = trimmedName;
       saveToStorage();
+      // Принудительно обновляем таблицу счетов
+      renderTakenSheet();
     }
-    // ================================================================
 
+    // ================================================================
+    // 8. ОТРИСОВКА ВКЛАДКИ "ВЗЯЛИ" (С ИСПРАВЛЕННЫМИ СЧЕТАМИ)
+    // ================================================================
     function renderTakenSheet() {
+      // --- Таблица "Взяли / Положили" ---
       const rowsTbody = document.getElementById('takenRowsTable');
       rowsTbody.innerHTML = '';
 
@@ -1081,7 +1113,7 @@
       document.getElementById('takenTotalSum').innerText = sumTaken.toLocaleString('ru-RU');
       document.getElementById('putTotalSum').innerText = sumPut.toLocaleString('ru-RU');
 
-      // 1. Расчет Кассы
+      // --- Расчет Кассы ---
       let totalDownPayments = 0;
       let totalInstallments = 0;
       let totalCostPrice = 0;
@@ -1098,7 +1130,7 @@
       let totalKassa = totalDownPayments + totalInstallments - totalCostPrice - sumTaken + sumPut;
       document.getElementById('kassaTotal').innerText = totalKassa.toLocaleString('ru-RU');
 
-      // 2. Учет
+      // --- Учет (баланс из раздела Учет) ---
       let totalUchetIncome = 0;
       let totalUchetExpense = 0;
       allAccounting.forEach(a => {
@@ -1108,7 +1140,7 @@
       let uchetBalance = totalUchetIncome - totalUchetExpense;
       document.getElementById('kassaUchet').innerText = uchetBalance.toLocaleString('ru-RU');
 
-      // 3. Статистика Договоров
+      // --- Статистика Договоров ---
       const now = new Date();
       const todayStr = now.toISOString().slice(0, 10);
 
@@ -1157,7 +1189,7 @@
       document.getElementById('statFactTodaySum').innerText = factTodaySum.toLocaleString('ru-RU') + ' ₽';
       document.getElementById('statFactTodayCount').innerText = factTodayCount;
 
-      // 4. Таблица счетов / карт с РЕДАКТИРОВАНИЕМ названия
+      // --- ТАБЛИЦА СЧЕТОВ / КАРТ (ИСПРАВЛЕНО) ---
       const accountsBody = document.getElementById('accountsTableBody');
       accountsBody.innerHTML = '';
 
@@ -1165,6 +1197,11 @@
       const currentYear = now.getFullYear();
 
       let accountsGrandTotalSum = 0;
+
+      // Проверяем, что customAccounts - это массив
+      if (!Array.isArray(customAccounts)) {
+        customAccounts = [];
+      }
 
       customAccounts.forEach((accObj, idx) => {
         let accBalance = 0;
@@ -1208,7 +1245,8 @@
         }
 
         const tr = document.createElement('tr');
-        tr.style = rowStyle;
+        if (rowStyle) tr.style = rowStyle;
+        
         tr.innerHTML = `
           <td>
             <input type="text" class="account-name-input" value="${accObj.name}" 
@@ -1232,7 +1270,9 @@
       document.getElementById('accountsGrandTotal').innerText = accountsGrandTotalSum.toLocaleString('ru-RU');
     }
 
-    // --- ПОИСК И ЭКСПОРТ/ИМПОРТ ---
+    // ================================================================
+    // 9. ПОИСК
+    // ================================================================
     function handleSearch() {
       const q = document.getElementById('searchInput').value.toLowerCase();
       if (activeTab === 'contracts') {
@@ -1266,6 +1306,9 @@
       });
     }
 
+    // ================================================================
+    // 10. ЭКСПОРТ / ИМПОРТ
+    // ================================================================
     function exportData() {
       const exportObject = {
         contracts: allContracts,
@@ -1306,7 +1349,9 @@
       reader.readAsText(file);
     }
 
-    // Горячие клавиши
+    // ================================================================
+    // 11. ГОРЯЧИЕ КЛАВИШИ И ИНИЦИАЛИЗАЦИЯ
+    // ================================================================
     document.addEventListener('keydown', (e) => {
       if (e.ctrlKey && (e.key === 'z' || e.key === 'я')) { e.preventDefault(); undo(); }
       if (e.ctrlKey && (e.key === 'y' || e.key === 'н')) { e.preventDefault(); redo(); }
@@ -1319,4 +1364,4 @@
     updateHistoryButtons();
   </script>
 </body>
-</html>
+              </html>
