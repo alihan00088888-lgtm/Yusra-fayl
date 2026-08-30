@@ -32,6 +32,45 @@
       color: #7f1d1d !important;
       font-weight: bold !important;
     }
+
+    .whatsapp-btn {
+      background-color: #25D366;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: bold;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s;
+      cursor: pointer;
+      border: none;
+      font-size: 14px;
+    }
+    .whatsapp-btn:hover {
+      background-color: #128C7E;
+      transform: scale(1.02);
+    }
+    .whatsapp-btn svg {
+      width: 24px;
+      height: 24px;
+      fill: white;
+    }
+
+    .client-item {
+      padding: 8px 12px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .client-item:last-child {
+      border-bottom: none;
+    }
+    .client-list {
+      max-height: 500px;
+      overflow-y: auto;
+    }
   </style>
 </head>
 <body class="bg-slate-100 text-gray-800 text-xs min-h-screen pb-20">
@@ -80,6 +119,7 @@
 
   <div class="p-4 max-w-[100vw]">
     
+    <!-- ================= Лист 1: Договоры ================= -->
     <div id="contractsTabContent" class="space-y-4">
       <div class="bg-white shadow-xl rounded-xl overflow-x-auto max-h-[78vh] border">
         <table class="min-w-full text-left border-collapse">
@@ -109,6 +149,7 @@
       </div>
     </div>
 
+    <!-- ================= Лист 2: Учет ================= -->
     <div id="accountingTabContent" class="hidden space-y-4">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="bg-white p-4 rounded-xl border-l-4 border-emerald-500 shadow-md flex justify-between items-center">
@@ -144,6 +185,7 @@
       </div>
     </div>
 
+    <!-- ================= Лист 3: Взяли ================= -->
     <div id="takenTabContent" class="hidden space-y-4">
       <div class="bg-white shadow-xl rounded-xl p-4 overflow-x-auto border">
         <div class="flex flex-wrap lg:flex-nowrap gap-6">
@@ -232,9 +274,42 @@
       </div>
     </div>
 
+    <!-- ================= Лист 4: Сегодня ================= -->
+    <div id="todayTabContent" class="hidden space-y-4">
+      <div class="bg-white shadow-xl rounded-xl p-6 border">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold text-green-600">📅 Клиенты на сегодня</h2>
+          <button onclick="sendWhatsAppToday()" class="whatsapp-btn">
+            <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Отправить всем WhatsApp
+          </button>
+        </div>
+        <div id="todayClientsList" class="client-list">
+          <!-- Список клиентов будет заполняться автоматически -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= Лист 5: 3 дня ================= -->
+    <div id="threeDaysTabContent" class="hidden space-y-4">
+      <div class="bg-white shadow-xl rounded-xl p-6 border">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold text-orange-600">⏰ Клиенты через 3 дня</h2>
+          <button onclick="sendWhatsAppThreeDays()" class="whatsapp-btn">
+            <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Отправить всем WhatsApp
+          </button>
+        </div>
+        <div id="threeDaysClientsList" class="client-list">
+          <!-- Список клиентов будет заполняться автоматически -->
+        </div>
+      </div>
+    </div>
+
   </div>
 
-  <div class="fixed bottom-0 left-0 right-0 z-40 bg-white shadow-lg border-t px-4 py-2 flex justify-center items-center gap-2">
+  <!-- НИЖНЯЯ ПАНЕЛЬ ПЕРЕКЛЮЧЕНИЯ ЛИСТОВ -->
+  <div class="fixed bottom-0 left-0 right-0 z-40 bg-white shadow-lg border-t px-4 py-2 flex justify-center items-center gap-2 overflow-x-auto">
     <div class="flex items-center gap-2 bg-slate-200 p-1 rounded-xl">
       <button type="button" onclick="switchTab('contracts')" id="tabBtnContracts" class="tab-btn active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2">
         📋 Договоры
@@ -245,9 +320,16 @@
       <button type="button" onclick="switchTab('taken')" id="tabBtnTaken" class="tab-btn px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
         📙 Взяли
       </button>
+      <button type="button" onclick="switchTab('today')" id="tabBtnToday" class="tab-btn px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
+        📅 Сегодня
+      </button>
+      <button type="button" onclick="switchTab('threeDays')" id="tabBtnThreeDays" class="tab-btn px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
+        ⏰ 3 дня
+      </button>
     </div>
   </div>
 
+  <!-- Модальные окна (остаются без изменений) -->
   <div id="modal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-xl p-6 max-w-4xl w-full max-h-[95vh] overflow-y-auto shadow-2xl">
       <h2 id="modalTitle" class="text-xl font-bold mb-4 border-b-2 pb-2 text-blue-700 uppercase tracking-tight">Новый договор</h2>
@@ -458,10 +540,14 @@
       const cTab = document.getElementById('contractsTabContent');
       const aTab = document.getElementById('accountingTabContent');
       const tTab = document.getElementById('takenTabContent');
+      const todayTab = document.getElementById('todayTabContent');
+      const threeDaysTab = document.getElementById('threeDaysTabContent');
 
       const cBtn = document.getElementById('tabBtnContracts');
       const aBtn = document.getElementById('tabBtnAccounting');
       const tBtn = document.getElementById('tabBtnTaken');
+      const todayBtn = document.getElementById('tabBtnToday');
+      const threeDaysBtn = document.getElementById('tabBtnThreeDays');
 
       const addC = document.getElementById('addContractBtn');
       const addA = document.getElementById('addAccBtn');
@@ -470,6 +556,8 @@
       cTab.classList.add('hidden');
       aTab.classList.add('hidden');
       tTab.classList.add('hidden');
+      todayTab.classList.add('hidden');
+      threeDaysTab.classList.add('hidden');
       addC.classList.add('hidden');
       addA.classList.add('hidden');
       addT.classList.add('hidden');
@@ -477,6 +565,8 @@
       cBtn.className = "tab-btn px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       aBtn.className = "tab-btn px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       tBtn.className = "tab-btn px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
+      todayBtn.className = "tab-btn px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
+      threeDaysBtn.className = "tab-btn px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
 
       if (tab === 'contracts') {
         cTab.classList.remove('hidden');
@@ -491,6 +581,14 @@
         tBtn.className = "tab-btn active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
         addT.classList.remove('hidden');
         renderTakenSheet();
+      } else if (tab === 'today') {
+        todayTab.classList.remove('hidden');
+        todayBtn.className = "tab-btn active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
+        renderTodayClients();
+      } else if (tab === 'threeDays') {
+        threeDaysTab.classList.remove('hidden');
+        threeDaysBtn.className = "tab-btn active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
+        renderThreeDaysClients();
       }
       handleSearch();
     }
@@ -552,6 +650,8 @@
       renderTable(allContracts);
       renderAccountingTable(allAccounting);
       renderTakenSheet();
+      if (activeTab === 'today') renderTodayClients();
+      if (activeTab === 'threeDays') renderThreeDaysClients();
       updateHistoryButtons();
     }
 
@@ -574,9 +674,185 @@
       renderTable(allContracts);
       renderAccountingTable(allAccounting);
       renderTakenSheet();
+      if (activeTab === 'today') renderTodayClients();
+      if (activeTab === 'threeDays') renderThreeDaysClients();
       updateHistoryButtons();
     }
 
+    // ================= ФУНКЦИИ ДЛЯ ЛИСТОВ "СЕГОДНЯ" И "3 ДНЯ" =================
+    
+    function getClientsForDate(targetDate) {
+      const result = [];
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const target = new Date(targetDate);
+      target.setHours(0, 0, 0, 0);
+      
+      allContracts.forEach(contract => {
+        // Проверяем только активные договоры (с остатком > 0)
+        const insts = contract.installments || {};
+        let totalPaid = 0;
+        Object.values(insts).forEach(p => totalPaid += Number(p.amount));
+        const rest = contract.totalCost - (contract.downPayment || 0) - totalPaid;
+        
+        if (rest <= 0) return; // Пропускаем закрытые договоры
+        
+        // Проверяем дату платежа
+        if (contract.payDate) {
+          const payDate = new Date(contract.payDate);
+          payDate.setHours(0, 0, 0, 0);
+          
+          // Сравниваем даты (только день, месяц, год)
+          if (payDate.getTime() === target.getTime()) {
+            result.push({
+              ...contract,
+              rest: rest,
+              phone: contract.phone || '',
+              fio: contract.fio || ''
+            });
+          }
+        }
+      });
+      
+      return result;
+    }
+
+    function renderTodayClients() {
+      const today = new Date();
+      const todayStr = today.toISOString().slice(0, 10);
+      const clients = getClientsForDate(todayStr);
+      
+      const container = document.getElementById('todayClientsList');
+      if (clients.length === 0) {
+        container.innerHTML = '<div class="text-center text-gray-500 py-8 text-sm">📭 Нет клиентов, которые должны оплатить сегодня</div>';
+        return;
+      }
+      
+      let html = '<div class="divide-y">';
+      clients.forEach((client, index) => {
+        html += `
+          <div class="client-item">
+            <div>
+              <span class="font-bold">${client.fio}</span>
+              <span class="text-gray-500 ml-2">📞 ${client.phone}</span>
+              <span class="text-xs text-orange-600 ml-2">Остаток: ${client.rest.toLocaleString('ru-RU')} ₽</span>
+            </div>
+            <a href="https://wa.me/7${client.phone.replace(/[^0-9]/g, '')}?text=Здравствуйте! Напоминаем, что сегодня ${todayStr} необходимо оплатить рассрочку в размере ${client.monthlyPay} ₽" 
+               target="_blank" 
+               class="text-green-600 hover:text-green-800 font-bold">
+              💬 Написать
+            </a>
+          </div>
+        `;
+      });
+      html += '</div>';
+      container.innerHTML = html;
+    }
+
+    function renderThreeDaysClients() {
+      const today = new Date();
+      const threeDaysLater = new Date(today);
+      threeDaysLater.setDate(today.getDate() + 3);
+      const threeDaysStr = threeDaysLater.toISOString().slice(0, 10);
+      
+      const clients = getClientsForDate(threeDaysStr);
+      
+      const container = document.getElementById('threeDaysClientsList');
+      if (clients.length === 0) {
+        container.innerHTML = '<div class="text-center text-gray-500 py-8 text-sm">📭 Нет клиентов, которым нужно оплатить через 3 дня</div>';
+        return;
+      }
+      
+      let html = '<div class="divide-y">';
+      clients.forEach((client, index) => {
+        html += `
+          <div class="client-item">
+            <div>
+              <span class="font-bold">${client.fio}</span>
+              <span class="text-gray-500 ml-2">📞 ${client.phone}</span>
+              <span class="text-xs text-orange-600 ml-2">Остаток: ${client.rest.toLocaleString('ru-RU')} ₽</span>
+            </div>
+            <a href="https://wa.me/7${client.phone.replace(/[^0-9]/g, '')}?text=Здравствуйте! Напоминаем, что через 3 дня (${threeDaysStr}) необходимо оплатить рассрочку в размере ${client.monthlyPay} ₽" 
+               target="_blank" 
+               class="text-green-600 hover:text-green-800 font-bold">
+              💬 Написать
+            </a>
+          </div>
+        `;
+      });
+      html += '</div>';
+      container.innerHTML = html;
+    }
+
+    // Функция для отправки сообщений всем клиентам через WhatsApp
+    function sendWhatsAppToday() {
+      const today = new Date();
+      const todayStr = today.toISOString().slice(0, 10);
+      const clients = getClientsForDate(todayStr);
+      
+      if (clients.length === 0) {
+        alert('Нет клиентов, которые должны оплатить сегодня');
+        return;
+      }
+      
+      const phones = clients.map(c => c.phone.replace(/[^0-9]/g, '')).filter(p => p.length > 0);
+      if (phones.length === 0) {
+        alert('Нет номеров телефонов для отправки');
+        return;
+      }
+      
+      // Создаем ссылку для массовой рассылки (только для WhatsApp Web)
+      const message = `Здравствуйте! Напоминаем, что сегодня ${todayStr} необходимо оплатить рассрочку.`;
+      const phoneStr = phones.map(p => `7${p}`).join(',');
+      const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+      
+      // Открываем WhatsApp с предзаполненным сообщением
+      window.open(url, '_blank');
+      
+      // Копируем номера в буфер обмена для массовой рассылки
+      const phoneList = phones.map(p => `7${p}`).join('\n');
+      navigator.clipboard.writeText(phoneList).then(() => {
+        alert(`Скопировано ${phones.length} номеров для рассылки.\nОтправьте сообщение в WhatsApp каждому клиенту.`);
+      }).catch(() => {
+        alert(`Найдено ${phones.length} клиентов. Отправьте сообщение в WhatsApp каждому клиенту.`);
+      });
+    }
+
+    function sendWhatsAppThreeDays() {
+      const today = new Date();
+      const threeDaysLater = new Date(today);
+      threeDaysLater.setDate(today.getDate() + 3);
+      const threeDaysStr = threeDaysLater.toISOString().slice(0, 10);
+      
+      const clients = getClientsForDate(threeDaysStr);
+      
+      if (clients.length === 0) {
+        alert('Нет клиентов, которым нужно оплатить через 3 дня');
+        return;
+      }
+      
+      const phones = clients.map(c => c.phone.replace(/[^0-9]/g, '')).filter(p => p.length > 0);
+      if (phones.length === 0) {
+        alert('Нет номеров телефонов для отправки');
+        return;
+      }
+      
+      const message = `Здравствуйте! Напоминаем, что через 3 дня (${threeDaysStr}) необходимо оплатить рассрочку.`;
+      const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+      
+      window.open(url, '_blank');
+      
+      const phoneList = phones.map(p => `7${p}`).join('\n');
+      navigator.clipboard.writeText(phoneList).then(() => {
+        alert(`Скопировано ${phones.length} номеров для рассылки.\nОтправьте сообщение в WhatsApp каждому клиенту.`);
+      }).catch(() => {
+        alert(`Найдено ${phones.length} клиентов. Отправьте сообщение в WhatsApp каждому клиенту.`);
+      });
+    }
+
+    // ================= ОСТАЛЬНЫЕ ФУНКЦИИ (без изменений) =================
+    
     function validateFinance() {
       const months = Number(document.getElementById('monthsCount').value) || 0;
       const monthly = Number(document.getElementById('monthlyPay').value) || 0;
@@ -584,7 +860,6 @@
       const down = Number(document.getElementById('downPayment').value) || 0;
       const cost = Number(document.getElementById('costPrice').value) || 0;
 
-      // Если все поля пустые или равны 0 - ошибки нет
       if (months === 0 && monthly === 0 && total === 0 && down === 0 && cost === 0) {
         document.getElementById('errorBanner').classList.add('hidden');
         const saveBtn = document.getElementById('saveBtn');
@@ -593,11 +868,7 @@
         return true;
       }
 
-      // Проверка: сумма рассрочки должна быть равна (мес.платеж * срок + предоплата)
-      // Но только если все поля заполнены
       const isMathError = (months > 0 || monthly > 0 || total > 0) && (months * monthly + down !== total);
-      
-      // Проверка: себестоимость не может быть больше суммы рассрочки
       const isPriceError = (cost > 0 || total > 0) && (cost > total);
       
       const hasError = isMathError || isPriceError;
@@ -605,7 +876,7 @@
       document.getElementById('totalCost').classList.toggle('input-error', isMathError);
       document.getElementById('monthlyPay').classList.toggle('input-error', isMathError);
       document.getElementById('monthsCount').classList.toggle('input-error', isMathError);
-      document.getElementById('downPayment').classList.toggle('input-error', false); // Предоплата больше не подсвечивается как ошибка
+      document.getElementById('downPayment').classList.toggle('input-error', false);
       document.getElementById('costPrice').classList.toggle('input-error', isPriceError);
 
       document.getElementById('errorBanner').classList.toggle('hidden', !hasError);
@@ -1261,4 +1532,4 @@
     updateHistoryButtons();
   </script>
 </body>
-              </html>
+            </html>
