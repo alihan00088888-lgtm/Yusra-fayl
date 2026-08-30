@@ -329,7 +329,7 @@
     </div>
   </div>
 
-  <!-- Модальные окна (остаются без изменений) -->
+  <!-- Модальные окна -->
   <div id="modal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-xl p-6 max-w-4xl w-full max-h-[95vh] overflow-y-auto shadow-2xl">
       <h2 id="modalTitle" class="text-xl font-bold mb-4 border-b-2 pb-2 text-blue-700 uppercase tracking-tight">Новый договор</h2>
@@ -785,7 +785,7 @@
       container.innerHTML = html;
     }
 
-    // Функция для отправки сообщений всем клиентам через WhatsApp
+    // Функция для отправки сообщений всем клиентам через WhatsApp (сегодня)
     function sendWhatsAppToday() {
       const today = new Date();
       const todayStr = today.toISOString().slice(0, 10);
@@ -796,29 +796,30 @@
         return;
       }
       
-      const phones = clients.map(c => c.phone.replace(/[^0-9]/g, '')).filter(p => p.length > 0);
-      if (phones.length === 0) {
-        alert('Нет номеров телефонов для отправки');
-        return;
-      }
+      // Формируем сообщение со списком всех клиентов
+      let message = '🔔 *Напоминание об оплате сегодня!*\n\n';
+      clients.forEach((client, index) => {
+        const phone = client.phone.replace(/[^0-9]/g, '');
+        message += `${index + 1}. ${client.fio} - ${client.monthlyPay} ₽ (Остаток: ${client.rest.toLocaleString('ru-RU')} ₽)\n`;
+        message += `   WhatsApp: https://wa.me/7${phone}\n\n`;
+      });
+      message += `\n📅 Дата платежа: ${todayStr}`;
       
-      // Создаем ссылку для массовой рассылки (только для WhatsApp Web)
-      const message = `Здравствуйте! Напоминаем, что сегодня ${todayStr} необходимо оплатить рассрочку.`;
-      const phoneStr = phones.map(p => `7${p}`).join(',');
+      // Открываем WhatsApp с общим сообщением
       const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-      
-      // Открываем WhatsApp с предзаполненным сообщением
       window.open(url, '_blank');
       
-      // Копируем номера в буфер обмена для массовой рассылки
-      const phoneList = phones.map(p => `7${p}`).join('\n');
-      navigator.clipboard.writeText(phoneList).then(() => {
-        alert(`Скопировано ${phones.length} номеров для рассылки.\nОтправьте сообщение в WhatsApp каждому клиенту.`);
-      }).catch(() => {
-        alert(`Найдено ${phones.length} клиентов. Отправьте сообщение в WhatsApp каждому клиенту.`);
-      });
+      // Также копируем номера в буфер обмена для удобства
+      const phones = clients.map(c => c.phone.replace(/[^0-9]/g, '')).filter(p => p.length > 0);
+      if (phones.length > 0) {
+        const phoneList = phones.map(p => `7${p}`).join(', ');
+        navigator.clipboard.writeText(phoneList).then(() => {
+          console.log('Номера скопированы:', phoneList);
+        }).catch(() => {});
+      }
     }
 
+    // Функция для отправки сообщений всем клиентам через WhatsApp (3 дня)
     function sendWhatsAppThreeDays() {
       const today = new Date();
       const threeDaysLater = new Date(today);
@@ -832,26 +833,30 @@
         return;
       }
       
-      const phones = clients.map(c => c.phone.replace(/[^0-9]/g, '')).filter(p => p.length > 0);
-      if (phones.length === 0) {
-        alert('Нет номеров телефонов для отправки');
-        return;
-      }
+      // Формируем сообщение со списком всех клиентов
+      let message = '🔔 *Напоминание об оплате через 3 дня!*\n\n';
+      clients.forEach((client, index) => {
+        const phone = client.phone.replace(/[^0-9]/g, '');
+        message += `${index + 1}. ${client.fio} - ${client.monthlyPay} ₽ (Остаток: ${client.rest.toLocaleString('ru-RU')} ₽)\n`;
+        message += `   WhatsApp: https://wa.me/7${phone}\n\n`;
+      });
+      message += `\n📅 Дата платежа: ${threeDaysStr}`;
       
-      const message = `Здравствуйте! Напоминаем, что через 3 дня (${threeDaysStr}) необходимо оплатить рассрочку.`;
+      // Открываем WhatsApp с общим сообщением
       const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-      
       window.open(url, '_blank');
       
-      const phoneList = phones.map(p => `7${p}`).join('\n');
-      navigator.clipboard.writeText(phoneList).then(() => {
-        alert(`Скопировано ${phones.length} номеров для рассылки.\nОтправьте сообщение в WhatsApp каждому клиенту.`);
-      }).catch(() => {
-        alert(`Найдено ${phones.length} клиентов. Отправьте сообщение в WhatsApp каждому клиенту.`);
-      });
+      // Копируем номера в буфер обмена
+      const phones = clients.map(c => c.phone.replace(/[^0-9]/g, '')).filter(p => p.length > 0);
+      if (phones.length > 0) {
+        const phoneList = phones.map(p => `7${p}`).join(', ');
+        navigator.clipboard.writeText(phoneList).then(() => {
+          console.log('Номера скопированы:', phoneList);
+        }).catch(() => {});
+      }
     }
 
-    // ================= ОСТАЛЬНЫЕ ФУНКЦИИ (без изменений) =================
+    // ================= ОСТАЛЬНЫЕ ФУНКЦИИ =================
     
     function validateFinance() {
       const months = Number(document.getElementById('monthsCount').value) || 0;
@@ -1532,4 +1537,4 @@
     updateHistoryButtons();
   </script>
 </body>
-            </html>
+</html>
