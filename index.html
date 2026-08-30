@@ -37,6 +37,11 @@
       background-color: #8b5cf6;
       color: #ffffff;
     }
+    
+    .tab-btn.print-tab.active {
+      background-color: #f59e0b;
+      color: #ffffff;
+    }
 
     .excel-table td, .excel-table th {
       border: 1px solid #cbd5e1;
@@ -128,7 +133,6 @@
     .partner-name { font-weight: bold; font-size: 14px; color: #7c3aed; }
     .partner-value { font-weight: bold; font-size: 13px; }
 
-    /* Стиль для уведомления о копировании */
     .copy-notification {
       position: fixed;
       top: 20px;
@@ -146,12 +150,72 @@
       from { transform: translateX(100%); opacity: 0; }
       to { transform: translateX(0); opacity: 1; }
     }
+
+    /* Стили для печати договора */
+    .contract-print {
+      font-family: 'Times New Roman', serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px;
+      background: white;
+    }
+    .contract-print .header {
+      text-align: center;
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+    }
+    .contract-print .contract-number {
+      text-align: right;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    .contract-print .section {
+      margin-bottom: 15px;
+    }
+    .contract-print .section-title {
+      font-weight: bold;
+      font-size: 14px;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+    }
+    .contract-print .section-content {
+      font-size: 13px;
+      line-height: 1.6;
+      padding-left: 15px;
+    }
+    .contract-print .signatures {
+      margin-top: 30px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+    }
+    .contract-print .signature-block {
+      text-align: center;
+    }
+    .contract-print .signature-line {
+      width: 150px;
+      border-bottom: 1px solid black;
+      margin: 5px auto;
+    }
+    .contract-print .bold {
+      font-weight: bold;
+    }
+    .contract-print .underline {
+      text-decoration: underline;
+    }
+    @media print {
+      .no-print { display: none !important; }
+      .contract-print { padding: 20px; }
+      body { background: white !important; }
+    }
   </style>
 </head>
 <body class="bg-slate-100 text-gray-800 text-xs min-h-screen pb-20">
 
   <!-- ВЕРХНЯЯ ПАНЕЛЬ ДЕЙСТВИЙ -->
-  <div class="sticky top-0 z-40 bg-white shadow-md border-b">
+  <div class="sticky top-0 z-40 bg-white shadow-md border-b no-print">
     <div class="p-3 max-w-[100vw] flex flex-wrap justify-between items-center gap-4">
       
       <div class="flex items-center gap-2 flex-wrap">
@@ -412,10 +476,35 @@
       </div>
     </div>
 
+    <!-- ================= Лист 8: Распечатка ================= -->
+    <div id="printTabContent" class="hidden space-y-4">
+      <div class="bg-white shadow-xl rounded-xl p-6 border">
+        <div class="flex justify-between items-center mb-4 no-print">
+          <h2 class="text-xl font-bold text-amber-600">🖨️ Распечатка договора</h2>
+          <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
+              <label class="text-xs font-bold">№ договора:</label>
+              <input type="number" id="printContractNumber" class="p-1 border rounded text-sm w-24" placeholder="Введите номер" onchange="loadContractForPrint()">
+              <button onclick="loadContractForPrint()" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">Загрузить</button>
+            </div>
+            <button onclick="printContract()" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2">
+              🖨️ Печать
+            </button>
+          </div>
+        </div>
+        <div id="contractPrintArea" class="contract-print">
+          <div class="text-center text-gray-400 py-12">
+            <p class="text-lg">📄 Введите номер договора сверху</p>
+            <p class="text-sm mt-2">Данные автоматически подгрузятся из базы</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- НИЖНЯЯ ПАНЕЛЬ ПЕРЕКЛЮЧЕНИЯ ЛИСТОВ -->
-  <div class="fixed bottom-0 left-0 right-0 z-40 bg-white shadow-lg border-t px-4 py-2 flex justify-center items-center gap-2 overflow-x-auto">
+  <div class="fixed bottom-0 left-0 right-0 z-40 bg-white shadow-lg border-t px-4 py-2 flex justify-center items-center gap-2 overflow-x-auto no-print">
     <div class="flex items-center gap-2 bg-slate-200 p-1 rounded-xl">
       <button type="button" onclick="switchTab('contracts')" id="tabBtnContracts" class="tab-btn active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2">
         📋 Договоры
@@ -427,8 +516,7 @@
         📙 Взяли
       </button>
       <button type="button" onclick="switchTab('today')" id="tabBtnToday" class="tab-btn today-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
-        📅 Сегодня
-      </button>
+        📅 Сегодня      </button>
       <button type="button" onclick="switchTab('threeDays')" id="tabBtnThreeDays" class="tab-btn three-days-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
         ⏰ 3 дня
       </button>
@@ -437,6 +525,9 @@
       </button>
       <button type="button" onclick="switchTab('partners')" id="tabBtnPartners" class="tab-btn partners-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
         🤝 Партнёры
+      </button>
+      <button type="button" onclick="switchTab('print')" id="tabBtnPrint" class="tab-btn print-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
+        🖨️ Распечатка
       </button>
     </div>
   </div>
@@ -647,6 +738,238 @@
     let undoStack = [];
     let redoStack = [];
 
+    // ================= ФУНКЦИИ ДЛЯ ЛИСТА РАСПЕЧАТКА =================
+    
+    function loadContractForPrint() {
+      const numInput = document.getElementById('printContractNumber');
+      const num = parseInt(numInput.value);
+      
+      if (!num || isNaN(num) || num <= 0) {
+        document.getElementById('contractPrintArea').innerHTML = `
+          <div class="text-center text-gray-400 py-12">
+            <p class="text-lg">⚠️ Введите корректный номер договора</p>
+            <p class="text-sm mt-2">Номер должен быть положительным числом</p>
+          </div>
+        `;
+        return;
+      }
+      
+      const contract = allContracts.find(c => c.contractNum === num);
+      
+      if (!contract) {
+        document.getElementById('contractPrintArea').innerHTML = `
+          <div class="text-center text-gray-400 py-12">
+            <p class="text-lg">❌ Договор №${num} не найден</p>
+            <p class="text-sm mt-2">Проверьте правильность номера</p>
+          </div>
+        `;
+        return;
+      }
+      
+      renderContractPrint(contract);
+    }
+
+    function renderContractPrint(contract) {
+      const area = document.getElementById('contractPrintArea');
+      
+      const today = new Date();
+      const dateStr = today.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      
+      const insts = contract.installments || {};
+      let totalPaid = 0;
+      Object.values(insts).forEach(p => totalPaid += Number(p.amount));
+      const rest = contract.totalCost - (contract.downPayment || 0) - totalPaid;
+      
+      // Формируем график платежей для отображения в договоре
+      let paymentSchedule = '';
+      const months = contract.monthsCount || 0;
+      const firstPayDate = new Date(contract.payDate);
+      
+      for (let i = 1; i <= months; i++) {
+        const payDate = new Date(firstPayDate);
+        payDate.setMonth(payDate.getMonth() + (i - 1));
+        const payDateStr = payDate.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        const payment = insts[i];
+        const isPaid = payment && payment.amount > 0;
+        const status = isPaid ? '✅ Оплачен' : '⏳ Ожидает оплаты';
+        paymentSchedule += `${i}-й платеж: ${payDateStr} - ${contract.monthlyPay} ₽ (${status})<br>`;
+      }
+
+      area.innerHTML = `
+        <div class="header">ДОГОВОР КУПЛИ-ПРОДАЖИ ТОВАРА В РАССРОЧКУ</div>
+        
+        <div class="contract-number">
+          <span class="bold">№ ${contract.contractNum}</span> от ${dateStr}
+        </div>
+        
+        <div class="section">
+          <div class="section-title">1. СТОРОНЫ ДОГОВОРА</div>
+          <div class="section-content">
+            <p><span class="bold">Продавец:</span> Индивидуальный предприниматель</p>
+            <p><span class="bold">Покупатель:</span> ${contract.fio}</p>
+            <p><span class="bold">Телефон:</span> ${contract.phone}</p>
+            <p><span class="bold">Адрес:</span> ${contract.address || '—'}</p>
+            <p><span class="bold">Паспортные данные:</span> ${contract.passport || '—'}</p>
+            <p><span class="bold">Дата рождения:</span> ${contract.birthDate || '—'}</p>
+          </div>
+        </div>
+        
+        <div class="section">
+          <div class="section-title">2. ПРЕДМЕТ ДОГОВОРА</div>
+          <div class="section-content">
+            <p>Продавец обязуется передать в собственность Покупателя, а Покупатель обязуется принять и оплатить следующий товар:</p>
+            <p><span class="bold">Наименование:</span> ${contract.product || '—'}</p>
+            <p><span class="bold">Магазин / Партнёр:</span> ${contract.store || '—'}</p>
+            <p><span class="bold">Стоимость товара:</span> ${contract.totalCost} ₽</p>
+          </div>
+        </div>
+        
+        <div class="section">
+          <div class="section-title">3. УСЛОВИЯ ОПЛАТЫ</div>
+          <div class="section-content">
+            <p><span class="bold">Сумма рассрочки:</span> ${contract.totalCost} ₽</p>
+            <p><span class="bold">Предоплата:</span> ${contract.downPayment || 0} ₽</p>
+            <p><span class="bold">Количество месяцев:</span> ${contract.monthsCount}</p>
+            <p><span class="bold">Ежемесячный платеж:</span> ${contract.monthlyPay} ₽</p>
+            <p><span class="bold">Дата первого платежа:</span> ${contract.payDate}</p>
+            <p><span class="bold">Остаток к оплате:</span> ${rest} ₽</p>
+            <p><span class="bold">Статус:</span> ${contract.shopPaid ? '✅ Оплачено полностью' : '⏳ В процессе оплаты'}</p>
+          </div>
+        </div>
+        
+        <div class="section">
+          <div class="section-title">4. ГРАФИК ПЛАТЕЖЕЙ</div>
+          <div class="section-content">
+            ${paymentSchedule}
+          </div>
+        </div>
+        
+        <div class="section">
+          <div class="section-title">5. ПРАВА И ОБЯЗАННОСТИ СТОРОН</div>
+          <div class="section-content">
+            <p><span class="bold">Продавец обязан:</span></p>
+            <p>Передать «Покупателю» Товар надлежащего качества, в надлежащей упаковке, в порядке и в сроки, установленные настоящим Договором.</p>
+            <p><span class="bold">Покупатель обязан:</span></p>
+            <p>- Принять Товар в порядке, предусмотренном настоящим Договором.</p>
+            <p>- Оплатить Товар в порядке и в сроки, предусмотренные настоящим Договором.</p>
+            <p>- Не имеет право менять контактный номер без предупреждения. При наступлении непредвиденных обстоятельств обязан всеми возможными способами оповестить продавца.</p>
+            <p><span class="bold">Поручитель обязан:</span></p>
+            <p>При неисполнении или ненадлежащем исполнении «Покупателем» своих обязательств по настоящему договору «Поручитель» отвечает перед «Продавцом» в том же объеме, что и «Покупатель», включая возврат основного долга. При просрочке выплаты «Покупателем» на 7 дней от установленного срока «Поручитель» обязан выплатить просроченный платеж.</p>
+          </div>
+        </div>
+        
+        <div class="section">
+          <div class="section-title">6. ПОРУЧИТЕЛЬ</div>
+          <div class="section-content">
+            <p><span class="bold">ФИО Поручителя:</span> ${contract.guarantorFio || '—'}</p>
+            <p><span class="bold">Телефон поручителя:</span> ${contract.guarantorPhone || '—'}</p>
+          </div>
+        </div>
+        
+        <div class="section">
+          <div class="section-title">7. ПЕРЕДАЧА И ПРИНЯТИЕ ТОВАРА</div>
+          <div class="section-content">
+            <p>- Товар передается «Покупателю» в месте нахождения продавца в дату подписания настоящего договора.</p>
+            <p>- «Покупатель» обязан осмотреть товар, проверить соответствие по качеству, количеству и комплектности условиям настоящего договора и принять его.</p>
+            <p>- Право собственности на товар переходит к «Покупателю» с момента полной оплаты им цены договора. Ответственность за сохранность товара переходит к покупателю с момента подписания настоящего договора.</p>
+            <p>- «Продавец» считается исполнившим свою обязанность по передаче товара с даты подписания настоящего договора.</p>
+          </div>
+        </div>
+        
+        <div class="section">
+          <div class="section-title">8. РАЗРЕШЕНИЕ СПОРОВ</div>
+          <div class="section-content">
+            <p>- Все споры и разногласия, которые могут возникнуть между сторонами по вопросам, не нашедшим своего разрешения в тексте настоящего договора, будут разрешаться путем переговоров.</p>
+            <p>- В случае неурегулирования спорных вопросов в процессе переговоров такой спор подлежит рассмотрению в суде.</p>
+          </div>
+        </div>
+        
+        <div class="section">
+          <div class="section-title">9. ЗАКЛЮЧИТЕЛЬНЫЕ ПОЛОЖЕНИЯ</div>
+          <div class="section-content">
+            <p>- Настоящий договор вступает в силу с даты его подписания «Сторонами» и действует до полного исполнения ими обязательств по настоящему договору.</p>
+            <p>- Любые изменения и дополнения к настоящему договору должны быть составлены в письменной форме и подписаны всеми сторонами.</p>
+          </div>
+        </div>
+        
+        <div class="signatures">
+          <div class="signature-block">
+            <p><span class="bold">«Продавец»</span></p>
+            <div class="signature-line"></div>
+            <p>__________________</p>
+            <p class="text-xs">подпись</p>
+          </div>
+          <div class="signature-block">
+            <p><span class="bold">«Покупатель»</span></p>
+            <div class="signature-line"></div>
+            <p>__________________</p>
+            <p class="text-xs">подпись</p>
+          </div>
+          <div class="signature-block">
+            <p><span class="bold">«Поручитель»</span></p>
+            <div class="signature-line"></div>
+            <p>__________________</p>
+            <p class="text-xs">подпись</p>
+          </div>
+        </div>
+        
+        <div class="text-center text-xs text-gray-400 mt-4">
+          Договор сгенерирован автоматически из системы учета
+        </div>
+      `;
+    }
+
+    function printContract() {
+      const printArea = document.getElementById('contractPrintArea');
+      const originalContent = printArea.innerHTML;
+      
+      // Проверяем, есть ли данные
+      if (originalContent.includes('Введите номер договора') || originalContent.includes('не найден')) {
+        alert('⚠️ Сначала загрузите договор по номеру!');
+        return;
+      }
+      
+      const printWindow = window.open('', '_blank', 'width=900,height=700');
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Договор №${document.getElementById('printContractNumber').value}</title>
+            <style>
+              body { font-family: 'Times New Roman', serif; padding: 20px; }
+              .contract-print { max-width: 800px; margin: 0 auto; }
+              .header { text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 20px; text-transform: uppercase; }
+              .contract-number { text-align: right; font-size: 14px; margin-bottom: 10px; }
+              .section { margin-bottom: 15px; }
+              .section-title { font-weight: bold; font-size: 14px; margin-bottom: 5px; text-transform: uppercase; }
+              .section-content { font-size: 13px; line-height: 1.6; padding-left: 15px; }
+              .signatures { margin-top: 30px; display: flex; justify-content: space-between; font-size: 13px; }
+              .signature-block { text-align: center; }
+              .signature-line { width: 150px; border-bottom: 1px solid black; margin: 5px auto; }
+              .bold { font-weight: bold; }
+              @media print {
+                body { padding: 0; }
+                .no-print { display: none !important; }
+              }
+            </style>
+          </head>
+          <body>
+            <div class="contract-print">
+              ${originalContent}
+            </div>
+            <script>
+              window.onload = function() {
+                window.print();
+                setTimeout(function() { window.close(); }, 1000);
+              };
+            <\/script>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
+
+    // ================= ОСТАЛЬНЫЕ ФУНКЦИИ (БЕЗ ИЗМЕНЕНИЙ) =================
+    
     function switchTab(tab) {
       activeTab = tab;
       const cTab = document.getElementById('contractsTabContent');
@@ -656,6 +979,7 @@
       const threeDaysTab = document.getElementById('threeDaysTabContent');
       const debtorsTab = document.getElementById('debtorsTabContent');
       const partnersTab = document.getElementById('partnersTabContent');
+      const printTab = document.getElementById('printTabContent');
 
       const cBtn = document.getElementById('tabBtnContracts');
       const aBtn = document.getElementById('tabBtnAccounting');
@@ -664,6 +988,7 @@
       const threeDaysBtn = document.getElementById('tabBtnThreeDays');
       const debtorsBtn = document.getElementById('tabBtnDebtors');
       const partnersBtn = document.getElementById('tabBtnPartners');
+      const printBtn = document.getElementById('tabBtnPrint');
 
       const addC = document.getElementById('addContractBtn');
       const addA = document.getElementById('addAccBtn');
@@ -676,6 +1001,7 @@
       threeDaysTab.classList.add('hidden');
       debtorsTab.classList.add('hidden');
       partnersTab.classList.add('hidden');
+      printTab.classList.add('hidden');
       addC.classList.add('hidden');
       addA.classList.add('hidden');
       addT.classList.add('hidden');
@@ -687,6 +1013,7 @@
       threeDaysBtn.className = "tab-btn three-days-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       debtorsBtn.className = "tab-btn debtors-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       partnersBtn.className = "tab-btn partners-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
+      printBtn.className = "tab-btn print-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
 
       if (tab === 'contracts') {
         cTab.classList.remove('hidden');
@@ -717,6 +1044,15 @@
         partnersTab.classList.remove('hidden');
         partnersBtn.className = "tab-btn partners-tab active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
         renderPartners();
+      } else if (tab === 'print') {
+        printTab.classList.remove('hidden');
+        printBtn.className = "tab-btn print-tab active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
+        // Загружаем последний договор если есть
+        if (allContracts.length > 0) {
+          const lastContract = allContracts[allContracts.length - 1];
+          document.getElementById('printContractNumber').value = lastContract.contractNum;
+          renderContractPrint(lastContract);
+        }
       }
       handleSearch();
     }
@@ -1068,8 +1404,6 @@
       return result;
     }
 
-    // ================= ФУНКЦИИ ДЛЯ ОТОБРАЖЕНИЯ КЛИЕНТОВ =================
-    
     function renderClientList(containerId, clients, title, dateStr) {
       const container = document.getElementById(containerId);
       if (clients.length === 0) {
@@ -1141,7 +1475,7 @@
       renderClientList('debtorsClientsList', clients, 'Нет клиентов с просрочкой', '');
     }
 
-    // ================= ФУНКЦИИ ДЛЯ WHATSAPP (УЛУЧШЕННЫЕ) =================
+    // ================= ФУНКЦИИ ДЛЯ WHATSAPP =================
     
     function showCopyNotification(message) {
       const notification = document.createElement('div');
@@ -1163,7 +1497,6 @@
         return;
       }
       
-      // Формируем сообщение со ВСЕМИ клиентами
       let message = '🔔 *Напоминание об оплате сегодня!*\n\n';
       let phoneNumbers = [];
       
@@ -1189,16 +1522,13 @@
       message += `\n📅 Дата платежа: ${todayStr}\n`;
       message += `👥 Всего клиентов: ${clients.length}`;
       
-      // Копируем номера в буфер обмена
       const phoneList = phoneNumbers.map(p => `7${p}`).join(', ');
       navigator.clipboard.writeText(phoneList).then(() => {
         showCopyNotification(`✅ Скопировано ${phoneNumbers.length} номеров для рассылки!`);
       }).catch(() => {
-        // Если не удалось скопировать, показываем вручную
         showCopyNotification(`⚠️ Найдено ${phoneNumbers.length} клиентов. Скопируйте номера вручную.`);
       });
       
-      // Открываем WhatsApp с общим сообщением
       const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
       window.open(url, '_blank');
     }
