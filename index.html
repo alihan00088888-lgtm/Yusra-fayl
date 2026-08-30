@@ -17,6 +17,21 @@
       color: #ffffff;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
+    
+    .tab-btn.today-tab.active {
+      background-color: #22c55e;
+      color: #ffffff;
+    }
+    
+    .tab-btn.three-days-tab.active {
+      background-color: #3b82f6;
+      color: #ffffff;
+    }
+    
+    .tab-btn.debtors-tab.active {
+      background-color: #ef4444;
+      color: #ffffff;
+    }
 
     .excel-table td, .excel-table th {
       border: 1px solid #cbd5e1;
@@ -60,6 +75,11 @@
     .client-item {
       padding: 12px 16px;
       border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
     }
     .client-item:last-child {
       border-bottom: none;
@@ -68,35 +88,30 @@
       max-height: 500px;
       overflow-y: auto;
     }
-    .client-name {
+    
+    .month-status {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin: 2px;
+      font-size: 10px;
       font-weight: bold;
-      font-size: 14px;
     }
-    .client-details {
-      font-size: 12px;
-      color: #4b5563;
-      margin-top: 4px;
+    .month-paid { background-color: #22c55e; color: white; }
+    .month-overdue { background-color: #ef4444; color: white; }
+    .month-future { background-color: #3b82f6; color: white; }
+    
+    .client-info {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
     }
-    .client-details span {
-      margin-right: 12px;
-    }
-    .month-paid { color: #22c55e; font-weight: bold; }
-    .month-unpaid { color: #ef4444; font-weight: bold; }
-    .month-overdue { color: #dc2626; font-weight: bold; background-color: #fee2e2; padding: 0 4px; border-radius: 4px; }
-
-    /* Цвета для кнопок вкладок */
-    #tabBtnToday.tab-btn.active {
-      background-color: #22c55e !important;
-      color: white !important;
-    }
-    #tabBtnThreeDays.tab-btn.active {
-      background-color: #3b82f6 !important;
-      color: white !important;
-    }
-    #tabBtnNonPayers.tab-btn.active {
-      background-color: #ef4444 !important;
-      color: white !important;
-    }
+    .client-name { font-weight: bold; font-size: 14px; }
+    .client-phone { color: #6b7280; font-size: 12px; }
+    .client-detail { font-size: 12px; color: #4b5563; }
+    .client-overdue { color: #ef4444; font-weight: bold; }
+    .client-rest { color: #f59e0b; font-weight: bold; }
   </style>
 </head>
 <body class="bg-slate-100 text-gray-800 text-xs min-h-screen pb-20">
@@ -310,7 +325,9 @@
             Отправить всем WhatsApp
           </button>
         </div>
-        <div id="todayClientsList" class="client-list"></div>
+        <div id="todayClientsList" class="client-list">
+          <!-- Список клиентов будет заполняться автоматически -->
+        </div>
       </div>
     </div>
 
@@ -324,21 +341,25 @@
             Отправить всем WhatsApp
           </button>
         </div>
-        <div id="threeDaysClientsList" class="client-list"></div>
+        <div id="threeDaysClientsList" class="client-list">
+          <!-- Список клиентов будет заполняться автоматически -->
+        </div>
       </div>
     </div>
 
     <!-- ================= Лист 6: Неплательщики ================= -->
-    <div id="nonPayersTabContent" class="hidden space-y-4">
+    <div id="debtorsTabContent" class="hidden space-y-4">
       <div class="bg-white shadow-xl rounded-xl p-6 border">
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold text-red-600">🚫 Неплательщики</h2>
-          <button onclick="sendWhatsAppNonPayers()" class="whatsapp-btn">
+          <h2 class="text-xl font-bold text-red-600">🚫 Неплательщики (просрочка)</h2>
+          <button onclick="sendWhatsAppDebtors()" class="whatsapp-btn">
             <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
             Отправить всем WhatsApp
           </button>
         </div>
-        <div id="nonPayersClientsList" class="client-list"></div>
+        <div id="debtorsClientsList" class="client-list">
+          <!-- Список клиентов будет заполняться автоматически -->
+        </div>
       </div>
     </div>
 
@@ -356,19 +377,19 @@
       <button type="button" onclick="switchTab('taken')" id="tabBtnTaken" class="tab-btn px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
         📙 Взяли
       </button>
-      <button type="button" onclick="switchTab('today')" id="tabBtnToday" class="tab-btn px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
+      <button type="button" onclick="switchTab('today')" id="tabBtnToday" class="tab-btn today-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
         📅 Сегодня
       </button>
-      <button type="button" onclick="switchTab('threeDays')" id="tabBtnThreeDays" class="tab-btn px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
+      <button type="button" onclick="switchTab('threeDays')" id="tabBtnThreeDays" class="tab-btn three-days-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
         ⏰ 3 дня
       </button>
-      <button type="button" onclick="switchTab('nonPayers')" id="tabBtnNonPayers" class="tab-btn px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
+      <button type="button" onclick="switchTab('debtors')" id="tabBtnDebtors" class="tab-btn debtors-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
         🚫 Неплательщики
       </button>
     </div>
   </div>
 
-  <!-- Модальные окна (остаются без изменений) -->
+  <!-- Модальные окна -->
   <div id="modal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-xl p-6 max-w-4xl w-full max-h-[95vh] overflow-y-auto shadow-2xl">
       <h2 id="modalTitle" class="text-xl font-bold mb-4 border-b-2 pb-2 text-blue-700 uppercase tracking-tight">Новый договор</h2>
@@ -581,14 +602,14 @@
       const tTab = document.getElementById('takenTabContent');
       const todayTab = document.getElementById('todayTabContent');
       const threeDaysTab = document.getElementById('threeDaysTabContent');
-      const nonPayersTab = document.getElementById('nonPayersTabContent');
+      const debtorsTab = document.getElementById('debtorsTabContent');
 
       const cBtn = document.getElementById('tabBtnContracts');
       const aBtn = document.getElementById('tabBtnAccounting');
       const tBtn = document.getElementById('tabBtnTaken');
       const todayBtn = document.getElementById('tabBtnToday');
       const threeDaysBtn = document.getElementById('tabBtnThreeDays');
-      const nonPayersBtn = document.getElementById('tabBtnNonPayers');
+      const debtorsBtn = document.getElementById('tabBtnDebtors');
 
       const addC = document.getElementById('addContractBtn');
       const addA = document.getElementById('addAccBtn');
@@ -599,7 +620,7 @@
       tTab.classList.add('hidden');
       todayTab.classList.add('hidden');
       threeDaysTab.classList.add('hidden');
-      nonPayersTab.classList.add('hidden');
+      debtorsTab.classList.add('hidden');
       addC.classList.add('hidden');
       addA.classList.add('hidden');
       addT.classList.add('hidden');
@@ -607,9 +628,9 @@
       cBtn.className = "tab-btn px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       aBtn.className = "tab-btn px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       tBtn.className = "tab-btn px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
-      todayBtn.className = "tab-btn px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
-      threeDaysBtn.className = "tab-btn px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
-      nonPayersBtn.className = "tab-btn px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
+      todayBtn.className = "tab-btn today-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
+      threeDaysBtn.className = "tab-btn three-days-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
+      debtorsBtn.className = "tab-btn debtors-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
 
       if (tab === 'contracts') {
         cTab.classList.remove('hidden');
@@ -626,16 +647,16 @@
         renderTakenSheet();
       } else if (tab === 'today') {
         todayTab.classList.remove('hidden');
-        todayBtn.className = "tab-btn active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
+        todayBtn.className = "tab-btn today-tab active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
         renderTodayClients();
       } else if (tab === 'threeDays') {
         threeDaysTab.classList.remove('hidden');
-        threeDaysBtn.className = "tab-btn active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
+        threeDaysBtn.className = "tab-btn three-days-tab active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
         renderThreeDaysClients();
-      } else if (tab === 'nonPayers') {
-        nonPayersTab.classList.remove('hidden');
-        nonPayersBtn.className = "tab-btn active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
-        renderNonPayersClients();
+      } else if (tab === 'debtors') {
+        debtorsTab.classList.remove('hidden');
+        debtorsBtn.className = "tab-btn debtors-tab active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
+        renderDebtorsClients();
       }
       handleSearch();
     }
@@ -699,7 +720,7 @@
       renderTakenSheet();
       if (activeTab === 'today') renderTodayClients();
       if (activeTab === 'threeDays') renderThreeDaysClients();
-      if (activeTab === 'nonPayers') renderNonPayersClients();
+      if (activeTab === 'debtors') renderDebtorsClients();
       updateHistoryButtons();
     }
 
@@ -724,99 +745,59 @@
       renderTakenSheet();
       if (activeTab === 'today') renderTodayClients();
       if (activeTab === 'threeDays') renderThreeDaysClients();
-      if (activeTab === 'nonPayers') renderNonPayersClients();
+      if (activeTab === 'debtors') renderDebtorsClients();
       updateHistoryButtons();
     }
 
-    // ================= ФУНКЦИИ ДЛЯ РАБОТЫ С КЛИЕНТАМИ =================
+    // ================= ФУНКЦИЯ ДЛЯ ПОЛУЧЕНИЯ ИНФОРМАЦИИ ПО МЕСЯЦАМ =================
     
-    function getClientDetails(contract) {
-      const insts = contract.installments || {};
-      let totalPaid = 0;
-      const paidMonths = [];
-      const unpaidMonths = [];
-      
-      // Собираем информацию по месяцам (до 15 месяцев)
-      for (let i = 1; i <= 15; i++) {
-        if (insts[i]) {
-          totalPaid += Number(insts[i].amount);
-          paidMonths.push({ month: i, date: insts[i].date, amount: insts[i].amount });
-        } else {
-          unpaidMonths.push(i);
-        }
-      }
-      
-      const rest = contract.totalCost - (contract.downPayment || 0) - totalPaid;
+    function getMonthStatus(contract) {
+      const months = contract.monthsCount || 0;
+      const installments = contract.installments || {};
       const monthlyPay = contract.monthlyPay || 0;
-      
-      // Расчет просрочки (если дата платежа прошла, а оплаты нет)
-      let overdueSum = 0;
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       
-      if (contract.payDate) {
-        const payDate = new Date(contract.payDate);
+      // Определяем дату первого платежа
+      const firstPayDate = new Date(contract.payDate);
+      firstPayDate.setHours(0, 0, 0, 0);
+      
+      const result = [];
+      let overdueSum = 0;
+      
+      for (let i = 1; i <= months; i++) {
+        // Вычисляем дату для i-го платежа
+        const payDate = new Date(firstPayDate);
+        payDate.setMonth(payDate.getMonth() + (i - 1));
         payDate.setHours(0, 0, 0, 0);
         
-        // Если дата платежа уже прошла и остаток > 0
-        if (payDate < today && rest > 0) {
-          // Считаем просрочку как сумму неоплаченных месяцев
-          unpaidMonths.forEach(month => {
-            // Проверяем, должен ли был быть оплачен этот месяц
-            const monthDate = new Date(payDate);
-            monthDate.setMonth(payDate.getMonth() + (month - 1));
-            if (monthDate < today) {
-              overdueSum += monthlyPay;
-            }
-          });
+        // Проверяем, оплачен ли этот месяц
+        const payment = installments[i];
+        const isPaid = !!payment && payment.amount > 0;
+        const paidAmount = isPaid ? payment.amount : 0;
+        
+        // Определяем статус
+        let status = 'future'; // по умолчанию - будущий платеж
+        if (isPaid) {
+          status = 'paid'; // оплачен
+        } else if (payDate < today) {
+          status = 'overdue'; // просрочен
+          overdueSum += monthlyPay;
         }
+        
+        result.push({
+          month: i,
+          date: payDate.toISOString().slice(0, 10),
+          status: status,
+          amount: isPaid ? paidAmount : monthlyPay,
+          isPaid: isPaid
+        });
       }
       
-      return {
-        paidMonths,
-        unpaidMonths,
-        totalPaid,
-        rest,
-        monthlyPay,
-        overdueSum,
-        isActive: rest > 0
-      };
+      return { months: result, overdueSum: overdueSum };
     }
 
-    function formatClientCard(contract, targetDate) {
-      const details = getClientDetails(contract);
-      const paidStr = details.paidMonths.map(m => `${m.month}-й (${m.date})`).join(', ') || 'Нет оплат';
-      const unpaidStr = details.unpaidMonths.join(', ') || 'Все оплачены';
-      
-      return `
-        <div class="client-item">
-          <div class="client-name">${contract.fio}</div>
-          <div class="client-details">
-            <span>📞 ${contract.phone}</span>
-            <span>💰 Мес. платеж: ${details.monthlyPay} ₽</span>
-          </div>
-          <div class="client-details">
-            <span class="month-paid">✅ Оплаченные: ${paidStr}</span>
-          </div>
-          <div class="client-details">
-            <span class="month-unpaid">❌ Неоплаченные: ${unpaidStr}</span>
-          </div>
-          <div class="client-details">
-            <span class="month-overdue">⚠️ Просрочка: ${details.overdueSum.toLocaleString('ru-RU')} ₽</span>
-            <span>💳 Остаток: ${details.rest.toLocaleString('ru-RU')} ₽</span>
-          </div>
-          <div class="mt-1">
-            <a href="https://wa.me/7${contract.phone.replace(/[^0-9]/g, '')}?text=Здравствуйте! Напоминаем об оплате рассрочки до ${targetDate}" 
-               target="_blank" 
-               class="text-green-600 hover:text-green-800 font-bold text-xs">
-              💬 Написать
-            </a>
-          </div>
-        </div>
-      `;
-    }
-
-    // ================= ЛИСТ "СЕГОДНЯ" =================
+    // ================= ФУНКЦИИ ДЛЯ ОТОБРАЖЕНИЯ КЛИЕНТОВ =================
     
     function getClientsForDate(targetDate) {
       const result = [];
@@ -824,15 +805,27 @@
       target.setHours(0, 0, 0, 0);
       
       allContracts.forEach(contract => {
-        const details = getClientDetails(contract);
-        if (!details.isActive) return; // Пропускаем закрытые договоры
+        const insts = contract.installments || {};
+        let totalPaid = 0;
+        Object.values(insts).forEach(p => totalPaid += Number(p.amount));
+        const rest = contract.totalCost - (contract.downPayment || 0) - totalPaid;
+        
+        if (rest <= 0) return;
         
         if (contract.payDate) {
           const payDate = new Date(contract.payDate);
           payDate.setHours(0, 0, 0, 0);
           
+          // Проверяем, есть ли непогашенный платеж на эту дату
           if (payDate.getTime() === target.getTime()) {
-            result.push(contract);
+            const monthInfo = getMonthStatus(contract);
+            result.push({
+              ...contract,
+              rest: rest,
+              phone: contract.phone || '',
+              fio: contract.fio || '',
+              monthInfo: monthInfo
+            });
           }
         }
       });
@@ -840,25 +833,111 @@
       return result;
     }
 
-    function renderTodayClients() {
+    function getDebtors() {
+      const result = [];
       const today = new Date();
-      const todayStr = today.toISOString().slice(0, 10);
-      const clients = getClientsForDate(todayStr);
+      today.setHours(0, 0, 0, 0);
       
-      const container = document.getElementById('todayClientsList');
+      allContracts.forEach(contract => {
+        const insts = contract.installments || {};
+        let totalPaid = 0;
+        Object.values(insts).forEach(p => totalPaid += Number(p.amount));
+        const rest = contract.totalCost - (contract.downPayment || 0) - totalPaid;
+        
+        if (rest <= 0) return;
+        
+        const monthInfo = getMonthStatus(contract);
+        const hasOverdue = monthInfo.months.some(m => m.status === 'overdue');
+        
+        if (hasOverdue) {
+          result.push({
+            ...contract,
+            rest: rest,
+            phone: contract.phone || '',
+            fio: contract.fio || '',
+            monthInfo: monthInfo
+          });
+        }
+      });
+      
+      return result;
+    }
+
+    function renderClientList(containerId, clients, title, dateStr) {
+      const container = document.getElementById(containerId);
       if (clients.length === 0) {
-        container.innerHTML = '<div class="text-center text-gray-500 py-8 text-sm">📭 Нет клиентов, которые должны оплатить сегодня</div>';
+        container.innerHTML = `<div class="text-center text-gray-500 py-8 text-sm">📭 ${title}</div>`;
         return;
       }
       
       let html = '<div class="divide-y">';
-      clients.forEach(client => {
-        html += formatClientCard(client, todayStr);
+      clients.forEach((client) => {
+        const monthInfo = client.monthInfo || getMonthStatus(client);
+        let monthsHtml = '';
+        let overdueSum = 0;
+        
+        monthInfo.months.forEach(m => {
+          let statusClass = 'month-future';
+          if (m.status === 'paid') statusClass = 'month-paid';
+          else if (m.status === 'overdue') {
+            statusClass = 'month-overdue';
+            overdueSum += m.amount;
+          }
+          monthsHtml += `<span class="month-status ${statusClass}">${m.month}-й (${m.date})</span>`;
+        });
+        
+        html += `
+          <div class="client-item">
+            <div class="client-info">
+              <span class="client-name">${client.fio}</span>
+              <span class="client-phone">📞 ${client.phone}</span>
+              <span class="client-detail">💰 Мес. платеж: ${client.monthlyPay} ₽</span>
+              <span class="client-detail">📅 ${dateStr || ''}</span>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="client-overdue">Просрочка: ${overdueSum.toLocaleString('ru-RU')} ₽</span>
+              <span class="client-rest">Остаток: ${client.rest.toLocaleString('ru-RU')} ₽</span>
+              <a href="https://wa.me/7${client.phone.replace(/[^0-9]/g, '')}?text=Здравствуйте! Напоминаем о платеже." 
+                 target="_blank" 
+                 class="text-green-600 hover:text-green-800 font-bold text-sm">
+                💬
+              </a>
+            </div>
+            <div class="w-full mt-1 flex flex-wrap gap-1">
+              ${monthsHtml}
+            </div>
+          </div>
+        `;
       });
       html += '</div>';
       container.innerHTML = html;
     }
 
+    // ================= ОТОБРАЖЕНИЕ ЛИСТОВ =================
+    
+    function renderTodayClients() {
+      const today = new Date();
+      const todayStr = today.toISOString().slice(0, 10);
+      const clients = getClientsForDate(todayStr);
+      renderClientList('todayClientsList', clients, 'Нет клиентов, которые должны оплатить сегодня', `Сегодня (${todayStr})`);
+    }
+
+    function renderThreeDaysClients() {
+      const today = new Date();
+      const threeDaysLater = new Date(today);
+      threeDaysLater.setDate(today.getDate() + 3);
+      const threeDaysStr = threeDaysLater.toISOString().slice(0, 10);
+      const clients = getClientsForDate(threeDaysStr);
+      renderClientList('threeDaysClientsList', clients, 'Нет клиентов, которым нужно оплатить через 3 дня', `Через 3 дня (${threeDaysStr})`);
+    }
+
+    function renderDebtorsClients() {
+      const clients = getDebtors();
+      renderClientList('debtorsClientsList', clients, 'Нет клиентов с просрочкой', '');
+    }
+
+    // ================= ФУНКЦИИ ДЛЯ ОТПРАВКИ WHATSAPP =================
+    
     function sendWhatsAppToday() {
       const today = new Date();
       const todayStr = today.toISOString().slice(0, 10);
@@ -871,10 +950,14 @@
       
       let message = '🔔 *Напоминание об оплате сегодня!*\n\n';
       clients.forEach((client, index) => {
-        const details = getClientDetails(client);
         const phone = client.phone.replace(/[^0-9]/g, '');
-        message += `${index + 1}. ${client.fio} - ${details.monthlyPay} ₽ (Остаток: ${details.rest.toLocaleString('ru-RU')} ₽)\n`;
-        message += `   https://wa.me/7${phone}\n\n`;
+        const monthInfo = getMonthStatus(client);
+        let overdueSum = 0;
+        monthInfo.months.forEach(m => {
+          if (m.status === 'overdue') overdueSum += m.amount;
+        });
+        message += `${index + 1}. ${client.fio} - ${client.monthlyPay} ₽ (Просрочка: ${overdueSum} ₽, Остаток: ${client.rest} ₽)\n`;
+        message += `   WhatsApp: https://wa.me/7${phone}\n\n`;
       });
       message += `\n📅 Дата платежа: ${todayStr}`;
       
@@ -882,36 +965,11 @@
       window.open(url, '_blank');
     }
 
-    // ================= ЛИСТ "3 ДНЯ" =================
-    
-    function renderThreeDaysClients() {
-      const today = new Date();
-      const threeDaysLater = new Date(today);
-      threeDaysLater.setDate(today.getDate() + 3);
-      const threeDaysStr = threeDaysLater.toISOString().slice(0, 10);
-      
-      const clients = getClientsForDate(threeDaysStr);
-      
-      const container = document.getElementById('threeDaysClientsList');
-      if (clients.length === 0) {
-        container.innerHTML = '<div class="text-center text-gray-500 py-8 text-sm">📭 Нет клиентов, которым нужно оплатить через 3 дня</div>';
-        return;
-      }
-      
-      let html = '<div class="divide-y">';
-      clients.forEach(client => {
-        html += formatClientCard(client, threeDaysStr);
-      });
-      html += '</div>';
-      container.innerHTML = html;
-    }
-
     function sendWhatsAppThreeDays() {
       const today = new Date();
       const threeDaysLater = new Date(today);
       threeDaysLater.setDate(today.getDate() + 3);
       const threeDaysStr = threeDaysLater.toISOString().slice(0, 10);
-      
       const clients = getClientsForDate(threeDaysStr);
       
       if (clients.length === 0) {
@@ -921,10 +979,14 @@
       
       let message = '🔔 *Напоминание об оплате через 3 дня!*\n\n';
       clients.forEach((client, index) => {
-        const details = getClientDetails(client);
         const phone = client.phone.replace(/[^0-9]/g, '');
-        message += `${index + 1}. ${client.fio} - ${details.monthlyPay} ₽ (Остаток: ${details.rest.toLocaleString('ru-RU')} ₽)\n`;
-        message += `   https://wa.me/7${phone}\n\n`;
+        const monthInfo = getMonthStatus(client);
+        let overdueSum = 0;
+        monthInfo.months.forEach(m => {
+          if (m.status === 'overdue') overdueSum += m.amount;
+        });
+        message += `${index + 1}. ${client.fio} - ${client.monthlyPay} ₽ (Просрочка: ${overdueSum} ₽, Остаток: ${client.rest} ₽)\n`;
+        message += `   WhatsApp: https://wa.me/7${phone}\n\n`;
       });
       message += `\n📅 Дата платежа: ${threeDaysStr}`;
       
@@ -932,74 +994,37 @@
       window.open(url, '_blank');
     }
 
-    // ================= ЛИСТ "НЕПЛАТЕЛЬЩИКИ" =================
-    
-    function getNonPayers() {
-      const result = [];
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+    function sendWhatsAppDebtors() {
+      const clients = getDebtors();
       
-      allContracts.forEach(contract => {
-        const details = getClientDetails(contract);
-        if (!details.isActive) return; // Пропускаем закрытые договоры
-        
-        // Проверяем, есть ли просрочка
-        if (details.overdueSum > 0) {
-          result.push(contract);
-        }
-      });
-      
-      // Сортируем по сумме просрочки (по убыванию)
-      result.sort((a, b) => {
-        const aDetails = getClientDetails(a);
-        const bDetails = getClientDetails(b);
-        return bDetails.overdueSum - aDetails.overdueSum;
-      });
-      
-      return result;
-    }
-
-    function renderNonPayersClients() {
-      const clients = getNonPayers();
-      const todayStr = new Date().toISOString().slice(0, 10);
-      
-      const container = document.getElementById('nonPayersClientsList');
       if (clients.length === 0) {
-        container.innerHTML = '<div class="text-center text-gray-500 py-8 text-sm">✅ Все клиенты оплачивают вовремя! Нет неплательщиков.</div>';
+        alert('Нет клиентов с просрочкой');
         return;
       }
       
-      let html = '<div class="divide-y">';
-      clients.forEach(client => {
-        html += formatClientCard(client, todayStr);
-      });
-      html += '</div>';
-      container.innerHTML = html;
-    }
-
-    function sendWhatsAppNonPayers() {
-      const clients = getNonPayers();
-      
-      if (clients.length === 0) {
-        alert('Нет неплательщиков');
-        return;
-      }
-      
-      let message = '🚫 *СПИСОК НЕПЛАТЕЛЬЩИКОВ!*\n\n';
+      let message = '🚫 *Напоминание о просроченной задолженности!*\n\n';
       clients.forEach((client, index) => {
-        const details = getClientDetails(client);
         const phone = client.phone.replace(/[^0-9]/g, '');
-        message += `${index + 1}. ${client.fio}\n`;
-        message += `   📞 https://wa.me/7${phone}\n`;
-        message += `   💰 Просрочка: ${details.overdueSum.toLocaleString('ru-RU')} ₽\n`;
-        message += `   💳 Остаток: ${details.rest.toLocaleString('ru-RU')} ₽\n\n`;
+        const monthInfo = getMonthStatus(client);
+        let overdueSum = 0;
+        let overdueMonths = [];
+        monthInfo.months.forEach(m => {
+          if (m.status === 'overdue') {
+            overdueSum += m.amount;
+            overdueMonths.push(`${m.month}-й (${m.date})`);
+          }
+        });
+        message += `${index + 1}. ${client.fio} - ${client.monthlyPay} ₽\n`;
+        message += `   Просрочка: ${overdueSum} ₽ (${overdueMonths.join(', ')})\n`;
+        message += `   Остаток: ${client.rest} ₽\n`;
+        message += `   WhatsApp: https://wa.me/7${phone}\n\n`;
       });
       
       const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
       window.open(url, '_blank');
     }
 
-    // ================= ОСТАЛЬНЫЕ ФУНКЦИИ (без изменений) =================
+    // ================= ОСТАЛЬНЫЕ ФУНКЦИИ =================
     
     function validateFinance() {
       const months = Number(document.getElementById('monthsCount').value) || 0;
@@ -1680,4 +1705,4 @@
     updateHistoryButtons();
   </script>
 </body>
-</html>
+  </html>
