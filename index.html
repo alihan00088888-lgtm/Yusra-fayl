@@ -26,6 +26,13 @@
     .bg-excel-yellow { background-color: #fef08a; }
     .bg-excel-green { background-color: #86efac; }
     .bg-excel-red { background-color: #fca5a5; color: #7f1d1d; font-weight: bold; }
+    
+    /* Новый стиль для красных ячеек с суммами при превышении 400к */
+    .cell-over-limit {
+      background-color: #fca5a5 !important;
+      color: #7f1d1d !important;
+      font-weight: bold !important;
+    }
   </style>
 </head>
 <body class="bg-slate-100 text-gray-800 text-xs min-h-screen pb-20">
@@ -1158,15 +1165,12 @@
 
         accountsGrandTotalSum += accBalance;
 
-        const isOverLimit = (incSumMonth >= 400000 || expSumMonth >= 400000);
+        // Проверяем превышение лимита для каждой суммы отдельно
+        const isIncOverLimit = incSumMonth >= 400000;
+        const isExpOverLimit = expSumMonth >= 400000;
         
-        // Определение цвета строки (приоритет у лимита 400к -> кастомный цвет пользователя)
-        let rowStyle = '';
-        if (isOverLimit) {
-          rowStyle = 'background-color: #fca5a5; color: #7f1d1d; font-weight: bold;';
-        } else if (accObj.color) {
-          rowStyle = `background-color: ${accObj.color};`;
-        }
+        // Определяем цвет строки только если есть кастомный цвет
+        let rowStyle = accObj.color ? `background-color: ${accObj.color};` : '';
 
         const tr = document.createElement('tr');
         tr.style = rowStyle;
@@ -1174,9 +1178,9 @@
           <td class="font-bold">${accObj.name}</td>
           <td class="font-bold">${accBalance.toLocaleString('ru-RU')}</td>
           <td>${incCountMonth}</td>
-          <td>${incSumMonth.toLocaleString('ru-RU')}</td>
+          <td class="${isIncOverLimit ? 'cell-over-limit' : ''}">${incSumMonth.toLocaleString('ru-RU')}</td>
           <td>${expCountMonth}</td>
-          <td>${expSumMonth.toLocaleString('ru-RU')}</td>
+          <td class="${isExpOverLimit ? 'cell-over-limit' : ''}">${expSumMonth.toLocaleString('ru-RU')}</td>
           <td class="space-x-1">
             <input type="color" value="${accObj.color || '#ffffff'}" onchange="changeAccountColor(${idx}, this.value)" title="Изменить цвет" class="w-5 h-5 cursor-pointer align-middle border rounded">
             <button onclick="deleteAccount(${idx})" class="text-red-700 font-bold px-1 text-[11px]" title="Удалить счет">🗑️</button>
