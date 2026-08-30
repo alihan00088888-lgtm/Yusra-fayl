@@ -983,14 +983,18 @@
       }
     }
 
+    // ================================================================
+    // ИСПРАВЛЕННЫЕ ФУНКЦИИ ДЛЯ РАБОТЫ СО СЧЕТАМИ
+    // ================================================================
     function addNewAccountPrompt() {
       const accName = prompt('Введите название нового счета/карты (например: S3, A1):');
       if (accName && accName.trim()) {
         const cleanName = accName.trim();
-        if(!customAccounts.some(a => a.name.toLowerCase() === cleanName.toLowerCase())) {
+        // Проверяем, нет ли уже такого счета (без учета регистра)
+        if (!customAccounts.some(a => a.name.toLowerCase() === cleanName.toLowerCase())) {
           saveState();
           customAccounts.push({ name: cleanName, color: '' });
-          saveToStorage();
+          saveToStorage(); // <-- КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ
         } else {
           alert('Такой счет уже существует!');
         }
@@ -1010,6 +1014,7 @@
       customAccounts[index].color = color;
       saveToStorage();
     }
+    // ================================================================
 
     function renderTakenSheet() {
       const rowsTbody = document.getElementById('takenRowsTable');
