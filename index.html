@@ -229,7 +229,7 @@
           <div class="flex-1 min-w-[500px]">
             <div class="mb-2 flex justify-between items-center">
               <span class="font-bold uppercase text-[10px] text-slate-500">Счета и Карты (Цвет, Редактирование, Удаление)</span>
-              <!-- Кнопка добавления карт УБРАНА -->
+              <button onclick="addNewAccountPrompt()" class="bg-slate-700 hover:bg-slate-800 text-white font-bold px-2 py-1 rounded text-[10px]">+ Добавить счет</button>
             </div>
             <div class="max-h-[70vh] overflow-y-auto">
               <table class="w-full border-collapse excel-table text-center">
@@ -469,9 +469,6 @@
     if (!Array.isArray(customAccounts)) {
       customAccounts = [];
     }
-
-    // Сохраняем пустой массив в localStorage, если там что-то не так
-    localStorage.setItem('accounts_db', JSON.stringify(customAccounts));
 
     let activeTab = 'contracts';
     let undoStack = [];
@@ -1011,10 +1008,23 @@
     }
 
     // ================================================================
-    // 7. УПРАВЛЕНИЕ СЧЕТАМИ (ТОЛЬКО РЕДАКТИРОВАНИЕ И УДАЛЕНИЕ)
+    // 7. УПРАВЛЕНИЕ СЧЕТАМИ (ИСПРАВЛЕНО)
     // ================================================================
-    // Кнопка добавления карт УБРАНА - вы будете добавлять карты сами через консоль или код
-    
+    function addNewAccountPrompt() {
+      const accName = prompt('Введите название нового счета/карты (например: С1, С2, Т1):');
+      if (accName && accName.trim()) {
+        const cleanName = accName.trim();
+        // Проверяем уникальность
+        if (!customAccounts.some(a => a.name.toLowerCase() === cleanName.toLowerCase())) {
+          saveState();
+          customAccounts.push({ name: cleanName, color: '' });
+          saveToStorage();
+        } else {
+          alert('Такой счет уже существует!');
+        }
+      }
+    }
+
     function deleteAccount(index) {
       if (confirm(`Удалить счет "${customAccounts[index].name}"?`)) {
         saveState();
@@ -1331,31 +1341,6 @@
     renderAccountingTable(allAccounting);
     renderTakenSheet();
     updateHistoryButtons();
-
-    // ================================================================
-    // 12. ДЛЯ ДОБАВЛЕНИЯ КАРТ (В КОНСОЛИ БРАУЗЕРА)
-    // ================================================================
-    console.log('📌 Для добавления карты введите в консоли:');
-    console.log('addCard("Название") - например: addCard("С1")');
-    console.log('addCard("Т1")');
-    console.log('addCard("К2")');
-    
-    // Функция для добавления карты (доступна в консоли)
-    window.addCard = function(name) {
-      const cleanName = name.trim();
-      if (!cleanName) {
-        alert('Название не может быть пустым!');
-        return;
-      }
-      if (customAccounts.some(a => a.name.toLowerCase() === cleanName.toLowerCase())) {
-        alert('Такой счет уже существует!');
-        return;
-      }
-      saveState();
-      customAccounts.push({ name: cleanName, color: '' });
-      saveToStorage();
-      console.log(`✅ Карта "${cleanName}" добавлена!`);
-    };
   </script>
 </body>
-</html>
+            </html>
