@@ -26,6 +26,25 @@
     .bg-excel-yellow { background-color: #fef08a; }
     .bg-excel-green { background-color: #86efac; }
     .bg-excel-red { background-color: #fca5a5; color: #7f1d1d; font-weight: bold; }
+    
+    .account-name-input {
+      background: transparent;
+      border: 1px solid transparent;
+      padding: 2px 4px;
+      width: 100%;
+      font-weight: bold;
+      text-align: center;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .account-name-input:hover {
+      border-color: #94a3b8;
+    }
+    .account-name-input:focus {
+      border-color: #3b82f6;
+      background: white;
+      border-radius: 4px;
+    }
   </style>
 </head>
 <body class="bg-slate-100 text-gray-800 text-xs min-h-screen pb-20">
@@ -209,7 +228,7 @@
           <!-- Правый блок: Таблица счетов / карт -->
           <div class="flex-1 min-w-[500px]">
             <div class="mb-2 flex justify-between items-center">
-              <span class="font-bold uppercase text-[10px] text-slate-500">Счета и Карты (Цвет и Удаление)</span>
+              <span class="font-bold uppercase text-[10px] text-slate-500">Счета и Карты (Цвет, Редактирование, Удаление)</span>
               <button onclick="addNewAccountPrompt()" class="bg-slate-700 hover:bg-slate-800 text-white font-bold px-2 py-1 rounded text-[10px]">+ Добавить счет</button>
             </div>
             <div class="max-h-[70vh] overflow-y-auto">
@@ -984,17 +1003,16 @@
     }
 
     // ================================================================
-    // ИСПРАВЛЕННЫЕ ФУНКЦИИ ДЛЯ РАБОТЫ СО СЧЕТАМИ
+    // ФУНКЦИИ ДЛЯ РАБОТЫ СО СЧЕТАМИ (С РЕДАКТИРОВАНИЕМ НАЗВАНИЯ)
     // ================================================================
     function addNewAccountPrompt() {
       const accName = prompt('Введите название нового счета/карты (например: S3, A1):');
       if (accName && accName.trim()) {
         const cleanName = accName.trim();
-        // Проверяем, нет ли уже такого счета (без учета регистра)
         if (!customAccounts.some(a => a.name.toLowerCase() === cleanName.toLowerCase())) {
           saveState();
           customAccounts.push({ name: cleanName, color: '' });
-          saveToStorage(); // <-- КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ
+          saveToStorage();
         } else {
           alert('Такой счет уже существует!');
         }
@@ -1012,6 +1030,23 @@
     function changeAccountColor(index, color) {
       saveState();
       customAccounts[index].color = color;
+      saveToStorage();
+    }
+
+    function renameAccount(index, newName) {
+      const trimmedName = newName.trim();
+      if (!trimmedName) {
+        alert('Название не может быть пустым!');
+        return;
+      }
+      // Проверяем, не занято ли имя другим счетом
+      const duplicate = customAccounts.some((a, i) => i !== index && a.name.toLowerCase() === trimmedName.toLowerCase());
+      if (duplicate) {
+        alert('Счет с таким названием уже существует!');
+        return;
+      }
+      saveState();
+      customAccounts[index].name = trimmedName;
       saveToStorage();
     }
     // ================================================================
@@ -1046,8 +1081,7 @@
       document.getElementById('takenTotalSum').innerText = sumTaken.toLocaleString('ru-RU');
       document.getElementById('putTotalSum').innerText = sumPut.toLocaleString('ru-RU');
 
-      // 1. Расчет Кассы по новой логике:
-      // Касса = Первый взнос (downPayment) + все платежи (installments) - себестоимость (costPrice) - Взяли (sumTaken) + Положили (sumPut)
+      // 1. Расчет Кассы
       let totalDownPayments = 0;
       let totalInstallments = 0;
       let totalCostPrice = 0;
@@ -1064,7 +1098,7 @@
       let totalKassa = totalDownPayments + totalInstallments - totalCostPrice - sumTaken + sumPut;
       document.getElementById('kassaTotal').innerText = totalKassa.toLocaleString('ru-RU');
 
-      // 2. Учет на листе Взяли (чистый баланс из листа Учет: доход минус расход)
+      // 2. Учет
       let totalUchetIncome = 0;
       let totalUchetExpense = 0;
       allAccounting.forEach(a => {
@@ -1123,7 +1157,7 @@
       document.getElementById('statFactTodaySum').innerText = factTodaySum.toLocaleString('ru-RU') + ' ₽';
       document.getElementById('statFactTodayCount').innerText = factTodayCount;
 
-      // 4. Таблица счетов / карт с кастомными цветами и удалением
+      // 4. Таблица счетов / карт с РЕДАКТИРОВАНИЕМ названия
       const accountsBody = document.getElementById('accountsTableBody');
       accountsBody.innerHTML = '';
 
@@ -1140,7 +1174,6 @@
         let expSumMonth = 0;
 
         allAccounting.forEach(a => {
-          // Сравниваем названия счетов без учета регистра и лишних пробелов
           const accountName = (a.account || '').trim();
           if (accountName.toLowerCase() === accObj.name.toLowerCase()) {
             const inc = Number(a.income || 0);
@@ -1167,7 +1200,6 @@
 
         const isOverLimit = (incSumMonth >= 400000 || expSumMonth >= 400000);
         
-        // Определение цвета строки (приоритет у лимита 400к -> кастомный цвет пользователя)
         let rowStyle = '';
         if (isOverLimit) {
           rowStyle = 'background-color: #fca5a5; color: #7f1d1d; font-weight: bold;';
@@ -1178,7 +1210,12 @@
         const tr = document.createElement('tr');
         tr.style = rowStyle;
         tr.innerHTML = `
-          <td class="font-bold">${accObj.name}</td>
+          <td>
+            <input type="text" class="account-name-input" value="${accObj.name}" 
+                   onchange="renameAccount(${idx}, this.value)" 
+                   onfocus="this.select()"
+                   title="Кликните чтобы изменить название">
+          </td>
           <td class="font-bold">${accBalance.toLocaleString('ru-RU')}</td>
           <td>${incCountMonth}</td>
           <td>${incSumMonth.toLocaleString('ru-RU')}</td>
