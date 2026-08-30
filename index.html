@@ -229,7 +229,7 @@
           <div class="flex-1 min-w-[500px]">
             <div class="mb-2 flex justify-between items-center">
               <span class="font-bold uppercase text-[10px] text-slate-500">Счета и Карты (Цвет, Редактирование, Удаление)</span>
-              <button onclick="addNewAccountPrompt()" class="bg-slate-700 hover:bg-slate-800 text-white font-bold px-2 py-1 rounded text-[10px]">+ Добавить счет</button>
+              <!-- Кнопка добавления карт УБРАНА -->
             </div>
             <div class="max-h-[70vh] overflow-y-auto">
               <table class="w-full border-collapse excel-table text-center">
@@ -410,7 +410,7 @@
         </div>
         <div>
           <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Счет / Источник</label>
-          <input type="text" id="accAccount" placeholder="Например: S1, N, C1..." class="p-2 border rounded-md w-full outline-none">
+          <input type="text" id="accAccount" placeholder="Например: С1, С2, Т1..." class="p-2 border rounded-md w-full outline-none">
         </div>
 
         <div class="flex justify-end gap-2 pt-4 border-t">
@@ -463,23 +463,14 @@
     let allContracts = JSON.parse(localStorage.getItem('contracts_db') || '[]');
     let allAccounting = JSON.parse(localStorage.getItem('accounting_db') || '[]');
     let allTaken = JSON.parse(localStorage.getItem('taken_db') || '[]');
-    let customAccounts = JSON.parse(localStorage.getItem('accounts_db') || 'null');
+    let customAccounts = JSON.parse(localStorage.getItem('accounts_db') || '[]');
 
-    // Инициализация счетов по умолчанию
-    if (!customAccounts) {
-      const defaultNames = ['N', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12', 'T13', 'T14', 'T15', 'T16', 'B1', 'B2', 'B3', 'B4'];
-      customAccounts = defaultNames.map(name => ({
-        name,
-        color: name === 'C1' ? '#86efac' : (name === 'T1' ? '#fef08a' : '')
-      }));
-    } else if (typeof customAccounts[0] === 'string') {
-      customAccounts = customAccounts.map(name => ({
-        name,
-        color: name === 'C1' ? '#86efac' : (name === 'T1' ? '#fef08a' : '')
-      }));
+    // Убеждаемся, что customAccounts - это массив
+    if (!Array.isArray(customAccounts)) {
+      customAccounts = [];
     }
 
-    // Обновляем localStorage если структура изменилась
+    // Сохраняем пустой массив в localStorage, если там что-то не так
     localStorage.setItem('accounts_db', JSON.stringify(customAccounts));
 
     let activeTab = 'contracts';
@@ -561,7 +552,7 @@
       allContracts = previousState.contracts;
       allAccounting = previousState.accounting;
       allTaken = previousState.taken || [];
-      customAccounts = previousState.accounts || customAccounts;
+      customAccounts = previousState.accounts || [];
       finishAction();
     }
 
@@ -579,7 +570,7 @@
       allContracts = nextState.contracts;
       allAccounting = nextState.accounting;
       allTaken = nextState.taken || [];
-      customAccounts = nextState.accounts || customAccounts;
+      customAccounts = nextState.accounts || [];
       finishAction();
     }
 
@@ -915,7 +906,7 @@
       }
 
       saveToStorage();
-      closeAccModal(); // <-- ОБЯЗАТЕЛЬНО ЗАКРЫВАЕМ МОДАЛКУ
+      closeAccModal();
     });
 
     function deleteAccItem(id) {
@@ -1020,32 +1011,15 @@
     }
 
     // ================================================================
-    // 7. УПРАВЛЕНИЕ СЧЕТАМИ (ИСПРАВЛЕНО)
+    // 7. УПРАВЛЕНИЕ СЧЕТАМИ (ТОЛЬКО РЕДАКТИРОВАНИЕ И УДАЛЕНИЕ)
     // ================================================================
-    function addNewAccountPrompt() {
-      const accName = prompt('Введите название нового счета/карты (например: S3, A1):');
-      if (accName && accName.trim()) {
-        const cleanName = accName.trim();
-        // Проверяем уникальность
-        if (!customAccounts.some(a => a.name.toLowerCase() === cleanName.toLowerCase())) {
-          saveState();
-          customAccounts.push({ name: cleanName, color: '' });
-          saveToStorage();
-          // Принудительно обновляем таблицу счетов
-          renderTakenSheet();
-        } else {
-          alert('Такой счет уже существует!');
-        }
-      }
-    }
-
+    // Кнопка добавления карт УБРАНА - вы будете добавлять карты сами через консоль или код
+    
     function deleteAccount(index) {
       if (confirm(`Удалить счет "${customAccounts[index].name}"?`)) {
         saveState();
         customAccounts.splice(index, 1);
         saveToStorage();
-        // Принудительно обновляем таблицу счетов
-        renderTakenSheet();
       }
     }
 
@@ -1053,15 +1027,12 @@
       saveState();
       customAccounts[index].color = color;
       saveToStorage();
-      // Принудительно обновляем таблицу счетов
-      renderTakenSheet();
     }
 
     function renameAccount(index, newName) {
       const trimmedName = newName.trim();
       if (!trimmedName) {
         alert('Название не может быть пустым!');
-        // Возвращаем старое название
         renderTakenSheet();
         return;
       }
@@ -1075,12 +1046,10 @@
       saveState();
       customAccounts[index].name = trimmedName;
       saveToStorage();
-      // Принудительно обновляем таблицу счетов
-      renderTakenSheet();
     }
 
     // ================================================================
-    // 8. ОТРИСОВКА ВКЛАДКИ "ВЗЯЛИ" (С ИСПРАВЛЕННЫМИ СЧЕТАМИ)
+    // 8. ОТРИСОВКА ВКЛАДКИ "ВЗЯЛИ"
     // ================================================================
     function renderTakenSheet() {
       // --- Таблица "Взяли / Положили" ---
@@ -1189,7 +1158,7 @@
       document.getElementById('statFactTodaySum').innerText = factTodaySum.toLocaleString('ru-RU') + ' ₽';
       document.getElementById('statFactTodayCount').innerText = factTodayCount;
 
-      // --- ТАБЛИЦА СЧЕТОВ / КАРТ (ИСПРАВЛЕНО) ---
+      // --- ТАБЛИЦА СЧЕТОВ / КАРТ ---
       const accountsBody = document.getElementById('accountsTableBody');
       accountsBody.innerHTML = '';
 
@@ -1340,7 +1309,7 @@
               allContracts = data.contracts || [];
               allAccounting = data.accounting || [];
               allTaken = data.taken || [];
-              customAccounts = data.accounts || customAccounts;
+              customAccounts = data.accounts || [];
             }
             saveToStorage();
           }
@@ -1362,6 +1331,31 @@
     renderAccountingTable(allAccounting);
     renderTakenSheet();
     updateHistoryButtons();
+
+    // ================================================================
+    // 12. ДЛЯ ДОБАВЛЕНИЯ КАРТ (В КОНСОЛИ БРАУЗЕРА)
+    // ================================================================
+    console.log('📌 Для добавления карты введите в консоли:');
+    console.log('addCard("Название") - например: addCard("С1")');
+    console.log('addCard("Т1")');
+    console.log('addCard("К2")');
+    
+    // Функция для добавления карты (доступна в консоли)
+    window.addCard = function(name) {
+      const cleanName = name.trim();
+      if (!cleanName) {
+        alert('Название не может быть пустым!');
+        return;
+      }
+      if (customAccounts.some(a => a.name.toLowerCase() === cleanName.toLowerCase())) {
+        alert('Такой счет уже существует!');
+        return;
+      }
+      saveState();
+      customAccounts.push({ name: cleanName, color: '' });
+      saveToStorage();
+      console.log(`✅ Карта "${cleanName}" добавлена!`);
+    };
   </script>
 </body>
-              </html>
+</html>
