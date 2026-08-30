@@ -127,6 +127,25 @@
     }
     .partner-name { font-weight: bold; font-size: 14px; color: #7c3aed; }
     .partner-value { font-weight: bold; font-size: 13px; }
+
+    /* Стиль для уведомления о копировании */
+    .copy-notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #22c55e;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: bold;
+      z-index: 9999;
+      animation: slideIn 0.5s ease;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
   </style>
 </head>
 <body class="bg-slate-100 text-gray-800 text-xs min-h-screen pb-20">
@@ -389,9 +408,7 @@
             <button onclick="clearPartnerDates()" class="bg-gray-500 hover:bg-gray-600 text-white px-2 py-1 rounded text-xs">Сбросить</button>
           </div>
         </div>
-        <div id="partnersList" class="divide-y">
-          <!-- Список партнеров будет заполняться автоматически -->
-        </div>
+        <div id="partnersList" class="divide-y"></div>
       </div>
     </div>
 
@@ -799,18 +816,15 @@
     function renderPartners() {
       const container = document.getElementById('partnersList');
       
-      // Получаем даты фильтра
       const dateFrom = document.getElementById('partnerDateFrom').value;
       const dateTo = document.getElementById('partnerDateTo').value;
       
-      // Собираем всех партнеров из договоров
       const partnersMap = new Map();
       
       allContracts.forEach(contract => {
         const store = contract.store || '';
         if (!store.trim()) return;
         
-        // Проверяем фильтр по датам
         if (dateFrom || dateTo) {
           const buyDate = contract.buyDate || '';
           if (buyDate) {
@@ -835,14 +849,12 @@
         partner.totalSum += Number(contract.totalCost || 0);
         partner.contracts.push(contract);
         
-        // Проверяем, оплачен ли договор (не стоит "Д")
         if (!contract.shopPaid) {
           partner.debtContracts++;
           partner.debtSum += Number(contract.totalCost || 0);
         }
       });
       
-      // Преобразуем в массив и сортируем по имени
       const partners = Array.from(partnersMap.values()).sort((a, b) => a.name.localeCompare(b.name));
       
       if (partners.length === 0) {
@@ -934,7 +946,6 @@
         message += `   📞 ${c.phone}\n\n`;
       });
       
-      // Открываем в отдельном окне или alert
       const detailsWindow = window.open('', '_blank', 'width=600,height=400');
       detailsWindow.document.write(`
         <html><head><title>Детали: ${partnerName}</title>
@@ -1057,6 +1068,8 @@
       return result;
     }
 
+    // ================= ФУНКЦИИ ДЛЯ ОТОБРАЖЕНИЯ КЛИЕНТОВ =================
+    
     function renderClientList(containerId, clients, title, dateStr) {
       const container = document.getElementById(containerId);
       if (clients.length === 0) {
@@ -1128,31 +1141,64 @@
       renderClientList('debtorsClientsList', clients, 'Нет клиентов с просрочкой', '');
     }
 
-    // ================= ФУНКЦИИ ДЛЯ ОТПРАВКИ WHATSAPP =================
+    // ================= ФУНКЦИИ ДЛЯ WHATSAPP (УЛУЧШЕННЫЕ) =================
     
+    function showCopyNotification(message) {
+      const notification = document.createElement('div');
+      notification.className = 'copy-notification';
+      notification.textContent = message;
+      document.body.appendChild(notification);
+      setTimeout(() => {
+        notification.remove();
+      }, 3000);
+    }
+
     function sendWhatsAppToday() {
       const today = new Date();
       const todayStr = today.toISOString().slice(0, 10);
       const clients = getClientsForDate(todayStr);
       
       if (clients.length === 0) {
-        alert('Нет клиентов, которые должны оплатить сегодня');
+        alert('📭 Нет клиентов, которые должны оплатить сегодня');
         return;
       }
       
+      // Формируем сообщение со ВСЕМИ клиентами
       let message = '🔔 *Напоминание об оплате сегодня!*\n\n';
+      let phoneNumbers = [];
+      
       clients.forEach((client, index) => {
         const phone = client.phone.replace(/[^0-9]/g, '');
+        if (phone) phoneNumbers.push(phone);
+        
         const monthInfo = getMonthStatus(client);
         let overdueSum = 0;
         monthInfo.months.forEach(m => {
           if (m.status === 'overdue') overdueSum += m.amount;
         });
-        message += `${index + 1}. ${client.fio} - ${client.monthlyPay} ₽ (Просрочка: ${overdueSum} ₽, Остаток: ${client.rest} ₽)\n`;
-        message += `   WhatsApp: https://wa.me/7${phone}\n\n`;
+        
+        message += `${index + 1}. *${client.fio}*\n`;
+        message += `   💰 Сумма: ${client.monthlyPay} ₽\n`;
+        message += `   📱 WhatsApp: wa.me/7${phone}\n`;
+        if (overdueSum > 0) {
+          message += `   ⚠️ Просрочка: ${overdueSum} ₽\n`;
+        }
+        message += `   📊 Остаток: ${client.rest} ₽\n\n`;
       });
-      message += `\n📅 Дата платежа: ${todayStr}`;
       
+      message += `\n📅 Дата платежа: ${todayStr}\n`;
+      message += `👥 Всего клиентов: ${clients.length}`;
+      
+      // Копируем номера в буфер обмена
+      const phoneList = phoneNumbers.map(p => `7${p}`).join(', ');
+      navigator.clipboard.writeText(phoneList).then(() => {
+        showCopyNotification(`✅ Скопировано ${phoneNumbers.length} номеров для рассылки!`);
+      }).catch(() => {
+        // Если не удалось скопировать, показываем вручную
+        showCopyNotification(`⚠️ Найдено ${phoneNumbers.length} клиентов. Скопируйте номера вручную.`);
+      });
+      
+      // Открываем WhatsApp с общим сообщением
       const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
       window.open(url, '_blank');
     }
@@ -1165,22 +1211,41 @@
       const clients = getClientsForDate(threeDaysStr);
       
       if (clients.length === 0) {
-        alert('Нет клиентов, которым нужно оплатить через 3 дня');
+        alert('📭 Нет клиентов, которым нужно оплатить через 3 дня');
         return;
       }
       
       let message = '🔔 *Напоминание об оплате через 3 дня!*\n\n';
+      let phoneNumbers = [];
+      
       clients.forEach((client, index) => {
         const phone = client.phone.replace(/[^0-9]/g, '');
+        if (phone) phoneNumbers.push(phone);
+        
         const monthInfo = getMonthStatus(client);
         let overdueSum = 0;
         monthInfo.months.forEach(m => {
           if (m.status === 'overdue') overdueSum += m.amount;
         });
-        message += `${index + 1}. ${client.fio} - ${client.monthlyPay} ₽ (Просрочка: ${overdueSum} ₽, Остаток: ${client.rest} ₽)\n`;
-        message += `   WhatsApp: https://wa.me/7${phone}\n\n`;
+        
+        message += `${index + 1}. *${client.fio}*\n`;
+        message += `   💰 Сумма: ${client.monthlyPay} ₽\n`;
+        message += `   📱 WhatsApp: wa.me/7${phone}\n`;
+        if (overdueSum > 0) {
+          message += `   ⚠️ Просрочка: ${overdueSum} ₽\n`;
+        }
+        message += `   📊 Остаток: ${client.rest} ₽\n\n`;
       });
-      message += `\n📅 Дата платежа: ${threeDaysStr}`;
+      
+      message += `\n📅 Дата платежа: ${threeDaysStr}\n`;
+      message += `👥 Всего клиентов: ${clients.length}`;
+      
+      const phoneList = phoneNumbers.map(p => `7${p}`).join(', ');
+      navigator.clipboard.writeText(phoneList).then(() => {
+        showCopyNotification(`✅ Скопировано ${phoneNumbers.length} номеров для рассылки!`);
+      }).catch(() => {
+        showCopyNotification(`⚠️ Найдено ${phoneNumbers.length} клиентов. Скопируйте номера вручную.`);
+      });
       
       const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
       window.open(url, '_blank');
@@ -1190,13 +1255,17 @@
       const clients = getDebtors();
       
       if (clients.length === 0) {
-        alert('Нет клиентов с просрочкой');
+        alert('📭 Нет клиентов с просрочкой');
         return;
       }
       
       let message = '🚫 *Напоминание о просроченной задолженности!*\n\n';
+      let phoneNumbers = [];
+      
       clients.forEach((client, index) => {
         const phone = client.phone.replace(/[^0-9]/g, '');
+        if (phone) phoneNumbers.push(phone);
+        
         const monthInfo = getMonthStatus(client);
         let overdueSum = 0;
         let overdueMonths = [];
@@ -1206,10 +1275,21 @@
             overdueMonths.push(`${m.month}-й (${m.date})`);
           }
         });
-        message += `${index + 1}. ${client.fio} - ${client.monthlyPay} ₽\n`;
-        message += `   Просрочка: ${overdueSum} ₽ (${overdueMonths.join(', ')})\n`;
-        message += `   Остаток: ${client.rest} ₽\n`;
-        message += `   WhatsApp: https://wa.me/7${phone}\n\n`;
+        
+        message += `${index + 1}. *${client.fio}*\n`;
+        message += `   💰 Сумма: ${client.monthlyPay} ₽\n`;
+        message += `   📱 WhatsApp: wa.me/7${phone}\n`;
+        message += `   ⚠️ Просрочка: ${overdueSum} ₽ (${overdueMonths.join(', ')})\n`;
+        message += `   📊 Остаток: ${client.rest} ₽\n\n`;
+      });
+      
+      message += `\n👥 Всего должников: ${clients.length}`;
+      
+      const phoneList = phoneNumbers.map(p => `7${p}`).join(', ');
+      navigator.clipboard.writeText(phoneList).then(() => {
+        showCopyNotification(`✅ Скопировано ${phoneNumbers.length} номеров для рассылки!`);
+      }).catch(() => {
+        showCopyNotification(`⚠️ Найдено ${phoneNumbers.length} должников. Скопируйте номера вручную.`);
       });
       
       const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
