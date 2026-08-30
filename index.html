@@ -9,14 +9,17 @@
     .row-error { background-color: #fee2e2 !important; }
     .pay-paid { background-color: #22c55e; color: white; font-weight: bold; cursor: pointer; }
     .btn-history-active { background-color: #f59e0b !important; color: white !important; cursor: pointer !important; }
+    .btn-history-active:hover { background-color: #d97706 !important; }
     .input-error { border: 2px solid #ef4444 !important; background-color: #fef2f2 !important; }
     
+    /* Стилизация вкладок */
     .tab-btn.active {
       background-color: #2563eb;
       color: #ffffff;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
 
+    /* Специфичные стили для Excel-дизайна листа Взяли */
     .excel-table td, .excel-table th {
       border: 1px solid #cbd5e1;
       padding: 4px 6px;
@@ -25,6 +28,9 @@
     .bg-excel-yellow { background-color: #fef08a; }
     .bg-excel-green { background-color: #86efac; }
     .bg-excel-red { background-color: #fca5a5; color: #7f1d1d; font-weight: bold; }
+    
+    .card-draggable { cursor: grab; }
+    .card-draggable:active { cursor: grabbing; }
   </style>
 </head>
 <body class="bg-slate-100 text-gray-800 text-xs min-h-screen pb-16">
@@ -33,10 +39,12 @@
   <div class="sticky top-0 z-40 bg-white shadow-md border-b">
     <div class="p-3 max-w-[100vw] flex flex-wrap justify-between items-center gap-4">
       
-      <div class="flex items-center gap-2">
-        <h1 class="font-black text-sm uppercase text-slate-700 tracking-wider">📊 Учет и Договоры</h1>
+      <!-- Пустое место слева для баланса -->
+      <div class="flex items-center gap-2 font-bold text-slate-700 text-sm">
+        📊 Система Учета
       </div>
 
+      <!-- Кнопки управления Undo/Redo и Базой -->
       <div class="flex items-center gap-2 flex-wrap">
         <div class="flex bg-slate-200 rounded-lg p-1 gap-1">
           <button type="button" id="undoBtn" onclick="undo()" disabled title="Шаг назад (Ctrl+Z)" 
@@ -59,6 +67,7 @@
 
         <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Поиск..." class="p-1.5 border rounded-lg w-40 focus:ring-2 focus:ring-blue-400 outline-none">
 
+        <!-- Динамические кнопки добавления -->
         <button type="button" id="addContractBtn" onclick="openCreateModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1.5 rounded-lg shadow transition">
           + Новый Договор
         </button>
@@ -131,7 +140,7 @@
               <th class="p-3 border-r border-slate-700 text-emerald-400 min-w-[120px]">Поступило</th>
               <th class="p-3 border-r border-slate-700 text-red-400 min-w-[120px]">Расход</th>
               <th class="p-3 border-r border-slate-700">Отметка</th>
-              <th class="p-3 border-r border-slate-700 min-w-[100px]">Счет</th>
+              <th class="p-3 border-r border-slate-700 min-w-[100px]">Счет / Источник</th>
               <th class="p-3 text-center sticky right-0 bg-slate-900 w-[100px]">Действия</th>
             </tr>
           </thead>
@@ -178,7 +187,9 @@
                   <td></td>
                 </tr>
               </tbody>
-              <tbody id="takenRowsTable"></tbody>
+              <tbody id="takenRowsTable">
+                <!-- Динамические строки операций Взяли/Положили -->
+              </tbody>
             </table>
           </div>
 
@@ -207,23 +218,25 @@
           <!-- Правый блок: Таблица счетов / карт -->
           <div class="flex-1 min-w-[500px]">
             <div class="mb-2 flex justify-between items-center">
-              <span class="font-bold uppercase text-[10px] text-slate-500">Счета и Карты</span>
+              <span class="font-bold uppercase text-[10px] text-slate-500">Счета и Карты (перетаскивайте строки для сортировки)</span>
               <button onclick="addNewAccountPrompt()" class="bg-slate-700 hover:bg-slate-800 text-white font-bold px-2 py-1 rounded text-[10px]">+ Добавить счет</button>
             </div>
             <div class="max-h-[70vh] overflow-y-auto">
               <table class="w-full border-collapse excel-table text-center">
                 <thead>
                   <tr class="bg-excel-header font-bold text-[10px]">
-                    <th>Счет / Карта</th>
+                    <th>Карта / Счет</th>
                     <th id="accountsGrandTotal">0</th>
                     <th>кол-во вход. в месяц</th>
                     <th>приход в месяц</th>
                     <th>кол-во исх. в месяц</th>
                     <th>расход в месяц</th>
-                    <th>действия</th>
+                    <th>кол-во перевод в месяц</th>
                   </tr>
                 </thead>
-                <tbody id="accountsTableBody"></tbody>
+                <tbody id="accountsTableBody">
+                  <!-- Динамические строки счетов -->
+                </tbody>
               </table>
             </div>
           </div>
@@ -234,17 +247,19 @@
 
   </div>
 
-  <!-- НИЖНЯЯ ПАНЕЛЬ ПЕРЕКЛЮЧЕНИЯ ВКЛАДОК (КАК В EXCEL) -->
-  <div class="fixed bottom-0 left-0 right-0 z-50 bg-slate-200 border-t border-slate-300 px-4 py-2 flex items-center gap-2 shadow-lg">
-    <button type="button" onclick="switchTab('contracts')" id="tabBtnContracts" class="tab-btn active px-5 py-1.5 rounded-lg font-bold text-xs transition flex items-center gap-2">
-      📋 Договоры
-    </button>
-    <button type="button" onclick="switchTab('accounting')" id="tabBtnAccounting" class="tab-btn px-5 py-1.5 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
-      📊 Учет
-    </button>
-    <button type="button" onclick="switchTab('taken')" id="tabBtnTaken" class="tab-btn px-5 py-1.5 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
-      📙 Взяли
-    </button>
+  <!-- НИЖНЯЯ ПАНЕЛЬ ПЕРЕКЛЮЧЕНИЯ ЛИСТОВ -->
+  <div class="fixed bottom-0 left-0 right-0 z-40 bg-white shadow-lg border-t py-2 px-4 flex justify-center">
+    <div class="flex items-center gap-2 bg-slate-200 p-1 rounded-xl">
+      <button type="button" onclick="switchTab('contracts')" id="tabBtnContracts" class="tab-btn active px-6 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2">
+        📋 Договоры
+      </button>
+      <button type="button" onclick="switchTab('accounting')" id="tabBtnAccounting" class="tab-btn px-6 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
+        📊 Учет
+      </button>
+      <button type="button" onclick="switchTab('taken')" id="tabBtnTaken" class="tab-btn px-6 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
+        📙 Взяли
+      </button>
+    </div>
   </div>
 
   <!-- Модальное окно договора -->
@@ -295,7 +310,7 @@
               <input type="number" id="totalCost" required oninput="validateFinance()" class="p-2 border rounded w-full">
             </div>
             <div>
-              <label class="block text-[9px] font-bold text-blue-800 uppercase mb-1">Предоплата</label>
+              <label class="block text-[9px] font-bold text-blue-800 uppercase mb-1">Предоплата (Взнос в договорах)</label>
               <input type="number" id="downPayment" value="0" oninput="validateFinance()" class="p-2 border rounded w-full">
             </div>
             <div>
@@ -383,11 +398,11 @@
         </div>
         <div>
           <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Отметка (Назначение / Комментарий)</label>
-          <input type="text" id="accNote" placeholder="Например: Перенос или Оплата товара" class="p-2 border rounded-md w-full outline-none">
+          <input type="text" id="accNote" placeholder="Например: Оплата товара" class="p-2 border rounded-md w-full outline-none">
         </div>
         <div>
           <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Счет / Источник</label>
-          <input type="text" id="accAccount" placeholder="Например: Карта 1, Основной..." class="p-2 border rounded-md w-full outline-none">
+          <input type="text" id="accAccount" placeholder="Например: С1, С2, N..." class="p-2 border rounded-md w-full outline-none">
         </div>
 
         <div class="flex justify-end gap-2 pt-4 border-t">
@@ -411,7 +426,7 @@
           </div>
           <div>
             <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Описание (Взяли)</label>
-            <input type="text" id="takenDesc" placeholder="Например: Рамзан" class="p-2 border rounded-md w-full outline-none">
+            <input type="text" id="takenDesc" placeholder="Описание" class="p-2 border rounded-md w-full outline-none">
           </div>
         </div>
         <div class="grid grid-cols-2 gap-2">
@@ -434,20 +449,23 @@
   </div>
 
   <script>
+    // --- ДАННЫЕ И СОСТОЯНИЕ ---
     let allContracts = JSON.parse(localStorage.getItem('contracts_db') || '[]');
     let allAccounting = JSON.parse(localStorage.getItem('accounting_db') || '[]');
     let allTaken = JSON.parse(localStorage.getItem('taken_db') || '[]');
     let customAccounts = JSON.parse(localStorage.getItem('accounts_db') || 'null');
+    let accountColors = JSON.parse(localStorage.getItem('account_colors_db') || '{}');
 
-    // Счета по умолчанию на русском языке
+    // Счета по умолчанию с русскими префиксами (С, Т, Б и т.д.)
     if (!customAccounts) {
-      customAccounts = ['Основной', 'Карта 1', 'Карта 2', 'Карта 3', 'Карта 4', 'Карта 5', 'Карта 6', 'Карта 7', 'Карта 8', 'Карта 9', 'Карта 10', 'Тайник 1', 'Тайник 2', 'Банк 1'];
+      customAccounts = ['N', 'С1', 'С2', 'С3', 'С4', 'С5', 'С6', 'С7', 'С8', 'С9', 'С10', 'С11', 'С12', 'С13', 'С14', 'С15', 'С16', 'Т1', 'Т2', 'Т3', 'Т4', 'Т5', 'Т6', 'Т7', 'Т8', 'Т9', 'Т10', 'Т11', 'Т12', 'Т13', 'Т14', 'Т15', 'Т16', 'Б1', 'Б2', 'Б3', 'Б4'];
     }
 
     let activeTab = 'contracts';
     let undoStack = [];
     let redoStack = [];
 
+    // --- ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ---
     function switchTab(tab) {
       activeTab = tab;
       const cTab = document.getElementById('contractsTabContent');
@@ -469,33 +487,35 @@
       addA.classList.add('hidden');
       addT.classList.add('hidden');
 
-      cBtn.className = "tab-btn px-5 py-1.5 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
-      aBtn.className = "tab-btn px-5 py-1.5 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
-      tBtn.className = "tab-btn px-5 py-1.5 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
+      cBtn.className = "tab-btn px-6 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
+      aBtn.className = "tab-btn px-6 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
+      tBtn.className = "tab-btn px-6 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
 
       if (tab === 'contracts') {
         cTab.classList.remove('hidden');
-        cBtn.className = "tab-btn active px-5 py-1.5 rounded-lg font-bold text-xs transition flex items-center gap-2";
+        cBtn.className = "tab-btn active px-6 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
         addC.classList.remove('hidden');
       } else if (tab === 'accounting') {
         aTab.classList.remove('hidden');
-        aBtn.className = "tab-btn active px-5 py-1.5 rounded-lg font-bold text-xs transition flex items-center gap-2";
+        aBtn.className = "tab-btn active px-6 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
         addA.classList.remove('hidden');
       } else if (tab === 'taken') {
         tTab.classList.remove('hidden');
-        tBtn.className = "tab-btn active px-5 py-1.5 rounded-lg font-bold text-xs transition flex items-center gap-2";
+        tBtn.className = "tab-btn active px-6 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
         addT.classList.remove('hidden');
         renderTakenSheet();
       }
       handleSearch();
     }
 
+    // --- ИСТОРИЯ ИЗМЕНЕНИЙ (UNDO / REDO) ---
     function saveState() {
       const stateSnapshot = {
         contracts: JSON.parse(JSON.stringify(allContracts)),
         accounting: JSON.parse(JSON.stringify(allAccounting)),
         taken: JSON.parse(JSON.stringify(allTaken)),
-        accounts: JSON.parse(JSON.stringify(customAccounts))
+        accounts: JSON.parse(JSON.stringify(customAccounts)),
+        colors: JSON.parse(JSON.stringify(accountColors))
       };
       undoStack.push(JSON.stringify(stateSnapshot));
       if (undoStack.length > 50) undoStack.shift();
@@ -509,7 +529,8 @@
         contracts: JSON.parse(JSON.stringify(allContracts)),
         accounting: JSON.parse(JSON.stringify(allAccounting)),
         taken: JSON.parse(JSON.stringify(allTaken)),
-        accounts: JSON.parse(JSON.stringify(customAccounts))
+        accounts: JSON.parse(JSON.stringify(customAccounts)),
+        colors: JSON.parse(JSON.stringify(accountColors))
       };
       redoStack.push(JSON.stringify(currentState));
       
@@ -518,6 +539,7 @@
       allAccounting = previousState.accounting;
       allTaken = previousState.taken || [];
       customAccounts = previousState.accounts || customAccounts;
+      accountColors = previousState.colors || accountColors;
       finishAction();
     }
 
@@ -527,7 +549,8 @@
         contracts: JSON.parse(JSON.stringify(allContracts)),
         accounting: JSON.parse(JSON.stringify(allAccounting)),
         taken: JSON.parse(JSON.stringify(allTaken)),
-        accounts: JSON.parse(JSON.stringify(customAccounts))
+        accounts: JSON.parse(JSON.stringify(customAccounts)),
+        colors: JSON.parse(JSON.stringify(accountColors))
       };
       undoStack.push(JSON.stringify(currentState));
       
@@ -536,6 +559,7 @@
       allAccounting = nextState.accounting;
       allTaken = nextState.taken || [];
       customAccounts = nextState.accounts || customAccounts;
+      accountColors = nextState.colors || accountColors;
       finishAction();
     }
 
@@ -544,6 +568,7 @@
       localStorage.setItem('accounting_db', JSON.stringify(allAccounting));
       localStorage.setItem('taken_db', JSON.stringify(allTaken));
       localStorage.setItem('accounts_db', JSON.stringify(customAccounts));
+      localStorage.setItem('account_colors_db', JSON.stringify(accountColors));
       renderTable(allContracts);
       renderAccountingTable(allAccounting);
       renderTakenSheet();
@@ -566,12 +591,14 @@
       localStorage.setItem('accounting_db', JSON.stringify(allAccounting));
       localStorage.setItem('taken_db', JSON.stringify(allTaken));
       localStorage.setItem('accounts_db', JSON.stringify(customAccounts));
+      localStorage.setItem('account_colors_db', JSON.stringify(accountColors));
       renderTable(allContracts);
       renderAccountingTable(allAccounting);
       renderTakenSheet();
       updateHistoryButtons();
     }
 
+    // --- ЛИСТ 1: ДОГОВОРЫ ---
     function validateFinance() {
       const months = Number(document.getElementById('monthsCount').value) || 0;
       const monthly = Number(document.getElementById('monthlyPay').value) || 0;
@@ -582,6 +609,7 @@
       const calcTotal = (monthly * months) + down;
       const isMathError = (months > 0 || monthly > 0 || total > 0) && (calcTotal !== total);
       const isPriceError = (cost > 0 || total > 0) && (cost > total);
+      
       const hasError = isMathError || isPriceError;
       
       document.getElementById('totalCost').classList.toggle('input-error', isMathError);
@@ -589,6 +617,7 @@
       document.getElementById('monthsCount').classList.toggle('input-error', isMathError);
       document.getElementById('downPayment').classList.toggle('input-error', isMathError);
       document.getElementById('costPrice').classList.toggle('input-error', isPriceError);
+
       document.getElementById('errorBanner').classList.toggle('hidden', !hasError);
       
       const saveBtn = document.getElementById('saveBtn');
@@ -646,6 +675,7 @@
     document.getElementById('contractForm').addEventListener('submit', (e) => {
       e.preventDefault();
       if (!validateFinance()) return;
+      
       saveState();
 
       const editId = document.getElementById('editDocId').value;
@@ -695,6 +725,7 @@
       const inputDateVal = document.getElementById('payDateVal').value;
       const inputDate = new Date(inputDateVal);
       const today = new Date();
+      
       const isDifferentMonth = (inputDate.getFullYear() !== today.getFullYear()) || (inputDate.getMonth() !== today.getMonth());
 
       if (isDifferentMonth) {
@@ -809,7 +840,9 @@
       });
     }
 
+    // --- ЛИСТ 2: УЧЕТ ---
     const accModal = document.getElementById('accModal');
+    
     function openAccModal() {
       document.getElementById('accForm').reset();
       document.getElementById('accEditId').value = '';
@@ -817,6 +850,7 @@
       document.getElementById('accDate').valueAsDate = new Date();
       accModal.classList.remove('hidden');
     }
+
     function closeAccModal() { accModal.classList.add('hidden'); }
 
     function openEditAccModal(id) {
@@ -855,6 +889,7 @@
           ...formData
         });
       }
+
       saveToStorage();
       closeAccModal();
     });
@@ -870,8 +905,10 @@
     function renderAccountingTable(items) {
       const tbody = document.getElementById('accountingTable');
       tbody.innerHTML = '';
+      
       let incomeSum = 0;
       let expenseSum = 0;
+
       const sorted = [...items].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
       sorted.forEach(item => {
@@ -897,13 +934,16 @@
       document.getElementById('totalExpense').innerText = expenseSum.toLocaleString('ru-RU') + ' ₽';
     }
 
+    // --- ЛИСТ 3: ВЗЯЛИ / ПОЛОЖИЛИ И АНАЛИТИКА ---
     const takenModal = document.getElementById('takenModal');
+
     function openTakenModal() {
       document.getElementById('takenForm').reset();
       document.getElementById('takenEditId').value = '';
       document.getElementById('takenModalTitle').innerText = 'Новая запись Взяли / Положили';
       takenModal.classList.remove('hidden');
     }
+
     function closeTakenModal() { takenModal.classList.add('hidden'); }
 
     function openEditTakenModal(id) {
@@ -940,6 +980,7 @@
           ...formData
         });
       }
+
       saveToStorage();
       closeTakenModal();
     });
@@ -953,7 +994,7 @@
     }
 
     function addNewAccountPrompt() {
-      const accName = prompt('Введите название нового счета/карты:');
+      const accName = prompt('Введите название нового счета/карты (например: С3, А1):');
       if (accName && accName.trim()) {
         const cleanName = accName.trim();
         if(!customAccounts.includes(cleanName)) {
@@ -966,37 +1007,44 @@
       }
     }
 
-    function renameAccount(index) {
-      const oldName = customAccounts[index];
-      const newName = prompt('Введите новое название счета/карты:', oldName);
+    // Редактирование названия карты по клику
+    function editAccountName(oldName) {
+      const newName = prompt(`Изменить название счета "${oldName}":`, oldName);
       if (newName && newName.trim() && newName.trim() !== oldName) {
+        const clean = newName.trim();
+        if (customAccounts.includes(clean)) {
+          alert('Счет с таким именем уже существует!');
+          return;
+        }
         saveState();
-        customAccounts[index] = newName.trim();
+        const idx = customAccounts.indexOf(oldName);
+        if (idx !== -1) customAccounts[idx] = clean;
+        // обновляем в учете
+        allAccounting.forEach(a => {
+          if (a.account && a.account.toLowerCase() === oldName.toLowerCase()) {
+            a.account = clean;
+          }
+        });
         saveToStorage();
       }
     }
 
-    function deleteAccount(index) {
-      if (confirm(`Удалить счет "${customAccounts[index]}"?`)) {
-        saveState();
-        customAccounts.splice(index, 1);
-        saveToStorage();
-      }
-    }
-
-    function moveAccount(index, direction) {
-      const newIndex = index + direction;
-      if (newIndex < 0 || newIndex >= customAccounts.length) return;
+    // Изменение цвета карты
+    function changeAccountColor(accName) {
+      const color = prompt(`Выберите цвет для карты "${accName}":\n1 - Желтый\n2 - Зеленый\n3 - Красный\n4 - Сбросить цвет`, "1");
       saveState();
-      const temp = customAccounts[index];
-      customAccounts[index] = customAccounts[newIndex];
-      customAccounts[newIndex] = temp;
+      if (color === "1") accountColors[accName] = "bg-excel-yellow";
+      else if (color === "2") accountColors[accName] = "bg-excel-green";
+      else if (color === "3") accountColors[accName] = "bg-excel-red";
+      else if (color === "4") delete accountColors[accName];
       saveToStorage();
     }
 
     function renderTakenSheet() {
+      // 1. Расчет таблицы Взяли / Положили
       const rowsTbody = document.getElementById('takenRowsTable');
       rowsTbody.innerHTML = '';
+
       let sumTaken = 0;
       let sumPut = 0;
 
@@ -1023,7 +1071,8 @@
       document.getElementById('takenTotalSum').innerText = sumTaken.toLocaleString('ru-RU');
       document.getElementById('putTotalSum').innerText = sumPut.toLocaleString('ru-RU');
 
-      // Логика Учета (доходы минус расходы со вкладки Учет)
+      // Логика Кассы и Учета из ТЗ:
+      // Учет = Доход минус Расход
       let totalUchetIncome = 0;
       let totalUchetExpense = 0;
       allAccounting.forEach(a => {
@@ -1031,37 +1080,86 @@
         totalUchetExpense += Number(a.expense || 0);
       });
       const uchetBalance = totalUchetIncome - totalUchetExpense;
+
+      // Касса = Первые взносы по договорам + платежи + положил - взял - себестоимость договоров
+      let contractsFirstPayments = 0;
+      let contractsInstallments = 0;
+      let contractsCostPrice = 0;
+
+      allContracts.forEach(c => {
+        contractsFirstPayments += Number(c.downPayment || 0);
+        contractsCostPrice += Number(c.costPrice || 0);
+        const insts = c.installments || {};
+        Object.values(insts).forEach(p => {
+          contractsInstallments += Number(p.amount || 0);
+        });
+      });
+
+      // Итоговая Касса по обновленной формуле
+      const totalKassa = contractsFirstPayments + contractsInstallments + sumPut - sumTaken - contractsCostPrice;
+
+      document.getElementById('kassaTotal').innerText = totalKassa.toLocaleString('ru-RU');
       document.getElementById('kassaUchet').innerText = uchetBalance.toLocaleString('ru-RU');
 
-      // Логика Кассы:
-      // Складываем все начальные предоплаты и внесенные платежи по договорам
-      let contractsPaymentsSum = 0;
+      // 2. Статистика Договоров
+      const now = new Date();
+      const todayStr = now.toISOString().slice(0, 10);
+
+      let totalContracts = allContracts.length;
+      let closedContracts = 0;
+      let activeContracts = 0;
+
+      let planTodaySum = 0;
+      let planTodayCount = 0;
+      let factTodaySum = 0;
+      let factTodayCount = 0;
+
       allContracts.forEach(c => {
-        contractsPaymentsSum += Number(c.downPayment || 0);
-        if (c.installments) {
-          Object.values(c.installments).forEach(inst => {
-            contractsPaymentsSum += Number(inst.amount || 0);
-          });
+        const insts = c.installments || {};
+        let paidSum = 0;
+        let hasPaidToday = false;
+
+        Object.values(insts).forEach(p => {
+          paidSum += Number(p.amount);
+          if (p.date === todayStr) {
+            factTodaySum += Number(p.amount);
+            hasPaidToday = true;
+          }
+        });
+
+        if (hasPaidToday) factTodayCount++;
+
+        const rest = c.totalCost - (c.downPayment || 0) - paidSum;
+        if (rest <= 0) {
+          closedContracts++;
+        } else {
+          activeContracts++;
+        }
+
+        if (c.payDate === todayStr) {
+          planTodaySum += Number(c.monthlyPay || 0);
+          planTodayCount++;
         }
       });
 
-      // Себестоимость договоров (минусуется из кассы)
-      let contractsCostSum = 0;
-      allContracts.forEach(c => {
-        contractsCostSum += Number(c.costPrice || 0);
-      });
+      document.getElementById('statTotalContracts').innerText = totalContracts;
+      document.getElementById('statClosedContracts').innerText = closedContracts;
+      document.getElementById('statActiveContracts').innerText = activeContracts;
+      document.getElementById('statPlanTodaySum').innerText = planTodaySum.toLocaleString('ru-RU') + ' ₽';
+      document.getElementById('statPlanTodayCount').innerText = planTodayCount;
+      document.getElementById('statFactTodaySum').innerText = factTodaySum.toLocaleString('ru-RU') + ' ₽';
+      document.getElementById('statFactTodayCount').innerText = factTodayCount;
 
-      // Итоговая касса = Баланс счетов + Платежи по договорам - Себестоимость - Взяли + Положили
-      let accountsGrandTotalSum = 0;
-      
+      // 3. Правая Таблица Счетов / Карт (с учетом лимита 400 000 руб. и перетаскивания)
       const accountsBody = document.getElementById('accountsTableBody');
       accountsBody.innerHTML = '';
 
-      const now = new Date();
       const currentMonth = now.getMonth();
       const currentYear = now.getFullYear();
 
-      customAccounts.forEach((acc, idx) => {
+      let accountsGrandTotalSum = 0;
+
+      customAccounts.forEach((acc, index) => {
         let accBalance = 0;
         let incCountMonth = 0;
         let incSumMonth = 0;
@@ -1072,6 +1170,7 @@
           if (a.account && a.account.trim().toLowerCase() === acc.toLowerCase()) {
             const inc = Number(a.income || 0);
             const exp = Number(a.expense || 0);
+            // Если в листе учета доход - добавляется к карте, если расход - сменяется (минусуется)
             accBalance += (inc - exp);
 
             if (a.date) {
@@ -1092,76 +1191,50 @@
 
         accountsGrandTotalSum += accBalance;
 
+        // Проверка лимита 400 000 рублей на приход или уход в текущем месяце -> подсвечиваем красным
         const isOverLimit = (incSumMonth >= 400000 || expSumMonth >= 400000);
-        const rowBgClass = isOverLimit ? 'bg-excel-red' : (accBalance > 0 ? 'bg-excel-green' : '');
+        let rowBgClass = isOverLimit ? 'bg-excel-red' : (accountColors[acc] || (accBalance > 0 ? 'bg-excel-green' : ''));
 
         const tr = document.createElement('tr');
-        tr.className = rowBgClass;
+        tr.className = `${rowBgClass} card-draggable`;
+        tr.draggable = true;
+        tr.dataset.index = index;
+
+        tr.addEventListener('dragstart', (e) => {
+          e.dataTransfer.setData('text/plain', index);
+        });
+        tr.addEventListener('dragover', (e) => { e.preventDefault(); });
+        tr.addEventListener('drop', (e) => {
+          e.preventDefault();
+          const fromIdx = Number(e.dataTransfer.getData('text/plain'));
+          const toIdx = index;
+          if (fromIdx !== toIdx) {
+            saveState();
+            const movedItem = customAccounts.splice(fromIdx, 1)[0];
+            customAccounts.splice(toIdx, 0, movedItem);
+            saveToStorage();
+          }
+        });
+
         tr.innerHTML = `
-          <td class="font-bold text-left pl-2">${acc}</td>
+          <td class="font-bold flex justify-between items-center">
+            <span class="cursor-pointer hover:text-blue-600" onclick="editAccountName('${acc}')" title="Кликните для переименования">${acc}</span>
+            <button onclick="changeAccountColor('${acc}')" class="text-[9px] px-1 bg-slate-200 rounded text-slate-600" title="Изменить цвет">🎨</button>
+          </td>
           <td class="font-bold">${accBalance.toLocaleString('ru-RU')}</td>
           <td>${incCountMonth}</td>
           <td>${incSumMonth.toLocaleString('ru-RU')}</td>
           <td>${expCountMonth}</td>
           <td>${expSumMonth.toLocaleString('ru-RU')}</td>
-          <td class="space-x-1 text-center">
-            <button onclick="renameAccount(${idx})" title="Переименовать" class="text-blue-700 font-bold text-[10px]">✏️</button>
-            <button onclick="moveAccount(${idx}, -1)" title="Вверх" class="text-slate-700 font-bold text-[10px]">⬆️</button>
-            <button onclick="moveAccount(${idx}, 1)" title="Вниз" class="text-slate-700 font-bold text-[10px]">⬇️</button>
-            <button onclick="deleteAccount(${idx})" title="Удалить" class="text-red-700 font-bold text-[10px]">🗑️</button>
-          </td>
+          <td>0</td>
         `;
         accountsBody.appendChild(tr);
       });
 
-      // Итоговый расчет Кассы согласно правилам
-      const totalKassa = accountsGrandTotalSum + contractsPaymentsSum - contractsCostSum - sumTaken + sumPut;
-      document.getElementById('kassaTotal').innerText = totalKassa.toLocaleString('ru-RU');
       document.getElementById('accountsGrandTotal').innerText = accountsGrandTotalSum.toLocaleString('ru-RU');
-
-      // Статистика договоров
-      const todayStr = now.toISOString().slice(0, 10);
-      let totalContracts = allContracts.length;
-      let closedContracts = 0;
-      let activeContracts = 0;
-      let planTodaySum = 0;
-      let planTodayCount = 0;
-      let factTodaySum = 0;
-      let factTodayCount = 0;
-
-      allContracts.forEach(c => {
-        const insts = c.installments || {};
-        let paidSum = 0;
-        let hasPaidToday = false;
-
-        Object.values(insts).forEach(p => {
-          paidSum += Number(p.amount);
-          if (p.date === todayStr) {
-            factTodaySum += Number(p.amount);
-            hasPaidToday = true;
-          }
-        });
-
-        if (hasPaidToday) factTodayCount++;
-        const rest = c.totalCost - (c.downPayment || 0) - paidSum;
-        if (rest <= 0) closedContracts++;
-        else activeContracts++;
-
-        if (c.payDate === todayStr) {
-          planTodaySum += Number(c.monthlyPay || 0);
-          planTodayCount++;
-        }
-      });
-
-      document.getElementById('statTotalContracts').innerText = totalContracts;
-      document.getElementById('statClosedContracts').innerText = closedContracts;
-      document.getElementById('statActiveContracts').innerText = activeContracts;
-      document.getElementById('statPlanTodaySum').innerText = planTodaySum.toLocaleString('ru-RU') + ' ₽';
-      document.getElementById('statPlanTodayCount').innerText = planTodayCount;
-      document.getElementById('statFactTodaySum').innerText = factTodaySum.toLocaleString('ru-RU') + ' ₽';
-      document.getElementById('statFactTodayCount').innerText = factTodayCount;
     }
 
+    // --- ПОИСК И ЭКСПОРТ/ИМПОРТ ---
     function handleSearch() {
       const q = document.getElementById('searchInput').value.toLowerCase();
       if (activeTab === 'contracts') {
@@ -1200,7 +1273,8 @@
         contracts: allContracts,
         accounting: allAccounting,
         taken: allTaken,
-        accounts: customAccounts
+        accounts: customAccounts,
+        colors: accountColors
       };
       const blob = new Blob([JSON.stringify(exportObject, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
@@ -1227,6 +1301,7 @@
               allAccounting = data.accounting || [];
               allTaken = data.taken || [];
               customAccounts = data.accounts || customAccounts;
+              accountColors = data.colors || {};
             }
             saveToStorage();
           }
@@ -1235,11 +1310,13 @@
       reader.readAsText(file);
     }
 
+    // Горячие клавиши
     document.addEventListener('keydown', (e) => {
       if (e.ctrlKey && (e.key === 'z' || e.key === 'я')) { e.preventDefault(); undo(); }
       if (e.ctrlKey && (e.key === 'y' || e.key === 'н')) { e.preventDefault(); redo(); }
     });
 
+    // Первичная инициализация
     renderTable(allContracts);
     renderAccountingTable(allAccounting);
     renderTakenSheet();
