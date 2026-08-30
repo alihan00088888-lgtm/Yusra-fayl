@@ -27,7 +27,6 @@
     .bg-excel-green { background-color: #86efac; }
     .bg-excel-red { background-color: #fca5a5; color: #7f1d1d; font-weight: bold; }
     
-    /* Новый стиль для красных ячеек с суммами при превышении 400к */
     .cell-over-limit {
       background-color: #fca5a5 !important;
       color: #7f1d1d !important;
@@ -41,7 +40,6 @@
   <div class="sticky top-0 z-40 bg-white shadow-md border-b">
     <div class="p-3 max-w-[100vw] flex flex-wrap justify-between items-center gap-4">
       
-      <!-- Кнопки управления Undo/Redo и Базой -->
       <div class="flex items-center gap-2 flex-wrap">
         <div class="flex bg-slate-200 rounded-lg p-1 gap-1">
           <button type="button" id="undoBtn" onclick="undo()" disabled title="Шаг назад (Ctrl+Z)" 
@@ -65,7 +63,6 @@
         <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Поиск..." class="p-1.5 border rounded-lg w-40 focus:ring-2 focus:ring-blue-400 outline-none">
       </div>
 
-      <!-- Динамические кнопки добавления -->
       <div class="flex items-center gap-2">
         <button type="button" id="addContractBtn" onclick="openCreateModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1.5 rounded-lg shadow transition">
           + Новый Договор
@@ -83,7 +80,6 @@
 
   <div class="p-4 max-w-[100vw]">
     
-    <!-- ================= Лист 1: Договоры ================= -->
     <div id="contractsTabContent" class="space-y-4">
       <div class="bg-white shadow-xl rounded-xl overflow-x-auto max-h-[78vh] border">
         <table class="min-w-full text-left border-collapse">
@@ -113,7 +109,6 @@
       </div>
     </div>
 
-    <!-- ================= Лист 2: Учет ================= -->
     <div id="accountingTabContent" class="hidden space-y-4">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="bg-white p-4 rounded-xl border-l-4 border-emerald-500 shadow-md flex justify-between items-center">
@@ -149,12 +144,10 @@
       </div>
     </div>
 
-    <!-- ================= Лист 3: Взяли ================= -->
     <div id="takenTabContent" class="hidden space-y-4">
       <div class="bg-white shadow-xl rounded-xl p-4 overflow-x-auto border">
         <div class="flex flex-wrap lg:flex-nowrap gap-6">
           
-          <!-- Левый блок: Касса, Взяли, Положили -->
           <div class="flex-1 min-w-[550px]">
             <table class="w-full text-left border-collapse excel-table bg-amber-50/20">
               <thead>
@@ -191,7 +184,6 @@
             </table>
           </div>
 
-          <!-- Блок по центру: Статистика Договоров -->
           <div class="w-64 shrink-0">
             <table class="w-full border-collapse excel-table text-center">
               <tbody>
@@ -213,7 +205,6 @@
             </table>
           </div>
 
-          <!-- Правый блок: Таблица счетов / карт -->
           <div class="flex-1 min-w-[500px]">
             <div class="mb-2 flex justify-between items-center">
               <span class="font-bold uppercase text-[10px] text-slate-500">Счета и Карты (Цвет и Удаление)</span>
@@ -243,7 +234,6 @@
 
   </div>
 
-  <!-- НИЖНЯЯ ПАНЕЛЬ ПЕРЕКЛЮЧЕНИЯ ЛИСТОВ (ЭКВАТОР EXCEL) -->
   <div class="fixed bottom-0 left-0 right-0 z-40 bg-white shadow-lg border-t px-4 py-2 flex justify-center items-center gap-2">
     <div class="flex items-center gap-2 bg-slate-200 p-1 rounded-xl">
       <button type="button" onclick="switchTab('contracts')" id="tabBtnContracts" class="tab-btn active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2">
@@ -258,7 +248,6 @@
     </div>
   </div>
 
-  <!-- Модальное окно договора -->
   <div id="modal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-xl p-6 max-w-4xl w-full max-h-[95vh] overflow-y-auto shadow-2xl">
       <h2 id="modalTitle" class="text-xl font-bold mb-4 border-b-2 pb-2 text-blue-700 uppercase tracking-tight">Новый договор</h2>
@@ -341,7 +330,6 @@
     </div>
   </div>
 
-  <!-- Модальное окно взноса -->
   <div id="payModal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-xl p-5 max-w-sm w-full shadow-2xl border-t-4 border-green-500">
       <h3 class="font-black text-xs uppercase text-slate-500 mb-4 tracking-widest">Регистрация оплаты</h3>
@@ -372,7 +360,6 @@
     </div>
   </div>
 
-  <!-- Модальное окно учета -->
   <div id="accModal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl border-t-4 border-emerald-500">
       <h3 id="accModalTitle" class="font-bold text-base text-slate-800 mb-4 border-b pb-2 uppercase">Запись учета</h3>
@@ -409,7 +396,6 @@
     </div>
   </div>
 
-  <!-- Модальное окно Взяли / Положили -->
   <div id="takenModal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl border-t-4 border-amber-500">
       <h3 id="takenModalTitle" class="font-bold text-base text-slate-800 mb-4 border-b pb-2 uppercase">Запись Взяли / Положили</h3>
@@ -445,13 +431,11 @@
   </div>
 
   <script>
-    // --- ДАННЫЕ И СОСТОЯНИЕ ---
     let allContracts = JSON.parse(localStorage.getItem('contracts_db') || '[]');
     let allAccounting = JSON.parse(localStorage.getItem('accounting_db') || '[]');
     let allTaken = JSON.parse(localStorage.getItem('taken_db') || '[]');
     let customAccounts = JSON.parse(localStorage.getItem('accounts_db') || 'null');
 
-    // Счета по умолчанию с поддержкой кастомных цветов
     if (!customAccounts) {
       const defaultNames = ['N', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12', 'T13', 'T14', 'T15', 'T16', 'B1', 'B2', 'B3', 'B4'];
       customAccounts = defaultNames.map(name => ({
@@ -469,7 +453,6 @@
     let undoStack = [];
     let redoStack = [];
 
-    // --- ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ---
     function switchTab(tab) {
       activeTab = tab;
       const cTab = document.getElementById('contractsTabContent');
@@ -512,7 +495,6 @@
       handleSearch();
     }
 
-    // --- ИСТОРИЯ ИЗМЕНЕНИЙ (UNDO / REDO) ---
     function saveState() {
       const stateSnapshot = {
         contracts: JSON.parse(JSON.stringify(allContracts)),
@@ -595,7 +577,6 @@
       updateHistoryButtons();
     }
 
-    // --- ЛИСТ 1: ДОГОВОРЫ ---
     function validateFinance() {
       const months = Number(document.getElementById('monthsCount').value) || 0;
       const monthly = Number(document.getElementById('monthlyPay').value) || 0;
@@ -603,8 +584,20 @@
       const down = Number(document.getElementById('downPayment').value) || 0;
       const cost = Number(document.getElementById('costPrice').value) || 0;
 
-      const calcTotal = (monthly * months) + down;
-      const isMathError = (months > 0 || monthly > 0 || total > 0) && (calcTotal !== total);
+      // Если все поля пустые или равны 0 - ошибки нет
+      if (months === 0 && monthly === 0 && total === 0 && down === 0 && cost === 0) {
+        document.getElementById('errorBanner').classList.add('hidden');
+        const saveBtn = document.getElementById('saveBtn');
+        saveBtn.disabled = false;
+        saveBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        return true;
+      }
+
+      // Проверка: сумма рассрочки должна быть равна (мес.платеж * срок + предоплата)
+      // Но только если все поля заполнены
+      const isMathError = (months > 0 || monthly > 0 || total > 0) && (months * monthly + down !== total);
+      
+      // Проверка: себестоимость не может быть больше суммы рассрочки
       const isPriceError = (cost > 0 || total > 0) && (cost > total);
       
       const hasError = isMathError || isPriceError;
@@ -612,7 +605,7 @@
       document.getElementById('totalCost').classList.toggle('input-error', isMathError);
       document.getElementById('monthlyPay').classList.toggle('input-error', isMathError);
       document.getElementById('monthsCount').classList.toggle('input-error', isMathError);
-      document.getElementById('downPayment').classList.toggle('input-error', isMathError);
+      document.getElementById('downPayment').classList.toggle('input-error', false); // Предоплата больше не подсвечивается как ошибка
       document.getElementById('costPrice').classList.toggle('input-error', isPriceError);
 
       document.getElementById('errorBanner').classList.toggle('hidden', !hasError);
@@ -630,6 +623,7 @@
       document.getElementById('contractForm').reset();
       document.getElementById('editDocId').value = '';
       document.getElementById('modalTitle').innerText = 'Оформление нового договора';
+      document.getElementById('downPayment').value = 0;
       validateFinance();
       modal.classList.remove('hidden');
     }
@@ -837,7 +831,6 @@
       });
     }
 
-    // --- ЛИСТ 2: УЧЕТ ---
     const accModal = document.getElementById('accModal');
     
     function openAccModal() {
@@ -931,7 +924,6 @@
       document.getElementById('totalExpense').innerText = expenseSum.toLocaleString('ru-RU') + ' ₽';
     }
 
-    // --- ЛИСТ 3: ВЗЯЛИ / ПОЛОЖИЛИ И АНАЛИТИКА ---
     const takenModal = document.getElementById('takenModal');
 
     function openTakenModal() {
@@ -1048,8 +1040,6 @@
       document.getElementById('takenTotalSum').innerText = sumTaken.toLocaleString('ru-RU');
       document.getElementById('putTotalSum').innerText = sumPut.toLocaleString('ru-RU');
 
-      // 1. Расчет Кассы по новой логике:
-      // Касса = Первый взнос (downPayment) + все платежи (installments) - себестоимость (costPrice) - Взяли (sumTaken) + Положили (sumPut)
       let totalDownPayments = 0;
       let totalInstallments = 0;
       let totalCostPrice = 0;
@@ -1066,7 +1056,6 @@
       let totalKassa = totalDownPayments + totalInstallments - totalCostPrice - sumTaken + sumPut;
       document.getElementById('kassaTotal').innerText = totalKassa.toLocaleString('ru-RU');
 
-      // 2. Учет на листе Взяли (чистый баланс из листа Учет: доход минус расход)
       let totalUchetIncome = 0;
       let totalUchetExpense = 0;
       allAccounting.forEach(a => {
@@ -1076,7 +1065,6 @@
       let uchetBalance = totalUchetIncome - totalUchetExpense;
       document.getElementById('kassaUchet').innerText = uchetBalance.toLocaleString('ru-RU');
 
-      // 3. Статистика Договоров
       const now = new Date();
       const todayStr = now.toISOString().slice(0, 10);
 
@@ -1125,7 +1113,6 @@
       document.getElementById('statFactTodaySum').innerText = factTodaySum.toLocaleString('ru-RU') + ' ₽';
       document.getElementById('statFactTodayCount').innerText = factTodayCount;
 
-      // 4. Таблица счетов / карт с кастомными цветами и удалением
       const accountsBody = document.getElementById('accountsTableBody');
       accountsBody.innerHTML = '';
 
@@ -1165,11 +1152,9 @@
 
         accountsGrandTotalSum += accBalance;
 
-        // Проверяем превышение лимита для каждой суммы отдельно
         const isIncOverLimit = incSumMonth >= 400000;
         const isExpOverLimit = expSumMonth >= 400000;
         
-        // Определяем цвет строки только если есть кастомный цвет
         let rowStyle = accObj.color ? `background-color: ${accObj.color};` : '';
 
         const tr = document.createElement('tr');
@@ -1192,7 +1177,6 @@
       document.getElementById('accountsGrandTotal').innerText = accountsGrandTotalSum.toLocaleString('ru-RU');
     }
 
-    // --- ПОИСК И ЭКСПОРТ/ИМПОРТ ---
     function handleSearch() {
       const q = document.getElementById('searchInput').value.toLowerCase();
       if (activeTab === 'contracts') {
@@ -1266,17 +1250,15 @@
       reader.readAsText(file);
     }
 
-    // Горячие клавиши
     document.addEventListener('keydown', (e) => {
       if (e.ctrlKey && (e.key === 'z' || e.key === 'я')) { e.preventDefault(); undo(); }
       if (e.ctrlKey && (e.key === 'y' || e.key === 'н')) { e.preventDefault(); redo(); }
     });
 
-    // Первичная инициализация
     renderTable(allContracts);
     renderAccountingTable(allAccounting);
     renderTakenSheet();
     updateHistoryButtons();
   </script>
 </body>
-</html>
+              </html>
