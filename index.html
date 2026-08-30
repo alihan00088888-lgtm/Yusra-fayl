@@ -118,18 +118,15 @@
     .client-overdue { color: #ef4444; font-weight: bold; }
     .client-rest { color: #f59e0b; font-weight: bold; }
 
-    .partner-row {
-      transition: all 0.2s;
-    }
-    .partner-row:hover {
-      background-color: #f3f4f6;
-    }
     .partner-stat {
-      font-weight: bold;
-      font-size: 14px;
+      padding: 8px 12px;
+      border-bottom: 1px solid #e5e7eb;
     }
-    .partner-debt { color: #ef4444; }
-    .partner-total { color: #2563eb; }
+    .partner-stat:last-child {
+      border-bottom: none;
+    }
+    .partner-name { font-weight: bold; font-size: 14px; color: #7c3aed; }
+    .partner-value { font-weight: bold; font-size: 13px; }
   </style>
 </head>
 <body class="bg-slate-100 text-gray-800 text-xs min-h-screen pb-20">
@@ -379,55 +376,21 @@
     <div id="partnersTabContent" class="hidden space-y-4">
       <div class="bg-white shadow-xl rounded-xl p-6 border">
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold text-purple-600">🤝 Партнёры и Магазины</h2>
-          <div class="flex gap-2">
-            <button onclick="addPartner()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-4 py-2 rounded-lg text-sm transition shadow">
-              + Добавить партнёра
-            </button>
+          <h2 class="text-xl font-bold text-purple-600">🤝 Партнёры / Магазины</h2>
+          <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
+              <label class="text-xs font-bold">С:</label>
+              <input type="date" id="partnerDateFrom" class="p-1 border rounded text-xs" onchange="renderPartners()">
+            </div>
+            <div class="flex items-center gap-2">
+              <label class="text-xs font-bold">По:</label>
+              <input type="date" id="partnerDateTo" class="p-1 border rounded text-xs" onchange="renderPartners()">
+            </div>
+            <button onclick="clearPartnerDates()" class="bg-gray-500 hover:bg-gray-600 text-white px-2 py-1 rounded text-xs">Сбросить</button>
           </div>
         </div>
-        
-        <!-- Фильтр по периоду -->
-        <div class="mb-4 p-4 bg-slate-50 rounded-lg border flex flex-wrap items-end gap-4">
-          <div>
-            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Период с</label>
-            <input type="date" id="partnerDateFrom" class="p-2 border rounded-lg text-sm">
-          </div>
-          <div>
-            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">По</label>
-            <input type="date" id="partnerDateTo" class="p-2 border rounded-lg text-sm">
-          </div>
-          <div>
-            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Месяц</label>
-            <input type="month" id="partnerMonth" class="p-2 border rounded-lg text-sm" onchange="applyPartnerFilter()">
-          </div>
-          <button onclick="applyPartnerFilter()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-lg text-sm transition">
-            Применить фильтр
-          </button>
-          <button onclick="clearPartnerFilter()" class="bg-gray-400 hover:bg-gray-500 text-white font-bold px-4 py-2 rounded-lg text-sm transition">
-            Сбросить
-          </button>
-        </div>
-        
-        <!-- Таблица партнеров -->
-        <div class="overflow-x-auto">
-          <table class="w-full border-collapse excel-table">
-            <thead>
-              <tr class="bg-excel-header font-bold text-center">
-                <th class="p-3 min-w-[150px]">Партнёр / Магазин</th>
-                <th class="p-3 min-w-[120px] text-red-600">Долг (кол-во)</th>
-                <th class="p-3 min-w-[150px] text-red-600">Сумма долга</th>
-                <th class="p-3 min-w-[120px] text-blue-600">Всего договоров</th>
-                <th class="p-3 min-w-[150px] text-blue-600">Общая сумма</th>
-                <th class="p-3 min-w-[120px]">За период (кол-во)</th>
-                <th class="p-3 min-w-[150px]">За период (сумма)</th>
-                <th class="p-3 min-w-[80px]">Действия</th>
-              </tr>
-            </thead>
-            <tbody id="partnersTableBody">
-              <!-- Заполняется динамически -->
-            </tbody>
-          </table>
+        <div id="partnersList" class="divide-y">
+          <!-- Список партнеров будет заполняться автоматически -->
         </div>
       </div>
     </div>
@@ -461,25 +424,7 @@
     </div>
   </div>
 
-  <!-- Модальное окно для добавления/редактирования партнера -->
-  <div id="partnerModal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl border-t-4 border-purple-500">
-      <h3 id="partnerModalTitle" class="font-bold text-lg text-slate-800 mb-4 border-b pb-2 uppercase">Добавить партнёра</h3>
-      <form id="partnerForm" class="space-y-4">
-        <input type="hidden" id="editPartnerId">
-        <div>
-          <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Название партнёра / магазина *</label>
-          <input type="text" id="partnerName" required placeholder="Например: Мебельный центр" class="p-2 border rounded-md w-full outline-none">
-        </div>
-        <div class="flex justify-end gap-2 pt-4 border-t">
-          <button type="button" onclick="closePartnerModal()" class="px-4 py-2 text-slate-500 font-bold">Отмена</button>
-          <button type="submit" class="px-6 py-2 bg-purple-600 text-white rounded-lg font-bold hover:bg-purple-700 transition shadow">Сохранить</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Модальные окна (остальные) -->
+  <!-- Модальные окна -->
   <div id="modal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-xl p-6 max-w-4xl w-full max-h-[95vh] overflow-y-auto shadow-2xl">
       <h2 id="modalTitle" class="text-xl font-bold mb-4 border-b-2 pb-2 text-blue-700 uppercase tracking-tight">Новый договор</h2>
@@ -545,7 +490,7 @@
           <div class="bg-gray-50 p-4 rounded-lg border">
             <h3 class="font-black text-[10px] uppercase text-gray-400 mb-3 tracking-widest">3. Описание товара</h3>
             <input type="text" id="product" placeholder="Наименование товара" class="p-2 border rounded w-full mb-2">
-            <input type="text" id="store" placeholder="Магазин" class="p-2 border rounded w-full">
+            <input type="text" id="store" placeholder="Магазин / Партнёр" class="p-2 border rounded w-full">
           </div>
           <div class="bg-gray-50 p-4 rounded-lg border">
             <h3 class="font-black text-[10px] uppercase text-gray-400 mb-3 tracking-widest">4. Поручитель</h3>
@@ -667,7 +612,6 @@
     let allAccounting = JSON.parse(localStorage.getItem('accounting_db') || '[]');
     let allTaken = JSON.parse(localStorage.getItem('taken_db') || '[]');
     let customAccounts = JSON.parse(localStorage.getItem('accounts_db') || 'null');
-    let partners = JSON.parse(localStorage.getItem('partners_db') || '[]');
 
     if (!customAccounts) {
       const defaultNames = ['N', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12', 'T13', 'T14', 'T15', 'T16', 'B1', 'B2', 'B3', 'B4'];
@@ -686,163 +630,6 @@
     let undoStack = [];
     let redoStack = [];
 
-    // ================= ФУНКЦИИ ДЛЯ ПАРТНЕРОВ =================
-    
-    function addPartner() {
-      document.getElementById('partnerForm').reset();
-      document.getElementById('editPartnerId').value = '';
-      document.getElementById('partnerModalTitle').innerText = 'Добавить партнёра';
-      document.getElementById('partnerModal').classList.remove('hidden');
-    }
-
-    function editPartner(id) {
-      const partner = partners.find(p => p.id === id);
-      if (!partner) return;
-      document.getElementById('editPartnerId').value = id;
-      document.getElementById('partnerName').value = partner.name;
-      document.getElementById('partnerModalTitle').innerText = 'Редактировать партнёра';
-      document.getElementById('partnerModal').classList.remove('hidden');
-    }
-
-    function closePartnerModal() {
-      document.getElementById('partnerModal').classList.add('hidden');
-    }
-
-    document.getElementById('partnerForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const editId = document.getElementById('editPartnerId').value;
-      const name = document.getElementById('partnerName').value.trim();
-      
-      if (!name) {
-        alert('Введите название партнёра');
-        return;
-      }
-      
-      saveState();
-      
-      if (editId) {
-        const idx = partners.findIndex(p => p.id === editId);
-        if (idx !== -1) partners[idx].name = name;
-      } else {
-        partners.push({
-          id: 'partner_' + Date.now(),
-          name: name
-        });
-      }
-      
-      localStorage.setItem('partners_db', JSON.stringify(partners));
-      renderPartners();
-      closePartnerModal();
-    });
-
-    function deletePartner(id) {
-      if (confirm('Удалить партнёра?')) {
-        saveState();
-        partners = partners.filter(p => p.id !== id);
-        localStorage.setItem('partners_db', JSON.stringify(partners));
-        renderPartners();
-      }
-    }
-
-    function applyPartnerFilter() {
-      renderPartners();
-    }
-
-    function clearPartnerFilter() {
-      document.getElementById('partnerDateFrom').value = '';
-      document.getElementById('partnerDateTo').value = '';
-      document.getElementById('partnerMonth').value = '';
-      renderPartners();
-    }
-
-    function renderPartners() {
-      const tbody = document.getElementById('partnersTableBody');
-      tbody.innerHTML = '';
-      
-      if (partners.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-gray-500">Нет добавленных партнёров. Нажмите "+ Добавить партнёра"</td></tr>';
-        return;
-      }
-      
-      const dateFrom = document.getElementById('partnerDateFrom').value;
-      const dateTo = document.getElementById('partnerDateTo').value;
-      const month = document.getElementById('partnerMonth').value;
-      
-      partners.forEach(partner => {
-        // Фильтруем договоры по партнеру
-        let partnerContracts = allContracts.filter(c => 
-          c.store && c.store.toLowerCase().includes(partner.name.toLowerCase())
-        );
-        
-        // Фильтр по периоду
-        let filteredContracts = partnerContracts;
-        if (dateFrom || dateTo || month) {
-          filteredContracts = partnerContracts.filter(c => {
-            if (!c.buyDate) return false;
-            const buyDate = new Date(c.buyDate);
-            buyDate.setHours(0, 0, 0, 0);
-            
-            if (dateFrom) {
-              const from = new Date(dateFrom);
-              from.setHours(0, 0, 0, 0);
-              if (buyDate < from) return false;
-            }
-            if (dateTo) {
-              const to = new Date(dateTo);
-              to.setHours(0, 0, 0, 0);
-              if (buyDate > to) return false;
-            }
-            if (month) {
-              const [year, mon] = month.split('-');
-              if (buyDate.getFullYear() !== parseInt(year) || buyDate.getMonth() !== parseInt(mon) - 1) {
-                return false;
-              }
-            }
-            return true;
-          });
-        }
-        
-        // Расчет статистики
-        let debtCount = 0;
-        let debtSum = 0;
-        let totalCount = partnerContracts.length;
-        let totalSum = 0;
-        let periodCount = filteredContracts.length;
-        let periodSum = 0;
-        
-        partnerContracts.forEach(c => {
-          totalSum += Number(c.totalCost || 0);
-          if (!c.shopPaid) {
-            debtCount++;
-            debtSum += Number(c.totalCost || 0);
-          }
-        });
-        
-        filteredContracts.forEach(c => {
-          periodSum += Number(c.totalCost || 0);
-        });
-        
-        const tr = document.createElement('tr');
-        tr.className = 'partner-row text-center';
-        tr.innerHTML = `
-          <td class="p-3 font-bold text-left">${partner.name}</td>
-          <td class="p-3 partner-stat partner-debt">${debtCount}</td>
-          <td class="p-3 partner-stat partner-debt">${debtSum.toLocaleString('ru-RU')} ₽</td>
-          <td class="p-3 partner-stat partner-total">${totalCount}</td>
-          <td class="p-3 partner-stat partner-total">${totalSum.toLocaleString('ru-RU')} ₽</td>
-          <td class="p-3">${periodCount}</td>
-          <td class="p-3">${periodSum.toLocaleString('ru-RU')} ₽</td>
-          <td class="p-3">
-            <button onclick="editPartner('${partner.id}')" class="text-blue-600 hover:text-blue-800 font-bold text-sm px-1">✏️</button>
-            <button onclick="deletePartner('${partner.id}')" class="text-red-600 hover:text-red-800 font-bold text-sm px-1">🗑️</button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    // ================= ФУНКЦИИ ДЛЯ ЛИСТОВ =================
-    
     function switchTab(tab) {
       activeTab = tab;
       const cTab = document.getElementById('contractsTabContent');
@@ -917,15 +704,12 @@
       handleSearch();
     }
 
-    // ================= ОСТАЛЬНЫЕ ФУНКЦИИ (без изменений) =================
-    
     function saveState() {
       const stateSnapshot = {
         contracts: JSON.parse(JSON.stringify(allContracts)),
         accounting: JSON.parse(JSON.stringify(allAccounting)),
         taken: JSON.parse(JSON.stringify(allTaken)),
-        accounts: JSON.parse(JSON.stringify(customAccounts)),
-        partners: JSON.parse(JSON.stringify(partners))
+        accounts: JSON.parse(JSON.stringify(customAccounts))
       };
       undoStack.push(JSON.stringify(stateSnapshot));
       if (undoStack.length > 50) undoStack.shift();
@@ -939,8 +723,7 @@
         contracts: JSON.parse(JSON.stringify(allContracts)),
         accounting: JSON.parse(JSON.stringify(allAccounting)),
         taken: JSON.parse(JSON.stringify(allTaken)),
-        accounts: JSON.parse(JSON.stringify(customAccounts)),
-        partners: JSON.parse(JSON.stringify(partners))
+        accounts: JSON.parse(JSON.stringify(customAccounts))
       };
       redoStack.push(JSON.stringify(currentState));
       
@@ -949,7 +732,6 @@
       allAccounting = previousState.accounting;
       allTaken = previousState.taken || [];
       customAccounts = previousState.accounts || customAccounts;
-      partners = previousState.partners || [];
       finishAction();
     }
 
@@ -959,8 +741,7 @@
         contracts: JSON.parse(JSON.stringify(allContracts)),
         accounting: JSON.parse(JSON.stringify(allAccounting)),
         taken: JSON.parse(JSON.stringify(allTaken)),
-        accounts: JSON.parse(JSON.stringify(customAccounts)),
-        partners: JSON.parse(JSON.stringify(partners))
+        accounts: JSON.parse(JSON.stringify(customAccounts))
       };
       undoStack.push(JSON.stringify(currentState));
       
@@ -969,7 +750,6 @@
       allAccounting = nextState.accounting;
       allTaken = nextState.taken || [];
       customAccounts = nextState.accounts || customAccounts;
-      partners = nextState.partners || [];
       finishAction();
     }
 
@@ -978,7 +758,6 @@
       localStorage.setItem('accounting_db', JSON.stringify(allAccounting));
       localStorage.setItem('taken_db', JSON.stringify(allTaken));
       localStorage.setItem('accounts_db', JSON.stringify(customAccounts));
-      localStorage.setItem('partners_db', JSON.stringify(partners));
       renderTable(allContracts);
       renderAccountingTable(allAccounting);
       renderTakenSheet();
@@ -1005,7 +784,6 @@
       localStorage.setItem('accounting_db', JSON.stringify(allAccounting));
       localStorage.setItem('taken_db', JSON.stringify(allTaken));
       localStorage.setItem('accounts_db', JSON.stringify(customAccounts));
-      localStorage.setItem('partners_db', JSON.stringify(partners));
       renderTable(allContracts);
       renderAccountingTable(allAccounting);
       renderTakenSheet();
@@ -1016,7 +794,163 @@
       updateHistoryButtons();
     }
 
-    // ================= ФУНКЦИИ ДЛЯ ПОЛУЧЕНИЯ ИНФОРМАЦИИ ПО МЕСЯЦАМ =================
+    // ================= ФУНКЦИИ ДЛЯ ЛИСТА ПАРТНЁРЫ =================
+    
+    function renderPartners() {
+      const container = document.getElementById('partnersList');
+      
+      // Получаем даты фильтра
+      const dateFrom = document.getElementById('partnerDateFrom').value;
+      const dateTo = document.getElementById('partnerDateTo').value;
+      
+      // Собираем всех партнеров из договоров
+      const partnersMap = new Map();
+      
+      allContracts.forEach(contract => {
+        const store = contract.store || '';
+        if (!store.trim()) return;
+        
+        // Проверяем фильтр по датам
+        if (dateFrom || dateTo) {
+          const buyDate = contract.buyDate || '';
+          if (buyDate) {
+            if (dateFrom && buyDate < dateFrom) return;
+            if (dateTo && buyDate > dateTo) return;
+          }
+        }
+        
+        if (!partnersMap.has(store)) {
+          partnersMap.set(store, {
+            name: store,
+            debtContracts: 0,
+            debtSum: 0,
+            totalContracts: 0,
+            totalSum: 0,
+            contracts: []
+          });
+        }
+        
+        const partner = partnersMap.get(store);
+        partner.totalContracts++;
+        partner.totalSum += Number(contract.totalCost || 0);
+        partner.contracts.push(contract);
+        
+        // Проверяем, оплачен ли договор (не стоит "Д")
+        if (!contract.shopPaid) {
+          partner.debtContracts++;
+          partner.debtSum += Number(contract.totalCost || 0);
+        }
+      });
+      
+      // Преобразуем в массив и сортируем по имени
+      const partners = Array.from(partnersMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+      
+      if (partners.length === 0) {
+        container.innerHTML = '<div class="text-center text-gray-500 py-8 text-sm">🤝 Нет партнеров/магазинов</div>';
+        return;
+      }
+      
+      let html = `
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+          <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+            <div class="text-xs text-purple-600 font-bold">Всего партнеров</div>
+            <div class="text-2xl font-bold text-purple-700">${partners.length}</div>
+          </div>
+          <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+            <div class="text-xs text-blue-600 font-bold">Всего договоров</div>
+            <div class="text-2xl font-bold text-blue-700">${partners.reduce((sum, p) => sum + p.totalContracts, 0)}</div>
+          </div>
+          <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+            <div class="text-xs text-red-600 font-bold">Договоров в долг (без "Д")</div>
+            <div class="text-2xl font-bold text-red-700">${partners.reduce((sum, p) => sum + p.debtContracts, 0)}</div>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse excel-table">
+            <thead>
+              <tr class="bg-purple-700 text-white font-bold text-xs">
+                <th class="p-3">Партнёр / Магазин</th>
+                <th class="p-3">Договоров в долг</th>
+                <th class="p-3">Сумма долга</th>
+                <th class="p-3">Всего договоров</th>
+                <th class="p-3">Общая сумма</th>
+                <th class="p-3">Детали</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+      
+      partners.forEach(partner => {
+        html += `
+          <tr class="hover:bg-purple-50">
+            <td class="p-3 font-bold text-purple-700">${partner.name}</td>
+            <td class="p-3 text-center font-bold ${partner.debtContracts > 0 ? 'text-red-600' : 'text-green-600'}">${partner.debtContracts}</td>
+            <td class="p-3 text-center font-bold ${partner.debtSum > 0 ? 'text-red-600' : 'text-green-600'}">${partner.debtSum.toLocaleString('ru-RU')} ₽</td>
+            <td class="p-3 text-center font-bold">${partner.totalContracts}</td>
+            <td class="p-3 text-center font-bold">${partner.totalSum.toLocaleString('ru-RU')} ₽</td>
+            <td class="p-3 text-center">
+              <button onclick="showPartnerDetails('${partner.name}')" class="bg-purple-500 hover:bg-purple-600 text-white px-2 py-1 rounded text-xs">📋 Детали</button>
+            </td>
+          </tr>
+        `;
+      });
+      
+      html += `
+            </tbody>
+          </table>
+        </div>
+      `;
+      
+      container.innerHTML = html;
+    }
+
+    function showPartnerDetails(partnerName) {
+      const dateFrom = document.getElementById('partnerDateFrom').value;
+      const dateTo = document.getElementById('partnerDateTo').value;
+      
+      const contracts = allContracts.filter(c => {
+        if (c.store !== partnerName) return false;
+        if (dateFrom && c.buyDate && c.buyDate < dateFrom) return false;
+        if (dateTo && c.buyDate && c.buyDate > dateTo) return false;
+        return true;
+      });
+      
+      if (contracts.length === 0) {
+        alert(`Нет договоров с партнером "${partnerName}" за выбранный период`);
+        return;
+      }
+      
+      let message = `📋 Детали по партнеру: ${partnerName}\n`;
+      message += `━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+      message += `📅 Период: ${dateFrom || 'с начала'} - ${dateTo || 'по сегодня'}\n`;
+      message += `📊 Всего договоров: ${contracts.length}\n`;
+      message += `━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+      
+      contracts.forEach((c, i) => {
+        const status = c.shopPaid ? '✅ Оплачен' : '❌ В долгу';
+        const rest = c.totalCost - (c.downPayment || 0) - Object.values(c.installments || {}).reduce((sum, p) => sum + Number(p.amount || 0), 0);
+        message += `${i+1}. ${c.fio} - ${c.totalCost} ₽ (${status})\n`;
+        message += `   📅 ${c.buyDate} | Остаток: ${rest} ₽\n`;
+        message += `   📞 ${c.phone}\n\n`;
+      });
+      
+      // Открываем в отдельном окне или alert
+      const detailsWindow = window.open('', '_blank', 'width=600,height=400');
+      detailsWindow.document.write(`
+        <html><head><title>Детали: ${partnerName}</title>
+        <style>body { font-family: Arial; padding: 20px; white-space: pre-wrap; }</style>
+        </head><body>${message.replace(/\n/g, '<br>')}</body></html>
+      `);
+      detailsWindow.document.close();
+    }
+
+    function clearPartnerDates() {
+      document.getElementById('partnerDateFrom').value = '';
+      document.getElementById('partnerDateTo').value = '';
+      renderPartners();
+    }
+
+    // ================= ФУНКЦИИ ДЛЯ ОСТАЛЬНЫХ ЛИСТОВ =================
     
     function getMonthStatus(contract) {
       const months = contract.monthsCount || 0;
@@ -1282,7 +1216,7 @@
       window.open(url, '_blank');
     }
 
-    // ================= ОСТАЛЬНЫЕ ФУНКЦИИ (сохранены без изменений) =================
+    // ================= ОСТАЛЬНЫЕ ФУНКЦИИ =================
     
     function validateFinance() {
       const months = Number(document.getElementById('monthsCount').value) || 0;
@@ -1917,8 +1851,7 @@
         contracts: allContracts,
         accounting: allAccounting,
         taken: allTaken,
-        accounts: customAccounts,
-        partners: partners
+        accounts: customAccounts
       };
       const blob = new Blob([JSON.stringify(exportObject, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
@@ -1945,7 +1878,6 @@
               allAccounting = data.accounting || [];
               allTaken = data.taken || [];
               customAccounts = data.accounts || customAccounts;
-              partners = data.partners || [];
             }
             saveToStorage();
           }
@@ -1962,7 +1894,6 @@
     renderTable(allContracts);
     renderAccountingTable(allAccounting);
     renderTakenSheet();
-    renderPartners();
     updateHistoryButtons();
   </script>
 </body>
