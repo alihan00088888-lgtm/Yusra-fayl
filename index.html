@@ -465,7 +465,6 @@
     let allTaken = JSON.parse(localStorage.getItem('taken_db') || '[]');
     let customAccounts = JSON.parse(localStorage.getItem('accounts_db') || '[]');
 
-    // Убеждаемся, что customAccounts - это массив
     if (!Array.isArray(customAccounts)) {
       customAccounts = [];
     }
@@ -1008,13 +1007,12 @@
     }
 
     // ================================================================
-    // 7. УПРАВЛЕНИЕ СЧЕТАМИ (ИСПРАВЛЕНО)
+    // 7. УПРАВЛЕНИЕ СЧЕТАМИ (ИСПРАВЛЕНО И НА РУССКОМ)
     // ================================================================
     function addNewAccountPrompt() {
-      const accName = prompt('Введите название нового счета/карты (например: С1, С2, Т1):');
+      const accName = prompt('Введите название нового счета/карты (например: Карта 1, Сбер, Тинькофф):');
       if (accName && accName.trim()) {
         const cleanName = accName.trim();
-        // Проверяем уникальность
         if (!customAccounts.some(a => a.name.toLowerCase() === cleanName.toLowerCase())) {
           saveState();
           customAccounts.push({ name: cleanName, color: '' });
@@ -1046,7 +1044,6 @@
         renderTakenSheet();
         return;
       }
-      // Проверяем, не занято ли имя другим счетом
       const duplicate = customAccounts.some((a, i) => i !== index && a.name.toLowerCase() === trimmedName.toLowerCase());
       if (duplicate) {
         alert('Счет с таким названием уже существует!');
@@ -1062,7 +1059,6 @@
     // 8. ОТРИСОВКА ВКЛАДКИ "ВЗЯЛИ"
     // ================================================================
     function renderTakenSheet() {
-      // --- Таблица "Взяли / Положили" ---
       const rowsTbody = document.getElementById('takenRowsTable');
       rowsTbody.innerHTML = '';
 
@@ -1092,7 +1088,6 @@
       document.getElementById('takenTotalSum').innerText = sumTaken.toLocaleString('ru-RU');
       document.getElementById('putTotalSum').innerText = sumPut.toLocaleString('ru-RU');
 
-      // --- Расчет Кассы ---
       let totalDownPayments = 0;
       let totalInstallments = 0;
       let totalCostPrice = 0;
@@ -1109,7 +1104,6 @@
       let totalKassa = totalDownPayments + totalInstallments - totalCostPrice - sumTaken + sumPut;
       document.getElementById('kassaTotal').innerText = totalKassa.toLocaleString('ru-RU');
 
-      // --- Учет (баланс из раздела Учет) ---
       let totalUchetIncome = 0;
       let totalUchetExpense = 0;
       allAccounting.forEach(a => {
@@ -1119,7 +1113,6 @@
       let uchetBalance = totalUchetIncome - totalUchetExpense;
       document.getElementById('kassaUchet').innerText = uchetBalance.toLocaleString('ru-RU');
 
-      // --- Статистика Договоров ---
       const now = new Date();
       const todayStr = now.toISOString().slice(0, 10);
 
@@ -1168,7 +1161,6 @@
       document.getElementById('statFactTodaySum').innerText = factTodaySum.toLocaleString('ru-RU') + ' ₽';
       document.getElementById('statFactTodayCount').innerText = factTodayCount;
 
-      // --- ТАБЛИЦА СЧЕТОВ / КАРТ ---
       const accountsBody = document.getElementById('accountsTableBody');
       accountsBody.innerHTML = '';
 
@@ -1177,7 +1169,6 @@
 
       let accountsGrandTotalSum = 0;
 
-      // Проверяем, что customAccounts - это массив
       if (!Array.isArray(customAccounts)) {
         customAccounts = [];
       }
@@ -1336,11 +1327,10 @@
       if (e.ctrlKey && (e.key === 'y' || e.key === 'н')) { e.preventDefault(); redo(); }
     });
 
-    // Первичная инициализация
     renderTable(allContracts);
     renderAccountingTable(allAccounting);
     renderTakenSheet();
     updateHistoryButtons();
   </script>
 </body>
-            </html>
+</html>
