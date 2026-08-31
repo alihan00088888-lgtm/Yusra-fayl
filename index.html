@@ -1104,7 +1104,11 @@
               for (let i = 1; i <= monthsCount; i++) {
                 // ✅ ПРАВИЛЬНО: добавляем месяцы к дате покупки
                 const payDate = new Date(startDate);
-                payDate.setMonth(payDate.getMonth() + (i - 1));
+payDate.setMonth(payDate.getMonth() + (i - 1));
+const lastDayOfMonth = new Date(payDate.getFullYear(), payDate.getMonth() + 1, 0);
+const lastDay = lastDayOfMonth.getDate();
+const targetDay = Math.min(payDay, lastDay); // ✅ Корректная установка дня
+payDate.setDate(targetDay);
                 
                 // ✅ ПРАВИЛЬНО: корректируем день (если нет такого дня в месяце)
                 const lastDayOfMonth = new Date(payDate.getFullYear(), payDate.getMonth() + 1, 0);
@@ -1639,8 +1643,12 @@
       for (let i = 1; i <= months; i++) {
         // ⬇️⬇️⬇️ ИСПРАВЛЕННАЯ ЧАСТЬ - РАСЧЕТ ДАТЫ ⬇️⬇️⬇️
         // ✅ ПРАВИЛЬНО: добавляем месяцы к дате покупки
-        const payDate = new Date(startDate);
-        payDate.setMonth(payDate.getMonth() + (i - 1));
+     const payDate = new Date(startDate);
+payDate.setMonth(payDate.getMonth() + (i - 1));
+const lastDayOfMonth = new Date(payDate.getFullYear(), payDate.getMonth() + 1, 0);
+const lastDay = lastDayOfMonth.getDate();
+const targetDay = Math.min(payDay, lastDay); // ✅ Корректная установка дня
+payDate.setDate(targetDay);
         
         // ✅ ПРАВИЛЬНО: корректируем день (если нет такого дня в месяце)
         const lastDayOfMonth = new Date(payDate.getFullYear(), payDate.getMonth() + 1, 0);
