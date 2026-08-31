@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Система Учета и Договоров</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Подключаем библиотеки для создания PDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
@@ -138,23 +139,28 @@
     /* Стили для печати договора */
     .print-contract {
       font-family: 'Times New Roman', serif;
-      font-size: 13px;
-      line-height: 1.5;
-      padding: 25px 35px;
+      font-size: 12px;
+      line-height: 1.4;
+      padding: 20px 30px;
       background: white;
       max-width: 210mm;
       margin: 0 auto;
     }
     .print-contract h1 {
-      font-size: 17px;
+      font-size: 16px;
       font-weight: bold;
       text-align: center;
       text-transform: uppercase;
       margin-bottom: 12px;
     }
+    .print-contract .contract-num {
+      font-weight: bold;
+      text-align: right;
+      font-size: 13px;
+    }
     .print-contract .section-title {
       font-weight: bold;
-      font-size: 15px;
+      font-size: 14px;
       margin-top: 12px;
       margin-bottom: 6px;
       text-transform: uppercase;
@@ -164,10 +170,10 @@
       font-weight: bold;
       margin-top: 8px;
       margin-bottom: 3px;
-      font-size: 12.5px;
+      font-size: 12px;
     }
     .print-contract .list-item {
-      padding-left: 20px;
+      padding-left: 18px;
       margin-bottom: 2px;
       font-size: 11.5px;
     }
@@ -186,7 +192,7 @@
       margin: 20px auto 4px;
     }
     .print-contract .signature-label {
-      font-size: 10.5px;
+      font-size: 10px;
     }
     .print-contract .page-break {
       page-break-after: always;
@@ -194,47 +200,56 @@
       margin: 10px 0;
     }
 
-    /* Стили для блоков в распечатке */
-    .print-contract .person-block {
-      border: 1px solid #000;
-      padding: 6px 10px;
-      margin-bottom: 8px;
-    }
-    .print-contract .person-block .title {
-      font-weight: bold;
-      font-size: 13px;
-      margin-bottom: 3px;
-    }
-    .print-contract .person-block .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2px 15px;
-      font-size: 12px;
-    }
-    .print-contract .person-block .grid-full {
-      grid-column: span 2;
-    }
-
-    .print-contract .months-table {
+    /* Таблица месяцев */
+    .months-table {
       width: 100%;
       border-collapse: collapse;
       font-size: 11px;
       margin-top: 10px;
     }
-    .print-contract .months-table th {
+    .months-table th {
       background-color: #e2e8f0;
       font-weight: bold;
       text-align: center;
       padding: 4px 8px;
       border: 1px solid #000;
     }
-    .print-contract .months-table td {
+    .months-table td {
       padding: 4px 8px;
       text-align: center;
       border: 1px solid #000;
     }
-    .print-contract .month-paid-cell { color: #22c55e; font-weight: bold; }
-    .print-contract .month-unpaid-cell { color: #ef4444; font-weight: bold; }
+    .month-paid-cell { color: #22c55e; font-weight: bold; }
+    .month-unpaid-cell { color: #ef4444; font-weight: bold; }
+
+    /* Блоки покупателя и поручителя */
+    .person-block {
+      border: 1px solid #000;
+      padding: 6px 10px;
+      margin-bottom: 8px;
+    }
+    .person-block .title {
+      font-weight: bold;
+      font-size: 13px;
+      margin-bottom: 3px;
+    }
+    .person-block .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px 15px;
+      font-size: 11.5px;
+    }
+    .person-block .grid-full {
+      grid-column: span 2;
+    }
+
+    /* Блок продавца */
+    .seller-block {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 11.5px;
+    }
 
     @media print {
       body * {
@@ -256,8 +271,8 @@
         display: none !important;
       }
       .print-contract {
-        padding: 15px 20px;
-        font-size: 11px;
+        padding: 12px 20px;
+        font-size: 10px;
       }
       .print-contract .page-break {
         border-bottom: none;
@@ -267,8 +282,11 @@
       .print-contract .signature-line {
         width: 100px;
       }
-      .print-contract .person-block .grid {
-        font-size: 10px;
+      .print-contract h1 {
+        font-size: 14px;
+      }
+      .print-contract .section-title {
+        font-size: 12px;
       }
     }
 
@@ -301,22 +319,64 @@
       align-items: center;
       justify-content: center;
       z-index: 10000;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
     }
-    .loading-overlay .content {
+    .loading-overlay .loader-content {
       text-align: center;
       background: rgba(0,0,0,0.8);
       padding: 30px 50px;
       border-radius: 12px;
-      color: white;
     }
-    .loading-overlay .content .icon { font-size: 40px; margin-bottom: 10px; }
-    .loading-overlay .content .title { font-size: 18px; font-weight: bold; }
-    .loading-overlay .content .sub { font-size: 14px; color: #aaa; margin-top: 5px; }
+    .loading-overlay .loader-content .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #25D366;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Стили для кнопки отправки */
+    .send-btn-group {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .send-btn-group button {
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 11px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .send-btn-group button:hover {
+      transform: scale(1.05);
+    }
+    .send-btn-wa { background: #25D366; color: white; }
+    .send-btn-wa:hover { background: #128C7E; }
+    .send-btn-tg { background: #0088cc; color: white; }
+    .send-btn-tg:hover { background: #006699; }
+    .send-btn-viber { background: #7360f2; color: white; }
+    .send-btn-viber:hover { background: #5a4bd1; }
+    .send-btn-pdf { background: #dc2626; color: white; }
+    .send-btn-pdf:hover { background: #b91c1c; }
   </style>
 </head>
 <body class="bg-slate-100 text-gray-800 text-xs min-h-screen pb-20">
 
-  <!-- ВЕРХНЯЯ ПАНЕЛЬ ДЕЙСТВИЙ -->
+  <!-- ===== ВЕРХНЯЯ ПАНЕЛЬ ДЕЙСТВИЙ ===== -->
   <div class="sticky top-0 z-40 bg-white shadow-md border-b no-print">
     <div class="p-3 max-w-[100vw] flex flex-wrap justify-between items-center gap-4">
       
@@ -360,7 +420,7 @@
 
   <div class="p-4 max-w-[100vw]">
     
-    <!-- ================= Лист 1: Договоры ================= -->
+    <!-- ===== Лист 1: Договоры ===== -->
     <div id="contractsTabContent" class="space-y-4">
       <div class="bg-white shadow-xl rounded-xl overflow-x-auto max-h-[78vh] border">
         <table class="min-w-full text-left border-collapse">
@@ -390,7 +450,7 @@
       </div>
     </div>
 
-    <!-- ================= Лист 2: Учет ================= -->
+    <!-- ===== Лист 2: Учет ===== -->
     <div id="accountingTabContent" class="hidden space-y-4">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="bg-white p-4 rounded-xl border-l-4 border-emerald-500 shadow-md flex justify-between items-center">
@@ -426,7 +486,7 @@
       </div>
     </div>
 
-    <!-- ================= Лист 3: Взяли ================= -->
+    <!-- ===== Лист 3: Взяли ===== -->
     <div id="takenTabContent" class="hidden space-y-4">
       <div class="bg-white shadow-xl rounded-xl p-4 overflow-x-auto border">
         <div class="flex flex-wrap lg:flex-nowrap gap-6">
@@ -515,7 +575,7 @@
       </div>
     </div>
 
-    <!-- ================= Лист 4: Сегодня ================= -->
+    <!-- ===== Лист 4: Сегодня ===== -->
     <div id="todayTabContent" class="hidden space-y-4">
       <div class="bg-white shadow-xl rounded-xl p-6 border">
         <div class="flex justify-between items-center mb-4">
@@ -529,7 +589,7 @@
       </div>
     </div>
 
-    <!-- ================= Лист 5: 3 дня ================= -->
+    <!-- ===== Лист 5: 3 дня ===== -->
     <div id="threeDaysTabContent" class="hidden space-y-4">
       <div class="bg-white shadow-xl rounded-xl p-6 border">
         <div class="flex justify-between items-center mb-4">
@@ -543,7 +603,7 @@
       </div>
     </div>
 
-    <!-- ================= Лист 6: Неплательщики ================= -->
+    <!-- ===== Лист 6: Неплательщики ===== -->
     <div id="debtorsTabContent" class="hidden space-y-4">
       <div class="bg-white shadow-xl rounded-xl p-6 border">
         <div class="flex justify-between items-center mb-4">
@@ -557,7 +617,7 @@
       </div>
     </div>
 
-    <!-- ================= Лист 7: Партнёры ================= -->
+    <!-- ===== Лист 7: Партнёры ===== -->
     <div id="partnersTabContent" class="hidden space-y-4">
       <div class="bg-white shadow-xl rounded-xl p-6 border">
         <div class="flex justify-between items-center mb-4">
@@ -578,7 +638,7 @@
       </div>
     </div>
 
-    <!-- ================= Лист 8: Распечатка ================= -->
+    <!-- ===== Лист 8: Распечатка (ОБНОВЛЕННЫЙ) ===== -->
     <div id="printTabContent" class="hidden space-y-4">
       <div class="bg-white shadow-xl rounded-xl p-6 border">
         <div class="flex justify-between items-center mb-4 no-print">
@@ -590,12 +650,20 @@
             <button onclick="printContract()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-4 py-2 rounded-lg shadow transition">
               🖨️ Печать
             </button>
-            <button onclick="sendContractWhatsApp()" class="bg-green-500 hover:bg-green-600 text-white font-bold px-4 py-2 rounded-lg shadow transition flex items-center gap-2">
-              <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: white;">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-              </svg>
-              📤 WhatsApp
-            </button>
+            <div class="send-btn-group">
+              <button onclick="sendContractToWhatsApp()" class="send-btn-wa" title="Отправить через WhatsApp">
+                💬 WA
+              </button>
+              <button onclick="sendContractToTelegram()" class="send-btn-tg" title="Отправить через Telegram">
+                ✈️ TG
+              </button>
+              <button onclick="sendContractToViber()" class="send-btn-viber" title="Отправить через Viber">
+                📱 Viber
+              </button>
+              <button onclick="downloadContractPDF()" class="send-btn-pdf" title="Скачать PDF">
+                📄 PDF
+              </button>
+            </div>
           </div>
         </div>
         <div id="printContent" class="print-contract">
@@ -608,7 +676,7 @@
 
   </div>
 
-  <!-- НИЖНЯЯ ПАНЕЛЬ ПЕРЕКЛЮЧЕНИЯ ЛИСТОВ -->
+  <!-- ===== НИЖНЯЯ ПАНЕЛЬ ПЕРЕКЛЮЧЕНИЯ ЛИСТОВ ===== -->
   <div class="fixed bottom-0 left-0 right-0 z-40 bg-white shadow-lg border-t px-4 py-2 flex justify-center items-center gap-2 overflow-x-auto no-print">
     <div class="flex items-center gap-2 bg-slate-200 p-1 rounded-xl">
       <button type="button" onclick="switchTab('contracts')" id="tabBtnContracts" class="tab-btn active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2">
@@ -638,7 +706,8 @@
     </div>
   </div>
 
-  <!-- Модальные окна -->
+  <!-- ===== МОДАЛЬНЫЕ ОКНА (без изменений) ===== -->
+  <!-- ... все модальные окна остаются без изменений ... -->
   <div id="modal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-xl p-6 max-w-4xl w-full max-h-[95vh] overflow-y-auto shadow-2xl">
       <h2 id="modalTitle" class="text-xl font-bold mb-4 border-b-2 pb-2 text-blue-700 uppercase tracking-tight">Новый договор</h2>
@@ -822,6 +891,10 @@
   </div>
 
   <script>
+    // ================================================================
+    // ВСЕ СУЩЕСТВУЮЩИЕ ПЕРЕМЕННЫЕ И БАЗОВЫЕ ФУНКЦИИ (БЕЗ ИЗМЕНЕНИЙ)
+    // ================================================================
+    
     let allContracts = JSON.parse(localStorage.getItem('contracts_db') || '[]');
     let allAccounting = JSON.parse(localStorage.getItem('accounting_db') || '[]');
     let allTaken = JSON.parse(localStorage.getItem('taken_db') || '[]');
@@ -843,6 +916,10 @@
     let activeTab = 'contracts';
     let undoStack = [];
     let redoStack = [];
+
+    // ================================================================
+    // ФУНКЦИИ ПЕРЕКЛЮЧЕНИЯ ВКЛАДОК И ИСТОРИИ
+    // ================================================================
 
     function switchTab(tab) {
       activeTab = tab;
@@ -1025,8 +1102,10 @@
       updateHistoryButtons();
     }
 
-    // ================= ФУНКЦИИ ДЛЯ ЛИСТА РАСПЕЧАТКА =================
-    
+    // ================================================================
+    // ГЛАВНАЯ ФУНКЦИЯ ЗАГРУЗКИ ДОГОВОРА ДЛЯ ПЕЧАТИ (ОБНОВЛЕННАЯ)
+    // ================================================================
+
     function updatePrintSelect() {
       const select = document.getElementById('printContractSelect');
       const currentValue = select.value;
@@ -1064,7 +1143,7 @@
       const monthInfo = getMonthStatus(contract);
       const months = monthInfo.months;
       
-      // Формируем таблицу месяцев (СВЕРХУ ВНИЗ - 1, 2, 3...)
+      // Таблица месяцев СВЕРХУ ВНИЗ (1, 2, 3...)
       let monthsHtml = '';
       for (let i = 0; i < months.length; i++) {
         const m = months[i];
@@ -1073,10 +1152,10 @@
         const statusColor = isPaid ? 'color: #22c55e; font-weight: bold;' : 'color: #ef4444; font-weight: bold;';
         monthsHtml += `
           <tr>
-            <td style="padding: 4px 8px; text-align: center; font-weight: bold; border: 1px solid #000;">${m.month}</td>
-            <td style="padding: 4px 8px; text-align: center; border: 1px solid #000;">${m.date}</td>
-            <td style="padding: 4px 8px; text-align: center; ${statusColor}">${isPaid ? m.amount.toLocaleString('ru-RU') + ' ₽' : '—'}</td>
-            <td style="padding: 4px 8px; text-align: center; ${statusColor}">${statusText}</td>
+            <td style="padding: 3px 8px; text-align: center; font-weight: bold; border: 1px solid #000;">${m.month}</td>
+            <td style="padding: 3px 8px; text-align: center; border: 1px solid #000;">${m.date}</td>
+            <td style="padding: 3px 8px; text-align: center; ${statusColor}">${isPaid ? m.amount.toLocaleString('ru-RU') + ' ₽' : '—'}</td>
+            <td style="padding: 3px 8px; text-align: center; ${statusColor}">${statusText}</td>
           </tr>
         `;
       }
@@ -1085,23 +1164,23 @@
       const todayStr = today.toLocaleDateString('ru-RU');
       
       container.innerHTML = `
-        <div style="font-family: 'Times New Roman', serif; font-size: 13px; line-height: 1.5; padding: 20px 30px; max-width: 210mm; margin: 0 auto; background: white;">
+        <div style="font-family: 'Times New Roman', serif; font-size: 12px; line-height: 1.4; padding: 15px 25px; max-width: 210mm; margin: 0 auto; background: white;">
           
           <!-- ================= СТРАНИЦА 1 ================= -->
           <div style="position: relative;">
             
             <!-- Номер договора справа сверху -->
-            <div style="position: absolute; top: 0; right: 0; font-size: 14px; font-weight: bold;">
+            <div style="position: absolute; top: 0; right: 0; font-size: 13px; font-weight: bold;">
               № ${contract.contractNum}
             </div>
             
             <!-- ЗАГОЛОВОК -->
-            <h1 style="font-size: 17px; font-weight: bold; text-align: center; text-transform: uppercase; margin-bottom: 10px;">
+            <h1 style="font-size: 16px; font-weight: bold; text-align: center; text-transform: uppercase; margin-bottom: 10px;">
               ДОГОВОР КУПЛИ-ПРОДАЖИ ТОВАРА В РАССРОЧКУ
             </h1>
             
             <!-- ШАПКА С ДАННЫМИ ПРОДАВЦА -->
-            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 12px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 11.5px;">
               <div>
                 <b>Чеченская Республика</b><br>
                 Дата: ${contract.buyDate || '______'}<br>
@@ -1115,55 +1194,59 @@
             </div>
             
             <!-- БЛОК ПОКУПАТЕЛЯ -->
-            <div class="person-block">
-              <div class="title">Покупатель</div>
-              <div class="grid">
+            <div style="border: 1px solid #000; padding: 6px 10px; margin-bottom: 8px;">
+              <div style="font-weight: bold; font-size: 13px; margin-bottom: 3px;">Покупатель</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px 15px; font-size: 11.5px;">
                 <div><b>ФИО:</b> ${contract.fio || '______'}</div>
                 <div><b>Паспорт серия:</b> ${contract.passport || '______'}</div>
                 <div><b>Дата рождения:</b> ${contract.birthDate || '______'}</div>
                 <div><b>Телефон:</b> ${contract.phone || '______'}</div>
-                <div class="grid-full"><b>Адрес:</b> ${contract.address || '______'}</div>
+                <div style="grid-column: span 2;"><b>Адрес:</b> ${contract.address || '______'}</div>
                 <div><b>Доп. Телефон:</b> ${contract.extraPhone || '______'}</div>
               </div>
             </div>
             
             <!-- БЛОК ПОРУЧИТЕЛЯ -->
-            <div class="person-block">
-              <div class="title">Поручитель</div>
-              <div class="grid">
+            <div style="border: 1px solid #000; padding: 6px 10px; margin-bottom: 10px;">
+              <div style="font-weight: bold; font-size: 13px; margin-bottom: 3px;">Поручитель</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px 15px; font-size: 11.5px;">
                 <div><b>ФИО:</b> ${contract.guarantorFio || '______'}</div>
                 <div><b>Паспорт серия:</b> ______</div>
                 <div><b>Дата рождения:</b> ______</div>
                 <div><b>Телефон:</b> ${contract.guarantorPhone || '______'}</div>
-                <div class="grid-full"><b>Адрес:</b> ______</div>
+                <div style="grid-column: span 2;"><b>Адрес:</b> ______</div>
                 <div><b>Доп. Телефон:</b> ______</div>
               </div>
             </div>
             
-            <p style="text-align: justify; font-size: 12px; margin-bottom: 10px;">
+            <p style="text-align: justify; font-size: 11.5px; margin-bottom: 10px;">
               Совместно именуемые «Стороны», заключили настоящий Договор о нижеследующем:
             </p>
             
             <!-- РАЗДЕЛ 1: ПРЕДМЕТ ДОГОВОРА -->
-            <div class="section-title">1. ПРЕДМЕТ ДОГОВОРА</div>
-            <p style="text-align: justify; font-size: 12px; padding-left: 15px; margin-bottom: 2px;">
+            <div style="font-weight: bold; font-size: 14px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">
+              1. ПРЕДМЕТ ДОГОВОРА
+            </div>
+            <p style="text-align: justify; font-size: 11.5px; padding-left: 12px; margin-bottom: 2px;">
               По настоящему Договору «Продавец» обязуется передать в собственность «Покупателя»:
             </p>
-            <p style="text-align: justify; font-size: 12px; padding-left: 30px; font-weight: bold;">
+            <p style="text-align: justify; font-size: 11.5px; padding-left: 25px; font-weight: bold;">
               Товар: ${contract.product || '______'}
             </p>
-            <p style="text-align: justify; font-size: 12px; padding-left: 15px;">
+            <p style="text-align: justify; font-size: 11.5px; padding-left: 12px;">
               «Покупатель» обязуется принять и уплатить за него стоимость, указанную в Договоре.
             </p>
             
             <!-- РАЗДЕЛ 2: ЦЕНА ТОВАРА И ПОРЯДОК РАСЧЕТОВ -->
-            <div class="section-title">2. ЦЕНА ТОВАРА И ПОРЯДОК РАСЧЕТОВ</div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px 25px; font-size: 12px; padding-left: 15px;">
+            <div style="font-weight: bold; font-size: 14px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">
+              2. ЦЕНА ТОВАРА И ПОРЯДОК РАСЧЕТОВ
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px 25px; font-size: 11.5px; padding-left: 12px;">
               <div><b>Цена Товара:</b> ${Number(contract.totalCost).toLocaleString('ru-RU')} руб.</div>
               <div><b>Первый взнос:</b> ${Number(contract.downPayment || 0).toLocaleString('ru-RU')} руб.</div>
               <div style="grid-column: span 2; text-align: right; font-size: 10px; color: #666;">подпись: ______</div>
             </div>
-            <p style="text-align: justify; font-size: 12px; padding-left: 15px; margin-top: 3px;">
+            <p style="text-align: justify; font-size: 11.5px; padding-left: 12px; margin-top: 3px;">
               Оставшуюся сумму Покупатель выплачивает в течение <b>${contract.monthsCount}</b> месяцев, 
               равными частями в размере <b>${Number(contract.monthlyPay).toLocaleString('ru-RU')}</b> руб. 
               не позднее <b>${contract.payDate || '______'}</b> числа каждого месяца.
@@ -1171,13 +1254,13 @@
             
             <!-- ТАБЛИЦА МЕСЯЦЕВ (СВЕРХУ ВНИЗ) -->
             <div style="margin-top: 10px; border: 1px solid #000; overflow: hidden;">
-              <table class="months-table">
+              <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
                 <thead>
                   <tr>
-                    <th style="width: 15%;">№</th>
-                    <th style="width: 35%;">Дата</th>
-                    <th style="width: 25%;">Сумма</th>
-                    <th style="width: 25%;">Статус</th>
+                    <th style="padding: 3px 8px; border: 1px solid #000; width: 15%; background: #e2e8f0;">№</th>
+                    <th style="padding: 3px 8px; border: 1px solid #000; width: 35%; background: #e2e8f0;">Дата</th>
+                    <th style="padding: 3px 8px; border: 1px solid #000; width: 25%; background: #e2e8f0;">Сумма</th>
+                    <th style="padding: 3px 8px; border: 1px solid #000; width: 25%; background: #e2e8f0;">Статус</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1189,67 +1272,101 @@
           </div>
           
           <!-- ================= РАЗРЫВ СТРАНИЦЫ ================= -->
-          <div class="page-break"></div>
+          <div style="page-break-after: always; border-bottom: 2px dashed #ccc; margin: 10px 0;"></div>
           
           <!-- ================= СТРАНИЦА 2 ================= -->
-          <div style="font-size: 11.5px;">
+          <div style="font-size: 11px;">
             
             <!-- РАЗДЕЛ 3: ПРАВА И ОБЯЗАННОСТИ СТОРОН -->
-            <div class="section-title" style="font-size: 14px;">3. ПРАВА И ОБЯЗАННОСТИ СТОРОН</div>
+            <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-top: 8px; margin-bottom: 5px;">
+              3. ПРАВА И ОБЯЗАННОСТИ СТОРОН
+            </div>
             
-            <div class="sub-section" style="font-size: 12px;">«Продавец» обязан:</div>
-            <div class="list-item" style="font-size: 11px;">- Передать «Покупателю» Товар надлежащего качества, в надлежащей упаковке, в порядке и в сроки, установленные настоящим Договором.</div>
+            <div style="font-weight: bold; font-size: 11.5px; margin-top: 6px; margin-bottom: 2px;">«Продавец» обязан:</div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 6px;">
+              - Передать «Покупателю» Товар надлежащего качества, в надлежащей упаковке, в порядке и в сроки, установленные настоящим Договором.
+            </div>
             
-            <div class="sub-section" style="font-size: 12px; margin-top: 6px;">«Покупатель» обязан:</div>
-            <div class="list-item" style="font-size: 11px;">- Принять Товар в порядке, предусмотренном настоящим Договором.</div>
-            <div class="list-item" style="font-size: 11px;">- Оплатить Товар в порядке и в сроки, предусмотренные настоящим Договором.</div>
-            <div class="list-item" style="font-size: 11px;">- Не имеет право менять контактный номер без предупреждения. При наступлении непредвиденных обстоятельств обязан всеми возможными способами оповестить продавца.</div>
+            <div style="font-weight: bold; font-size: 11.5px; margin-top: 6px; margin-bottom: 2px;">«Покупатель» обязан:</div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">
+              - Принять Товар в порядке, предусмотренном настоящим Договором.
+            </div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">
+              - Оплатить Товар в порядке и в сроки, предусмотренные настоящим Договором.
+            </div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 6px;">
+              - Не имеет право менять контактный номер без предупреждения. При наступлении непредвиденных обстоятельств обязан всеми возможными способами оповестить продавца.
+            </div>
             
-            <div class="sub-section" style="font-size: 12px; margin-top: 6px;">«Поручитель» обязан:</div>
-            <div class="list-item" style="font-size: 11px;">- При неисполнении или ненадлежащем исполнении «Покупателем» своих обязательств по настоящему договору «Поручитель» отвечает перед «Продавцом» в том же объеме, что и «Покупатель», включая возврат основного долга. При просрочке выплаты «Покупателем» на 7 дней от установленного срока «Поручитель» обязан выплатить просроченный платеж.</div>
+            <div style="font-weight: bold; font-size: 11.5px; margin-top: 6px; margin-bottom: 2px;">«Поручитель» обязан:</div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 8px;">
+              - При неисполнении или ненадлежащем исполнении «Покупателем» своих обязательств по настоящему договору «Поручитель» отвечает перед «Продавцом» в том же объеме, что и «Покупатель», включая возврат основного долга. При просрочке выплаты «Покупателем» на 7 дней от установленного срока «Поручитель» обязан выплатить просроченный платеж.
+            </div>
             
             <!-- РАЗДЕЛ 4: ПЕРЕДАЧА И ПРИНЯТИЕ ТОВАРА -->
-            <div class="section-title" style="font-size: 14px; margin-top: 10px;">4. ПЕРЕДАЧА И ПРИНЯТИЕ ТОВАРА</div>
-            <div class="list-item" style="font-size: 11px;">- Товар передается «Покупателю» в месте нахождения продавца в дату подписания настоящего договора.</div>
-            <div class="list-item" style="font-size: 11px;">- «Покупатель» обязан осмотреть товар, проверить соответствие по качеству, количеству и комплектности условиям настоящего договора и принять его.</div>
-            <div class="list-item" style="font-size: 11px;">- Право собственности на товар переходит к «Покупателю» с момента полной оплаты им цены договора. Ответственность за сохранность товара переходит к покупателю с момента подписания настоящего договора.</div>
-            <div class="list-item" style="font-size: 11px;">- «Продавец» считается исполнившим свою обязанность по передаче товара с даты подписания настоящего договора.</div>
+            <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">
+              4. ПЕРЕДАЧА И ПРИНЯТИЕ ТОВАРА
+            </div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">
+              - Товар передается «Покупателю» в месте нахождения продавца в дату подписания настоящего договора.
+            </div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">
+              - «Покупатель» обязан осмотреть товар, проверить соответствие по качеству, количеству и комплектности условиям настоящего договора и принять его.
+            </div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">
+              - Право собственности на товар переходит к «Покупателю» с момента полной оплаты им цены договора. Ответственность за сохранность товара переходит к покупателю с момента подписания настоящего договора.
+            </div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 8px;">
+              - «Продавец» считается исполнившим свою обязанность по передаче товара с даты подписания настоящего договора.
+            </div>
             
             <!-- РАЗДЕЛ 5: РАЗРЕШЕНИЕ СПОРОВ -->
-            <div class="section-title" style="font-size: 14px; margin-top: 10px;">5. РАЗРЕШЕНИЕ СПОРОВ</div>
-            <div class="list-item" style="font-size: 11px;">- Все споры и разногласия, которые могут возникнуть между сторонами по вопросам, не нашедшим своего разрешения в тексте настоящего договора, будут разрешаться путем переговоров.</div>
-            <div class="list-item" style="font-size: 11px;">- В случае неурегулирования спорных вопросов в процессе переговоров такой спор подлежит рассмотрению в суде.</div>
+            <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">
+              5. РАЗРЕШЕНИЕ СПОРОВ
+            </div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">
+              - Все споры и разногласия, которые могут возникнуть между сторонами по вопросам, не нашедшим своего разрешения в тексте настоящего договора, будут разрешаться путем переговоров.
+            </div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 8px;">
+              - В случае неурегулирования спорных вопросов в процессе переговоров такой спор подлежит рассмотрению в суде.
+            </div>
             
             <!-- РАЗДЕЛ 6: ЗАКЛЮЧИТЕЛЬНЫЕ ПОЛОЖЕНИЯ -->
-            <div class="section-title" style="font-size: 14px; margin-top: 10px;">6. ЗАКЛЮЧИТЕЛЬНЫЕ ПОЛОЖЕНИЯ</div>
-            <div class="list-item" style="font-size: 11px;">- Настоящий договор вступает в силу с даты его подписания «Сторонами» и действует до полного исполнения ими обязательств по настоящему договору.</div>
-            <div class="list-item" style="font-size: 11px;">- Любые изменения и дополнения к настоящему договору должны быть составлены в письменной форме и подписаны всеми сторонами.</div>
+            <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">
+              6. ЗАКЛЮЧИТЕЛЬНЫЕ ПОЛОЖЕНИЯ
+            </div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">
+              - Настоящий договор вступает в силу с даты его подписания «Сторонами» и действует до полного исполнения ими обязательств по настоящему договору.
+            </div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 12px;">
+              - Любые изменения и дополнения к настоящему договору должны быть составлены в письменной форме и подписаны всеми сторонами.
+            </div>
             
             <!-- ПОДПИСИ СТОРОН (НА ЭТОЙ ЖЕ СТРАНИЦЕ СНИЗУ) -->
-            <div style="margin-top: 15px;">
-              <div style="font-weight: bold; font-size: 14px; text-transform: uppercase; text-decoration: underline; margin-bottom: 8px;">
+            <div style="margin-top: 12px;">
+              <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-bottom: 8px;">
                 ПОДПИСИ СТОРОН
               </div>
               
               <table style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: center;">
                 <thead>
                   <tr>
-                    <th style="padding: 6px; border: 1px solid #000; width: 33%;">«Продавец»</th>
-                    <th style="padding: 6px; border: 1px solid #000; width: 33%;">«Покупатель»</th>
-                    <th style="padding: 6px; border: 1px solid #000; width: 34%;">«Поручитель»</th>
+                    <th style="padding: 5px; border: 1px solid #000; width: 33%;">«Продавец»</th>
+                    <th style="padding: 5px; border: 1px solid #000; width: 33%;">«Покупатель»</th>
+                    <th style="padding: 5px; border: 1px solid #000; width: 34%;">«Поручитель»</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td style="padding: 20px 6px; border: 1px solid #000; vertical-align: bottom;">
-                      <div style="border-top: 1px solid #000; width: 65%; margin: 0 auto; padding-top: 3px;">______</div>
+                    <td style="padding: 18px 5px; border: 1px solid #000; vertical-align: bottom;">
+                      <div style="border-top: 1px solid #000; width: 60%; margin: 0 auto; padding-top: 3px;">______</div>
                     </td>
-                    <td style="padding: 20px 6px; border: 1px solid #000; vertical-align: bottom;">
-                      <div style="border-top: 1px solid #000; width: 65%; margin: 0 auto; padding-top: 3px;">______</div>
+                    <td style="padding: 18px 5px; border: 1px solid #000; vertical-align: bottom;">
+                      <div style="border-top: 1px solid #000; width: 60%; margin: 0 auto; padding-top: 3px;">______</div>
                       <div style="font-size: 9px; margin-top: 2px; color: #555;">${contract.fio || ''}</div>
                     </td>
-                    <td style="padding: 20px 6px; border: 1px solid #000; vertical-align: bottom;">
-                      <div style="border-top: 1px solid #000; width: 65%; margin: 0 auto; padding-top: 3px;">______</div>
+                    <td style="padding: 18px 5px; border: 1px solid #000; vertical-align: bottom;">
+                      <div style="border-top: 1px solid #000; width: 60%; margin: 0 auto; padding-top: 3px;">______</div>
                       <div style="font-size: 9px; margin-top: 2px; color: #555;">${contract.guarantorFio || ''}</div>
                     </td>
                   </tr>
@@ -1268,77 +1385,184 @@
       `;
     }
 
-    // ================= ОТПРАВКА ЧЕРЕЗ WHATSAPP В PDF =================
-    
-    function sendContractWhatsApp() {
+    // ================================================================
+    // ФУНКЦИЯ ПЕЧАТИ
+    // ================================================================
+
+    function printContract() {
       const select = document.getElementById('printContractSelect');
-      const contractId = select.value;
-      
-      if (!contractId) {
-        alert('Пожалуйста, выберите договор для отправки');
+      if (!select.value) {
+        alert('Пожалуйста, выберите договор для печати');
         return;
       }
-      
-      const contract = allContracts.find(c => c.id === contractId);
-      if (!contract) {
-        alert('Договор не найден');
-        return;
-      }
-      
-      // Показываем загрузку
+      window.print();
+    }
+
+    // ================================================================
+    // ФУНКЦИИ ДЛЯ СОЗДАНИЯ PDF И ОТПРАВКИ
+    // ================================================================
+
+    function showLoading() {
       const overlay = document.createElement('div');
       overlay.className = 'loading-overlay';
+      overlay.id = 'loadingOverlay';
       overlay.innerHTML = `
-        <div class="content">
-          <div class="icon">⏳</div>
-          <div class="title">Создание PDF...</div>
-          <div class="sub">Пожалуйста, подождите</div>
+        <div class="loader-content">
+          <div class="spinner"></div>
+          <div style="font-size: 18px;">Создание документа...</div>
+          <div style="font-size: 13px; color: #aaa; margin-top: 6px;">Пожалуйста, подождите</div>
         </div>
       `;
       document.body.appendChild(overlay);
-      
-      const printContent = document.getElementById('printContent');
-      
-      html2canvas(printContent, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: '#ffffff',
-        width: printContent.scrollWidth,
-        height: printContent.scrollHeight,
-        windowWidth: printContent.scrollWidth,
-        windowHeight: printContent.scrollHeight
-      }).then(canvas => {
-        overlay.remove();
+    }
+
+    function hideLoading() {
+      const overlay = document.getElementById('loadingOverlay');
+      if (overlay) overlay.remove();
+    }
+
+    function generateContractPDF() {
+      return new Promise((resolve, reject) => {
+        const printContent = document.getElementById('printContent');
+        const select = document.getElementById('printContractSelect');
         
-        const { jsPDF } = window.jspdf;
-        const imgData = canvas.toDataURL('image/jpeg', 0.95);
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-        const pageHeight = pdf.internal.pageSize.getHeight();
-        
-        let heightLeft = pdfHeight;
-        let position = 0;
-        
-        pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, pdfHeight);
-        heightLeft -= pageHeight;
-        
-        while (heightLeft > 0) {
-          position = heightLeft - pdfHeight;
-          pdf.addPage();
-          pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, pdfHeight);
-          heightLeft -= pageHeight;
+        if (!select.value) {
+          reject('Выберите договор');
+          return;
         }
         
+        // Проверяем, загружен ли договор
+        if (printContent.querySelector('.text-center.text-gray-400')) {
+          reject('Сначала выберите договор');
+          return;
+        }
+        
+        // Создаем временный контейнер для точной печати
+        const tempContainer = document.createElement('div');
+        tempContainer.style.position = 'absolute';
+        tempContainer.style.left = '-9999px';
+        tempContainer.style.top = '0';
+        tempContainer.style.width = '210mm';
+        tempContainer.style.background = 'white';
+        tempContainer.style.padding = '10px';
+        tempContainer.innerHTML = printContent.innerHTML;
+        document.body.appendChild(tempContainer);
+        
+        // Используем html2canvas
+        html2canvas(tempContainer, {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#ffffff',
+          width: tempContainer.scrollWidth,
+          height: tempContainer.scrollHeight,
+          windowWidth: tempContainer.scrollWidth,
+          windowHeight: tempContainer.scrollHeight
+        }).then(canvas => {
+          document.body.removeChild(tempContainer);
+          
+          const { jsPDF } = window.jspdf;
+          const imgData = canvas.toDataURL('image/jpeg', 0.95);
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+          
+          let heightLeft = pdfHeight;
+          let position = 0;
+          const pageHeight = pdf.internal.pageSize.getHeight();
+          
+          pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, pdfHeight);
+          heightLeft -= pageHeight;
+          
+          while (heightLeft > 0) {
+            position = heightLeft - pdfHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, pdfHeight);
+            heightLeft -= pageHeight;
+          }
+          
+          resolve(pdf);
+        }).catch(error => {
+          document.body.removeChild(tempContainer);
+          reject(error);
+        });
+      });
+    }
+
+    async function downloadContractPDF() {
+      try {
+        showLoading();
+        const pdf = await generateContractPDF();
+        const contract = getSelectedContract();
+        const fileName = `Договор_№${contract.contractNum}_${contract.fio}.pdf`;
+        pdf.save(fileName);
+        hideLoading();
+        showCopyNotification(`✅ PDF скачан: ${fileName}`);
+      } catch (error) {
+        hideLoading();
+        alert('Ошибка: ' + error);
+      }
+    }
+
+    function getSelectedContract() {
+      const select = document.getElementById('printContractSelect');
+      const contractId = select.value;
+      return allContracts.find(c => c.id === contractId);
+    }
+
+    async function sendContractToWhatsApp() {
+      const contract = getSelectedContract();
+      if (!contract) {
+        alert('Пожалуйста, выберите договор');
+        return;
+      }
+      
+      try {
+        showLoading();
+        const pdf = await generateContractPDF();
         const pdfBlob = pdf.output('blob');
-        const pdfFile = new File([pdfBlob], `Договор_№${contract.contractNum}_${contract.fio}.pdf`, { type: 'application/pdf' });
+        const file = new File([pdfBlob], `Договор_№${contract.contractNum}_${contract.fio}.pdf`, { type: 'application/pdf' });
         
         const phone = contract.phone.replace(/[^0-9]/g, '');
-        const message = `Здравствуйте! Отправляю Вам договор №${contract.contractNum} на рассрочку.`;
-        const url = `https://wa.me/7${phone}?text=${encodeURIComponent(message)}`;
+        const message = `Добрый день! Отправляю Вам договор №${contract.contractNum} на рассрочку.`;
         
-        window.open(url, '_blank');
+        // Открываем WhatsApp
+        const waUrl = `https://wa.me/7${phone}?text=${encodeURIComponent(message)}`;
+        window.open(waUrl, '_blank');
+        
+        // Скачиваем PDF как запасной вариант
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(pdfBlob);
+        link.download = `Договор_№${contract.contractNum}_${contract.fio}.pdf`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+        
+        hideLoading();
+        showCopyNotification(`✅ Договор №${contract.contractNum} отправлен в WhatsApp!`);
+      } catch (error) {
+        hideLoading();
+        alert('Ошибка: ' + error);
+      }
+    }
+
+    async function sendContractToTelegram() {
+      const contract = getSelectedContract();
+      if (!contract) {
+        alert('Пожалуйста, выберите договор');
+        return;
+      }
+      
+      try {
+        showLoading();
+        const pdf = await generateContractPDF();
+        const pdfBlob = pdf.output('blob');
+        
+        const phone = contract.phone.replace(/[^0-9]/g, '');
+        const message = `Добрый день! Отправляю Вам договор №${contract.contractNum} на рассрочку.`;
+        
+        // Открываем Telegram
+        const tgUrl = `https://t.me/${phone}?text=${encodeURIComponent(message)}`;
+        window.open(tgUrl, '_blank');
         
         const link = document.createElement('a');
         link.href = URL.createObjectURL(pdfBlob);
@@ -1346,15 +1570,52 @@
         link.click();
         URL.revokeObjectURL(link.href);
         
-        showCopyNotification(`✅ Договор №${contract.contractNum} отправлен в WhatsApp и скачан как PDF!`);
-        
-      }).catch(error => {
-        overlay.remove();
-        console.error('Ошибка создания PDF:', error);
-        alert('Произошла ошибка при создании PDF. Попробуйте использовать кнопку "Печать" и сохранить как PDF.');
-      });
+        hideLoading();
+        showCopyNotification(`✅ Договор №${contract.contractNum} отправлен в Telegram!`);
+      } catch (error) {
+        hideLoading();
+        alert('Ошибка: ' + error);
+      }
     }
 
+    async function sendContractToViber() {
+      const contract = getSelectedContract();
+      if (!contract) {
+        alert('Пожалуйста, выберите договор');
+        return;
+      }
+      
+      try {
+        showLoading();
+        const pdf = await generateContractPDF();
+        const pdfBlob = pdf.output('blob');
+        
+        const phone = contract.phone.replace(/[^0-9]/g, '');
+        const message = `Добрый день! Отправляю Вам договор №${contract.contractNum} на рассрочку.`;
+        
+        // Открываем Viber
+        const viberUrl = `viber://chat?number=7${phone}`;
+        window.open(viberUrl, '_blank');
+        
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(pdfBlob);
+        link.download = `Договор_№${contract.contractNum}_${contract.fio}.pdf`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+        
+        hideLoading();
+        showCopyNotification(`✅ Договор №${contract.contractNum} отправлен в Viber!`);
+      } catch (error) {
+        hideLoading();
+        alert('Ошибка: ' + error);
+      }
+    }
+
+    // ================================================================
+    // ОСТАЛЬНЫЕ ФУНКЦИИ (БЕЗ ИЗМЕНЕНИЙ)
+    // ================================================================
+
+    // Функция для преобразования чисел в слова (прописи)
     function numberToWords(num) {
       if (!num || num === 0) return 'ноль';
       
@@ -1393,16 +1654,7 @@
       return getWords(num);
     }
 
-    function printContract() {
-      const select = document.getElementById('printContractSelect');
-      if (!select.value) {
-        alert('Пожалуйста, выберите договор для печати');
-        return;
-      }
-      window.print();
-    }
-
-    // ================= ФУНКЦИИ ДЛЯ ЛИСТА ПАРТНЁРЫ =================
+    // ===== ФУНКЦИИ ДЛЯ ЛИСТА ПАРТНЁРЫ =====
     
     function renderPartners() {
       const container = document.getElementById('partnersList');
@@ -1552,7 +1804,7 @@
       renderPartners();
     }
 
-    // ================= ФУНКЦИИ ДЛЯ ОСТАЛЬНЫХ ЛИСТОВ =================
+    // ===== ФУНКЦИИ ДЛЯ ОСТАЛЬНЫХ ЛИСТОВ =====
     
     function getMonthStatus(contract) {
       const months = contract.monthsCount || 0;
@@ -1730,6 +1982,8 @@
       renderClientList('debtorsClientsList', clients, 'Нет клиентов с просрочкой', '');
     }
 
+    // ===== ФУНКЦИИ ДЛЯ WHATSAPP =====
+    
     function showCopyNotification(message) {
       const notification = document.createElement('div');
       notification.className = 'copy-notification';
@@ -1879,8 +2133,10 @@
       window.open(url, '_blank');
     }
 
-    // ================= ОСТАЛЬНЫЕ ФУНКЦИИ =================
-    
+    // ================================================================
+    // ОСНОВНЫЕ ФУНКЦИИ РАБОТЫ С ДАННЫМИ
+    // ================================================================
+
     function validateFinance() {
       const months = Number(document.getElementById('monthsCount').value) || 0;
       const monthly = Number(document.getElementById('monthlyPay').value) || 0;
