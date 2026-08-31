@@ -6,6 +6,7 @@
   <title>Система Учета и Договоров</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    /* --- Ваши стили --- */
     .row-error { background-color: #fee2e2 !important; }
     .pay-paid { background-color: #22c55e; color: white; font-weight: bold; cursor: pointer; }
     .btn-history-active { background-color: #f59e0b !important; color: white !important; cursor: pointer !important; }
@@ -197,7 +198,6 @@
       margin: 10px 0;
     }
 
-    /* Таблица месяцев */
     .months-table {
       width: 100%;
       border-collapse: collapse;
@@ -219,7 +219,6 @@
     .month-paid-cell { color: #22c55e; font-weight: bold; }
     .month-unpaid-cell { color: #ef4444; font-weight: bold; }
 
-    /* Блоки покупателя и поручителя */
     .person-block {
       border: 1px solid #000;
       padding: 6px 10px;
@@ -240,7 +239,6 @@
       grid-column: span 2;
     }
 
-    /* Блок продавца */
     .seller-block {
       display: flex;
       justify-content: space-between;
@@ -249,12 +247,8 @@
     }
 
     @media print {
-      body * {
-        visibility: hidden;
-      }
-      #printContent, #printContent * {
-        visibility: visible;
-      }
+      body * { visibility: hidden; }
+      #printContent, #printContent * { visibility: visible; }
       #printContent {
         position: absolute;
         left: 0;
@@ -264,27 +258,12 @@
         margin: 0;
         background: white;
       }
-      .no-print {
-        display: none !important;
-      }
-      .print-contract {
-        padding: 12px 20px;
-        font-size: 10px;
-      }
-      .print-contract .page-break {
-        border-bottom: none;
-        page-break-after: always;
-        margin: 0;
-      }
-      .print-contract .signature-line {
-        width: 100px;
-      }
-      .print-contract h1 {
-        font-size: 14px;
-      }
-      .print-contract .section-title {
-        font-size: 12px;
-      }
+      .no-print { display: none !important; }
+      .print-contract { padding: 12px 20px; font-size: 10px; }
+      .print-contract .page-break { border-bottom: none; page-break-after: always; margin: 0; }
+      .print-contract .signature-line { width: 100px; }
+      .print-contract h1 { font-size: 14px; }
+      .print-contract .section-title { font-size: 12px; }
     }
 
     .copy-notification {
@@ -653,12 +632,11 @@
           <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div>
               <label class="block text-[9px] font-bold text-blue-800 uppercase mb-1">Дата покупки</label>
-              <input type="date" id="buyDate" required onchange="calculateFirstPaymentDate()" class="p-2 border rounded w-full">
+              <input type="date" id="buyDate" required class="p-2 border rounded w-full">
             </div>
             <div>
-              <label class="block text-[9px] font-bold text-blue-800 uppercase mb-1">Дата первого платежа</label>
+              <label class="block text-[9px] font-bold text-blue-800 uppercase mb-1">График платежа</label>
               <input type="date" id="payDate" required class="p-2 border rounded w-full">
-              <span class="text-[8px] text-slate-500">Автоматически: то же число, следующий месяц</span>
             </div>
             <div>
               <label class="block text-[9px] font-bold text-blue-800 uppercase mb-1">Срок (мес.) *</label>
@@ -818,6 +796,7 @@
     let allTaken = JSON.parse(localStorage.getItem('taken_db') || '[]');
     let customAccounts = JSON.parse(localStorage.getItem('accounts_db') || 'null');
 
+    // Инициализация счетов по умолчанию
     if (!customAccounts) {
       const defaultNames = ['N', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12', 'T13', 'T14', 'T15', 'T16', 'B1', 'B2', 'B3', 'B4'];
       customAccounts = defaultNames.map(name => ({
@@ -834,60 +813,6 @@
     let activeTab = 'contracts';
     let undoStack = [];
     let redoStack = [];
-
-    // ================================================================
-    // ФУНКЦИЯ АВТОМАТИЧЕСКОГО РАСЧЕТА ДАТЫ ПЛАТЕЖА
-    // ================================================================
-
-    function calculateFirstPaymentDate() {
-      const buyDateInput = document.getElementById('buyDate');
-      const payDateInput = document.getElementById('payDate');
-      
-      // Если поле payDate уже заполнено вручную, не трогаем его
-      if (payDateInput.value && document.activeElement !== buyDateInput) {
-        return;
-      }
-      
-      if (!buyDateInput.value) {
-        if (!payDateInput.value) {
-          payDateInput.value = '';
-        }
-        return;
-      }
-      
-      // Парсим дату покупки
-      const buyDate = new Date(buyDateInput.value);
-      const day = buyDate.getDate();
-      const month = buyDate.getMonth();
-      const year = buyDate.getFullYear();
-      
-      // Переходим на следующий месяц
-      let nextMonth = month + 1;
-      let nextYear = year;
-      if (nextMonth > 11) {
-        nextMonth = 0;
-        nextYear = year + 1;
-      }
-      
-      // Получаем последний день следующего месяца
-      const lastDayOfNextMonth = new Date(nextYear, nextMonth + 1, 0).getDate();
-      
-      // Берем минимальное из (день покупки, последний день следующего месяца)
-      const targetDay = Math.min(day, lastDayOfNextMonth);
-      
-      // Формируем дату
-      const payDate = new Date(nextYear, nextMonth, targetDay);
-      
-      // Форматируем в YYYY-MM-DD
-      const formattedYear = payDate.getFullYear();
-      const formattedMonth = String(payDate.getMonth() + 1).padStart(2, '0');
-      const formattedDay = String(payDate.getDate()).padStart(2, '0');
-      
-      payDateInput.value = `${formattedYear}-${formattedMonth}-${formattedDay}`;
-      
-      // Запускаем валидацию
-      validateFinance();
-    }
 
     // ================================================================
     // ФУНКЦИИ ПЕРЕКЛЮЧЕНИЯ ВКЛАДОК И ИСТОРИИ
@@ -976,6 +901,7 @@
       handleSearch();
     }
 
+    // --- Функции истории ---
     function saveState() {
       const stateSnapshot = {
         contracts: JSON.parse(JSON.stringify(allContracts)),
@@ -1075,6 +1001,87 @@
     }
 
     // ================================================================
+    // УНИВЕРСАЛЬНАЯ ФУНКЦИЯ РАСЧЕТА ПОКАЗАТЕЛЕЙ ПО ДОГОВОРУ
+    // ================================================================
+    
+    function calculateContractMetrics(contract) {
+      const totalCost = Number(contract.totalCost) || 0;
+      const downPayment = Number(contract.downPayment) || 0;
+      const monthlyPay = Number(contract.monthlyPay) || 0;
+      const installments = contract.installments || {};
+      
+      let totalPaid = 0;
+      let paidCount = 0;
+      let lastPaymentDate = null;
+      
+      for (const key in installments) {
+        const payment = installments[key];
+        const amount = Number(payment.amount) || 0;
+        totalPaid += amount;
+        paidCount++;
+        if (payment.date) {
+          try {
+            const d = new Date(payment.date);
+            if (!isNaN(d.getTime())) {
+              if (!lastPaymentDate || d > lastPaymentDate) lastPaymentDate = d;
+            }
+          } catch (e) {}
+        }
+      }
+      
+      const rest = totalCost - downPayment - totalPaid;
+      const totalPayable = totalCost - downPayment;
+      const paidPercentage = totalPayable > 0 ? (totalPaid / totalPayable) * 100 : 0;
+      const isClosed = rest <= 0;
+      
+      // Расчет просрочки
+      let overdueSum = 0;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      if (contract.payDate && contract.monthsCount && !isClosed) {
+        try {
+          const payDateObj = new Date(contract.payDate);
+          if (!isNaN(payDateObj.getTime())) {
+            const payDay = payDateObj.getDate();
+            const startDate = contract.buyDate ? new Date(contract.buyDate) : new Date(contract.payDate);
+            if (!isNaN(startDate.getTime())) {
+              startDate.setHours(0, 0, 0, 0);
+              const monthsCount = Number(contract.monthsCount) || 0;
+              for (let i = 1; i <= monthsCount; i++) {
+                const payDate = new Date(startDate);
+                payDate.setMonth(payDate.getMonth() + (i - 1));
+                const maxDay = new Date(payDate.getFullYear(), payDate.getMonth() + 1, 0).getDate();
+                const targetDay = Math.min(payDay, maxDay);
+                payDate.setDate(targetDay);
+                payDate.setHours(0, 0, 0, 0);
+                
+                const payment = installments[i];
+                const isPaid = !!payment && Number(payment.amount) > 0;
+                
+                if (!isPaid && payDate < today) {
+                  overdueSum += monthlyPay;
+                }
+              }
+            }
+          }
+        } catch (e) {
+          console.warn('Ошибка расчета просрочки для договора', contract.id);
+        }
+      }
+      
+      return {
+        rest: Math.max(0, rest),
+        totalPaid,
+        paidCount,
+        lastPaymentDate,
+        paidPercentage,
+        isClosed,
+        overdueSum
+      };
+    }
+
+    // ================================================================
     // ФУНКЦИЯ ЗАГРУЗКИ ДОГОВОРА ДЛЯ ПЕЧАТИ
     // ================================================================
 
@@ -1090,7 +1097,7 @@
         select.appendChild(option);
       });
       
-      if (currentValue) {
+      if (currentValue && [...select.options].some(o => o.value === currentValue)) {
         select.value = currentValue;
       }
     }
@@ -1115,7 +1122,6 @@
       const monthInfo = getMonthStatus(contract);
       const months = monthInfo.months;
       
-      // Таблица месяцев СВЕРХУ ВНИЗ (1, 2, 3...)
       let monthsHtml = '';
       for (let i = 0; i < months.length; i++) {
         const m = months[i];
@@ -1573,43 +1579,41 @@
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       
-      // Получаем дату из payDate
       const payDateStr = contract.payDate;
       if (!payDateStr) {
         return { months: [], overdueSum: 0 };
       }
       
-      // Парсим payDate - это ДЕНЬ МЕСЯЦА (число), когда должен быть платеж
       const payDateObj = new Date(payDateStr);
-      const payDay = payDateObj.getDate(); // число месяца (1-31)
+      if (isNaN(payDateObj.getTime())) {
+        return { months: [], overdueSum: 0 };
+      }
       
-      // Получаем дату покупки для определения первого месяца
+      const payDay = payDateObj.getDate();
+      
       const buyDateStr = contract.buyDate;
       let startDate = new Date(buyDateStr || payDateStr);
+      if (isNaN(startDate.getTime())) {
+        startDate = new Date(payDateStr);
+      }
       startDate.setHours(0, 0, 0, 0);
       
       const result = [];
       let overdueSum = 0;
       
-      // Для каждого месяца с 1 по monthsCount
       for (let i = 1; i <= months; i++) {
-        // Создаем дату: от startDate прибавляем (i-1) месяцев
         const payDate = new Date(startDate);
         payDate.setMonth(payDate.getMonth() + (i - 1));
         
-        // Устанавливаем день месяца = payDay (фиксированное число)
-        // Если в месяце нет такого дня, берем последний день месяца
         const maxDay = new Date(payDate.getFullYear(), payDate.getMonth() + 1, 0).getDate();
         const targetDay = Math.min(payDay, maxDay);
         payDate.setDate(targetDay);
         payDate.setHours(0, 0, 0, 0);
         
-        // Проверяем, есть ли оплата за этот месяц
         const payment = installments[i];
-        const isPaid = !!payment && payment.amount > 0;
-        const paidAmount = isPaid ? payment.amount : 0;
+        const isPaid = !!payment && Number(payment.amount) > 0;
+        const paidAmount = isPaid ? Number(payment.amount) : 0;
         
-        // Определяем статус
         let status = 'future';
         if (isPaid) {
           status = 'paid';
@@ -1624,7 +1628,7 @@
           status: status,
           amount: isPaid ? paidAmount : monthlyPay,
           isPaid: isPaid,
-          payDateObj: payDate // сохраняем объект даты для сравнения
+          payDateObj: payDate
         });
       }
       
@@ -1635,57 +1639,44 @@
     // ФУНКЦИИ ДЛЯ ЛИСТОВ "СЕГОДНЯ" И "3 ДНЯ"
     // ================================================================
     
-    function getClientsForDate(targetDate) {
+    function getClientsForDate(targetDateStr) {
       const result = [];
-      const target = new Date(targetDate);
+      const target = new Date(targetDateStr);
+      if (isNaN(target.getTime())) return result;
       target.setHours(0, 0, 0, 0);
       
       allContracts.forEach(contract => {
-        // Проверяем только активные договоры (с остатком > 0)
-        const insts = contract.installments || {};
-        let totalPaid = 0;
-        Object.values(insts).forEach(p => totalPaid += Number(p.amount));
-        const rest = contract.totalCost - (contract.downPayment || 0) - totalPaid;
+        const metrics = calculateContractMetrics(contract);
+        if (metrics.isClosed) return;
         
-        if (rest <= 0) return; // Пропускаем закрытые договоры
-        
-        // Получаем все месяцы и их статусы
         const monthInfo = getMonthStatus(contract);
         const months = monthInfo.months;
         
-        // Проверяем, есть ли НЕОПЛАЧЕННЫЙ месяц с датой, равной targetDate
         let hasUnpaidMonth = false;
         let unpaidMonthAmount = 0;
         
         for (let i = 0; i < months.length; i++) {
           const m = months[i];
           if (!m.isPaid) {
-            // Сравниваем даты (только день, месяц, год)
             const payDate = new Date(m.date);
-            payDate.setHours(0, 0, 0, 0);
-            if (payDate.getTime() === target.getTime()) {
-              hasUnpaidMonth = true;
-              unpaidMonthAmount = m.amount;
-              break;
+            if (!isNaN(payDate.getTime())) {
+              payDate.setHours(0, 0, 0, 0);
+              if (payDate.getTime() === target.getTime()) {
+                hasUnpaidMonth = true;
+                unpaidMonthAmount = m.amount;
+                break;
+              }
             }
           }
         }
         
         if (hasUnpaidMonth) {
-          // Пересчитываем просрочку для этого клиента
-          let clientOverdue = 0;
-          months.forEach(m => {
-            if (m.status === 'overdue' && !m.isPaid) {
-              clientOverdue += m.amount;
-            }
-          });
-          
           result.push({
             ...contract,
-            rest: rest,
+            rest: metrics.rest,
             phone: contract.phone || '',
             fio: contract.fio || '',
-            monthInfo: { months: months, overdueSum: clientOverdue },
+            monthInfo: { months: months, overdueSum: metrics.overdueSum },
             unpaidMonthAmount: unpaidMonthAmount
           });
         }
@@ -1707,7 +1698,6 @@
         let monthsHtml = '';
         let overdueSum = 0;
         
-        // Показываем ТОЛЬКО те месяцы, которые есть у клиента (до monthsCount)
         monthInfo.months.forEach(m => {
           let statusClass = 'month-future';
           let statusText = '⏳ Ожидает';
@@ -1725,6 +1715,7 @@
         });
         
         const clientOverdue = overdueSum || monthInfo.overdueSum || 0;
+        const rest = client.rest || calculateContractMetrics(client).rest;
         
         html += `
           <div class="client-item">
@@ -1732,11 +1723,11 @@
               <span class="client-name">${client.fio}</span>
               <span class="client-phone">📞 ${client.phone}</span>
               <span class="client-detail">💰 Мес. платеж: ${client.monthlyPay} ₽</span>
-              <span class="client-detail">📅 ${dateStr || ''}</span>
+              ${dateStr ? `<span class="client-detail">📅 ${dateStr}</span>` : ''}
             </div>
             <div class="flex flex-wrap items-center gap-2">
               <span class="client-overdue">Просрочка: ${clientOverdue.toLocaleString('ru-RU')} ₽</span>
-              <span class="client-rest">Остаток: ${client.rest.toLocaleString('ru-RU')} ₽</span>
+              <span class="client-rest">Остаток: ${rest.toLocaleString('ru-RU')} ₽</span>
               <a href="https://wa.me/7${client.phone.replace(/[^0-9]/g, '')}?text=Здравствуйте! Напоминаем о платеже." 
                  target="_blank" 
                  class="text-green-600 hover:text-green-800 font-bold text-sm">
@@ -1776,34 +1767,21 @@
 
     function getDebtors() {
       const result = [];
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
       
       allContracts.forEach(contract => {
-        const insts = contract.installments || {};
-        let totalPaid = 0;
-        Object.values(insts).forEach(p => totalPaid += Number(p.amount));
-        const rest = contract.totalCost - (contract.downPayment || 0) - totalPaid;
-        
-        if (rest <= 0) return;
+        const metrics = calculateContractMetrics(contract);
+        if (metrics.isClosed) return;
         
         const monthInfo = getMonthStatus(contract);
         const hasOverdue = monthInfo.months.some(m => m.status === 'overdue' && !m.isPaid);
         
         if (hasOverdue) {
-          let clientOverdue = 0;
-          monthInfo.months.forEach(m => {
-            if (m.status === 'overdue' && !m.isPaid) {
-              clientOverdue += m.amount;
-            }
-          });
-          
           result.push({
             ...contract,
-            rest: rest,
+            rest: metrics.rest,
             phone: contract.phone || '',
             fio: contract.fio || '',
-            monthInfo: { months: monthInfo.months, overdueSum: clientOverdue }
+            monthInfo: { months: monthInfo.months, overdueSum: metrics.overdueSum }
           });
         }
       });
@@ -2008,13 +1986,6 @@
       document.getElementById('editDocId').value = '';
       document.getElementById('modalTitle').innerText = 'Оформление нового договора';
       document.getElementById('downPayment').value = 0;
-      
-      // Устанавливаем сегодняшнюю дату покупки и автоматически рассчитываем дату платежа
-      const today = new Date();
-      const todayStr = today.toISOString().slice(0, 10);
-      document.getElementById('buyDate').value = todayStr;
-      calculateFirstPaymentDate();
-      
       validateFinance();
       modal.classList.remove('hidden');
     }
@@ -2082,9 +2053,24 @@
         guarantorPhone: document.getElementById('guarantorPhone').value || ''
       };
 
+      // Автоматическая установка shopPaid, если остаток 0
+      const totalCost = formData.totalCost;
+      const downPayment = formData.downPayment;
+      const installments = editId ? (allContracts.find(c => c.id === editId)?.installments || {}) : {};
+      let totalPaid = 0;
+      Object.values(installments).forEach(p => totalPaid += Number(p.amount));
+      const rest = totalCost - downPayment - totalPaid;
+      if (rest <= 0) {
+        formData.shopPaid = true;
+      }
+
       if (editId) {
         const index = allContracts.findIndex(c => c.id === editId);
-        if (index !== -1) allContracts[index] = { ...allContracts[index], ...formData };
+        if (index !== -1) {
+          allContracts[index] = { ...allContracts[index], ...formData };
+          // Сохраняем существующие installments
+          if (!allContracts[index].installments) allContracts[index].installments = {};
+        }
       } else {
         const maxNum = allContracts.reduce((max, c) => (c.contractNum > max ? c.contractNum : max), 0);
         allContracts.push({
@@ -2122,6 +2108,13 @@
         amount: Number(document.getElementById('payAmount').value), 
         date: inputDateVal 
       };
+      
+      // Проверяем, закрыт ли договор
+      const metrics = calculateContractMetrics(contract);
+      if (metrics.isClosed) {
+        contract.shopPaid = true;
+      }
+      
       saveToStorage();
       closePayModal();
       document.getElementById('payForm').reset();
@@ -2136,6 +2129,8 @@
         if (confirm(`Удалить ${idx}-й взнос на сумму ${contract.installments[idx].amount} ₽?`)) {
           saveState();
           delete contract.installments[idx];
+          // Возможно, договор снова стал активным
+          contract.shopPaid = false;
           saveToStorage();
           closePayModal();
           document.getElementById('payForm').reset();
@@ -2168,7 +2163,7 @@
     function copyHistory(id, btn) {
       const c = allContracts.find(i => i.id === id);
       let log = `Договор №${c.contractNum}\nФИО: ${c.fio}\n\nОплаты:\n`;
-      Object.keys(c.installments || {}).sort((a,b)=>a-b).forEach(k => {
+      Object.keys(c.installments || {}).sort((a,b)=>Number(a)-Number(b)).forEach(k => {
         log += `${k}-й: ${c.installments[k].amount}₽ (${c.installments[k].date})\n`;
       });
       copyToClip(log, btn);
@@ -2182,14 +2177,15 @@
     function renderTable(contracts) {
       const tbody = document.getElementById('contractsTable');
       tbody.innerHTML = '';
+      
       contracts.forEach(item => {
+        const metrics = calculateContractMetrics(item);
+        const rest = metrics.rest;
+        const overdueSum = metrics.overdueSum;
         const insts = item.installments || {};
-        let totalPaid = 0;
-        Object.values(insts).forEach(p => totalPaid += Number(p.amount));
-        const rest = item.totalCost - (item.downPayment || 0) - totalPaid;
         
         const tr = document.createElement('tr');
-        if (item.costPrice > item.totalCost) tr.className = 'row-error';
+        if (Number(item.costPrice) > Number(item.totalCost)) tr.className = 'row-error';
         
         let instHtml = '';
         for(let i=1; i<=15; i++) {
@@ -2203,8 +2199,8 @@
           <td class="p-2 border-r text-[10px]">${item.buyDate}<br><b class="text-blue-600">${item.payDate}</b></td>
           <td class="p-2 border-r font-bold text-center">${item.monthlyPay}</td>
           ${instHtml}
-          <td class="p-2 border-r text-red-600 font-bold text-center">0</td>
-          <td class="p-2 border-r font-bold text-center ${rest <= 0 ? 'text-green-600' : 'text-orange-600'}">${rest}</td>
+          <td class="p-2 border-r text-red-600 font-bold text-center">${overdueSum > 0 ? overdueSum.toLocaleString('ru-RU') : 0}</td>
+          <td class="p-2 border-r font-bold text-center ${rest <= 0 ? 'text-green-600' : 'text-orange-600'}">${rest.toLocaleString('ru-RU')}</td>
           <td class="p-2 border-r text-[10px] text-center">${item.totalCost} / ${item.downPayment}</td>
           <td class="p-2 border-r text-center">${item.costPrice}</td>
           <td class="p-2 border-r text-center font-black ${item.shopPaid ? 'text-green-600' : 'text-gray-300'}">${item.shopPaid ? 'Д' : '—'}</td>
@@ -2469,26 +2465,22 @@
       let factTodayCount = 0;
 
       allContracts.forEach(c => {
+        const metrics = calculateContractMetrics(c);
+        if (metrics.isClosed) {
+          closedContracts++;
+        } else {
+          activeContracts++;
+        }
+        
         const insts = c.installments || {};
-        let paidSum = 0;
         let hasPaidToday = false;
-
         Object.values(insts).forEach(p => {
-          paidSum += Number(p.amount);
           if (p.date === todayStr) {
             factTodaySum += Number(p.amount);
             hasPaidToday = true;
           }
         });
-
         if (hasPaidToday) factTodayCount++;
-
-        const rest = c.totalCost - (c.downPayment || 0) - paidSum;
-        if (rest <= 0) {
-          closedContracts++;
-        } else {
-          activeContracts++;
-        }
 
         if (c.payDate === todayStr) {
           planTodaySum += Number(c.monthlyPay || 0);
@@ -2526,17 +2518,19 @@
             accBalance += (inc - exp);
 
             if (a.date) {
-              const d = new Date(a.date);
-              if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
-                if (inc > 0) {
-                  incCountMonth++;
-                  incSumMonth += inc;
+              try {
+                const d = new Date(a.date);
+                if (!isNaN(d.getTime()) && d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
+                  if (inc > 0) {
+                    incCountMonth++;
+                    incSumMonth += inc;
+                  }
+                  if (exp > 0) {
+                    expCountMonth++;
+                    expSumMonth += exp;
+                  }
                 }
-                if (exp > 0) {
-                  expCountMonth++;
-                  expSumMonth += exp;
-                }
-              }
+              } catch (e) {}
             }
           }
         });
@@ -2636,7 +2630,7 @@
             }
             saveToStorage();
           }
-        } catch { alert("Ошибка при чтении файла!"); }
+        } catch (err) { alert("Ошибка при чтении файла: " + err.message); }
       };
       reader.readAsText(file);
     }
@@ -2646,11 +2640,10 @@
       if (e.ctrlKey && (e.key === 'y' || e.key === 'н')) { e.preventDefault(); redo(); }
     });
 
-    // Инициализация
     renderTable(allContracts);
     renderAccountingTable(allAccounting);
     renderTakenSheet();
     updateHistoryButtons();
   </script>
 </body>
-</html>
+  </html>
