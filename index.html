@@ -1518,39 +1518,43 @@
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       
-      // Парсим дату payDate
+      // Получаем дату из payDate
       const payDateStr = contract.payDate;
       if (!payDateStr) {
         return { months: [], overdueSum: 0 };
       }
       
-      const firstPayDate = new Date(payDateStr);
-      firstPayDate.setHours(0, 0, 0, 0);
+      // Парсим payDate - это ДЕНЬ МЕСЯЦА (число), когда должен быть платеж
+      const payDateObj = new Date(payDateStr);
+      const payDay = payDateObj.getDate(); // число месяца (1-31)
       
-      // Извлекаем день месяца из payDate
-      const payDay = firstPayDate.getDate();
+      // Получаем дату покупки для определения первого месяца
+      const buyDateStr = contract.buyDate;
+      let startDate = new Date(buyDateStr || payDateStr);
+      startDate.setHours(0, 0, 0, 0);
       
       const result = [];
       let overdueSum = 0;
       
-      // Создаем массив месяцев
+      // Для каждого месяца с 1 по monthsCount
       for (let i = 1; i <= months; i++) {
-        // Базовый месяц: первыйPayDate + i месяцев (НЕ i-1, а i!)
-        // Это значит, что 1-й платеж будет через 1 месяц, а не в текущем
-        const payDate = new Date(firstPayDate);
-        payDate.setMonth(payDate.getMonth() + i);
+        // Создаем дату: от startDate прибавляем (i-1) месяцев
+        const payDate = new Date(startDate);
+        payDate.setMonth(payDate.getMonth() + (i - 1));
         
-        // Устанавливаем день месяца как payDay (фиксированное число)
-        // Если в месяце нет такого числа (например, 31 февраля), берем последний день месяца
-        const maxDay = getDaysInMonth(payDate.getFullYear(), payDate.getMonth());
+        // Устанавливаем день месяца = payDay (фиксированное число)
+        // Если в месяце нет такого дня, берем последний день месяца
+        const maxDay = new Date(payDate.getFullYear(), payDate.getMonth() + 1, 0).getDate();
         const targetDay = Math.min(payDay, maxDay);
         payDate.setDate(targetDay);
         payDate.setHours(0, 0, 0, 0);
         
+        // Проверяем, есть ли оплата за этот месяц
         const payment = installments[i];
         const isPaid = !!payment && payment.amount > 0;
         const paidAmount = isPaid ? payment.amount : 0;
         
+        // Определяем статус
         let status = 'future';
         if (isPaid) {
           status = 'paid';
@@ -1564,16 +1568,12 @@
           date: payDate.toISOString().slice(0, 10),
           status: status,
           amount: isPaid ? paidAmount : monthlyPay,
-          isPaid: isPaid
+          isPaid: isPaid,
+          payDateObj: payDate // сохраняем объект даты для сравнения
         });
       }
       
       return { months: result, overdueSum: overdueSum };
-    }
-
-    // Вспомогательная функция: количество дней в месяце
-    function getDaysInMonth(year, month) {
-      return new Date(year, month + 1, 0).getDate();
     }
 
     // ================================================================
@@ -1605,6 +1605,7 @@
         for (let i = 0; i < months.length; i++) {
           const m = months[i];
           if (!m.isPaid) {
+            // Сравниваем даты (только день, месяц, год)
             const payDate = new Date(m.date);
             payDate.setHours(0, 0, 0, 0);
             if (payDate.getTime() === target.getTime()) {
@@ -1651,6 +1652,7 @@
         let monthsHtml = '';
         let overdueSum = 0;
         
+        // Показываем ТОЛЬКО те месяцы, которые есть у клиента (до monthsCount)
         monthInfo.months.forEach(m => {
           let statusClass = 'month-future';
           let statusText = '⏳ Ожидает';
@@ -2588,4 +2590,4 @@
     updateHistoryButtons();
   </script>
 </body>
-</html>
+  </html>
