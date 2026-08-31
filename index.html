@@ -1508,7 +1508,7 @@
     }
 
     // ================================================================
-    // ОСНОВНАЯ ЛОГИКА МЕСЯЦЕВ (ИСПРАВЛЕННАЯ - БЕЗ СДВИГА)
+    // ОСНОВНАЯ ЛОГИКА МЕСЯЦЕВ (ИСПРАВЛЕННАЯ)
     // ================================================================
     
     function getMonthStatus(contract) {
@@ -1518,7 +1518,7 @@
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       
-      // Парсим дату первого платежа (payDate) - это дата, с которой начинается график
+      // Парсим дату payDate
       const payDateStr = contract.payDate;
       if (!payDateStr) {
         return { months: [], overdueSum: 0 };
@@ -1527,7 +1527,7 @@
       const firstPayDate = new Date(payDateStr);
       firstPayDate.setHours(0, 0, 0, 0);
       
-      // Извлекаем день месяца из payDate (число, которое должно быть днем платежа)
+      // Извлекаем день месяца из payDate
       const payDay = firstPayDate.getDate();
       
       const result = [];
@@ -1535,9 +1535,10 @@
       
       // Создаем массив месяцев
       for (let i = 1; i <= months; i++) {
-        // Базовый месяц: первыйPayDate + (i-1) месяцев
+        // Базовый месяц: первыйPayDate + i месяцев (НЕ i-1, а i!)
+        // Это значит, что 1-й платеж будет через 1 месяц, а не в текущем
         const payDate = new Date(firstPayDate);
-        payDate.setMonth(payDate.getMonth() + (i - 1));
+        payDate.setMonth(payDate.getMonth() + i);
         
         // Устанавливаем день месяца как payDay (фиксированное число)
         // Если в месяце нет такого числа (например, 31 февраля), берем последний день месяца
@@ -2587,4 +2588,4 @@
     updateHistoryButtons();
   </script>
 </body>
-</html>
+        </html>
