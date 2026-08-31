@@ -570,7 +570,7 @@
       </div>
     </div>
 
-    <!-- ================= Лист 8: Распечатка (ТОЛЬКО ПЕЧАТЬ) ================= -->
+    <!-- ================= Лист 8: Распечатка ================= -->
     <div id="printTabContent" class="hidden space-y-4">
       <div class="bg-white shadow-xl rounded-xl p-6 border">
         <div class="flex justify-between items-center mb-4 no-print">
@@ -624,7 +624,7 @@
     </div>
   </div>
 
-  <!-- МОДАЛЬНЫЕ ОКНА (без изменений) -->
+  <!-- МОДАЛЬНЫЕ ОКНА -->
   <div id="modal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-xl p-6 max-w-4xl w-full max-h-[95vh] overflow-y-auto shadow-2xl">
       <h2 id="modalTitle" class="text-xl font-bold mb-4 border-b-2 pb-2 text-blue-700 uppercase tracking-tight">Новый договор</h2>
@@ -809,7 +809,7 @@
 
   <script>
     // ================================================================
-    // ВСЕ СУЩЕСТВУЮЩИЕ ПЕРЕМЕННЫЕ И БАЗОВЫЕ ФУНКЦИИ
+    // ВСЕ ПЕРЕМЕННЫЕ И БАЗОВЫЕ ФУНКЦИИ
     // ================================================================
     
     let allContracts = JSON.parse(localStorage.getItem('contracts_db') || '[]');
@@ -1316,10 +1316,9 @@
     }
 
     // ================================================================
-    // ОСТАЛЬНЫЕ ФУНКЦИИ (БЕЗ ИЗМЕНЕНИЙ)
+    // ОСТАЛЬНЫЕ ФУНКЦИИ
     // ================================================================
 
-    // Функция для преобразования чисел в слова (прописи)
     function numberToWords(num) {
       if (!num || num === 0) return 'ноль';
       
@@ -1508,7 +1507,7 @@
       renderPartners();
     }
 
-    // ===== ОСНОВНАЯ ФУНКЦИЯ СТАТУСА МЕСЯЦЕВ (С ПЕРЕПЛАТОЙ) =====
+    // ===== ОСНОВНАЯ ЛОГИКА МЕСЯЦЕВ (ИСПРАВЛЕННАЯ) =====
     
     function getMonthStatus(contract) {
       const months = contract.monthsCount || 0;
@@ -1517,6 +1516,7 @@
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       
+      // Первая дата платежа - это payDate (график)
       const firstPayDate = new Date(contract.payDate);
       firstPayDate.setHours(0, 0, 0, 0);
       
@@ -1524,13 +1524,14 @@
       let overdueSum = 0;
       let totalPaid = 0;
       
-      // Сначала считаем общую сумму оплат
+      // Считаем все оплаты
       Object.values(installments).forEach(p => {
         totalPaid += Number(p.amount || 0);
       });
       
       // Создаем массив месяцев
       for (let i = 1; i <= months; i++) {
+        // Дата платежа: если i=1, то это payDate, иначе payDate + (i-1) месяцев
         const payDate = new Date(firstPayDate);
         payDate.setMonth(payDate.getMonth() + (i - 1));
         payDate.setHours(0, 0, 0, 0);
@@ -1554,22 +1555,6 @@
           amount: isPaid ? paidAmount : monthlyPay,
           isPaid: isPaid
         });
-      }
-      
-      // Корректируем с учетом переплат
-      let remainingOverpayment = 0;
-      for (let i = 0; i < result.length; i++) {
-        const m = result[i];
-        if (m.isPaid) {
-          // Если оплачено больше, чем должны были
-          const overpay = m.amount - monthlyPay;
-          if (overpay > 0) {
-            remainingOverpayment += overpay;
-          }
-        } else if (remainingOverpayment > 0 && m.status === 'future') {
-          // Если есть переплата, она идет в счет будущих месяцев
-          // Но не показываем как оплаченный, просто статус остается future
-        }
       }
       
       return { months: result, overdueSum: overdueSum };
@@ -1648,7 +1633,6 @@
         let monthsHtml = '';
         let overdueSum = 0;
         
-        // Показываем ТОЛЬКО те месяцы, которые есть у клиента (до monthsCount)
         monthInfo.months.forEach(m => {
           let statusClass = 'month-future';
           let statusText = '⏳ Ожидает';
@@ -1665,7 +1649,6 @@
           monthsHtml += `<span class="month-status ${statusClass}" title="${m.date}">${m.month}-й: ${statusText}</span>`;
         });
         
-        // Сумма просрочки для этого клиента
         const clientOverdue = overdueSum || monthInfo.overdueSum || 0;
         
         html += `
@@ -1733,7 +1716,6 @@
         const hasOverdue = monthInfo.months.some(m => m.status === 'overdue' && !m.isPaid);
         
         if (hasOverdue) {
-          // Пересчитываем просрочку
           let clientOverdue = 0;
           monthInfo.months.forEach(m => {
             if (m.status === 'overdue' && !m.isPaid) {
@@ -2588,4 +2570,4 @@
     updateHistoryButtons();
   </script>
 </body>
-</html>
+  </html>
