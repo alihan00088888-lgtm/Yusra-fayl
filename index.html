@@ -1,8 +1,3 @@
-Отлично! Я вижу, что в вашем коде уже есть лист "Распечатка", но он использует старую версию договора. Я заменю функцию loadContractForPrint() на новую версию с двумя страницами, которые мы с вами разработали.
-
-Вот полный обновленный код с правильной распечаткой на 2 страницы:
-
-```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -148,47 +143,6 @@
       max-width: 210mm;
       margin: 0 auto;
     }
-    .print-contract h1 {
-      font-size: 18px;
-      font-weight: bold;
-      text-align: center;
-      text-transform: uppercase;
-      margin-bottom: 20px;
-    }
-    .print-contract .section-title {
-      font-weight: bold;
-      font-size: 16px;
-      margin-top: 20px;
-      margin-bottom: 10px;
-      text-transform: uppercase;
-      text-decoration: underline;
-    }
-    .print-contract .sub-section {
-      font-weight: bold;
-      margin-top: 15px;
-      margin-bottom: 5px;
-    }
-    .print-contract .list-item {
-      padding-left: 20px;
-      margin-bottom: 3px;
-    }
-    .print-contract .signatures {
-      margin-top: 40px;
-      display: flex;
-      justify-content: space-between;
-    }
-    .print-contract .signature-block {
-      text-align: center;
-      min-width: 150px;
-    }
-    .print-contract .signature-line {
-      border-top: 1px solid black;
-      width: 200px;
-      margin: 30px auto 5px;
-    }
-    .print-contract .signature-label {
-      font-size: 12px;
-    }
     .print-contract .page-break {
       page-break-after: always;
       border-bottom: 2px dashed #ccc;
@@ -222,9 +176,6 @@
         border-bottom: none;
         page-break-after: always;
         margin: 0;
-      }
-      .print-contract .signature-line {
-        width: 150px;
       }
     }
 
@@ -565,7 +516,7 @@
     </div>
   </div>
 
-  <!-- Модальные окна (без изменений) -->
+  <!-- Модальные окна -->
   <div id="modal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-xl p-6 max-w-4xl w-full max-h-[95vh] overflow-y-auto shadow-2xl">
       <h2 id="modalTitle" class="text-xl font-bold mb-4 border-b-2 pb-2 text-blue-700 uppercase tracking-tight">Новый договор</h2>
@@ -952,46 +903,7 @@
       updateHistoryButtons();
     }
 
-    // ================= ФУНКЦИЯ ДЛЯ ПЕРЕВОДА ЧИСЕЛ В СЛОВА =================
-    function numberToWords(num) {
-      if (!num || num === 0) return 'ноль';
-      
-      const units = ['', 'один', 'два', 'три', 'четыре', 'пять', 'шесть', 'семь', 'восемь', 'девять'];
-      const teens = ['десять', 'одиннадцать', 'двенадцать', 'тринадцать', 'четырнадцать', 'пятнадцать', 'шестнадцать', 'семнадцать', 'восемнадцать', 'девятнадцать'];
-      const tens = ['', '', 'двадцать', 'тридцать', 'сорок', 'пятьдесят', 'шестьдесят', 'семьдесят', 'восемьдесят', 'девяносто'];
-      const hundreds = ['', 'сто', 'двести', 'триста', 'четыреста', 'пятьсот', 'шестьсот', 'семьсот', 'восемьсот', 'девятьсот'];
-      
-      function getWords(n) {
-        if (n === 0) return '';
-        if (n < 10) return units[n];
-        if (n < 20) return teens[n - 10];
-        if (n < 100) {
-          const t = Math.floor(n / 10);
-          const u = n % 10;
-          return tens[t] + (u > 0 ? ' ' + units[u] : '');
-        }
-        if (n < 1000) {
-          const h = Math.floor(n / 100);
-          const rest = n % 100;
-          return hundreds[h] + (rest > 0 ? ' ' + getWords(rest) : '');
-        }
-        if (n < 1000000) {
-          const thousands = Math.floor(n / 1000);
-          const rest = n % 1000;
-          let result = '';
-          if (thousands === 1) result = 'одна тысяча';
-          else if (thousands === 2) result = 'две тысячи';
-          else if (thousands < 5) result = getWords(thousands) + ' тысячи';
-          else result = getWords(thousands) + ' тысяч';
-          return result + (rest > 0 ? ' ' + getWords(rest) : '');
-        }
-        return String(n);
-      }
-      
-      return getWords(num);
-    }
-
-    // ================= ФУНКЦИЯ ДЛЯ РАСПЕЧАТКИ (НОВАЯ ВЕРСИЯ) =================
+    // ================= ФУНКЦИИ ДЛЯ ЛИСТА РАСПЕЧАТКА =================
     
     function updatePrintSelect() {
       const select = document.getElementById('printContractSelect');
@@ -1026,13 +938,13 @@
         return;
       }
       
-      // Получаем информацию по месяцам
+      // Получаем информацию по месяцам (сверху вниз: 1, 2, 3...)
       const monthInfo = getMonthStatus(contract);
       const months = monthInfo.months;
       
-      // Формируем таблицу месяцев (снизу вверх)
+      // Формируем таблицу месяцев (сверху вниз)
       let monthsHtml = '';
-      for (let i = months.length - 1; i >= 0; i--) {
+      for (let i = 0; i < months.length; i++) {
         const m = months[i];
         const isPaid = m.isPaid;
         const statusText = isPaid ? '✅ Оплачен' : '⏳ Ожидает';
@@ -1051,9 +963,8 @@
       const todayStr = today.toLocaleDateString('ru-RU');
       
       container.innerHTML = `
+        <!-- ================= СТРАНИЦА 1 ================= -->
         <div style="font-family: 'Times New Roman', serif; font-size: 14px; line-height: 1.6; padding: 20px 30px; max-width: 210mm; margin: 0 auto; background: white;">
-          
-          <!-- ================= СТРАНИЦА 1 ================= -->
           <div style="position: relative;">
             
             <!-- Номер договора справа сверху -->
@@ -1139,7 +1050,7 @@
               не позднее <b>${contract.payDate || '______'}</b> числа каждого месяца.
             </p>
             
-            <!-- ТАБЛИЦА МЕСЯЦЕВ (СНИЗУ ВВЕРХ) -->
+            <!-- ТАБЛИЦА МЕСЯЦЕВ (СВЕРХУ ВНИЗ) -->
             <div style="margin-top: 20px; border: 1px solid #000; overflow: hidden;">
               <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
                 <thead>
@@ -1158,7 +1069,7 @@
             
           </div>
           
-          <!-- ================= РАЗРЫВ СТРАНИЦЫ ================= -->
+          <!-- РАЗРЫВ СТРАНИЦЫ -->
           <div style="page-break-after: always; border-bottom: 2px dashed #ccc; margin: 20px 0;"></div>
           
           <!-- ================= СТРАНИЦА 2 ================= -->
@@ -1229,7 +1140,7 @@
               - Любые изменения и дополнения к настоящему договору должны быть составлены в письменной форме и подписаны всеми сторонами.
             </div>
             
-            <!-- ПОДПИСИ СТОРОН -->
+            <!-- ПОДПИСИ СТОРОН (внизу второй страницы) -->
             <div style="font-weight: bold; font-size: 16px; text-transform: uppercase; text-decoration: underline; margin-top: 25px; margin-bottom: 15px;">
               ПОДПИСИ СТОРОН
             </div>
@@ -1265,7 +1176,6 @@
             </div>
             
           </div>
-          
         </div>
       `;
     }
@@ -2439,15 +2349,4 @@
     updateHistoryButtons();
   </script>
 </body>
-</html>
-```
-
-Что было сделано:
-
-1. Добавлена функция numberToWords() для перевода чисел в пропись
-2. Полностью переписана функция loadContractForPrint() - теперь она формирует договор на 2 страницы точно по вашему образцу
-3. Таблица месяцев отображается снизу вверх с указанием статуса (Оплачен/Ожидает)
-4. Все поля автоматически заполняются из данных выбранного договора
-5. Разрыв страницы между 1-й и 2-й страницей для правильной печати
-
-Теперь при выборе договора и нажатии "Печать" у вас будет ровно 2 страницы, как в вашем Excel файле! 🖨️
+  </html>
