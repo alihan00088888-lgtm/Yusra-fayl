@@ -308,7 +308,7 @@
 </head>
 <body class="bg-slate-100 text-gray-800 text-xs min-h-screen pb-20">
 
-  <!-- ===== ВЕРХНЯЯ ПАНЕЛЬ ДЕЙСТВИЙ ===== -->
+  <!-- ВЕРХНЯЯ ПАНЕЛЬ ДЕЙСТВИЙ -->
   <div class="sticky top-0 z-40 bg-white shadow-md border-b no-print">
     <div class="p-3 max-w-[100vw] flex flex-wrap justify-between items-center gap-4">
       
@@ -352,7 +352,7 @@
 
   <div class="p-4 max-w-[100vw]">
     
-    <!-- ===== Лист 1: Договоры ===== -->
+    <!-- ================= Лист 1: Договоры ================= -->
     <div id="contractsTabContent" class="space-y-4">
       <div class="bg-white shadow-xl rounded-xl overflow-x-auto max-h-[78vh] border">
         <table class="min-w-full text-left border-collapse">
@@ -382,7 +382,7 @@
       </div>
     </div>
 
-    <!-- ===== Лист 2: Учет ===== -->
+    <!-- ================= Лист 2: Учет ================= -->
     <div id="accountingTabContent" class="hidden space-y-4">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="bg-white p-4 rounded-xl border-l-4 border-emerald-500 shadow-md flex justify-between items-center">
@@ -418,7 +418,7 @@
       </div>
     </div>
 
-    <!-- ===== Лист 3: Взяли ===== -->
+    <!-- ================= Лист 3: Взяли ================= -->
     <div id="takenTabContent" class="hidden space-y-4">
       <div class="bg-white shadow-xl rounded-xl p-4 overflow-x-auto border">
         <div class="flex flex-wrap lg:flex-nowrap gap-6">
@@ -507,7 +507,7 @@
       </div>
     </div>
 
-    <!-- ===== Лист 4: Сегодня ===== -->
+    <!-- ================= Лист 4: Сегодня ================= -->
     <div id="todayTabContent" class="hidden space-y-4">
       <div class="bg-white shadow-xl rounded-xl p-6 border">
         <div class="flex justify-between items-center mb-4">
@@ -521,7 +521,7 @@
       </div>
     </div>
 
-    <!-- ===== Лист 5: 3 дня ===== -->
+    <!-- ================= Лист 5: 3 дня ================= -->
     <div id="threeDaysTabContent" class="hidden space-y-4">
       <div class="bg-white shadow-xl rounded-xl p-6 border">
         <div class="flex justify-between items-center mb-4">
@@ -535,7 +535,7 @@
       </div>
     </div>
 
-    <!-- ===== Лист 6: Неплательщики ===== -->
+    <!-- ================= Лист 6: Неплательщики ================= -->
     <div id="debtorsTabContent" class="hidden space-y-4">
       <div class="bg-white shadow-xl rounded-xl p-6 border">
         <div class="flex justify-between items-center mb-4">
@@ -549,7 +549,7 @@
       </div>
     </div>
 
-    <!-- ===== Лист 7: Партнёры ===== -->
+    <!-- ================= Лист 7: Партнёры ================= -->
     <div id="partnersTabContent" class="hidden space-y-4">
       <div class="bg-white shadow-xl rounded-xl p-6 border">
         <div class="flex justify-between items-center mb-4">
@@ -570,12 +570,12 @@
       </div>
     </div>
 
-    <!-- ===== Лист 8: Распечатка (ТОЛЬКО ПЕЧАТЬ) ===== -->
+    <!-- ================= Лист 8: Распечатка (ТОЛЬКО ПЕЧАТЬ) ================= -->
     <div id="printTabContent" class="hidden space-y-4">
       <div class="bg-white shadow-xl rounded-xl p-6 border">
         <div class="flex justify-between items-center mb-4 no-print">
           <h2 class="text-xl font-bold text-amber-600">🖨️ Распечатка договора</h2>
-          <div class="flex gap-2">
+          <div class="flex gap-2 flex-wrap">
             <select id="printContractSelect" class="p-2 border rounded text-sm font-bold" onchange="loadContractForPrint()">
               <option value="">-- Выберите договор --</option>
             </select>
@@ -594,7 +594,7 @@
 
   </div>
 
-  <!-- ===== НИЖНЯЯ ПАНЕЛЬ ПЕРЕКЛЮЧЕНИЯ ЛИСТОВ ===== -->
+  <!-- НИЖНЯЯ ПАНЕЛЬ ПЕРЕКЛЮЧЕНИЯ ЛИСТОВ -->
   <div class="fixed bottom-0 left-0 right-0 z-40 bg-white shadow-lg border-t px-4 py-2 flex justify-center items-center gap-2 overflow-x-auto no-print">
     <div class="flex items-center gap-2 bg-slate-200 p-1 rounded-xl">
       <button type="button" onclick="switchTab('contracts')" id="tabBtnContracts" class="tab-btn active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2">
@@ -624,7 +624,7 @@
     </div>
   </div>
 
-  <!-- ===== МОДАЛЬНЫЕ ОКНА ===== -->
+  <!-- МОДАЛЬНЫЕ ОКНА (без изменений) -->
   <div id="modal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-xl p-6 max-w-4xl w-full max-h-[95vh] overflow-y-auto shadow-2xl">
       <h2 id="modalTitle" class="text-xl font-bold mb-4 border-b-2 pb-2 text-blue-700 uppercase tracking-tight">Новый договор</h2>
@@ -1020,7 +1020,7 @@
     }
 
     // ================================================================
-    // ГЛАВНАЯ ФУНКЦИЯ ЗАГРУЗКИ ДОГОВОРА ДЛЯ ПЕЧАТИ
+    // ФУНКЦИЯ ЗАГРУЗКИ ДОГОВОРА ДЛЯ ПЕЧАТИ
     // ================================================================
 
     function updatePrintSelect() {
@@ -1508,7 +1508,7 @@
       renderPartners();
     }
 
-    // ===== ФУНКЦИИ ДЛЯ ОСТАЛЬНЫХ ЛИСТОВ =====
+    // ===== ОСНОВНАЯ ФУНКЦИЯ СТАТУСА МЕСЯЦЕВ (С ПЕРЕПЛАТОЙ) =====
     
     function getMonthStatus(contract) {
       const months = contract.monthsCount || 0;
@@ -1522,7 +1522,14 @@
       
       const result = [];
       let overdueSum = 0;
+      let totalPaid = 0;
       
+      // Сначала считаем общую сумму оплат
+      Object.values(installments).forEach(p => {
+        totalPaid += Number(p.amount || 0);
+      });
+      
+      // Создаем массив месяцев
       for (let i = 1; i <= months; i++) {
         const payDate = new Date(firstPayDate);
         payDate.setMonth(payDate.getMonth() + (i - 1));
@@ -1549,65 +1556,78 @@
         });
       }
       
+      // Корректируем с учетом переплат
+      let remainingOverpayment = 0;
+      for (let i = 0; i < result.length; i++) {
+        const m = result[i];
+        if (m.isPaid) {
+          // Если оплачено больше, чем должны были
+          const overpay = m.amount - monthlyPay;
+          if (overpay > 0) {
+            remainingOverpayment += overpay;
+          }
+        } else if (remainingOverpayment > 0 && m.status === 'future') {
+          // Если есть переплата, она идет в счет будущих месяцев
+          // Но не показываем как оплаченный, просто статус остается future
+        }
+      }
+      
       return { months: result, overdueSum: overdueSum };
     }
 
+    // ===== ФУНКЦИИ ДЛЯ ЛИСТОВ "СЕГОДНЯ" И "3 ДНЯ" (ИСПРАВЛЕННЫЕ) =====
+    
     function getClientsForDate(targetDate) {
       const result = [];
       const target = new Date(targetDate);
       target.setHours(0, 0, 0, 0);
       
       allContracts.forEach(contract => {
+        // Проверяем только активные договоры (с остатком > 0)
         const insts = contract.installments || {};
         let totalPaid = 0;
         Object.values(insts).forEach(p => totalPaid += Number(p.amount));
         const rest = contract.totalCost - (contract.downPayment || 0) - totalPaid;
         
-        if (rest <= 0) return;
+        if (rest <= 0) return; // Пропускаем закрытые договоры
         
-        if (contract.payDate) {
-          const payDate = new Date(contract.payDate);
-          payDate.setHours(0, 0, 0, 0);
-          
-          if (payDate.getTime() === target.getTime()) {
-            const monthInfo = getMonthStatus(contract);
-            result.push({
-              ...contract,
-              rest: rest,
-              phone: contract.phone || '',
-              fio: contract.fio || '',
-              monthInfo: monthInfo
-            });
+        // Получаем все месяцы и их статусы
+        const monthInfo = getMonthStatus(contract);
+        const months = monthInfo.months;
+        
+        // Проверяем, есть ли НЕОПЛАЧЕННЫЙ месяц с датой, равной targetDate
+        let hasUnpaidMonth = false;
+        let unpaidMonthAmount = 0;
+        
+        for (let i = 0; i < months.length; i++) {
+          const m = months[i];
+          if (!m.isPaid) {
+            const payDate = new Date(m.date);
+            payDate.setHours(0, 0, 0, 0);
+            if (payDate.getTime() === target.getTime()) {
+              hasUnpaidMonth = true;
+              unpaidMonthAmount = m.amount;
+              break;
+            }
           }
         }
-      });
-      
-      return result;
-    }
-
-    function getDebtors() {
-      const result = [];
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      
-      allContracts.forEach(contract => {
-        const insts = contract.installments || {};
-        let totalPaid = 0;
-        Object.values(insts).forEach(p => totalPaid += Number(p.amount));
-        const rest = contract.totalCost - (contract.downPayment || 0) - totalPaid;
         
-        if (rest <= 0) return;
-        
-        const monthInfo = getMonthStatus(contract);
-        const hasOverdue = monthInfo.months.some(m => m.status === 'overdue');
-        
-        if (hasOverdue) {
+        if (hasUnpaidMonth) {
+          // Пересчитываем просрочку для этого клиента
+          let clientOverdue = 0;
+          months.forEach(m => {
+            if (m.status === 'overdue' && !m.isPaid) {
+              clientOverdue += m.amount;
+            }
+          });
+          
           result.push({
             ...contract,
             rest: rest,
             phone: contract.phone || '',
             fio: contract.fio || '',
-            monthInfo: monthInfo
+            monthInfo: { months: months, overdueSum: clientOverdue },
+            unpaidMonthAmount: unpaidMonthAmount
           });
         }
       });
@@ -1628,15 +1648,25 @@
         let monthsHtml = '';
         let overdueSum = 0;
         
+        // Показываем ТОЛЬКО те месяцы, которые есть у клиента (до monthsCount)
         monthInfo.months.forEach(m => {
           let statusClass = 'month-future';
-          if (m.status === 'paid') statusClass = 'month-paid';
-          else if (m.status === 'overdue') {
+          let statusText = '⏳ Ожидает';
+          if (m.status === 'paid') {
+            statusClass = 'month-paid';
+            statusText = `✅ ${m.amount} ₽`;
+          } else if (m.status === 'overdue') {
             statusClass = 'month-overdue';
+            statusText = `❌ ${m.amount} ₽`;
             overdueSum += m.amount;
+          } else {
+            statusText = `📅 ${m.amount} ₽`;
           }
-          monthsHtml += `<span class="month-status ${statusClass}">${m.month}-й (${m.date})</span>`;
+          monthsHtml += `<span class="month-status ${statusClass}" title="${m.date}">${m.month}-й: ${statusText}</span>`;
         });
+        
+        // Сумма просрочки для этого клиента
+        const clientOverdue = overdueSum || monthInfo.overdueSum || 0;
         
         html += `
           <div class="client-item">
@@ -1647,7 +1677,7 @@
               <span class="client-detail">📅 ${dateStr || ''}</span>
             </div>
             <div class="flex flex-wrap items-center gap-2">
-              <span class="client-overdue">Просрочка: ${overdueSum.toLocaleString('ru-RU')} ₽</span>
+              <span class="client-overdue">Просрочка: ${clientOverdue.toLocaleString('ru-RU')} ₽</span>
               <span class="client-rest">Остаток: ${client.rest.toLocaleString('ru-RU')} ₽</span>
               <a href="https://wa.me/7${client.phone.replace(/[^0-9]/g, '')}?text=Здравствуйте! Напоминаем о платеже." 
                  target="_blank" 
@@ -1686,7 +1716,45 @@
       renderClientList('debtorsClientsList', clients, 'Нет клиентов с просрочкой', '');
     }
 
-    // ===== ФУНКЦИИ ДЛЯ WHATSAPP (для листов Сегодня, 3 дня, Неплательщики) =====
+    function getDebtors() {
+      const result = [];
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      allContracts.forEach(contract => {
+        const insts = contract.installments || {};
+        let totalPaid = 0;
+        Object.values(insts).forEach(p => totalPaid += Number(p.amount));
+        const rest = contract.totalCost - (contract.downPayment || 0) - totalPaid;
+        
+        if (rest <= 0) return;
+        
+        const monthInfo = getMonthStatus(contract);
+        const hasOverdue = monthInfo.months.some(m => m.status === 'overdue' && !m.isPaid);
+        
+        if (hasOverdue) {
+          // Пересчитываем просрочку
+          let clientOverdue = 0;
+          monthInfo.months.forEach(m => {
+            if (m.status === 'overdue' && !m.isPaid) {
+              clientOverdue += m.amount;
+            }
+          });
+          
+          result.push({
+            ...contract,
+            rest: rest,
+            phone: contract.phone || '',
+            fio: contract.fio || '',
+            monthInfo: { months: monthInfo.months, overdueSum: clientOverdue }
+          });
+        }
+      });
+      
+      return result;
+    }
+
+    // ===== ФУНКЦИИ ДЛЯ WHATSAPP =====
     
     function showCopyNotification(message) {
       const notification = document.createElement('div');
@@ -1715,10 +1783,10 @@
         const phone = client.phone.replace(/[^0-9]/g, '');
         if (phone) phoneNumbers.push(phone);
         
-        const monthInfo = getMonthStatus(client);
+        const monthInfo = client.monthInfo || getMonthStatus(client);
         let overdueSum = 0;
         monthInfo.months.forEach(m => {
-          if (m.status === 'overdue') overdueSum += m.amount;
+          if (m.status === 'overdue' && !m.isPaid) overdueSum += m.amount;
         });
         
         message += `${index + 1}. *${client.fio}*\n`;
@@ -1763,10 +1831,10 @@
         const phone = client.phone.replace(/[^0-9]/g, '');
         if (phone) phoneNumbers.push(phone);
         
-        const monthInfo = getMonthStatus(client);
+        const monthInfo = client.monthInfo || getMonthStatus(client);
         let overdueSum = 0;
         monthInfo.months.forEach(m => {
-          if (m.status === 'overdue') overdueSum += m.amount;
+          if (m.status === 'overdue' && !m.isPaid) overdueSum += m.amount;
         });
         
         message += `${index + 1}. *${client.fio}*\n`;
@@ -1807,11 +1875,11 @@
         const phone = client.phone.replace(/[^0-9]/g, '');
         if (phone) phoneNumbers.push(phone);
         
-        const monthInfo = getMonthStatus(client);
+        const monthInfo = client.monthInfo || getMonthStatus(client);
         let overdueSum = 0;
         let overdueMonths = [];
         monthInfo.months.forEach(m => {
-          if (m.status === 'overdue') {
+          if (m.status === 'overdue' && !m.isPaid) {
             overdueSum += m.amount;
             overdueMonths.push(`${m.month}-й (${m.date})`);
           }
