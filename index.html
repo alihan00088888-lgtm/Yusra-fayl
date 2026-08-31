@@ -1507,7 +1507,9 @@
       renderPartners();
     }
 
-    // ===== ОСНОВНАЯ ЛОГИКА МЕСЯЦЕВ (ИСПРАВЛЕННАЯ) =====
+    // ================================================================
+    // ОСНОВНАЯ ЛОГИКА МЕСЯЦЕВ (ИСПРАВЛЕННАЯ - правильный расчет дат)
+    // ================================================================
     
     function getMonthStatus(contract) {
       const months = contract.monthsCount || 0;
@@ -1516,24 +1518,32 @@
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       
-      // Первая дата платежа - это payDate (график)
-      const firstPayDate = new Date(contract.payDate);
+      // Парсим дату первого платежа (payDate)
+      const payDateStr = contract.payDate;
+      if (!payDateStr) {
+        return { months: [], overdueSum: 0 };
+      }
+      
+      const firstPayDate = new Date(payDateStr);
       firstPayDate.setHours(0, 0, 0, 0);
+      
+      // Извлекаем день месяца из payDate (число, которое должно быть днем платежа)
+      const payDay = firstPayDate.getDate();
       
       const result = [];
       let overdueSum = 0;
-      let totalPaid = 0;
-      
-      // Считаем все оплаты
-      Object.values(installments).forEach(p => {
-        totalPaid += Number(p.amount || 0);
-      });
       
       // Создаем массив месяцев
       for (let i = 1; i <= months; i++) {
-        // Дата платежа: если i=1, то это payDate, иначе payDate + (i-1) месяцев
+        // Базовый месяц: первыйPayDate + (i-1) месяцев
         const payDate = new Date(firstPayDate);
         payDate.setMonth(payDate.getMonth() + (i - 1));
+        
+        // Устанавливаем день месяца как payDay (фиксированное число)
+        // Если в месяце нет такого числа (например, 31 февраля), берем последний день месяца
+        const maxDay = getDaysInMonth(payDate.getFullYear(), payDate.getMonth());
+        const targetDay = Math.min(payDay, maxDay);
+        payDate.setDate(targetDay);
         payDate.setHours(0, 0, 0, 0);
         
         const payment = installments[i];
@@ -1560,7 +1570,14 @@
       return { months: result, overdueSum: overdueSum };
     }
 
-    // ===== ФУНКЦИИ ДЛЯ ЛИСТОВ "СЕГОДНЯ" И "3 ДНЯ" (ИСПРАВЛЕННЫЕ) =====
+    // Вспомогательная функция: количество дней в месяце
+    function getDaysInMonth(year, month) {
+      return new Date(year, month + 1, 0).getDate();
+    }
+
+    // ================================================================
+    // ФУНКЦИИ ДЛЯ ЛИСТОВ "СЕГОДНЯ" И "3 ДНЯ"
+    // ================================================================
     
     function getClientsForDate(targetDate) {
       const result = [];
@@ -2570,4 +2587,4 @@
     updateHistoryButtons();
   </script>
 </body>
-  </html>
+</html>
