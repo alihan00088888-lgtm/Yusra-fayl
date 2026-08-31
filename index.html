@@ -136,17 +136,60 @@
     /* Стили для печати договора */
     .print-contract {
       font-family: 'Times New Roman', serif;
-      font-size: 14px;
-      line-height: 1.6;
-      padding: 40px 50px;
+      font-size: 13px;
+      line-height: 1.5;
+      padding: 30px 40px;
       background: white;
       max-width: 210mm;
       margin: 0 auto;
     }
+    .print-contract h1 {
+      font-size: 17px;
+      font-weight: bold;
+      text-align: center;
+      text-transform: uppercase;
+      margin-bottom: 15px;
+    }
+    .print-contract .section-title {
+      font-weight: bold;
+      font-size: 15px;
+      margin-top: 15px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      text-decoration: underline;
+    }
+    .print-contract .sub-section {
+      font-weight: bold;
+      font-size: 13px;
+      margin-top: 10px;
+      margin-bottom: 3px;
+    }
+    .print-contract .list-item {
+      padding-left: 18px;
+      margin-bottom: 2px;
+      font-size: 12px;
+    }
+    .print-contract .signatures {
+      margin-top: 25px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .print-contract .signature-block {
+      text-align: center;
+      min-width: 140px;
+    }
+    .print-contract .signature-line {
+      border-top: 1px solid black;
+      width: 160px;
+      margin: 25px auto 5px;
+    }
+    .print-contract .signature-label {
+      font-size: 11px;
+    }
     .print-contract .page-break {
       page-break-after: always;
       border-bottom: 2px dashed #ccc;
-      margin: 20px 0;
+      margin: 15px 0;
     }
 
     @media print {
@@ -169,13 +212,16 @@
         display: none !important;
       }
       .print-contract {
-        padding: 20px 30px;
-        font-size: 12px;
+        padding: 15px 25px;
+        font-size: 11px;
       }
       .print-contract .page-break {
         border-bottom: none;
         page-break-after: always;
         margin: 0;
+      }
+      .print-contract .signature-line {
+        width: 120px;
       }
     }
 
@@ -938,11 +984,11 @@
         return;
       }
       
-      // Получаем информацию по месяцам (сверху вниз: 1, 2, 3...)
+      // Получаем информацию по месяцам
       const monthInfo = getMonthStatus(contract);
       const months = monthInfo.months;
       
-      // Формируем таблицу месяцев (сверху вниз)
+      // Формируем таблицу месяцев (сверху вниз - 1,2,3,4,5...)
       let monthsHtml = '';
       for (let i = 0; i < months.length; i++) {
         const m = months[i];
@@ -951,10 +997,10 @@
         const statusColor = isPaid ? 'color: #22c55e;' : 'color: #ef4444;';
         monthsHtml += `
           <tr style="border-bottom: 1px solid #ccc;">
-            <td style="padding: 6px 12px; text-align: center; font-weight: bold; border-right: 1px solid #ccc;">${m.month}</td>
-            <td style="padding: 6px 12px; text-align: center; border-right: 1px solid #ccc;">${m.date}</td>
-            <td style="padding: 6px 12px; text-align: center; font-weight: bold; ${statusColor}">${isPaid ? m.amount.toLocaleString('ru-RU') : '—'}</td>
-            <td style="padding: 6px 12px; text-align: center; ${statusColor}">${statusText}</td>
+            <td style="padding: 4px 10px; text-align: center; font-weight: bold; border-right: 1px solid #ccc; font-size: 12px;">${m.month}</td>
+            <td style="padding: 4px 10px; text-align: center; border-right: 1px solid #ccc; font-size: 12px;">${m.date}</td>
+            <td style="padding: 4px 10px; text-align: center; font-weight: bold; ${statusColor} font-size: 12px;">${isPaid ? m.amount.toLocaleString('ru-RU') : '—'}</td>
+            <td style="padding: 4px 10px; text-align: center; ${statusColor} font-size: 12px;">${statusText}</td>
           </tr>
         `;
       }
@@ -963,22 +1009,23 @@
       const todayStr = today.toLocaleDateString('ru-RU');
       
       container.innerHTML = `
-        <!-- ================= СТРАНИЦА 1 ================= -->
-        <div style="font-family: 'Times New Roman', serif; font-size: 14px; line-height: 1.6; padding: 20px 30px; max-width: 210mm; margin: 0 auto; background: white;">
+        <div style="font-family: 'Times New Roman', serif; font-size: 13px; line-height: 1.5; padding: 20px 30px; max-width: 210mm; margin: 0 auto; background: white;">
+          
+          <!-- ================= СТРАНИЦА 1 ================= -->
           <div style="position: relative;">
             
             <!-- Номер договора справа сверху -->
-            <div style="position: absolute; top: 0; right: 0; font-size: 16px; font-weight: bold;">
+            <div style="position: absolute; top: 0; right: 0; font-size: 15px; font-weight: bold;">
               № ${contract.contractNum}
             </div>
             
             <!-- ЗАГОЛОВОК -->
-            <h1 style="font-size: 18px; font-weight: bold; text-align: center; text-transform: uppercase; margin-bottom: 10px;">
+            <h1 style="font-size: 17px; font-weight: bold; text-align: center; text-transform: uppercase; margin-bottom: 8px;">
               ДОГОВОР КУПЛИ-ПРОДАЖИ ТОВАРА В РАССРОЧКУ
             </h1>
             
             <!-- ШАПКА С ДАННЫМИ ПРОДАВЦА -->
-            <div style="display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 13px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 12px;">
               <div>
                 <b>Чеченская Республика</b><br>
                 Дата: ${contract.buyDate || '______'}<br>
@@ -992,9 +1039,9 @@
             </div>
             
             <!-- БЛОК ПОКУПАТЕЛЯ -->
-            <div style="border: 1px solid #000; padding: 10px; margin-bottom: 10px;">
-              <div style="font-weight: bold; font-size: 15px; margin-bottom: 5px;">Покупатель</div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3px 20px; font-size: 13px;">
+            <div style="border: 1px solid #000; padding: 8px; margin-bottom: 8px;">
+              <div style="font-weight: bold; font-size: 14px; margin-bottom: 4px;">Покупатель</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px 15px; font-size: 12px;">
                 <div><b>ФИО:</b> ${contract.fio || '______'}</div>
                 <div><b>Паспорт серия:</b> ${contract.passport || '______'}</div>
                 <div><b>Дата рождения:</b> ${contract.birthDate || '______'}</div>
@@ -1005,9 +1052,9 @@
             </div>
             
             <!-- БЛОК ПОРУЧИТЕЛЯ -->
-            <div style="border: 1px solid #000; padding: 10px; margin-bottom: 15px;">
-              <div style="font-weight: bold; font-size: 15px; margin-bottom: 5px;">Поручитель</div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3px 20px; font-size: 13px;">
+            <div style="border: 1px solid #000; padding: 8px; margin-bottom: 12px;">
+              <div style="font-weight: bold; font-size: 14px; margin-bottom: 4px;">Поручитель</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px 15px; font-size: 12px;">
                 <div><b>ФИО:</b> ${contract.guarantorFio || '______'}</div>
                 <div><b>Паспорт серия:</b> ______</div>
                 <div><b>Дата рождения:</b> ______</div>
@@ -1017,48 +1064,48 @@
               </div>
             </div>
             
-            <p style="text-align: justify; font-size: 13px; margin-bottom: 15px;">
+            <p style="text-align: justify; font-size: 12px; margin-bottom: 10px;">
               Совместно именуемые «Стороны», заключили настоящий Договор о нижеследующем:
             </p>
             
             <!-- РАЗДЕЛ 1: ПРЕДМЕТ ДОГОВОРА -->
-            <div style="font-weight: bold; font-size: 16px; text-transform: uppercase; text-decoration: underline; margin-top: 15px; margin-bottom: 8px;">
+            <div style="font-weight: bold; font-size: 14px; text-transform: uppercase; text-decoration: underline; margin-top: 12px; margin-bottom: 5px;">
               1. ПРЕДМЕТ ДОГОВОРА
             </div>
-            <p style="text-align: justify; font-size: 13px; padding-left: 15px;">
+            <p style="text-align: justify; font-size: 12px; padding-left: 12px;">
               По настоящему Договору «Продавец» обязуется передать в собственность «Покупателя»:
             </p>
-            <p style="text-align: justify; font-size: 13px; padding-left: 30px; font-weight: bold;">
+            <p style="text-align: justify; font-size: 12px; padding-left: 25px; font-weight: bold;">
               Товар: ${contract.product || '______'}
             </p>
-            <p style="text-align: justify; font-size: 13px; padding-left: 15px;">
+            <p style="text-align: justify; font-size: 12px; padding-left: 12px;">
               «Покупатель» обязуется принять и уплатить за него стоимость, указанную в Договоре.
             </p>
             
             <!-- РАЗДЕЛ 2: ЦЕНА ТОВАРА И ПОРЯДОК РАСЧЕТОВ -->
-            <div style="font-weight: bold; font-size: 16px; text-transform: uppercase; text-decoration: underline; margin-top: 15px; margin-bottom: 8px;">
+            <div style="font-weight: bold; font-size: 14px; text-transform: uppercase; text-decoration: underline; margin-top: 12px; margin-bottom: 5px;">
               2. ЦЕНА ТОВАРА И ПОРЯДОК РАСЧЕТОВ
             </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px 30px; font-size: 13px; padding-left: 15px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3px 20px; font-size: 12px; padding-left: 12px;">
               <div><b>Цена Товара:</b> ${Number(contract.totalCost).toLocaleString('ru-RU')} руб.</div>
               <div><b>Первый взнос:</b> ${Number(contract.downPayment || 0).toLocaleString('ru-RU')} руб.</div>
-              <div style="grid-column: span 2; text-align: right; font-size: 12px; color: #666;">подпись: ______</div>
+              <div style="grid-column: span 2; text-align: right; font-size: 11px; color: #666;">подпись: ______</div>
             </div>
-            <p style="text-align: justify; font-size: 13px; padding-left: 15px; margin-top: 5px;">
+            <p style="text-align: justify; font-size: 12px; padding-left: 12px; margin-top: 3px;">
               Оставшуюся сумму Покупатель выплачивает в течение <b>${contract.monthsCount}</b> месяцев, 
               равными частями в размере <b>${Number(contract.monthlyPay).toLocaleString('ru-RU')}</b> руб. 
               не позднее <b>${contract.payDate || '______'}</b> числа каждого месяца.
             </p>
             
-            <!-- ТАБЛИЦА МЕСЯЦЕВ (СВЕРХУ ВНИЗ) -->
-            <div style="margin-top: 20px; border: 1px solid #000; overflow: hidden;">
-              <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+            <!-- ТАБЛИЦА МЕСЯЦЕВ (СВЕРХУ ВНИЗ - 1,2,3,4,5...) -->
+            <div style="margin-top: 12px; border: 1px solid #000; overflow: hidden;">
+              <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
                 <thead>
                   <tr style="background-color: #e2e8f0; font-weight: bold; text-align: center;">
-                    <th style="padding: 8px 12px; border-right: 1px solid #000; width: 15%;">№</th>
-                    <th style="padding: 8px 12px; border-right: 1px solid #000; width: 35%;">Дата</th>
-                    <th style="padding: 8px 12px; border-right: 1px solid #000; width: 25%;">Сумма</th>
-                    <th style="padding: 8px 12px; width: 25%;">Статус</th>
+                    <th style="padding: 5px 10px; border-right: 1px solid #000; width: 15%;">№</th>
+                    <th style="padding: 5px 10px; border-right: 1px solid #000; width: 35%;">Дата</th>
+                    <th style="padding: 5px 10px; border-right: 1px solid #000; width: 25%;">Сумма</th>
+                    <th style="padding: 5px 10px; width: 25%;">Статус</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1069,113 +1116,114 @@
             
           </div>
           
-          <!-- РАЗРЫВ СТРАНИЦЫ -->
-          <div style="page-break-after: always; border-bottom: 2px dashed #ccc; margin: 20px 0;"></div>
+          <!-- ================= РАЗРЫВ СТРАНИЦЫ ================= -->
+          <div style="page-break-after: always; border-bottom: 2px dashed #ccc; margin: 15px 0;"></div>
           
           <!-- ================= СТРАНИЦА 2 ================= -->
           <div>
             
             <!-- РАЗДЕЛ 3: ПРАВА И ОБЯЗАННОСТИ СТОРОН -->
-            <div style="font-weight: bold; font-size: 16px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 8px;">
+            <div style="font-weight: bold; font-size: 14px; text-transform: uppercase; text-decoration: underline; margin-top: 5px; margin-bottom: 5px;">
               3. ПРАВА И ОБЯЗАННОСТИ СТОРОН
             </div>
             
-            <div style="font-weight: bold; font-size: 14px; margin-top: 10px; margin-bottom: 5px;">«Продавец» обязан:</div>
-            <div style="padding-left: 20px; font-size: 13px; margin-bottom: 10px;">
+            <div style="font-weight: bold; font-size: 12px; margin-top: 8px; margin-bottom: 3px;">«Продавец» обязан:</div>
+            <div style="padding-left: 15px; font-size: 11px; margin-bottom: 6px;">
               - Передать «Покупателю» Товар надлежащего качества, в надлежащей упаковке, в порядке и в сроки, установленные настоящим Договором.
             </div>
             
-            <div style="font-weight: bold; font-size: 14px; margin-top: 10px; margin-bottom: 5px;">«Покупатель» обязан:</div>
-            <div style="padding-left: 20px; font-size: 13px; margin-bottom: 5px;">
+            <div style="font-weight: bold; font-size: 12px; margin-top: 8px; margin-bottom: 3px;">«Покупатель» обязан:</div>
+            <div style="padding-left: 15px; font-size: 11px; margin-bottom: 2px;">
               - Принять Товар в порядке, предусмотренном настоящим Договором.
             </div>
-            <div style="padding-left: 20px; font-size: 13px; margin-bottom: 5px;">
+            <div style="padding-left: 15px; font-size: 11px; margin-bottom: 2px;">
               - Оплатить Товар в порядке и в сроки, предусмотренные настоящим Договором.
             </div>
-            <div style="padding-left: 20px; font-size: 13px; margin-bottom: 10px;">
+            <div style="padding-left: 15px; font-size: 11px; margin-bottom: 6px;">
               - Не имеет право менять контактный номер без предупреждения. При наступлении непредвиденных обстоятельств обязан всеми возможными способами оповестить продавца.
             </div>
             
-            <div style="font-weight: bold; font-size: 14px; margin-top: 10px; margin-bottom: 5px;">«Поручитель» обязан:</div>
-            <div style="padding-left: 20px; font-size: 13px; margin-bottom: 10px;">
+            <div style="font-weight: bold; font-size: 12px; margin-top: 8px; margin-bottom: 3px;">«Поручитель» обязан:</div>
+            <div style="padding-left: 15px; font-size: 11px; margin-bottom: 8px;">
               - При неисполнении или ненадлежащем исполнении «Покупателем» своих обязательств по настоящему договору «Поручитель» отвечает перед «Продавцом» в том же объеме, что и «Покупатель», включая возврат основного долга. При просрочке выплаты «Покупателем» на 7 дней от установленного срока «Поручитель» обязан выплатить просроченный платеж.
             </div>
             
             <!-- РАЗДЕЛ 4: ПЕРЕДАЧА И ПРИНЯТИЕ ТОВАРА -->
-            <div style="font-weight: bold; font-size: 16px; text-transform: uppercase; text-decoration: underline; margin-top: 20px; margin-bottom: 8px;">
+            <div style="font-weight: bold; font-size: 14px; text-transform: uppercase; text-decoration: underline; margin-top: 12px; margin-bottom: 5px;">
               4. ПЕРЕДАЧА И ПРИНЯТИЕ ТОВАРА
             </div>
-            <div style="padding-left: 20px; font-size: 13px; margin-bottom: 5px;">
+            <div style="padding-left: 15px; font-size: 11px; margin-bottom: 2px;">
               - Товар передается «Покупателю» в месте нахождения продавца в дату подписания настоящего договора.
             </div>
-            <div style="padding-left: 20px; font-size: 13px; margin-bottom: 5px;">
+            <div style="padding-left: 15px; font-size: 11px; margin-bottom: 2px;">
               - «Покупатель» обязан осмотреть товар, проверить соответствие по качеству, количеству и комплектности условиям настоящего договора и принять его.
             </div>
-            <div style="padding-left: 20px; font-size: 13px; margin-bottom: 5px;">
+            <div style="padding-left: 15px; font-size: 11px; margin-bottom: 2px;">
               - Право собственности на товар переходит к «Покупателю» с момента полной оплаты им цены договора. Ответственность за сохранность товара переходит к покупателю с момента подписания настоящего договора.
             </div>
-            <div style="padding-left: 20px; font-size: 13px; margin-bottom: 10px;">
+            <div style="padding-left: 15px; font-size: 11px; margin-bottom: 6px;">
               - «Продавец» считается исполнившим свою обязанность по передаче товара с даты подписания настоящего договора.
             </div>
             
             <!-- РАЗДЕЛ 5: РАЗРЕШЕНИЕ СПОРОВ -->
-            <div style="font-weight: bold; font-size: 16px; text-transform: uppercase; text-decoration: underline; margin-top: 20px; margin-bottom: 8px;">
+            <div style="font-weight: bold; font-size: 14px; text-transform: uppercase; text-decoration: underline; margin-top: 12px; margin-bottom: 5px;">
               5. РАЗРЕШЕНИЕ СПОРОВ
             </div>
-            <div style="padding-left: 20px; font-size: 13px; margin-bottom: 5px;">
+            <div style="padding-left: 15px; font-size: 11px; margin-bottom: 2px;">
               - Все споры и разногласия, которые могут возникнуть между сторонами по вопросам, не нашедшим своего разрешения в тексте настоящего договора, будут разрешаться путем переговоров.
             </div>
-            <div style="padding-left: 20px; font-size: 13px; margin-bottom: 10px;">
+            <div style="padding-left: 15px; font-size: 11px; margin-bottom: 6px;">
               - В случае неурегулирования спорных вопросов в процессе переговоров такой спор подлежит рассмотрению в суде.
             </div>
             
             <!-- РАЗДЕЛ 6: ЗАКЛЮЧИТЕЛЬНЫЕ ПОЛОЖЕНИЯ -->
-            <div style="font-weight: bold; font-size: 16px; text-transform: uppercase; text-decoration: underline; margin-top: 20px; margin-bottom: 8px;">
+            <div style="font-weight: bold; font-size: 14px; text-transform: uppercase; text-decoration: underline; margin-top: 12px; margin-bottom: 5px;">
               6. ЗАКЛЮЧИТЕЛЬНЫЕ ПОЛОЖЕНИЯ
             </div>
-            <div style="padding-left: 20px; font-size: 13px; margin-bottom: 5px;">
+            <div style="padding-left: 15px; font-size: 11px; margin-bottom: 2px;">
               - Настоящий договор вступает в силу с даты его подписания «Сторонами» и действует до полного исполнения ими обязательств по настоящему договору.
             </div>
-            <div style="padding-left: 20px; font-size: 13px; margin-bottom: 15px;">
+            <div style="padding-left: 15px; font-size: 11px; margin-bottom: 10px;">
               - Любые изменения и дополнения к настоящему договору должны быть составлены в письменной форме и подписаны всеми сторонами.
             </div>
             
-            <!-- ПОДПИСИ СТОРОН (внизу второй страницы) -->
-            <div style="font-weight: bold; font-size: 16px; text-transform: uppercase; text-decoration: underline; margin-top: 25px; margin-bottom: 15px;">
+            <!-- ПОДПИСИ СТОРОН -->
+            <div style="font-weight: bold; font-size: 14px; text-transform: uppercase; text-decoration: underline; margin-top: 15px; margin-bottom: 10px;">
               ПОДПИСИ СТОРОН
             </div>
             
-            <table style="width: 100%; border-collapse: collapse; font-size: 14px; text-align: center;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: center;">
               <thead>
                 <tr>
-                  <th style="padding: 10px; border: 1px solid #000; width: 33%;">«Продавец»</th>
-                  <th style="padding: 10px; border: 1px solid #000; width: 33%;">«Покупатель»</th>
-                  <th style="padding: 10px; border: 1px solid #000; width: 34%;">«Поручитель»</th>
+                  <th style="padding: 6px; border: 1px solid #000; width: 33%;">«Продавец»</th>
+                  <th style="padding: 6px; border: 1px solid #000; width: 33%;">«Покупатель»</th>
+                  <th style="padding: 6px; border: 1px solid #000; width: 34%;">«Поручитель»</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td style="padding: 30px 10px; border: 1px solid #000; vertical-align: bottom;">
-                    <div style="border-top: 1px solid #000; width: 80%; margin: 0 auto; padding-top: 5px;">______</div>
+                  <td style="padding: 20px 6px; border: 1px solid #000; vertical-align: bottom;">
+                    <div style="border-top: 1px solid #000; width: 70%; margin: 0 auto; padding-top: 4px;">______</div>
                   </td>
-                  <td style="padding: 30px 10px; border: 1px solid #000; vertical-align: bottom;">
-                    <div style="border-top: 1px solid #000; width: 80%; margin: 0 auto; padding-top: 5px;">______</div>
-                    <div style="font-size: 11px; margin-top: 5px; color: #555;">${contract.fio || ''}</div>
+                  <td style="padding: 20px 6px; border: 1px solid #000; vertical-align: bottom;">
+                    <div style="border-top: 1px solid #000; width: 70%; margin: 0 auto; padding-top: 4px;">______</div>
+                    <div style="font-size: 10px; margin-top: 3px; color: #555;">${contract.fio || ''}</div>
                   </td>
-                  <td style="padding: 30px 10px; border: 1px solid #000; vertical-align: bottom;">
-                    <div style="border-top: 1px solid #000; width: 80%; margin: 0 auto; padding-top: 5px;">______</div>
-                    <div style="font-size: 11px; margin-top: 5px; color: #555;">${contract.guarantorFio || ''}</div>
+                  <td style="padding: 20px 6px; border: 1px solid #000; vertical-align: bottom;">
+                    <div style="border-top: 1px solid #000; width: 70%; margin: 0 auto; padding-top: 4px;">______</div>
+                    <div style="font-size: 10px; margin-top: 3px; color: #555;">${contract.guarantorFio || ''}</div>
                   </td>
                 </tr>
               </tbody>
             </table>
             
             <!-- Дата печати внизу -->
-            <div style="margin-top: 20px; font-size: 11px; text-align: center; color: #999; border-top: 1px solid #ddd; padding-top: 10px;">
+            <div style="margin-top: 12px; font-size: 10px; text-align: center; color: #999; border-top: 1px solid #ddd; padding-top: 8px;">
               Дата печати: ${todayStr}
             </div>
             
           </div>
+          
         </div>
       `;
     }
@@ -2349,4 +2397,4 @@
     updateHistoryButtons();
   </script>
 </body>
-  </html>
+</html>
