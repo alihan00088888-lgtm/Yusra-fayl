@@ -656,9 +656,9 @@
               <input type="date" id="buyDate" required onchange="calculateFirstPaymentDate()" class="p-2 border rounded w-full">
             </div>
             <div>
-              <label class="block text-[9px] font-bold text-blue-800 uppercase mb-1">Дата первого платежа (авто)</label>
-              <input type="date" id="payDate" readonly class="p-2 border rounded w-full bg-slate-100 cursor-not-allowed">
-              <span class="text-[8px] text-slate-500">Рассчитывается автоматически</span>
+              <label class="block text-[9px] font-bold text-blue-800 uppercase mb-1">Дата первого платежа</label>
+              <input type="date" id="payDate" required class="p-2 border rounded w-full">
+              <span class="text-[8px] text-slate-500">Автоматически: то же число, следующий месяц</span>
             </div>
             <div>
               <label class="block text-[9px] font-bold text-blue-800 uppercase mb-1">Срок (мес.) *</label>
@@ -836,39 +836,56 @@
     let redoStack = [];
 
     // ================================================================
-    // ФУНКЦИЯ РАСЧЕТА ДАТЫ ПЕРВОГО ПЛАТЕЖА
+    // ФУНКЦИЯ АВТОМАТИЧЕСКОГО РАСЧЕТА ДАТЫ ПЛАТЕЖА
     // ================================================================
 
     function calculateFirstPaymentDate() {
       const buyDateInput = document.getElementById('buyDate');
       const payDateInput = document.getElementById('payDate');
       
+      // Если поле payDate уже заполнено вручную, не трогаем его
+      if (payDateInput.value && document.activeElement !== buyDateInput) {
+        return;
+      }
+      
       if (!buyDateInput.value) {
-        payDateInput.value = '';
+        if (!payDateInput.value) {
+          payDateInput.value = '';
+        }
         return;
       }
       
       // Парсим дату покупки
       const buyDate = new Date(buyDateInput.value);
       const day = buyDate.getDate();
+      const month = buyDate.getMonth();
+      const year = buyDate.getFullYear();
       
       // Переходим на следующий месяц
-      buyDate.setMonth(buyDate.getMonth() + 1);
+      let nextMonth = month + 1;
+      let nextYear = year;
+      if (nextMonth > 11) {
+        nextMonth = 0;
+        nextYear = year + 1;
+      }
       
-      // Устанавливаем тот же день месяца
-      // Если в следующем месяце нет такого дня (например, 31), берем последний день месяца
-      const maxDay = new Date(buyDate.getFullYear(), buyDate.getMonth() + 1, 0).getDate();
-      const targetDay = Math.min(day, maxDay);
-      buyDate.setDate(targetDay);
+      // Получаем последний день следующего месяца
+      const lastDayOfNextMonth = new Date(nextYear, nextMonth + 1, 0).getDate();
       
-      // Форматируем обратно в YYYY-MM-DD
-      const year = buyDate.getFullYear();
-      const month = String(buyDate.getMonth() + 1).padStart(2, '0');
-      const dayStr = String(buyDate.getDate()).padStart(2, '0');
+      // Берем минимальное из (день покупки, последний день следующего месяца)
+      const targetDay = Math.min(day, lastDayOfNextMonth);
       
-      payDateInput.value = `${year}-${month}-${dayStr}`;
+      // Формируем дату
+      const payDate = new Date(nextYear, nextMonth, targetDay);
       
-      // Запускаем валидацию, чтобы пересчитать ошибки (если нужно)
+      // Форматируем в YYYY-MM-DD
+      const formattedYear = payDate.getFullYear();
+      const formattedMonth = String(payDate.getMonth() + 1).padStart(2, '0');
+      const formattedDay = String(payDate.getDate()).padStart(2, '0');
+      
+      payDateInput.value = `${formattedYear}-${formattedMonth}-${formattedDay}`;
+      
+      // Запускаем валидацию
       validateFinance();
     }
 
@@ -1546,7 +1563,7 @@
     }
 
     // ================================================================
-    // ОСНОВНАЯ ЛОГИКА МЕСЯЦЕВ
+    // ОСНОВНАЯ ЛОГИКА МЕСЯЦЕВ (ИСПРАВЛЕННАЯ)
     // ================================================================
     
     function getMonthStatus(contract) {
@@ -1556,24 +1573,35 @@
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       
-      // Получаем дату из payDate (дата первого платежа)
+      // Получаем дату из payDate
       const payDateStr = contract.payDate;
       if (!payDateStr) {
         return { months: [], overdueSum: 0 };
       }
       
-      // Парсим payDate - это дата первого платежа
-      const firstPayDate = new Date(payDateStr);
-      firstPayDate.setHours(0, 0, 0, 0);
+      // Парсим payDate - это ДЕНЬ МЕСЯЦА (число), когда должен быть платеж
+      const payDateObj = new Date(payDateStr);
+      const payDay = payDateObj.getDate(); // число месяца (1-31)
+      
+      // Получаем дату покупки для определения первого месяца
+      const buyDateStr = contract.buyDate;
+      let startDate = new Date(buyDateStr || payDateStr);
+      startDate.setHours(0, 0, 0, 0);
       
       const result = [];
       let overdueSum = 0;
       
       // Для каждого месяца с 1 по monthsCount
       for (let i = 1; i <= months; i++) {
-        // Создаем дату: от firstPayDate прибавляем (i-1) месяцев
-        const payDate = new Date(firstPayDate);
+        // Создаем дату: от startDate прибавляем (i-1) месяцев
+        const payDate = new Date(startDate);
         payDate.setMonth(payDate.getMonth() + (i - 1));
+        
+        // Устанавливаем день месяца = payDay (фиксированное число)
+        // Если в месяце нет такого дня, берем последний день месяца
+        const maxDay = new Date(payDate.getFullYear(), payDate.getMonth() + 1, 0).getDate();
+        const targetDay = Math.min(payDay, maxDay);
+        payDate.setDate(targetDay);
         payDate.setHours(0, 0, 0, 0);
         
         // Проверяем, есть ли оплата за этот месяц
@@ -1596,7 +1624,7 @@
           status: status,
           amount: isPaid ? paidAmount : monthlyPay,
           isPaid: isPaid,
-          payDateObj: payDate
+          payDateObj: payDate // сохраняем объект даты для сравнения
         });
       }
       
@@ -1980,13 +2008,13 @@
       document.getElementById('editDocId').value = '';
       document.getElementById('modalTitle').innerText = 'Оформление нового договора';
       document.getElementById('downPayment').value = 0;
-      // Устанавливаем сегодняшнюю дату как дату покупки
+      
+      // Устанавливаем сегодняшнюю дату покупки и автоматически рассчитываем дату платежа
       const today = new Date();
-      const year = today.getFullYear();
-      const month = String(today.getMonth() + 1).padStart(2, '0');
-      const day = String(today.getDate()).padStart(2, '0');
-      document.getElementById('buyDate').value = `${year}-${month}-${day}`;
+      const todayStr = today.toISOString().slice(0, 10);
+      document.getElementById('buyDate').value = todayStr;
       calculateFirstPaymentDate();
+      
       validateFinance();
       modal.classList.remove('hidden');
     }
@@ -2011,8 +2039,7 @@
       document.getElementById('extraPhone').value = contract.extraPhone || '';
       document.getElementById('address').value = contract.address || '';
       document.getElementById('buyDate').value = contract.buyDate || '';
-      // Автоматически рассчитываем дату первого платежа на основе даты покупки
-      calculateFirstPaymentDate();
+      document.getElementById('payDate').value = contract.payDate || '';
       document.getElementById('monthsCount').value = contract.monthsCount || '';
       document.getElementById('monthlyPay').value = contract.monthlyPay || '';
       document.getElementById('totalCost').value = contract.totalCost || '';
@@ -2042,7 +2069,7 @@
         extraPhone: document.getElementById('extraPhone').value || '',
         address: document.getElementById('address').value || '',
         buyDate: document.getElementById('buyDate').value,
-        payDate: document.getElementById('payDate').value, // Автоматически рассчитанная дата
+        payDate: document.getElementById('payDate').value,
         monthsCount: Number(document.getElementById('monthsCount').value),
         monthlyPay: Number(document.getElementById('monthlyPay').value),
         totalCost: Number(document.getElementById('totalCost').value),
@@ -2463,14 +2490,10 @@
           activeContracts++;
         }
 
-        // Проверяем, есть ли сегодня платеж по графику
-        const monthInfo = getMonthStatus(c);
-        monthInfo.months.forEach(m => {
-          if (m.date === todayStr && !m.isPaid) {
-            planTodaySum += Number(c.monthlyPay || 0);
-            planTodayCount++;
-          }
-        });
+        if (c.payDate === todayStr) {
+          planTodaySum += Number(c.monthlyPay || 0);
+          planTodayCount++;
+        }
       });
 
       document.getElementById('statTotalContracts').innerText = totalContracts;
@@ -2623,6 +2646,7 @@
       if (e.ctrlKey && (e.key === 'y' || e.key === 'н')) { e.preventDefault(); redo(); }
     });
 
+    // Инициализация
     renderTable(allContracts);
     renderAccountingTable(allAccounting);
     renderTakenSheet();
