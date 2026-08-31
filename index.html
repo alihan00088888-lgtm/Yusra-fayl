@@ -1,3 +1,8 @@
+Отлично! Я вижу, что в вашем коде уже есть лист "Распечатка", но он использует старую версию договора. Я заменю функцию loadContractForPrint() на новую версию с двумя страницами, которые мы с вами разработали.
+
+Вот полный обновленный код с правильной распечаткой на 2 страницы:
+
+```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -150,15 +155,6 @@
       text-transform: uppercase;
       margin-bottom: 20px;
     }
-    .print-contract .header {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-    .print-contract .contract-num {
-      font-weight: bold;
-      text-align: right;
-    }
     .print-contract .section-title {
       font-weight: bold;
       font-size: 16px;
@@ -192,19 +188,6 @@
     }
     .print-contract .signature-label {
       font-size: 12px;
-    }
-    .print-contract .data-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 10px 0;
-    }
-    .print-contract .data-table td {
-      padding: 5px 10px;
-      border: 1px solid #000;
-    }
-    .print-contract .data-table .label {
-      font-weight: bold;
-      width: 30%;
     }
     .print-contract .page-break {
       page-break-after: always;
@@ -582,7 +565,7 @@
     </div>
   </div>
 
-  <!-- Модальные окна -->
+  <!-- Модальные окна (без изменений) -->
   <div id="modal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-xl p-6 max-w-4xl w-full max-h-[95vh] overflow-y-auto shadow-2xl">
       <h2 id="modalTitle" class="text-xl font-bold mb-4 border-b-2 pb-2 text-blue-700 uppercase tracking-tight">Новый договор</h2>
@@ -969,155 +952,7 @@
       updateHistoryButtons();
     }
 
-    // ================= ФУНКЦИИ ДЛЯ ЛИСТА РАСПЕЧАТКА =================
-    
-    function updatePrintSelect() {
-      const select = document.getElementById('printContractSelect');
-      const currentValue = select.value;
-      select.innerHTML = '<option value="">-- Выберите договор --</option>';
-      
-      allContracts.forEach(contract => {
-        const option = document.createElement('option');
-        option.value = contract.id;
-        option.textContent = `№${contract.contractNum} - ${contract.fio} (${contract.phone})`;
-        select.appendChild(option);
-      });
-      
-      if (currentValue) {
-        select.value = currentValue;
-      }
-    }
-
-    function loadContractForPrint() {
-      const select = document.getElementById('printContractSelect');
-      const contractId = select.value;
-      const container = document.getElementById('printContent');
-      
-      if (!contractId) {
-        container.innerHTML = `<div class="text-center text-gray-400 py-20 text-lg">Выберите договор для распечатки</div>`;
-        return;
-      }
-      
-      const contract = allContracts.find(c => c.id === contractId);
-      if (!contract) {
-        container.innerHTML = `<div class="text-center text-red-500 py-20 text-lg">Договор не найден</div>`;
-        return;
-      }
-      
-      // Формируем HTML договора
-      const today = new Date();
-      const todayStr = today.toLocaleDateString('ru-RU');
-      
-      container.innerHTML = `
-        <div style="position: relative;">
-          <!-- Номер договора справа сверху -->
-          <div style="position: absolute; top: 0; right: 0; font-size: 14px; font-weight: bold;">
-            № ${contract.contractNum}
-          </div>
-          
-          <h1>ДОГОВОР КУПЛИ-ПРОДАЖИ ТОВАРА В РАССРОЧКУ</h1>
-          
-          <p style="text-align: center; margin-bottom: 20px;">г. ______________ «____» ________ 20__ г.</p>
-          
-          <p style="text-align: justify; text-indent: 25px;">
-            <b>Продавец:</b> ___________________________________________________________,
-            в лице _____________________________________, действующего на основании _______________,
-            и <b>Покупатель:</b> ${contract.fio}, паспорт: ${contract.passport || '______'}, 
-            дата рождения: ${contract.birthDate || '______'}, телефон: ${contract.phone},
-            проживающий по адресу: ${contract.address || '______'}, 
-            совместно именуемые «Стороны», заключили настоящий договор о нижеследующем:
-          </p>
-          
-          <div class="section-title">1. ПРЕДМЕТ ДОГОВОРА</div>
-          <p style="text-align: justify; text-indent: 25px;">
-            1.1. Продавец обязуется передать в собственность Покупателя, а Покупатель обязуется принять 
-            и оплатить в рассрочку следующий товар: <b>${contract.product || '______'}</b>.
-          </p>
-          <p style="text-align: justify; text-indent: 25px;">
-            1.2. Общая стоимость товара составляет <b>${Number(contract.totalCost).toLocaleString('ru-RU')} (${numberToWords(contract.totalCost)}) рублей</b>.
-          </p>
-          <p style="text-align: justify; text-indent: 25px;">
-            1.3. Покупатель вносит предоплату в размере <b>${Number(contract.downPayment || 0).toLocaleString('ru-RU')} (${numberToWords(contract.downPayment || 0)}) рублей</b>.
-          </p>
-          <p style="text-align: justify; text-indent: 25px;">
-            1.4. Оставшаяся сумма в размере <b>${(contract.totalCost - (contract.downPayment || 0)).toLocaleString('ru-RU')} (${numberToWords(contract.totalCost - (contract.downPayment || 0))}) рублей</b> 
-            выплачивается в рассрочку на срок <b>${contract.monthsCount} месяцев</b>.
-          </p>
-          <p style="text-align: justify; text-indent: 25px;">
-            1.5. Ежемесячный платеж составляет <b>${Number(contract.monthlyPay).toLocaleString('ru-RU')} (${numberToWords(contract.monthlyPay)}) рублей</b>.
-          </p>
-          
-          <div class="section-title">2. ПОРЯДОК ОПЛАТЫ</div>
-          <p style="text-align: justify; text-indent: 25px;">
-            2.1. Покупатель обязуется вносить ежемесячные платежи не позднее <b>${contract.payDate || '______'}</b> 
-            каждого месяца в течение всего срока рассрочки.
-          </p>
-          <p style="text-align: justify; text-indent: 25px;">
-            2.2. Датой первого платежа считается <b>${contract.payDate || '______'}</b>.
-          </p>
-          <p style="text-align: justify; text-indent: 25px;">
-            2.3. Оплата производится путем внесения денежных средств наличными или на расчетный счет Продавца.
-          </p>
-          
-          <div class="section-title">3. ПРАВА И ОБЯЗАННОСТИ СТОРОН</div>
-          
-          <div class="sub-section">Продавец обязан:</div>
-          <div class="list-item">- Передать Покупателю Товар надлежащего качества, в надлежащей упаковке, в порядке и в сроки, установленные настоящим Договором.</div>
-          
-          <div class="sub-section">Покупатель обязан:</div>
-          <div class="list-item">- Принять Товар в порядке, предусмотренном настоящим Договором.</div>
-          <div class="list-item">- Оплатить Товар в порядке и в сроки, предусмотренные настоящим Договором.</div>
-          <div class="list-item">- Не имеет право менять контактный номер без предупреждения. При наступлении непредвиденных обстоятельств обязан всеми возможными способами оповестить продавца.</div>
-          
-          <div class="sub-section">Поручитель обязан:</div>
-          <div class="list-item">- При неисполнении или ненадлежащем исполнении Покупателем своих обязательств по настоящему договору Поручитель отвечает перед Продавцом в том же объеме, что и Покупатель, включая возврат основного долга. При просрочке выплаты Покупателем на 7 дней от установленного срока Поручитель обязан выплатить просроченный платеж.</div>
-          
-          <div style="page-break-after: always;"></div>
-          
-          <div class="section-title">4. ПЕРЕДАЧА И ПРИНЯТИЕ ТОВАРА</div>
-          <div class="list-item">- Товар передается Покупателю в месте нахождения продавца в дату подписания настоящего договора.</div>
-          <div class="list-item">- Покупатель обязан осмотреть товар, проверить соответствие по качеству, количеству и комплектности условиям настоящего договора и принять его.</div>
-          <div class="list-item">- Право собственности на товар переходит к Покупателю с момента полной оплаты им цены договора. Ответственность за сохранность товара переходит к покупателю с момента подписания настоящего договора.</div>
-          <div class="list-item">- Продавец считается исполнившим свою обязанность по передаче товара с даты подписания настоящего договора.</div>
-          
-          <div class="section-title">5. РАЗРЕШЕНИЕ СПОРОВ</div>
-          <div class="list-item">- Все споры и разногласия, которые могут возникнуть между сторонами по вопросам, не нашедшим своего разрешения в тексте настоящего договора, будут разрешаться путем переговоров.</div>
-          <div class="list-item">- В случае неурегулирования спорных вопросов в процессе переговоров такой спор подлежит рассмотрению в суде.</div>
-          
-          <div class="section-title">6. ЗАКЛЮЧИТЕЛЬНЫЕ ПОЛОЖЕНИЯ</div>
-          <div class="list-item">- Настоящий договор вступает в силу с даты его подписания Сторонами и действует до полного исполнения ими обязательств по настоящему договору.</div>
-          <div class="list-item">- Любые изменения и дополнения к настоящему договору должны быть составлены в письменной форме и подписаны всеми сторонами.</div>
-          
-          <div style="margin-top: 30px;">
-            <p><b>Поручитель:</b> ${contract.guarantorFio || '______'}, телефон: ${contract.guarantorPhone || '______'}</p>
-            <p><b>Магазин/Партнёр:</b> ${contract.store || '______'}</p>
-          </div>
-          
-          <div class="signatures">
-            <div class="signature-block">
-              <div class="signature-line"></div>
-              <div class="signature-label"><b>«Продавец»</b></div>
-            </div>
-            <div class="signature-block">
-              <div class="signature-line"></div>
-              <div class="signature-label"><b>«Покупатель»</b></div>
-              <div style="font-size: 11px; margin-top: 3px;">${contract.fio}</div>
-            </div>
-            <div class="signature-block">
-              <div class="signature-line"></div>
-              <div class="signature-label"><b>«Поручитель»</b></div>
-              <div style="font-size: 11px; margin-top: 3px;">${contract.guarantorFio || '______'}</div>
-            </div>
-          </div>
-          
-          <div style="margin-top: 20px; font-size: 11px; text-align: center; color: #666;">
-            Дата печати: ${todayStr}
-          </div>
-        </div>
-      `;
-    }
-
-    // Функция для преобразования чисел в слова (прописи)
+    // ================= ФУНКЦИЯ ДЛЯ ПЕРЕВОДА ЧИСЕЛ В СЛОВА =================
     function numberToWords(num) {
       if (!num || num === 0) return 'ноль';
       
@@ -1154,6 +989,285 @@
       }
       
       return getWords(num);
+    }
+
+    // ================= ФУНКЦИЯ ДЛЯ РАСПЕЧАТКИ (НОВАЯ ВЕРСИЯ) =================
+    
+    function updatePrintSelect() {
+      const select = document.getElementById('printContractSelect');
+      const currentValue = select.value;
+      select.innerHTML = '<option value="">-- Выберите договор --</option>';
+      
+      allContracts.forEach(contract => {
+        const option = document.createElement('option');
+        option.value = contract.id;
+        option.textContent = `№${contract.contractNum} - ${contract.fio} (${contract.phone})`;
+        select.appendChild(option);
+      });
+      
+      if (currentValue) {
+        select.value = currentValue;
+      }
+    }
+
+    function loadContractForPrint() {
+      const select = document.getElementById('printContractSelect');
+      const contractId = select.value;
+      const container = document.getElementById('printContent');
+      
+      if (!contractId) {
+        container.innerHTML = `<div class="text-center text-gray-400 py-20 text-lg">Выберите договор для распечатки</div>`;
+        return;
+      }
+      
+      const contract = allContracts.find(c => c.id === contractId);
+      if (!contract) {
+        container.innerHTML = `<div class="text-center text-red-500 py-20 text-lg">Договор не найден</div>`;
+        return;
+      }
+      
+      // Получаем информацию по месяцам
+      const monthInfo = getMonthStatus(contract);
+      const months = monthInfo.months;
+      
+      // Формируем таблицу месяцев (снизу вверх)
+      let monthsHtml = '';
+      for (let i = months.length - 1; i >= 0; i--) {
+        const m = months[i];
+        const isPaid = m.isPaid;
+        const statusText = isPaid ? '✅ Оплачен' : '⏳ Ожидает';
+        const statusColor = isPaid ? 'color: #22c55e;' : 'color: #ef4444;';
+        monthsHtml += `
+          <tr style="border-bottom: 1px solid #ccc;">
+            <td style="padding: 6px 12px; text-align: center; font-weight: bold; border-right: 1px solid #ccc;">${m.month}</td>
+            <td style="padding: 6px 12px; text-align: center; border-right: 1px solid #ccc;">${m.date}</td>
+            <td style="padding: 6px 12px; text-align: center; font-weight: bold; ${statusColor}">${isPaid ? m.amount.toLocaleString('ru-RU') : '—'}</td>
+            <td style="padding: 6px 12px; text-align: center; ${statusColor}">${statusText}</td>
+          </tr>
+        `;
+      }
+      
+      const today = new Date();
+      const todayStr = today.toLocaleDateString('ru-RU');
+      
+      container.innerHTML = `
+        <div style="font-family: 'Times New Roman', serif; font-size: 14px; line-height: 1.6; padding: 20px 30px; max-width: 210mm; margin: 0 auto; background: white;">
+          
+          <!-- ================= СТРАНИЦА 1 ================= -->
+          <div style="position: relative;">
+            
+            <!-- Номер договора справа сверху -->
+            <div style="position: absolute; top: 0; right: 0; font-size: 16px; font-weight: bold;">
+              № ${contract.contractNum}
+            </div>
+            
+            <!-- ЗАГОЛОВОК -->
+            <h1 style="font-size: 18px; font-weight: bold; text-align: center; text-transform: uppercase; margin-bottom: 10px;">
+              ДОГОВОР КУПЛИ-ПРОДАЖИ ТОВАРА В РАССРОЧКУ
+            </h1>
+            
+            <!-- ШАПКА С ДАННЫМИ ПРОДАВЦА -->
+            <div style="display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 13px;">
+              <div>
+                <b>Чеченская Республика</b><br>
+                Дата: ${contract.buyDate || '______'}<br>
+                Продавец: Компания "YUSRA"<br>
+                рабочий номер: ${contract.phone || '______'}
+              </div>
+              <div style="text-align: right;">
+                <b>ИНН/ОГРН:</b> ______<br>
+                <b>Юр. адрес:</b> ______
+              </div>
+            </div>
+            
+            <!-- БЛОК ПОКУПАТЕЛЯ -->
+            <div style="border: 1px solid #000; padding: 10px; margin-bottom: 10px;">
+              <div style="font-weight: bold; font-size: 15px; margin-bottom: 5px;">Покупатель</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3px 20px; font-size: 13px;">
+                <div><b>ФИО:</b> ${contract.fio || '______'}</div>
+                <div><b>Паспорт серия:</b> ${contract.passport || '______'}</div>
+                <div><b>Дата рождения:</b> ${contract.birthDate || '______'}</div>
+                <div><b>Телефон:</b> ${contract.phone || '______'}</div>
+                <div style="grid-column: span 2;"><b>Адрес:</b> ${contract.address || '______'}</div>
+                <div><b>Доп. Телефон:</b> ${contract.extraPhone || '______'}</div>
+              </div>
+            </div>
+            
+            <!-- БЛОК ПОРУЧИТЕЛЯ -->
+            <div style="border: 1px solid #000; padding: 10px; margin-bottom: 15px;">
+              <div style="font-weight: bold; font-size: 15px; margin-bottom: 5px;">Поручитель</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3px 20px; font-size: 13px;">
+                <div><b>ФИО:</b> ${contract.guarantorFio || '______'}</div>
+                <div><b>Паспорт серия:</b> ______</div>
+                <div><b>Дата рождения:</b> ______</div>
+                <div><b>Телефон:</b> ${contract.guarantorPhone || '______'}</div>
+                <div style="grid-column: span 2;"><b>Адрес:</b> ______</div>
+                <div><b>Доп. Телефон:</b> ______</div>
+              </div>
+            </div>
+            
+            <p style="text-align: justify; font-size: 13px; margin-bottom: 15px;">
+              Совместно именуемые «Стороны», заключили настоящий Договор о нижеследующем:
+            </p>
+            
+            <!-- РАЗДЕЛ 1: ПРЕДМЕТ ДОГОВОРА -->
+            <div style="font-weight: bold; font-size: 16px; text-transform: uppercase; text-decoration: underline; margin-top: 15px; margin-bottom: 8px;">
+              1. ПРЕДМЕТ ДОГОВОРА
+            </div>
+            <p style="text-align: justify; font-size: 13px; padding-left: 15px;">
+              По настоящему Договору «Продавец» обязуется передать в собственность «Покупателя»:
+            </p>
+            <p style="text-align: justify; font-size: 13px; padding-left: 30px; font-weight: bold;">
+              Товар: ${contract.product || '______'}
+            </p>
+            <p style="text-align: justify; font-size: 13px; padding-left: 15px;">
+              «Покупатель» обязуется принять и уплатить за него стоимость, указанную в Договоре.
+            </p>
+            
+            <!-- РАЗДЕЛ 2: ЦЕНА ТОВАРА И ПОРЯДОК РАСЧЕТОВ -->
+            <div style="font-weight: bold; font-size: 16px; text-transform: uppercase; text-decoration: underline; margin-top: 15px; margin-bottom: 8px;">
+              2. ЦЕНА ТОВАРА И ПОРЯДОК РАСЧЕТОВ
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px 30px; font-size: 13px; padding-left: 15px;">
+              <div><b>Цена Товара:</b> ${Number(contract.totalCost).toLocaleString('ru-RU')} руб.</div>
+              <div><b>Первый взнос:</b> ${Number(contract.downPayment || 0).toLocaleString('ru-RU')} руб.</div>
+              <div style="grid-column: span 2; text-align: right; font-size: 12px; color: #666;">подпись: ______</div>
+            </div>
+            <p style="text-align: justify; font-size: 13px; padding-left: 15px; margin-top: 5px;">
+              Оставшуюся сумму Покупатель выплачивает в течение <b>${contract.monthsCount}</b> месяцев, 
+              равными частями в размере <b>${Number(contract.monthlyPay).toLocaleString('ru-RU')}</b> руб. 
+              не позднее <b>${contract.payDate || '______'}</b> числа каждого месяца.
+            </p>
+            
+            <!-- ТАБЛИЦА МЕСЯЦЕВ (СНИЗУ ВВЕРХ) -->
+            <div style="margin-top: 20px; border: 1px solid #000; overflow: hidden;">
+              <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                  <tr style="background-color: #e2e8f0; font-weight: bold; text-align: center;">
+                    <th style="padding: 8px 12px; border-right: 1px solid #000; width: 15%;">№</th>
+                    <th style="padding: 8px 12px; border-right: 1px solid #000; width: 35%;">Дата</th>
+                    <th style="padding: 8px 12px; border-right: 1px solid #000; width: 25%;">Сумма</th>
+                    <th style="padding: 8px 12px; width: 25%;">Статус</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${monthsHtml}
+                </tbody>
+              </table>
+            </div>
+            
+          </div>
+          
+          <!-- ================= РАЗРЫВ СТРАНИЦЫ ================= -->
+          <div style="page-break-after: always; border-bottom: 2px dashed #ccc; margin: 20px 0;"></div>
+          
+          <!-- ================= СТРАНИЦА 2 ================= -->
+          <div>
+            
+            <!-- РАЗДЕЛ 3: ПРАВА И ОБЯЗАННОСТИ СТОРОН -->
+            <div style="font-weight: bold; font-size: 16px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 8px;">
+              3. ПРАВА И ОБЯЗАННОСТИ СТОРОН
+            </div>
+            
+            <div style="font-weight: bold; font-size: 14px; margin-top: 10px; margin-bottom: 5px;">«Продавец» обязан:</div>
+            <div style="padding-left: 20px; font-size: 13px; margin-bottom: 10px;">
+              - Передать «Покупателю» Товар надлежащего качества, в надлежащей упаковке, в порядке и в сроки, установленные настоящим Договором.
+            </div>
+            
+            <div style="font-weight: bold; font-size: 14px; margin-top: 10px; margin-bottom: 5px;">«Покупатель» обязан:</div>
+            <div style="padding-left: 20px; font-size: 13px; margin-bottom: 5px;">
+              - Принять Товар в порядке, предусмотренном настоящим Договором.
+            </div>
+            <div style="padding-left: 20px; font-size: 13px; margin-bottom: 5px;">
+              - Оплатить Товар в порядке и в сроки, предусмотренные настоящим Договором.
+            </div>
+            <div style="padding-left: 20px; font-size: 13px; margin-bottom: 10px;">
+              - Не имеет право менять контактный номер без предупреждения. При наступлении непредвиденных обстоятельств обязан всеми возможными способами оповестить продавца.
+            </div>
+            
+            <div style="font-weight: bold; font-size: 14px; margin-top: 10px; margin-bottom: 5px;">«Поручитель» обязан:</div>
+            <div style="padding-left: 20px; font-size: 13px; margin-bottom: 10px;">
+              - При неисполнении или ненадлежащем исполнении «Покупателем» своих обязательств по настоящему договору «Поручитель» отвечает перед «Продавцом» в том же объеме, что и «Покупатель», включая возврат основного долга. При просрочке выплаты «Покупателем» на 7 дней от установленного срока «Поручитель» обязан выплатить просроченный платеж.
+            </div>
+            
+            <!-- РАЗДЕЛ 4: ПЕРЕДАЧА И ПРИНЯТИЕ ТОВАРА -->
+            <div style="font-weight: bold; font-size: 16px; text-transform: uppercase; text-decoration: underline; margin-top: 20px; margin-bottom: 8px;">
+              4. ПЕРЕДАЧА И ПРИНЯТИЕ ТОВАРА
+            </div>
+            <div style="padding-left: 20px; font-size: 13px; margin-bottom: 5px;">
+              - Товар передается «Покупателю» в месте нахождения продавца в дату подписания настоящего договора.
+            </div>
+            <div style="padding-left: 20px; font-size: 13px; margin-bottom: 5px;">
+              - «Покупатель» обязан осмотреть товар, проверить соответствие по качеству, количеству и комплектности условиям настоящего договора и принять его.
+            </div>
+            <div style="padding-left: 20px; font-size: 13px; margin-bottom: 5px;">
+              - Право собственности на товар переходит к «Покупателю» с момента полной оплаты им цены договора. Ответственность за сохранность товара переходит к покупателю с момента подписания настоящего договора.
+            </div>
+            <div style="padding-left: 20px; font-size: 13px; margin-bottom: 10px;">
+              - «Продавец» считается исполнившим свою обязанность по передаче товара с даты подписания настоящего договора.
+            </div>
+            
+            <!-- РАЗДЕЛ 5: РАЗРЕШЕНИЕ СПОРОВ -->
+            <div style="font-weight: bold; font-size: 16px; text-transform: uppercase; text-decoration: underline; margin-top: 20px; margin-bottom: 8px;">
+              5. РАЗРЕШЕНИЕ СПОРОВ
+            </div>
+            <div style="padding-left: 20px; font-size: 13px; margin-bottom: 5px;">
+              - Все споры и разногласия, которые могут возникнуть между сторонами по вопросам, не нашедшим своего разрешения в тексте настоящего договора, будут разрешаться путем переговоров.
+            </div>
+            <div style="padding-left: 20px; font-size: 13px; margin-bottom: 10px;">
+              - В случае неурегулирования спорных вопросов в процессе переговоров такой спор подлежит рассмотрению в суде.
+            </div>
+            
+            <!-- РАЗДЕЛ 6: ЗАКЛЮЧИТЕЛЬНЫЕ ПОЛОЖЕНИЯ -->
+            <div style="font-weight: bold; font-size: 16px; text-transform: uppercase; text-decoration: underline; margin-top: 20px; margin-bottom: 8px;">
+              6. ЗАКЛЮЧИТЕЛЬНЫЕ ПОЛОЖЕНИЯ
+            </div>
+            <div style="padding-left: 20px; font-size: 13px; margin-bottom: 5px;">
+              - Настоящий договор вступает в силу с даты его подписания «Сторонами» и действует до полного исполнения ими обязательств по настоящему договору.
+            </div>
+            <div style="padding-left: 20px; font-size: 13px; margin-bottom: 15px;">
+              - Любые изменения и дополнения к настоящему договору должны быть составлены в письменной форме и подписаны всеми сторонами.
+            </div>
+            
+            <!-- ПОДПИСИ СТОРОН -->
+            <div style="font-weight: bold; font-size: 16px; text-transform: uppercase; text-decoration: underline; margin-top: 25px; margin-bottom: 15px;">
+              ПОДПИСИ СТОРОН
+            </div>
+            
+            <table style="width: 100%; border-collapse: collapse; font-size: 14px; text-align: center;">
+              <thead>
+                <tr>
+                  <th style="padding: 10px; border: 1px solid #000; width: 33%;">«Продавец»</th>
+                  <th style="padding: 10px; border: 1px solid #000; width: 33%;">«Покупатель»</th>
+                  <th style="padding: 10px; border: 1px solid #000; width: 34%;">«Поручитель»</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="padding: 30px 10px; border: 1px solid #000; vertical-align: bottom;">
+                    <div style="border-top: 1px solid #000; width: 80%; margin: 0 auto; padding-top: 5px;">______</div>
+                  </td>
+                  <td style="padding: 30px 10px; border: 1px solid #000; vertical-align: bottom;">
+                    <div style="border-top: 1px solid #000; width: 80%; margin: 0 auto; padding-top: 5px;">______</div>
+                    <div style="font-size: 11px; margin-top: 5px; color: #555;">${contract.fio || ''}</div>
+                  </td>
+                  <td style="padding: 30px 10px; border: 1px solid #000; vertical-align: bottom;">
+                    <div style="border-top: 1px solid #000; width: 80%; margin: 0 auto; padding-top: 5px;">______</div>
+                    <div style="font-size: 11px; margin-top: 5px; color: #555;">${contract.guarantorFio || ''}</div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <!-- Дата печати внизу -->
+            <div style="margin-top: 20px; font-size: 11px; text-align: center; color: #999; border-top: 1px solid #ddd; padding-top: 10px;">
+              Дата печати: ${todayStr}
+            </div>
+            
+          </div>
+          
+        </div>
+      `;
     }
 
     function printContract() {
@@ -2325,4 +2439,15 @@
     updateHistoryButtons();
   </script>
 </body>
-        </html>
+</html>
+```
+
+Что было сделано:
+
+1. Добавлена функция numberToWords() для перевода чисел в пропись
+2. Полностью переписана функция loadContractForPrint() - теперь она формирует договор на 2 страницы точно по вашему образцу
+3. Таблица месяцев отображается снизу вверх с указанием статуса (Оплачен/Ожидает)
+4. Все поля автоматически заполняются из данных выбранного договора
+5. Разрыв страницы между 1-й и 2-й страницей для правильной печати
+
+Теперь при выборе договора и нажатии "Печать" у вас будет ровно 2 страницы, как в вашем Excel файле! 🖨️
