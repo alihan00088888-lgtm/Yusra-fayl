@@ -1535,13 +1535,11 @@
       
       // Создаем массив месяцев
       for (let i = 1; i <= months; i++) {
-        // Базовый месяц: первыйPayDate + i месяцев (НЕ i-1, а i!)
-        // Это значит, что 1-й платеж будет через 1 месяц, а не в текущем
+        // Базовый месяц: первыйPayDate + i месяцев
         const payDate = new Date(firstPayDate);
         payDate.setMonth(payDate.getMonth() + i);
         
-        // Устанавливаем день месяца как payDay (фиксированное число)
-        // Если в месяце нет такого числа (например, 31 февраля), берем последний день месяца
+        // Устанавливаем день месяца как payDay
         const maxDay = getDaysInMonth(payDate.getFullYear(), payDate.getMonth());
         const targetDay = Math.min(payDay, maxDay);
         payDate.setDate(targetDay);
@@ -1586,7 +1584,6 @@
       target.setHours(0, 0, 0, 0);
       
       allContracts.forEach(contract => {
-        // Проверяем только активные договоры (с остатком > 0)
         const insts = contract.installments || {};
         let totalPaid = 0;
         Object.values(insts).forEach(p => totalPaid += Number(p.amount));
@@ -1594,11 +1591,9 @@
         
         if (rest <= 0) return; // Пропускаем закрытые договоры
         
-        // Получаем все месяцы и их статусы
         const monthInfo = getMonthStatus(contract);
         const months = monthInfo.months;
         
-        // Проверяем, есть ли НЕОПЛАЧЕННЫЙ месяц с датой, равной targetDate
         let hasUnpaidMonth = false;
         let unpaidMonthAmount = 0;
         
@@ -1616,358 +1611,281 @@
         }
         
         if (hasUnpaidMonth) {
-          // Пересчитываем просрочку для этого клиента
-          let clientOverdue = 0;
-          months.forEach(m => {
-            if (m.status === 'overdue' && !m.isPaid) {
-              clientOverdue += m.amount;
-            }
-          });
-          
-          result.push({
-            ...contract,
-            rest: rest,
-            phone: contract.phone || '',
-            fio: contract.fio || '',
-            monthInfo: { months: months, overdueSum: clientOverdue },
-            unpaidMonthAmount: unpaidMonthAmount
-          });
+          result.push({ contract, amount: unpaidMonthAmount, rest });
         }
       });
       
       return result;
     }
 
-    function renderClientList(containerId, clients, title, dateStr) {
-      const container = document.getElementById(containerId);
+    function renderTodayClients() {
+      const today = new Date().toISOString().slice(0, 10);
+      const clients = getClientsForDate(today);
+      const container = document.getElementById('todayClientsList');
+      
       if (clients.length === 0) {
-        container.innerHTML = `<div class="text-center text-gray-500 py-8 text-sm">📭 ${title}</div>`;
+        container.innerHTML = '<div class="text-center text-gray-500 py-8 text-sm">📅 Нет клиентов на сегодня</div>';
         return;
       }
-      
-      let html = '<div class="divide-y">';
-      clients.forEach((client) => {
-        const monthInfo = client.monthInfo || getMonthStatus(client);
-        let monthsHtml = '';
-        let overdueSum = 0;
-        
-        monthInfo.months.forEach(m => {
-          let statusClass = 'month-future';
-          let statusText = '⏳ Ожидает';
-          if (m.status === 'paid') {
-            statusClass = 'month-paid';
-            statusText = `✅ ${m.amount} ₽`;
-          } else if (m.status === 'overdue') {
-            statusClass = 'month-overdue';
-            statusText = `❌ ${m.amount} ₽`;
-            overdueSum += m.amount;
-          } else {
-            statusText = `📅 ${m.amount} ₽`;
-          }
-          monthsHtml += `<span class="month-status ${statusClass}" title="${m.date}">${m.month}-й: ${statusText}</span>`;
-        });
-        
-        const clientOverdue = overdueSum || monthInfo.overdueSum || 0;
+
+      let html = '';
+      clients.forEach(({ contract, amount, rest }) => {
+        const cleanPhone = contract.phone.replace(/\D/g, '');
+        const message = encodeURIComponent(`Здравствуйте, ${contract.fio}! Напоминаем о платеже по рассрочке на сумму ${amount} ₽ на сегодня.`);
         
         html += `
           <div class="client-item">
             <div class="client-info">
-              <span class="client-name">${client.fio}</span>
-              <span class="client-phone">📞 ${client.phone}</span>
-              <span class="client-detail">💰 Мес. платеж: ${client.monthlyPay} ₽</span>
-              <span class="client-detail">📅 ${dateStr || ''}</span>
+              <span class="client-name">${contract.fio}</span>
+              <span class="client-phone">📞 ${contract.phone}</span>
+              <span class="client-detail">К оплате: <b class="text-green-600">${amount} ₽</b></span>
+              <span class="client-detail client-rest">Остаток: ${rest} ₽</span>
             </div>
-            <div class="flex flex-wrap items-center gap-2">
-              <span class="client-overdue">Просрочка: ${clientOverdue.toLocaleString('ru-RU')} ₽</span>
-              <span class="client-rest">Остаток: ${client.rest.toLocaleString('ru-RU')} ₽</span>
-              <a href="https://wa.me/7${client.phone.replace(/[^0-9]/g, '')}?text=Здравствуйте! Напоминаем о платеже." 
-                 target="_blank" 
-                 class="text-green-600 hover:text-green-800 font-bold text-sm">
-                💬
-              </a>
-            </div>
-            <div class="w-full mt-1 flex flex-wrap gap-1">
-              ${monthsHtml}
-            </div>
+            <a href="https://wa.me/${cleanPhone}?text=${message}" target="_blank" class="whatsapp-btn">
+              💬 Написать WhatsApp
+            </a>
           </div>
         `;
       });
-      html += '</div>';
       container.innerHTML = html;
     }
 
-    function renderTodayClients() {
-      const today = new Date();
-      const todayStr = today.toISOString().slice(0, 10);
-      const clients = getClientsForDate(todayStr);
-      renderClientList('todayClientsList', clients, 'Нет клиентов, которые должны оплатить сегодня', `Сегодня (${todayStr})`);
-    }
-
     function renderThreeDaysClients() {
-      const today = new Date();
-      const threeDaysLater = new Date(today);
-      threeDaysLater.setDate(today.getDate() + 3);
-      const threeDaysStr = threeDaysLater.toISOString().slice(0, 10);
-      const clients = getClientsForDate(threeDaysStr);
-      renderClientList('threeDaysClientsList', clients, 'Нет клиентов, которым нужно оплатить через 3 дня', `Через 3 дня (${threeDaysStr})`);
+      const targetDate = new Date();
+      targetDate.setDate(targetDate.getDate() + 3);
+      const targetStr = targetDate.toISOString().slice(0, 10);
+      
+      const clients = getClientsForDate(targetStr);
+      const container = document.getElementById('threeDaysClientsList');
+      
+      if (clients.length === 0) {
+        container.innerHTML = '<div class="text-center text-gray-500 py-8 text-sm">⏰ Нет клиентов через 3 дня</div>';
+        return;
+      }
+
+      let html = '';
+      clients.forEach(({ contract, amount, rest }) => {
+        const cleanPhone = contract.phone.replace(/\D/g, '');
+        const message = encodeURIComponent(`Здравствуйте, ${contract.fio}! Напоминаем, что через 3 дня дата вашего очередного платежа по рассрочке в размере ${amount} ₽.`);
+        
+        html += `
+          <div class="client-item">
+            <div class="client-info">
+              <span class="client-name">${contract.fio}</span>
+              <span class="client-phone">📞 ${contract.phone}</span>
+              <span class="client-detail">К оплате: <b class="text-blue-600">${amount} ₽</b></span>
+              <span class="client-detail client-rest">Остаток: ${rest} ₽</span>
+            </div>
+            <a href="https://wa.me/${cleanPhone}?text=${message}" target="_blank" class="whatsapp-btn">
+              💬 Написать WhatsApp
+            </a>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
     }
 
     function renderDebtorsClients() {
-      const clients = getDebtors();
-      renderClientList('debtorsClientsList', clients, 'Нет клиентов с просрочкой', '');
-    }
-
-    function getDebtors() {
-      const result = [];
+      const container = document.getElementById('debtorsClientsList');
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      
+
+      const debtors = [];
+
       allContracts.forEach(contract => {
         const insts = contract.installments || {};
         let totalPaid = 0;
         Object.values(insts).forEach(p => totalPaid += Number(p.amount));
         const rest = contract.totalCost - (contract.downPayment || 0) - totalPaid;
-        
+
         if (rest <= 0) return;
-        
+
         const monthInfo = getMonthStatus(contract);
-        const hasOverdue = monthInfo.months.some(m => m.status === 'overdue' && !m.isPaid);
-        
-        if (hasOverdue) {
-          let clientOverdue = 0;
-          monthInfo.months.forEach(m => {
-            if (m.status === 'overdue' && !m.isPaid) {
-              clientOverdue += m.amount;
-            }
-          });
-          
-          result.push({
-            ...contract,
-            rest: rest,
-            phone: contract.phone || '',
-            fio: contract.fio || '',
-            monthInfo: { months: monthInfo.months, overdueSum: clientOverdue }
-          });
+        if (monthInfo.overdueSum > 0) {
+          debtors.push({ contract, overdueSum: monthInfo.overdueSum, rest });
         }
       });
-      
-      return result;
-    }
 
-    // ===== ФУНКЦИИ ДЛЯ WHATSAPP =====
-    
-    function showCopyNotification(message) {
-      const notification = document.createElement('div');
-      notification.className = 'copy-notification';
-      notification.textContent = message;
-      document.body.appendChild(notification);
-      setTimeout(() => {
-        notification.remove();
-      }, 3000);
+      if (debtors.length === 0) {
+        container.innerHTML = '<div class="text-center text-gray-500 py-8 text-sm">🎉 Нет неплательщиков! Все платят вовремя.</div>';
+        return;
+      }
+
+      let html = '';
+      debtors.forEach(({ contract, overdueSum, rest }) => {
+        const cleanPhone = contract.phone.replace(/\D/g, '');
+        const message = encodeURIComponent(`Здравствуйте, ${contract.fio}! У вас имеется просроченная задолженность по рассрочке на сумму ${overdueSum} ₽. Просим срочно погасить платеж.`);
+
+        html += `
+          <div class="client-item">
+            <div class="client-info">
+              <span class="client-name">${contract.fio}</span>
+              <span class="client-phone">📞 ${contract.phone}</span>
+              <span class="client-detail client-overdue">Просрочка: ${overdueSum} ₽</span>
+              <span class="client-detail client-rest">Общий остаток: ${rest} ₽</span>
+            </div>
+            <a href="https://wa.me/${cleanPhone}?text=${message}" target="_blank" class="whatsapp-btn">
+              💬 Написать WhatsApp
+            </a>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
     }
 
     function sendWhatsAppToday() {
-      const today = new Date();
-      const todayStr = today.toISOString().slice(0, 10);
-      const clients = getClientsForDate(todayStr);
-      
+      const today = new Date().toISOString().slice(0, 10);
+      const clients = getClientsForDate(today);
       if (clients.length === 0) {
-        alert('📭 Нет клиентов, которые должны оплатить сегодня');
+        alert('Нет клиентов на сегодня для рассылки');
         return;
       }
-      
-      let message = '🔔 *Напоминание об оплате сегодня!*\n\n';
-      let phoneNumbers = [];
-      
-      clients.forEach((client, index) => {
-        const phone = client.phone.replace(/[^0-9]/g, '');
-        if (phone) phoneNumbers.push(phone);
-        
-        const monthInfo = client.monthInfo || getMonthStatus(client);
-        let overdueSum = 0;
-        monthInfo.months.forEach(m => {
-          if (m.status === 'overdue' && !m.isPaid) overdueSum += m.amount;
-        });
-        
-        message += `${index + 1}. *${client.fio}*\n`;
-        message += `   💰 Сумма: ${client.monthlyPay} ₽\n`;
-        message += `   📱 WhatsApp: wa.me/7${phone}\n`;
-        if (overdueSum > 0) {
-          message += `   ⚠️ Просрочка: ${overdueSum} ₽\n`;
-        }
-        message += `   📊 Остаток: ${client.rest} ₽\n\n`;
+      clients.forEach(({ contract, amount }) => {
+        const cleanPhone = contract.phone.replace(/\D/g, '');
+        const message = encodeURIComponent(`Здравствуйте, ${contract.fio}! Напоминаем о платеже по рассрочке на сумму ${amount} ₽ на сегодня.`);
+        window.open(`https://wa.me/${cleanPhone}?text=${message}`, '_blank');
       });
-      
-      message += `\n📅 Дата платежа: ${todayStr}\n`;
-      message += `👥 Всего клиентов: ${clients.length}`;
-      
-      const phoneList = phoneNumbers.map(p => `7${p}`).join(', ');
-      navigator.clipboard.writeText(phoneList).then(() => {
-        showCopyNotification(`✅ Скопировано ${phoneNumbers.length} номеров для рассылки!`);
-      }).catch(() => {
-        showCopyNotification(`⚠️ Найдено ${phoneNumbers.length} клиентов. Скопируйте номера вручную.`);
-      });
-      
-      const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-      window.open(url, '_blank');
     }
 
     function sendWhatsAppThreeDays() {
-      const today = new Date();
-      const threeDaysLater = new Date(today);
-      threeDaysLater.setDate(today.getDate() + 3);
-      const threeDaysStr = threeDaysLater.toISOString().slice(0, 10);
-      const clients = getClientsForDate(threeDaysStr);
-      
+      const targetDate = new Date();
+      targetDate.setDate(targetDate.getDate() + 3);
+      const targetStr = targetDate.toISOString().slice(0, 10);
+      const clients = getClientsForDate(targetStr);
       if (clients.length === 0) {
-        alert('📭 Нет клиентов, которым нужно оплатить через 3 дня');
+        alert('Нет клиентов через 3 дня для рассылки');
         return;
       }
-      
-      let message = '🔔 *Напоминание об оплате через 3 дня!*\n\n';
-      let phoneNumbers = [];
-      
-      clients.forEach((client, index) => {
-        const phone = client.phone.replace(/[^0-9]/g, '');
-        if (phone) phoneNumbers.push(phone);
-        
-        const monthInfo = client.monthInfo || getMonthStatus(client);
-        let overdueSum = 0;
-        monthInfo.months.forEach(m => {
-          if (m.status === 'overdue' && !m.isPaid) overdueSum += m.amount;
-        });
-        
-        message += `${index + 1}. *${client.fio}*\n`;
-        message += `   💰 Сумма: ${client.monthlyPay} ₽\n`;
-        message += `   📱 WhatsApp: wa.me/7${phone}\n`;
-        if (overdueSum > 0) {
-          message += `   ⚠️ Просрочка: ${overdueSum} ₽\n`;
-        }
-        message += `   📊 Остаток: ${client.rest} ₽\n\n`;
+      clients.forEach(({ contract, amount }) => {
+        const cleanPhone = contract.phone.replace(/\D/g, '');
+        const message = encodeURIComponent(`Здравствуйте, ${contract.fio}! Напоминаем, что через 3 дня дата вашего очередного платежа по рассрочке в размере ${amount} ₽.`);
+        window.open(`https://wa.me/${cleanPhone}?text=${message}`, '_blank');
       });
-      
-      message += `\n📅 Дата платежа: ${threeDaysStr}\n`;
-      message += `👥 Всего клиентов: ${clients.length}`;
-      
-      const phoneList = phoneNumbers.map(p => `7${p}`).join(', ');
-      navigator.clipboard.writeText(phoneList).then(() => {
-        showCopyNotification(`✅ Скопировано ${phoneNumbers.length} номеров для рассылки!`);
-      }).catch(() => {
-        showCopyNotification(`⚠️ Найдено ${phoneNumbers.length} клиентов. Скопируйте номера вручную.`);
-      });
-      
-      const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-      window.open(url, '_blank');
     }
 
     function sendWhatsAppDebtors() {
-      const clients = getDebtors();
-      
-      if (clients.length === 0) {
-        alert('📭 Нет клиентов с просрочкой');
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const debtors = [];
+
+      allContracts.forEach(contract => {
+        const insts = contract.installments || {};
+        let totalPaid = 0;
+        Object.values(insts).forEach(p => totalPaid += Number(p.amount));
+        const rest = contract.totalCost - (contract.downPayment || 0) - totalPaid;
+        if (rest <= 0) return;
+
+        const monthInfo = getMonthStatus(contract);
+        if (monthInfo.overdueSum > 0) {
+          debtors.push({ contract, overdueSum: monthInfo.overdueSum });
+        }
+      });
+
+      if (debtors.length === 0) {
+        alert('Нет неплательщиков для рассылки');
         return;
       }
-      
-      let message = '🚫 *Напоминание о просроченной задолженности!*\n\n';
-      let phoneNumbers = [];
-      
-      clients.forEach((client, index) => {
-        const phone = client.phone.replace(/[^0-9]/g, '');
-        if (phone) phoneNumbers.push(phone);
-        
-        const monthInfo = client.monthInfo || getMonthStatus(client);
-        let overdueSum = 0;
-        let overdueMonths = [];
-        monthInfo.months.forEach(m => {
-          if (m.status === 'overdue' && !m.isPaid) {
-            overdueSum += m.amount;
-            overdueMonths.push(`${m.month}-й (${m.date})`);
+
+      debtors.forEach(({ contract, overdueSum }) => {
+        const cleanPhone = contract.phone.replace(/\D/g, '');
+        const message = encodeURIComponent(`Здравствуйте, ${contract.fio}! У вас имеется просроченная задолженность по рассрочке на сумму ${overdueSum} ₽. Просим срочно погасить платеж.`);
+        window.open(`https://wa.me/${cleanPhone}?text=${message}`, '_blank');
+      });
+    }
+
+    // ================================================================
+    // ЛОГИКА ТАБЛИЦЫ "ДОГОВОРЫ"
+    // ================================================================
+
+    function renderTable(data) {
+      const tbody = document.getElementById('contractsTable');
+      tbody.innerHTML = '';
+
+      data.forEach(item => {
+        const insts = item.installments || {};
+        let totalPaid = 0;
+        Object.values(insts).forEach(p => totalPaid += Number(p.amount));
+
+        const rest = item.totalCost - (item.downPayment || 0) - totalPaid;
+        const monthInfo = getMonthStatus(item);
+
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50 transition border-b';
+
+        let cellsHtml = `
+          <td class="p-2 font-bold border-r">${item.fio}</td>
+          <td class="p-2 border-r whitespace-nowrap">${item.phone}</td>
+          <td class="p-2 border-r whitespace-nowrap text-[10px]">
+            <div>Покупка: <b>${item.buyDate || '-'}</b></div>
+            <div>График: <b>${item.payDate || '-'}</b></div>
+          </td>
+          <td class="p-2 font-bold border-r text-blue-700">${Number(item.monthlyPay).toLocaleString('ru-RU')} ₽</td>
+        `;
+
+        for (let i = 1; i <= 15; i++) {
+          if (i <= item.monthsCount) {
+            const pay = insts[i];
+            if (pay && pay.amount > 0) {
+              cellsHtml += `
+                <td onclick="openPayModal('${item.id}', ${i})" title="${pay.date || ''}" class="p-1 border-r text-center pay-paid">
+                  ${Number(pay.amount).toLocaleString('ru-RU')}
+                </td>`;
+            } else {
+              cellsHtml += `
+                <td onclick="openPayModal('${item.id}', ${i})" class="p-1 border-r text-center hover:bg-slate-200 cursor-pointer text-gray-400">
+                  -
+                </td>`;
+            }
+          } else {
+            cellsHtml += `<td class="p-1 border-r text-center bg-gray-100 text-gray-300">-</td>`;
           }
-        });
-        
-        message += `${index + 1}. *${client.fio}*\n`;
-        message += `   💰 Сумма: ${client.monthlyPay} ₽\n`;
-        message += `   📱 WhatsApp: wa.me/7${phone}\n`;
-        message += `   ⚠️ Просрочка: ${overdueSum} ₽ (${overdueMonths.join(', ')})\n`;
-        message += `   📊 Остаток: ${client.rest} ₽\n\n`;
+        }
+
+        cellsHtml += `
+          <td class="p-2 border-r font-bold ${monthInfo.overdueSum > 0 ? 'text-red-600 bg-red-50' : 'text-gray-400'}">
+            ${monthInfo.overdueSum > 0 ? monthInfo.overdueSum.toLocaleString('ru-RU') + ' ₽' : '0 ₽'}
+          </td>
+          <td class="p-2 border-r font-black ${rest > 0 ? 'text-amber-600' : 'text-green-600'}">
+            ${rest.toLocaleString('ru-RU')} ₽
+          </td>
+          <td class="p-2 border-r text-[10px]">
+            <div>Рассрочка: <b>${Number(item.totalCost).toLocaleString('ru-RU')}</b></div>
+            <div>Пред.: <b>${Number(item.downPayment || 0).toLocaleString('ru-RU')}</b></div>
+          </td>
+          <td class="p-2 border-r font-bold">${Number(item.costPrice).toLocaleString('ru-RU')} ₽</td>
+          <td class="p-2 border-r text-center">
+            <input type="checkbox" ${item.shopPaid ? 'checked' : ''} onchange="toggleShopPaid('${item.id}', this.checked)" class="w-4 h-4 cursor-pointer">
+          </td>
+          <td class="p-2 border-r text-[10px]">
+            <div><b>${item.product || '-'}</b></div>
+            <div class="text-gray-500">${item.store || '-'}</div>
+          </td>
+          <td class="p-2 border-r text-[10px]">
+            <div><b>${item.guarantorFio || '-'}</b></div>
+            <div class="text-gray-500">${item.guarantorPhone || '-'}</div>
+          </td>
+          <td class="p-2 text-center sticky right-0 bg-white shadow-md">
+            <button onclick="editContract('${item.id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-[10px] font-bold mr-1">✏️ Ред.</button>
+            <button onclick="deleteContract('${item.id}')" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-[10px] font-bold">🗑 Уд.</button>
+          </td>
+        `;
+
+        tr.innerHTML = cellsHtml;
+        tbody.appendChild(tr);
       });
-      
-      message += `\n👥 Всего должников: ${clients.length}`;
-      
-      const phoneList = phoneNumbers.map(p => `7${p}`).join(', ');
-      navigator.clipboard.writeText(phoneList).then(() => {
-        showCopyNotification(`✅ Скопировано ${phoneNumbers.length} номеров для рассылки!`);
-      }).catch(() => {
-        showCopyNotification(`⚠️ Найдено ${phoneNumbers.length} должников. Скопируйте номера вручную.`);
-      });
-      
-      const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-      window.open(url, '_blank');
     }
 
-    // ================================================================
-    // ОСНОВНЫЕ ФУНКЦИИ РАБОТЫ С ДАННЫМИ
-    // ================================================================
-
-    function validateFinance() {
-      const months = Number(document.getElementById('monthsCount').value) || 0;
-      const monthly = Number(document.getElementById('monthlyPay').value) || 0;
-      const total = Number(document.getElementById('totalCost').value) || 0;
-      const down = Number(document.getElementById('downPayment').value) || 0;
-      const cost = Number(document.getElementById('costPrice').value) || 0;
-
-      if (months === 0 && monthly === 0 && total === 0 && down === 0 && cost === 0) {
-        document.getElementById('errorBanner').classList.add('hidden');
-        const saveBtn = document.getElementById('saveBtn');
-        saveBtn.disabled = false;
-        saveBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-        return true;
-      }
-
-      const isMathError = (months > 0 || monthly > 0 || total > 0) && (months * monthly + down !== total);
-      const isPriceError = (cost > 0 || total > 0) && (cost > total);
-      
-      const hasError = isMathError || isPriceError;
-      
-      document.getElementById('totalCost').classList.toggle('input-error', isMathError);
-      document.getElementById('monthlyPay').classList.toggle('input-error', isMathError);
-      document.getElementById('monthsCount').classList.toggle('input-error', isMathError);
-      document.getElementById('downPayment').classList.toggle('input-error', false);
-      document.getElementById('costPrice').classList.toggle('input-error', isPriceError);
-
-      document.getElementById('errorBanner').classList.toggle('hidden', !hasError);
-      
-      const saveBtn = document.getElementById('saveBtn');
-      saveBtn.disabled = hasError;
-      saveBtn.classList.toggle('opacity-50', hasError);
-      saveBtn.classList.toggle('cursor-not-allowed', hasError);
-
-      return !hasError;
-    }
-
-    const modal = document.getElementById('modal');
     function openCreateModal() {
+      document.getElementById('modalTitle').innerText = 'Новый договор';
       document.getElementById('contractForm').reset();
       document.getElementById('editDocId').value = '';
-      document.getElementById('modalTitle').innerText = 'Оформление нового договора';
-      document.getElementById('downPayment').value = 0;
-      validateFinance();
-      modal.classList.remove('hidden');
-    }
-    function closeModal() { modal.classList.add('hidden'); }
-    function closePayModal() { document.getElementById('payModal').classList.add('hidden'); }
-
-    function openPayModal(id) {
-      document.getElementById('payContractId').value = id;
-      document.getElementById('payDateVal').valueAsDate = new Date();
-      document.getElementById('payModal').classList.remove('hidden');
+      document.getElementById('errorBanner').classList.add('hidden');
+      document.getElementById('modal').classList.remove('hidden');
     }
 
-    function openEditModal(id) {
-      const contract = allContracts.find(c => c.id === id);
-      if(!contract) return;
-      document.getElementById('editDocId').value = id;
-      document.getElementById('modalTitle').innerText = `Редактирование №${contract.contractNum}`;
+    function openEditModal(contract) {
+      document.getElementById('modalTitle').innerText = 'Редактировать договор';
+      document.getElementById('editDocId').value = contract.id;
       document.getElementById('fio').value = contract.fio || '';
       document.getElementById('birthDate').value = contract.birthDate || '';
       document.getElementById('passport').value = contract.passport || '';
@@ -1986,24 +1904,46 @@
       document.getElementById('store').value = contract.store || '';
       document.getElementById('guarantorFio').value = contract.guarantorFio || '';
       document.getElementById('guarantorPhone').value = contract.guarantorPhone || '';
-      validateFinance();
-      modal.classList.remove('hidden');
+      document.getElementById('errorBanner').classList.add('hidden');
+      document.getElementById('modal').classList.remove('hidden');
     }
 
-    document.getElementById('contractForm').addEventListener('submit', (e) => {
+    function closeModal() {
+      document.getElementById('modal').classList.add('hidden');
+    }
+
+    function validateFinance() {
+      const months = Number(document.getElementById('monthsCount').value) || 0;
+      const mPay = Number(document.getElementById('monthlyPay').value) || 0;
+      const total = Number(document.getElementById('totalCost').value) || 0;
+      const down = Number(document.getElementById('downPayment').value) || 0;
+      const banner = document.getElementById('errorBanner');
+
+      if (months > 0 && mPay > 0 && total > 0) {
+        if ((months * mPay + down) !== total) {
+          banner.classList.remove('hidden');
+          banner.innerText = `⚠️ Ошибка: ${months} мес. * ${mPay} ₽ + пред. ${down} ₽ = ${months * mPay + down} ₽, а указано всего ${total} ₽!`;
+          return false;
+        }
+      }
+      banner.classList.add('hidden');
+      return true;
+    }
+
+    document.getElementById('contractForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      if (!validateFinance()) return;
-      
       saveState();
 
-      const editId = document.getElementById('editDocId').value;
-      const formData = {
+      const id = document.getElementById('editDocId').value;
+      const contractData = {
+        id: id || Date.now().toString(),
+        contractNum: id ? (allContracts.find(c => c.id === id)?.contractNum || allContracts.length + 1) : allContracts.length + 1,
         fio: document.getElementById('fio').value,
-        birthDate: document.getElementById('birthDate').value || '',
-        passport: document.getElementById('passport').value || '',
+        birthDate: document.getElementById('birthDate').value,
+        passport: document.getElementById('passport').value,
         phone: document.getElementById('phone').value,
-        extraPhone: document.getElementById('extraPhone').value || '',
-        address: document.getElementById('address').value || '',
+        extraPhone: document.getElementById('extraPhone').value,
+        address: document.getElementById('address').value,
         buyDate: document.getElementById('buyDate').value,
         payDate: document.getElementById('payDate').value,
         monthsCount: Number(document.getElementById('monthsCount').value),
@@ -2012,580 +1952,515 @@
         downPayment: Number(document.getElementById('downPayment').value) || 0,
         costPrice: Number(document.getElementById('costPrice').value),
         shopPaid: document.getElementById('shopPaid').checked,
-        product: document.getElementById('product').value || '',
-        store: document.getElementById('store').value || '',
-        guarantorFio: document.getElementById('guarantorFio').value || '',
-        guarantorPhone: document.getElementById('guarantorPhone').value || ''
+        product: document.getElementById('product').value,
+        store: document.getElementById('store').value,
+        guarantorFio: document.getElementById('guarantorFio').value,
+        guarantorPhone: document.getElementById('guarantorPhone').value,
+        installments: id ? (allContracts.find(c => c.id === id)?.installments || {}) : {}
       };
 
-      if (editId) {
-        const index = allContracts.findIndex(c => c.id === editId);
-        if (index !== -1) allContracts[index] = { ...allContracts[index], ...formData };
+      if (id) {
+        const index = allContracts.findIndex(c => c.id === id);
+        if (index !== -1) allContracts[index] = contractData;
       } else {
-        const maxNum = allContracts.reduce((max, c) => (c.contractNum > max ? c.contractNum : max), 0);
-        allContracts.push({
-          id: 'doc_' + Date.now(),
-          contractNum: maxNum + 1,
-          installments: {},
-          ...formData
-        });
+        allContracts.push(contractData);
       }
-      saveToStorage();
+
       closeModal();
-    });
-
-    document.getElementById('payForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const id = document.getElementById('payContractId').value;
-      const contract = allContracts.find(c => c.id === id);
-      if (!contract) return;
-
-      const inputDateVal = document.getElementById('payDateVal').value;
-      const inputDate = new Date(inputDateVal);
-      const today = new Date();
-      
-      const isDifferentMonth = (inputDate.getFullYear() !== today.getFullYear()) || (inputDate.getMonth() !== today.getMonth());
-
-      if (isDifferentMonth) {
-        const confirmed = confirm(`Внимание! Дата платежа (${inputDateVal}) относится НЕ к текущему месяцу.\n\nВы уверены, что хотите сохранить эту дату?`);
-        if (!confirmed) return;
-      }
-
-      saveState();
-      const idx = document.getElementById('payIndex').value;
-      if (!contract.installments) contract.installments = {};
-      contract.installments[idx] = { 
-        amount: Number(document.getElementById('payAmount').value), 
-        date: inputDateVal 
-      };
       saveToStorage();
-      closePayModal();
-      document.getElementById('payForm').reset();
     });
 
-    function deleteInstallment() {
-      const id = document.getElementById('payContractId').value;
-      const idx = document.getElementById('payIndex').value;
+    function editContract(id) {
       const contract = allContracts.find(c => c.id === id);
-
-      if (contract && contract.installments && contract.installments[idx]) {
-        if (confirm(`Удалить ${idx}-й взнос на сумму ${contract.installments[idx].amount} ₽?`)) {
-          saveState();
-          delete contract.installments[idx];
-          saveToStorage();
-          closePayModal();
-          document.getElementById('payForm').reset();
-        }
-      } else {
-        alert("Этот взнос еще не был внесен.");
-      }
+      if (contract) openEditModal(contract);
     }
 
     function deleteContract(id) {
-      const contract = allContracts.find(c => c.id === id);
-      if (confirm(`Удалить договор №${contract.contractNum}?`)) {
-        if (prompt('Введите "УДАЛИТЬ" для подтверждения:') === "УДАЛИТЬ") {
-          saveState();
-          allContracts = allContracts.filter(c => c.id !== id);
-          saveToStorage();
-        }
+      if (confirm('Вы действительно хотите удалить этот договор?')) {
+        saveState();
+        allContracts = allContracts.filter(c => c.id !== id);
+        saveToStorage();
       }
     }
 
-    function copyToClip(text, btn) {
-      navigator.clipboard.writeText(text).then(() => {
-        const oldText = btn.innerText;
-        btn.innerText = "✓ Готово";
-        btn.classList.add("bg-green-700");
-        setTimeout(() => { btn.innerText = oldText; btn.classList.remove("bg-green-700"); }, 1000);
-      });
+    function toggleShopPaid(id, checked) {
+      saveState();
+      const contract = allContracts.find(c => c.id === id);
+      if (contract) {
+        contract.shopPaid = checked;
+        saveToStorage();
+      }
     }
 
-    function copyHistory(id, btn) {
-      const c = allContracts.find(i => i.id === id);
-      let log = `Договор №${c.contractNum}\nФИО: ${c.fio}\n\nОплаты:\n`;
-      Object.keys(c.installments || {}).sort((a,b)=>a-b).forEach(k => {
-        log += `${k}-й: ${c.installments[k].amount}₽ (${c.installments[k].date})\n`;
-      });
-      copyToClip(log, btn);
+    // ================================================================
+    // МОДАЛЬНОЕ ОКНО ОПЛАТЫ ВЗНОСА
+    // ================================================================
+
+    function openPayModal(contractId, monthIndex) {
+      const contract = allContracts.find(c => c.id === contractId);
+      if (!contract) return;
+
+      document.getElementById('payContractId').value = contractId;
+      document.getElementById('payIndex').value = monthIndex;
+      
+      const existingPay = contract.installments?.[monthIndex];
+      document.getElementById('payAmount').value = existingPay ? existingPay.amount : contract.monthlyPay;
+      document.getElementById('payDateVal').value = existingPay ? existingPay.date : new Date().toISOString().slice(0, 10);
+
+      document.getElementById('payModal').classList.remove('hidden');
     }
 
-    function copyGuarantor(id, btn) {
-      const c = allContracts.find(i => i.id === id);
-      copyToClip(`Договор №${c.contractNum}\nКлиент: ${c.fio}\nПоручитель: ${c.guarantorFio || '—'} (${c.guarantorPhone || '—'})`, btn);
+    function closePayModal() {
+      document.getElementById('payModal').classList.add('hidden');
     }
 
-    function renderTable(contracts) {
-      const tbody = document.getElementById('contractsTable');
-      tbody.innerHTML = '';
-      contracts.forEach(item => {
-        const insts = item.installments || {};
-        let totalPaid = 0;
-        Object.values(insts).forEach(p => totalPaid += Number(p.amount));
-        const rest = item.totalCost - (item.downPayment || 0) - totalPaid;
-        
-        const tr = document.createElement('tr');
-        if (item.costPrice > item.totalCost) tr.className = 'row-error';
-        
-        let instHtml = '';
-        for(let i=1; i<=15; i++) {
-          const v = insts[i];
-          instHtml += v ? `<td class="p-1 border-r text-center pay-paid" title="Дата: ${v.date}">${v.amount}</td>` : `<td class="p-1 border-r text-center text-gray-300">—</td>`;
+    document.getElementById('payForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      saveState();
+
+      const contractId = document.getElementById('payContractId').value;
+      const monthIndex = document.getElementById('payIndex').value;
+      const amount = Number(document.getElementById('payAmount').value);
+      const date = document.getElementById('payDateVal').value;
+
+      const contract = allContracts.find(c => c.id === contractId);
+      if (contract) {
+        if (!contract.installments) contract.installments = {};
+        contract.installments[monthIndex] = { amount, date };
+        saveToStorage();
+      }
+
+      closePayModal();
+    });
+
+    function deleteInstallment() {
+      const contractId = document.getElementById('payContractId').value;
+      const monthIndex = document.getElementById('payIndex').value;
+
+      const contract = allContracts.find(c => c.id === contractId);
+      if (contract && contract.installments?.[monthIndex]) {
+        if (confirm('Удалить данный взнос?')) {
+          saveState();
+          delete contract.installments[monthIndex];
+          saveToStorage();
+          closePayModal();
         }
+      } else {
+        alert('Взнос еще не был внесен');
+      }
+    }
 
+    // ================================================================
+    // ЛОГИКА ТАБЛИЦЫ "УЧЕТ"
+    // ================================================================
+
+    function renderAccountingTable(data) {
+      const tbody = document.getElementById('accountingTable');
+      tbody.innerHTML = '';
+
+      let inc = 0, exp = 0;
+
+      data.forEach(item => {
+        inc += Number(item.income || 0);
+        exp += Number(item.expense || 0);
+
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50 transition border-b';
         tr.innerHTML = `
-          <td class="p-2 border-r font-bold">${item.fio}</td>
-          <td class="p-2 border-r text-[10px]">${item.phone}</td>
-          <td class="p-2 border-r text-[10px]">${item.buyDate}<br><b class="text-blue-600">${item.payDate}</b></td>
-          <td class="p-2 border-r font-bold text-center">${item.monthlyPay}</td>
-          ${instHtml}
-          <td class="p-2 border-r text-red-600 font-bold text-center">0</td>
-          <td class="p-2 border-r font-bold text-center ${rest <= 0 ? 'text-green-600' : 'text-orange-600'}">${rest}</td>
-          <td class="p-2 border-r text-[10px] text-center">${item.totalCost} / ${item.downPayment}</td>
-          <td class="p-2 border-r text-center">${item.costPrice}</td>
-          <td class="p-2 border-r text-center font-black ${item.shopPaid ? 'text-green-600' : 'text-gray-300'}">${item.shopPaid ? 'Д' : '—'}</td>
-          <td class="p-2 border-r text-[10px]">${item.product || '—'}</td>
-          <td class="p-2 border-r text-[10px]">${item.guarantorFio || '—'}</td>
-          <td class="p-2 text-center space-x-1 sticky right-0 bg-white shadow-[-5px_0_10px_rgba(0,0,0,0.05)]">
-            <button onclick="openPayModal('${item.id}')" class="bg-green-600 text-white px-1 py-0.5 rounded text-[9px] font-bold">+Взнос</button>
-            <button onclick="copyHistory('${item.id}', this)" class="bg-slate-500 text-white px-1 py-0.5 rounded text-[9px]">📋 Опл.</button>
-            <button onclick="copyGuarantor('${item.id}', this)" class="bg-indigo-500 text-white px-1 py-0.5 rounded text-[9px]">👥 Пор.</button>
-            <button onclick="openEditModal('${item.id}')" class="bg-blue-500 text-white px-1 py-0.5 rounded text-[9px]">✏️</button>
-            <button onclick="deleteContract('${item.id}')" class="bg-red-500 text-white px-1 py-0.5 rounded text-[9px]">🗑️</button>
+          <td class="p-3 border-r font-bold">${item.date}</td>
+          <td class="p-3 border-r font-black text-emerald-600">${Number(item.income || 0).toLocaleString('ru-RU')} ₽</td>
+          <td class="p-3 border-r font-black text-red-600">${Number(item.expense || 0).toLocaleString('ru-RU')} ₽</td>
+          <td class="p-3 border-r">${item.note || '-'}</td>
+          <td class="p-3 border-r font-bold">${item.account || '-'}</td>
+          <td class="p-3 text-center sticky right-0 bg-white">
+            <button onclick="editAccRecord('${item.id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-[10px] font-bold mr-1">✏️</button>
+            <button onclick="deleteAccRecord('${item.id}')" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-[10px] font-bold">🗑</button>
           </td>
         `;
         tbody.appendChild(tr);
       });
+
+      document.getElementById('totalIncome').innerText = `${inc.toLocaleString('ru-RU')} ₽`;
+      document.getElementById('totalExpense').innerText = `${exp.toLocaleString('ru-RU')} ₽`;
     }
 
-    const accModal = document.getElementById('accModal');
-    
     function openAccModal() {
+      document.getElementById('accModalTitle').innerText = 'Новая запись учета';
       document.getElementById('accForm').reset();
       document.getElementById('accEditId').value = '';
-      document.getElementById('accModalTitle').innerText = 'Новая запись учета';
-      document.getElementById('accDate').valueAsDate = new Date();
-      accModal.classList.remove('hidden');
+      document.getElementById('accDate').value = new Date().toISOString().slice(0, 10);
+      document.getElementById('accModal').classList.remove('hidden');
     }
 
-    function closeAccModal() { accModal.classList.add('hidden'); }
-
-    function openEditAccModal(id) {
-      const item = allAccounting.find(a => a.id === id);
-      if (!item) return;
-      document.getElementById('accEditId').value = item.id;
-      document.getElementById('accModalTitle').innerText = 'Редактирование записи';
-      document.getElementById('accDate').value = item.date;
-      document.getElementById('accIncome').value = item.income || 0;
-      document.getElementById('accExpense').value = item.expense || 0;
-      document.getElementById('accNote').value = item.note || '';
-      document.getElementById('accAccount').value = item.account || '';
-      accModal.classList.remove('hidden');
+    function closeAccModal() {
+      document.getElementById('accModal').classList.add('hidden');
     }
 
-    document.getElementById('accForm').addEventListener('submit', (e) => {
+    document.getElementById('accForm').addEventListener('submit', function(e) {
       e.preventDefault();
       saveState();
 
-      const editId = document.getElementById('accEditId').value;
-      const formData = {
+      const id = document.getElementById('accEditId').value;
+      const accData = {
+        id: id || Date.now().toString(),
         date: document.getElementById('accDate').value,
         income: Number(document.getElementById('accIncome').value) || 0,
         expense: Number(document.getElementById('accExpense').value) || 0,
-        note: document.getElementById('accNote').value || '—',
-        account: (document.getElementById('accAccount').value || '—').trim(),
-        createdAt: editId ? (allAccounting.find(a => a.id === editId)?.createdAt || Date.now()) : Date.now()
+        note: document.getElementById('accNote').value,
+        account: document.getElementById('accAccount').value
       };
 
-      if (editId) {
-        const idx = allAccounting.findIndex(a => a.id === editId);
-        if (idx !== -1) allAccounting[idx] = { ...allAccounting[idx], ...formData };
+      if (id) {
+        const idx = allAccounting.findIndex(a => a.id === id);
+        if (idx !== -1) allAccounting[idx] = accData;
       } else {
-        allAccounting.unshift({
-          id: 'acc_' + Date.now(),
-          ...formData
-        });
+        allAccounting.push(accData);
       }
 
-      saveToStorage();
       closeAccModal();
+      saveToStorage();
     });
 
-    function deleteAccItem(id) {
-      if (confirm('Удалить эту запись из учета?')) {
+    function editAccRecord(id) {
+      const acc = allAccounting.find(a => a.id === id);
+      if (!acc) return;
+      document.getElementById('accModalTitle').innerText = 'Редактировать запись учета';
+      document.getElementById('accEditId').value = acc.id;
+      document.getElementById('accDate').value = acc.date;
+      document.getElementById('accIncome').value = acc.income;
+      document.getElementById('accExpense').value = acc.expense;
+      document.getElementById('accNote').value = acc.note || '';
+      document.getElementById('accAccount').value = acc.account || '';
+      document.getElementById('accModal').classList.remove('hidden');
+    }
+
+    function deleteAccRecord(id) {
+      if (confirm('Удалить эту запись учета?')) {
         saveState();
         allAccounting = allAccounting.filter(a => a.id !== id);
         saveToStorage();
       }
     }
 
-    function renderAccountingTable(items) {
-      const tbody = document.getElementById('accountingTable');
+    // ================================================================
+    // ЛОГИКА ТАБЛИЦЫ "ВЗЯЛИ / ПОЛОЖИЛИ" И СЧЕТОВ
+    // ================================================================
+
+    function renderTakenSheet() {
+      const tbody = document.getElementById('takenRowsTable');
       tbody.innerHTML = '';
-      
-      let incomeSum = 0;
-      let expenseSum = 0;
 
-      const sorted = [...items].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+      let takenSum = 0;
+      let putSum = 0;
 
-      sorted.forEach(item => {
-        incomeSum += Number(item.income || 0);
-        expenseSum += Number(item.expense || 0);
+      allTaken.forEach(item => {
+        takenSum += Number(item.takenAmount || 0);
+        putSum += Number(item.putAmount || 0);
 
         const tr = document.createElement('tr');
+        tr.className = 'text-center border-b hover:bg-amber-50';
         tr.innerHTML = `
-          <td class="p-2 border-r font-medium">${item.date}</td>
-          <td class="p-2 border-r font-bold ${item.income > 0 ? 'text-emerald-600 bg-emerald-50/50' : 'text-slate-300'}">${item.income > 0 ? item.income + ' ₽' : '—'}</td>
-          <td class="p-2 border-r font-bold ${item.expense > 0 ? 'text-red-600 bg-red-50/50' : 'text-slate-300'}">${item.expense > 0 ? item.expense + ' ₽' : '—'}</td>
-          <td class="p-2 border-r text-slate-700 font-medium">${item.note}</td>
-          <td class="p-2 border-r font-bold text-blue-700">${item.account}</td>
-          <td class="p-2 text-center space-x-1 sticky right-0 bg-white shadow-[-5px_0_10px_rgba(0,0,0,0.05)]">
-            <button onclick="openEditAccModal('${item.id}')" class="bg-blue-500 text-white px-1.5 py-0.5 rounded text-[9px]">✏️</button>
-            <button onclick="deleteAccItem('${item.id}')" class="bg-red-500 text-white px-1.5 py-0.5 rounded text-[9px]">🗑️</button>
+          <td></td>
+          <td class="font-bold text-amber-700">${Number(item.takenAmount || 0).toLocaleString('ru-RU')}</td>
+          <td class="text-left px-2">${item.takenDesc || ''}</td>
+          <td class="font-bold text-emerald-600">${Number(item.putAmount || 0).toLocaleString('ru-RU')}</td>
+          <td class="text-left px-2">${item.putDesc || ''}</td>
+          <td class="p-1">
+            <button onclick="editTakenRecord('${item.id}')" class="text-blue-600 font-bold px-1">✏️</button>
+            <button onclick="deleteTakenRecord('${item.id}')" class="text-red-600 font-bold px-1">🗑</button>
           </td>
         `;
         tbody.appendChild(tr);
       });
 
-      document.getElementById('totalIncome').innerText = incomeSum.toLocaleString('ru-RU') + ' ₽';
-      document.getElementById('totalExpense').innerText = expenseSum.toLocaleString('ru-RU') + ' ₽';
+      document.getElementById('takenTotalSum').innerText = takenSum.toLocaleString('ru-RU');
+      document.getElementById('putTotalSum').innerText = putSum.toLocaleString('ru-RU');
+
+      let totalInc = allAccounting.reduce((sum, a) => sum + Number(a.income || 0), 0);
+      let totalExp = allAccounting.reduce((sum, a) => sum + Number(a.expense || 0), 0);
+      let uchetBalance = totalInc - totalExp;
+      document.getElementById('kassaUchet').innerText = uchetBalance.toLocaleString('ru-RU');
+
+      let kassaFinal = uchetBalance - takenSum + putSum;
+      document.getElementById('kassaTotal').innerText = kassaFinal.toLocaleString('ru-RU');
+
+      renderTakenStats();
+      renderAccountsPanel();
     }
 
-    const takenModal = document.getElementById('takenModal');
+    function renderTakenStats() {
+      const totalContracts = allContracts.length;
+      let closedContracts = 0;
+      let activeContracts = 0;
+
+      allContracts.forEach(c => {
+        const insts = c.installments || {};
+        let paid = 0;
+        Object.values(insts).forEach(p => paid += Number(p.amount));
+        const rest = c.totalCost - (c.downPayment || 0) - paid;
+
+        if (rest <= 0) closedContracts++;
+        else activeContracts++;
+      });
+
+      document.getElementById('statTotalContracts').innerText = totalContracts;
+      document.getElementById('statClosedContracts').innerText = closedContracts;
+      document.getElementById('statActiveContracts').innerText = activeContracts;
+
+      const todayStr = new Date().toISOString().slice(0, 10);
+      const todayClients = getClientsForDate(todayStr);
+
+      let planSum = 0;
+      todayClients.forEach(item => planSum += item.amount);
+
+      document.getElementById('statPlanTodaySum').innerText = planSum.toLocaleString('ru-RU') + ' ₽';
+      document.getElementById('statPlanTodayCount').innerText = todayClients.length;
+
+      let factSum = 0;
+      let factCount = 0;
+
+      allContracts.forEach(c => {
+        const insts = c.installments || {};
+        Object.values(insts).forEach(p => {
+          if (p.date === todayStr && p.amount > 0) {
+            factSum += Number(p.amount);
+            factCount++;
+          }
+        });
+      });
+
+      document.getElementById('statFactTodaySum').innerText = factSum.toLocaleString('ru-RU') + ' ₽';
+      document.getElementById('statFactTodayCount').innerText = factCount;
+    }
+
+    function renderAccountsPanel() {
+      const tbody = document.getElementById('accountsTableBody');
+      tbody.innerHTML = '';
+
+      let grandTotal = 0;
+      const now = new Date();
+      const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+      customAccounts.forEach((accObj, idx) => {
+        const accName = accObj.name;
+        const accColor = accObj.color || '';
+
+        let incCount = 0, incMonth = 0;
+        let expCount = 0, expMonth = 0;
+        let accBalance = 0;
+
+        allAccounting.forEach(a => {
+          if (a.account && a.account.trim().toLowerCase() === accName.toLowerCase()) {
+            const inc = Number(a.income || 0);
+            const exp = Number(a.expense || 0);
+            accBalance += (inc - exp);
+
+            if (inc > 0) {
+              incCount++;
+              if (a.date && a.date.startsWith(currentMonthStr)) incMonth += inc;
+            }
+            if (exp > 0) {
+              expCount++;
+              if (a.date && a.date.startsWith(currentMonthStr)) expMonth += exp;
+            }
+          }
+        });
+
+        grandTotal += accBalance;
+
+        const tr = document.createElement('tr');
+        tr.style.backgroundColor = accColor;
+
+        tr.innerHTML = `
+          <td class="font-bold">${accName}</td>
+          <td class="font-bold ${accBalance < 0 ? 'text-red-600' : ''}">${accBalance.toLocaleString('ru-RU')}</td>
+          <td>${incCount}</td>
+          <td class="text-emerald-600 font-bold">${incMonth.toLocaleString('ru-RU')}</td>
+          <td>${expCount}</td>
+          <td class="text-red-600 font-bold">${expMonth.toLocaleString('ru-RU')}</td>
+          <td class="p-1">
+            <input type="color" value="${accColor || '#ffffff'}" onchange="changeAccountColor(${idx}, this.value)" class="w-6 h-6 rounded cursor-pointer border inline-block align-middle">
+            <button onclick="removeAccount(${idx})" class="text-red-600 font-bold ml-1 text-xs" title="Удалить счет">✕</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('accountsGrandTotal').innerText = grandTotal.toLocaleString('ru-RU');
+    }
 
     function openTakenModal() {
+      document.getElementById('takenModalTitle').innerText = 'Запись Взяли / Положили';
       document.getElementById('takenForm').reset();
       document.getElementById('takenEditId').value = '';
-      document.getElementById('takenModalTitle').innerText = 'Новая запись Взяли / Положили';
-      takenModal.classList.remove('hidden');
+      document.getElementById('takenModal').classList.remove('hidden');
     }
 
-    function closeTakenModal() { takenModal.classList.add('hidden'); }
-
-    function openEditTakenModal(id) {
-      const item = allTaken.find(t => t.id === id);
-      if(!item) return;
-      document.getElementById('takenEditId').value = item.id;
-      document.getElementById('takenModalTitle').innerText = 'Редактировать Взяли / Положили';
-      document.getElementById('takenAmount').value = item.takenAmount || 0;
-      document.getElementById('takenDesc').value = item.takenDesc || '';
-      document.getElementById('putAmount').value = item.putAmount || 0;
-      document.getElementById('putDesc').value = item.putDesc || '';
-      takenModal.classList.remove('hidden');
+    function closeTakenModal() {
+      document.getElementById('takenModal').classList.add('hidden');
     }
 
-    document.getElementById('takenForm').addEventListener('submit', (e) => {
+    document.getElementById('takenForm').addEventListener('submit', function(e) {
       e.preventDefault();
       saveState();
 
-      const editId = document.getElementById('takenEditId').value;
-      const formData = {
+      const id = document.getElementById('takenEditId').value;
+      const takenData = {
+        id: id || Date.now().toString(),
         takenAmount: Number(document.getElementById('takenAmount').value) || 0,
-        takenDesc: document.getElementById('takenDesc').value || '',
+        takenDesc: document.getElementById('takenDesc').value,
         putAmount: Number(document.getElementById('putAmount').value) || 0,
-        putDesc: document.getElementById('putDesc').value || '',
-        createdAt: editId ? (allTaken.find(t => t.id === editId)?.createdAt || Date.now()) : Date.now()
+        putDesc: document.getElementById('putDesc').value
       };
 
-      if (editId) {
-        const idx = allTaken.findIndex(t => t.id === editId);
-        if (idx !== -1) allTaken[idx] = { ...allTaken[idx], ...formData };
+      if (id) {
+        const idx = allTaken.findIndex(t => t.id === id);
+        if (idx !== -1) allTaken[idx] = takenData;
       } else {
-        allTaken.push({
-          id: 'taken_' + Date.now(),
-          ...formData
-        });
+        allTaken.push(takenData);
       }
 
-      saveToStorage();
       closeTakenModal();
+      saveToStorage();
     });
 
-    function deleteTakenItem(id) {
-      if(confirm('Удалить эту строку?')) {
+    function editTakenRecord(id) {
+      const t = allTaken.find(item => item.id === id);
+      if (!t) return;
+      document.getElementById('takenModalTitle').innerText = 'Редактировать Взяли/Положили';
+      document.getElementById('takenEditId').value = t.id;
+      document.getElementById('takenAmount').value = t.takenAmount;
+      document.getElementById('takenDesc').value = t.takenDesc || '';
+      document.getElementById('putAmount').value = t.putAmount;
+      document.getElementById('putDesc').value = t.putDesc || '';
+      document.getElementById('takenModal').classList.remove('hidden');
+    }
+
+    function deleteTakenRecord(id) {
+      if (confirm('Удалить эту запись?')) {
         saveState();
         allTaken = allTaken.filter(t => t.id !== id);
         saveToStorage();
       }
     }
 
-    function addNewAccountPrompt() {
-      const accName = prompt('Введите название нового счета/карты (например: S3, A1):');
-      if (accName && accName.trim()) {
-        const cleanName = accName.trim();
-        if(!customAccounts.some(a => a.name.toLowerCase() === cleanName.toLowerCase())) {
-          saveState();
-          customAccounts.push({ name: cleanName, color: '' });
-          saveToStorage();
-        } else {
-          alert('Такой счет уже существует!');
-        }
-      }
+    function changeAccountColor(idx, colorHex) {
+      saveState();
+      customAccounts[idx].color = colorHex;
+      saveToStorage();
     }
 
-    function deleteAccount(index) {
-      if (confirm(`Удалить счет "${customAccounts[index].name}"?`)) {
+    function removeAccount(idx) {
+      if (confirm(`Удалить счет "${customAccounts[idx].name}" из таблицы?`)) {
         saveState();
-        customAccounts.splice(index, 1);
+        customAccounts.splice(idx, 1);
         saveToStorage();
       }
     }
 
-    function changeAccountColor(index, color) {
-      saveState();
-      customAccounts[index].color = color;
-      saveToStorage();
-    }
-
-    function renderTakenSheet() {
-      const rowsTbody = document.getElementById('takenRowsTable');
-      rowsTbody.innerHTML = '';
-
-      let sumTaken = 0;
-      let sumPut = 0;
-
-      allTaken.forEach(item => {
-        sumTaken += Number(item.takenAmount || 0);
-        sumPut += Number(item.putAmount || 0);
-
-        const tr = document.createElement('tr');
-        tr.className = "text-center";
-        tr.innerHTML = `
-          <td></td>
-          <td class="font-bold text-amber-700">${item.takenAmount || ''}</td>
-          <td class="text-left">${item.takenDesc || ''}</td>
-          <td class="font-bold text-emerald-600">${item.putAmount || ''}</td>
-          <td class="text-left">${item.putDesc || ''}</td>
-          <td class="space-x-1">
-            <button onclick="openEditTakenModal('${item.id}')" class="text-blue-600 font-bold">✏️</button>
-            <button onclick="deleteTakenItem('${item.id}')" class="text-red-600 font-bold">🗑️</button>
-          </td>
-        `;
-        rowsTbody.appendChild(tr);
-      });
-
-      document.getElementById('takenTotalSum').innerText = sumTaken.toLocaleString('ru-RU');
-      document.getElementById('putTotalSum').innerText = sumPut.toLocaleString('ru-RU');
-
-      let totalDownPayments = 0;
-      let totalInstallments = 0;
-      let totalCostPrice = 0;
-
-      allContracts.forEach(c => {
-        totalDownPayments += Number(c.downPayment || 0);
-        totalCostPrice += Number(c.costPrice || 0);
-        const insts = c.installments || {};
-        Object.values(insts).forEach(p => {
-          totalInstallments += Number(p.amount || 0);
-        });
-      });
-
-      let totalKassa = totalDownPayments + totalInstallments - totalCostPrice - sumTaken + sumPut;
-      document.getElementById('kassaTotal').innerText = totalKassa.toLocaleString('ru-RU');
-
-      let totalUchetIncome = 0;
-      let totalUchetExpense = 0;
-      allAccounting.forEach(a => {
-        totalUchetIncome += Number(a.income || 0);
-        totalUchetExpense += Number(a.expense || 0);
-      });
-      let uchetBalance = totalUchetIncome - totalUchetExpense;
-      document.getElementById('kassaUchet').innerText = uchetBalance.toLocaleString('ru-RU');
-
-      const now = new Date();
-      const todayStr = now.toISOString().slice(0, 10);
-
-      let totalContracts = allContracts.length;
-      let closedContracts = 0;
-      let activeContracts = 0;
-
-      let planTodaySum = 0;
-      let planTodayCount = 0;
-      let factTodaySum = 0;
-      let factTodayCount = 0;
-
-      allContracts.forEach(c => {
-        const insts = c.installments || {};
-        let paidSum = 0;
-        let hasPaidToday = false;
-
-        Object.values(insts).forEach(p => {
-          paidSum += Number(p.amount);
-          if (p.date === todayStr) {
-            factTodaySum += Number(p.amount);
-            hasPaidToday = true;
-          }
-        });
-
-        if (hasPaidToday) factTodayCount++;
-
-        const rest = c.totalCost - (c.downPayment || 0) - paidSum;
-        if (rest <= 0) {
-          closedContracts++;
-        } else {
-          activeContracts++;
+    function addNewAccountPrompt() {
+      const name = prompt('Введите название нового счета/карты:');
+      if (name && name.trim()) {
+        const cleanName = name.trim();
+        if (customAccounts.some(a => a.name.toLowerCase() === cleanName.toLowerCase())) {
+          alert('Счет с таким названием уже существует!');
+          return;
         }
-
-        if (c.payDate === todayStr) {
-          planTodaySum += Number(c.monthlyPay || 0);
-          planTodayCount++;
-        }
-      });
-
-      document.getElementById('statTotalContracts').innerText = totalContracts;
-      document.getElementById('statClosedContracts').innerText = closedContracts;
-      document.getElementById('statActiveContracts').innerText = activeContracts;
-      document.getElementById('statPlanTodaySum').innerText = planTodaySum.toLocaleString('ru-RU') + ' ₽';
-      document.getElementById('statPlanTodayCount').innerText = planTodayCount;
-      document.getElementById('statFactTodaySum').innerText = factTodaySum.toLocaleString('ru-RU') + ' ₽';
-      document.getElementById('statFactTodayCount').innerText = factTodayCount;
-
-      const accountsBody = document.getElementById('accountsTableBody');
-      accountsBody.innerHTML = '';
-
-      const currentMonth = now.getMonth();
-      const currentYear = now.getFullYear();
-
-      let accountsGrandTotalSum = 0;
-
-      customAccounts.forEach((accObj, idx) => {
-        let accBalance = 0;
-        let incCountMonth = 0;
-        let incSumMonth = 0;
-        let expCountMonth = 0;
-        let expSumMonth = 0;
-
-        allAccounting.forEach(a => {
-          if (a.account && a.account.trim().toLowerCase() === accObj.name.toLowerCase()) {
-            const inc = Number(a.income || 0);
-            const exp = Number(a.expense || 0);
-            accBalance += (inc - exp);
-
-            if (a.date) {
-              const d = new Date(a.date);
-              if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
-                if (inc > 0) {
-                  incCountMonth++;
-                  incSumMonth += inc;
-                }
-                if (exp > 0) {
-                  expCountMonth++;
-                  expSumMonth += exp;
-                }
-              }
-            }
-          }
-        });
-
-        accountsGrandTotalSum += accBalance;
-
-        const isIncOverLimit = incSumMonth >= 400000;
-        const isExpOverLimit = expSumMonth >= 400000;
-        
-        let rowStyle = accObj.color ? `background-color: ${accObj.color};` : '';
-
-        const tr = document.createElement('tr');
-        tr.style = rowStyle;
-        tr.innerHTML = `
-          <td class="font-bold">${accObj.name}</td>
-          <td class="font-bold">${accBalance.toLocaleString('ru-RU')}</td>
-          <td>${incCountMonth}</td>
-          <td class="${isIncOverLimit ? 'cell-over-limit' : ''}">${incSumMonth.toLocaleString('ru-RU')}</td>
-          <td>${expCountMonth}</td>
-          <td class="${isExpOverLimit ? 'cell-over-limit' : ''}">${expSumMonth.toLocaleString('ru-RU')}</td>
-          <td class="space-x-1">
-            <input type="color" value="${accObj.color || '#ffffff'}" onchange="changeAccountColor(${idx}, this.value)" title="Изменить цвет" class="w-5 h-5 cursor-pointer align-middle border rounded">
-            <button onclick="deleteAccount(${idx})" class="text-red-700 font-bold px-1 text-[11px]" title="Удалить счет">🗑️</button>
-          </td>
-        `;
-        accountsBody.appendChild(tr);
-      });
-
-      document.getElementById('accountsGrandTotal').innerText = accountsGrandTotalSum.toLocaleString('ru-RU');
-    }
-
-    function handleSearch() {
-      const q = document.getElementById('searchInput').value.toLowerCase();
-      if (activeTab === 'contracts') {
-        renderTable(allContracts.filter(c => c.fio.toLowerCase().includes(q) || String(c.contractNum).includes(q)));
-      } else if (activeTab === 'accounting') {
-        renderAccountingTable(allAccounting.filter(a => a.note.toLowerCase().includes(q) || a.account.toLowerCase().includes(q) || a.date.includes(q)));
-      } else if (activeTab === 'taken') {
-        const filtered = allTaken.filter(t => (t.takenDesc && t.takenDesc.toLowerCase().includes(q)) || (t.putDesc && t.putDesc.toLowerCase().includes(q)));
-        renderTakenFiltered(filtered);
+        saveState();
+        customAccounts.push({ name: cleanName, color: '' });
+        saveToStorage();
       }
     }
 
-    function renderTakenFiltered(items) {
-      const rowsTbody = document.getElementById('takenRowsTable');
-      rowsTbody.innerHTML = '';
-      items.forEach(item => {
-        const tr = document.createElement('tr');
-        tr.className = "text-center";
-        tr.innerHTML = `
-          <td></td>
-          <td class="font-bold text-amber-700">${item.takenAmount || ''}</td>
-          <td class="text-left">${item.takenDesc || ''}</td>
-          <td class="font-bold text-emerald-600">${item.putAmount || ''}</td>
-          <td class="text-left">${item.putDesc || ''}</td>
-          <td class="space-x-1">
-            <button onclick="openEditTakenModal('${item.id}')" class="text-blue-600 font-bold">✏️</button>
-            <button onclick="deleteTakenItem('${item.id}')" class="text-red-600 font-bold">🗑️</button>
-          </td>
-        `;
-        rowsTbody.appendChild(tr);
-      });
+    // ================================================================
+    // ПОИСК, ЭКСПОРТ И ИМПОРТ
+    // ================================================================
+
+    function handleSearch() {
+      const query = document.getElementById('searchInput').value.toLowerCase().trim();
+
+      if (activeTab === 'contracts') {
+        const filtered = allContracts.filter(c => 
+          (c.fio && c.fio.toLowerCase().includes(query)) ||
+          (c.phone && c.phone.toLowerCase().includes(query)) ||
+          (c.product && c.product.toLowerCase().includes(query)) ||
+          (c.store && c.store.toLowerCase().includes(query))
+        );
+        renderTable(filtered);
+      } else if (activeTab === 'accounting') {
+        const filtered = allAccounting.filter(a => 
+          (a.note && a.note.toLowerCase().includes(query)) ||
+          (a.account && a.account.toLowerCase().includes(query)) ||
+          (a.date && a.date.includes(query))
+        );
+        renderAccountingTable(filtered);
+      }
     }
 
     function exportData() {
-      const exportObject = {
+      const fullData = {
         contracts: allContracts,
         accounting: allAccounting,
         taken: allTaken,
-        accounts: customAccounts
+        accounts: customAccounts,
+        exportDate: new Date().toISOString()
       };
-      const blob = new Blob([JSON.stringify(exportObject, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `BAZA_FULL_${new Date().toISOString().slice(0,10)}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(fullData, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `installment_db_backup_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
     }
 
-    function importData(e) {
-      const file = e.target.files[0];
+    function importData(event) {
+      const file = event.target.files[0];
       if (!file) return;
+
       const reader = new FileReader();
-      reader.onload = (ev) => {
+      reader.onload = function(e) {
         try {
-          const data = JSON.parse(ev.target.result);
-          if (confirm(`Загрузить данные из файла? Это заменит текущую базу.`)) {
+          const imported = JSON.parse(e.target.result);
+          if (confirm('Внимание! Импорт перезапишет текущую базу данных. Продолжить?')) {
             saveState();
-            if (Array.isArray(data)) {
-              allContracts = data;
+
+            if (Array.isArray(imported)) {
+              allContracts = imported;
             } else {
-              allContracts = data.contracts || [];
-              allAccounting = data.accounting || [];
-              allTaken = data.taken || [];
-              customAccounts = data.accounts || customAccounts;
+              allContracts = imported.contracts || [];
+              allAccounting = imported.accounting || [];
+              allTaken = imported.taken || [];
+              if (imported.accounts) customAccounts = imported.accounts;
             }
+
             saveToStorage();
+            alert('База данных успешно загружена!');
           }
-        } catch { alert("Ошибка при чтении файла!"); }
+        } catch (err) {
+          alert('Ошибка чтения файла базы данных. Убедитесь, что это корректный JSON!');
+        }
       };
       reader.readAsText(file);
     }
 
-    document.addEventListener('keydown', (e) => {
-      if (e.ctrlKey && (e.key === 'z' || e.key === 'я')) { e.preventDefault(); undo(); }
-      if (e.ctrlKey && (e.key === 'y' || e.key === 'н')) { e.preventDefault(); redo(); }
+    // Горячие клавиши (Ctrl+Z / Ctrl+Y)
+    document.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+        e.preventDefault();
+        undo();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
+        e.preventDefault();
+        redo();
+      }
     });
 
+    // Первоначальная инициализация
     renderTable(allContracts);
     renderAccountingTable(allAccounting);
     renderTakenSheet();
     updateHistoryButtons();
   </script>
 </body>
-          </html>
+</html>
