@@ -18,30 +18,11 @@
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
     
-    .tab-btn.today-tab.active {
-      background-color: #22c55e;
-      color: #ffffff;
-    }
-    
-    .tab-btn.three-days-tab.active {
-      background-color: #3b82f6;
-      color: #ffffff;
-    }
-    
-    .tab-btn.debtors-tab.active {
-      background-color: #ef4444;
-      color: #ffffff;
-    }
-    
-    .tab-btn.partners-tab.active {
-      background-color: #8b5cf6;
-      color: #ffffff;
-    }
-    
-    .tab-btn.print-tab.active {
-      background-color: #f59e0b;
-      color: #ffffff;
-    }
+    .tab-btn.today-tab.active { background-color: #22c55e; color: #ffffff; }
+    .tab-btn.three-days-tab.active { background-color: #3b82f6; color: #ffffff; }
+    .tab-btn.debtors-tab.active { background-color: #ef4444; color: #ffffff; }
+    .tab-btn.partners-tab.active { background-color: #8b5cf6; color: #ffffff; }
+    .tab-btn.print-tab.active { background-color: #f59e0b; color: #ffffff; }
 
     .excel-table td, .excel-table th {
       border: 1px solid #cbd5e1;
@@ -76,11 +57,7 @@
       background-color: #128C7E;
       transform: scale(1.02);
     }
-    .whatsapp-btn svg {
-      width: 24px;
-      height: 24px;
-      fill: white;
-    }
+    .whatsapp-btn svg { width: 24px; height: 24px; fill: white; }
 
     .client-item {
       padding: 12px 16px;
@@ -91,13 +68,8 @@
       flex-wrap: wrap;
       gap: 8px;
     }
-    .client-item:last-child {
-      border-bottom: none;
-    }
-    .client-list {
-      max-height: 500px;
-      overflow-y: auto;
-    }
+    .client-item:last-child { border-bottom: none; }
+    .client-list { max-height: 500px; overflow-y: auto; }
     
     .month-status {
       display: inline-block;
@@ -111,29 +83,13 @@
     .month-overdue { background-color: #ef4444; color: white; }
     .month-future { background-color: #3b82f6; color: white; }
     
-    .client-info {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 12px;
-    }
+    .client-info { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
     .client-name { font-weight: bold; font-size: 14px; }
     .client-phone { color: #6b7280; font-size: 12px; }
     .client-detail { font-size: 12px; color: #4b5563; }
     .client-overdue { color: #ef4444; font-weight: bold; }
     .client-rest { color: #f59e0b; font-weight: bold; }
 
-    .partner-stat {
-      padding: 8px 12px;
-      border-bottom: 1px solid #e5e7eb;
-    }
-    .partner-stat:last-child {
-      border-bottom: none;
-    }
-    .partner-name { font-weight: bold; font-size: 14px; color: #7c3aed; }
-    .partner-value { font-weight: bold; font-size: 13px; }
-
-    /* Стили для печати договора */
     .print-contract {
       font-family: 'Times New Roman', serif;
       font-size: 12px;
@@ -143,118 +99,10 @@
       max-width: 210mm;
       margin: 0 auto;
     }
-    .print-contract h1 {
-      font-size: 16px;
-      font-weight: bold;
-      text-align: center;
-      text-transform: uppercase;
-      margin-bottom: 12px;
-    }
-    .print-contract .contract-num {
-      font-weight: bold;
-      text-align: right;
-      font-size: 13px;
-    }
-    .print-contract .section-title {
-      font-weight: bold;
-      font-size: 14px;
-      margin-top: 12px;
-      margin-bottom: 6px;
-      text-transform: uppercase;
-      text-decoration: underline;
-    }
-    .print-contract .sub-section {
-      font-weight: bold;
-      margin-top: 8px;
-      margin-bottom: 3px;
-      font-size: 12px;
-    }
-    .print-contract .list-item {
-      padding-left: 18px;
-      margin-bottom: 2px;
-      font-size: 11.5px;
-    }
-    .print-contract .signatures {
-      margin-top: 20px;
-      display: flex;
-      justify-content: space-between;
-    }
-    .print-contract .signature-block {
-      text-align: center;
-      min-width: 120px;
-    }
-    .print-contract .signature-line {
-      border-top: 1px solid black;
-      width: 140px;
-      margin: 20px auto 4px;
-    }
-    .print-contract .signature-label {
-      font-size: 10px;
-    }
-    .print-contract .page-break {
-      page-break-after: always;
-      border-bottom: 2px dashed #ccc;
-      margin: 10px 0;
-    }
-
-    /* Таблица месяцев */
-    .months-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 11px;
-      margin-top: 10px;
-    }
-    .months-table th {
-      background-color: #e2e8f0;
-      font-weight: bold;
-      text-align: center;
-      padding: 4px 8px;
-      border: 1px solid #000;
-    }
-    .months-table td {
-      padding: 4px 8px;
-      text-align: center;
-      border: 1px solid #000;
-    }
-    .month-paid-cell { color: #22c55e; font-weight: bold; }
-    .month-unpaid-cell { color: #ef4444; font-weight: bold; }
-
-    /* Блоки покупателя и поручителя */
-    .person-block {
-      border: 1px solid #000;
-      padding: 6px 10px;
-      margin-bottom: 8px;
-    }
-    .person-block .title {
-      font-weight: bold;
-      font-size: 13px;
-      margin-bottom: 3px;
-    }
-    .person-block .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2px 15px;
-      font-size: 11.5px;
-    }
-    .person-block .grid-full {
-      grid-column: span 2;
-    }
-
-    /* Блок продавца */
-    .seller-block {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
-      font-size: 11.5px;
-    }
 
     @media print {
-      body * {
-        visibility: hidden;
-      }
-      #printContent, #printContent * {
-        visibility: visible;
-      }
+      body * { visibility: hidden; }
+      #printContent, #printContent * { visibility: visible; }
       #printContent {
         position: absolute;
         left: 0;
@@ -264,27 +112,7 @@
         margin: 0;
         background: white;
       }
-      .no-print {
-        display: none !important;
-      }
-      .print-contract {
-        padding: 12px 20px;
-        font-size: 10px;
-      }
-      .print-contract .page-break {
-        border-bottom: none;
-        page-break-after: always;
-        margin: 0;
-      }
-      .print-contract .signature-line {
-        width: 100px;
-      }
-      .print-contract h1 {
-        font-size: 14px;
-      }
-      .print-contract .section-title {
-        font-size: 12px;
-      }
+      .no-print { display: none !important; }
     }
 
     .copy-notification {
@@ -482,7 +310,7 @@
 
           <div class="flex-1 min-w-[500px]">
             <div class="mb-2 flex justify-between items-center">
-              <span class="font-bold uppercase text-[10px] text-slate-500">Счета и Карты (Цвет и Удаление)</span>
+              <span class="font-bold uppercase text-[10px] text-slate-500">Счета и Карты</span>
               <button onclick="addNewAccountPrompt()" class="bg-slate-700 hover:bg-slate-800 text-white font-bold px-2 py-1 rounded text-[10px]">+ Добавить счет</button>
             </div>
             <div class="max-h-[70vh] overflow-y-auto">
@@ -1031,7 +859,7 @@
       allContracts.forEach(contract => {
         const option = document.createElement('option');
         option.value = contract.id;
-        option.textContent = `№${contract.contractNum} - ${contract.fio} (${contract.phone})`;
+        option.textContent = `№${contract.contractNum || ''} - ${contract.fio} (${contract.phone})`;
         select.appendChild(option);
       });
       
@@ -1056,11 +884,9 @@
         return;
       }
       
-      // Получаем информацию по месяцам
       const monthInfo = getMonthStatus(contract);
       const months = monthInfo.months;
       
-      // Таблица месяцев СВЕРХУ ВНИЗ (1, 2, 3...)
       let monthsHtml = '';
       for (let i = 0; i < months.length; i++) {
         const m = months[i];
@@ -1071,7 +897,7 @@
           <tr>
             <td style="padding: 3px 8px; text-align: center; font-weight: bold; border: 1px solid #000;">${m.month}</td>
             <td style="padding: 3px 8px; text-align: center; border: 1px solid #000;">${m.date}</td>
-            <td style="padding: 3px 8px; text-align: center; ${statusColor}">${isPaid ? m.amount.toLocaleString('ru-RU') + ' ₽' : '—'}</td>
+            <td style="padding: 3px 8px; text-align: center; ${statusColor}">${isPaid ? Number(m.amount).toLocaleString('ru-RU') + ' ₽' : '—'}</td>
             <td style="padding: 3px 8px; text-align: center; ${statusColor}">${statusText}</td>
           </tr>
         `;
@@ -1082,21 +908,15 @@
       
       container.innerHTML = `
         <div style="font-family: 'Times New Roman', serif; font-size: 12px; line-height: 1.4; padding: 15px 25px; max-width: 210mm; margin: 0 auto; background: white;">
-          
-          <!-- ================= СТРАНИЦА 1 ================= -->
           <div style="position: relative;">
-            
-            <!-- Номер договора справа сверху -->
             <div style="position: absolute; top: 0; right: 0; font-size: 13px; font-weight: bold;">
-              № ${contract.contractNum}
+              № ${contract.contractNum || ''}
             </div>
             
-            <!-- ЗАГОЛОВОК -->
             <h1 style="font-size: 16px; font-weight: bold; text-align: center; text-transform: uppercase; margin-bottom: 10px;">
               ДОГОВОР КУПЛИ-ПРОДАЖИ ТОВАРА В РАССРОЧКУ
             </h1>
             
-            <!-- ШАПКА С ДАННЫМИ ПРОДАВЦА -->
             <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 11.5px;">
               <div>
                 <b>Чеченская Республика</b><br>
@@ -1110,7 +930,6 @@
               </div>
             </div>
             
-            <!-- БЛОК ПОКУПАТЕЛЯ -->
             <div style="border: 1px solid #000; padding: 6px 10px; margin-bottom: 8px;">
               <div style="font-weight: bold; font-size: 13px; margin-bottom: 3px;">Покупатель</div>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px 15px; font-size: 11.5px;">
@@ -1123,7 +942,6 @@
               </div>
             </div>
             
-            <!-- БЛОК ПОРУЧИТЕЛЯ -->
             <div style="border: 1px solid #000; padding: 6px 10px; margin-bottom: 10px;">
               <div style="font-weight: bold; font-size: 13px; margin-bottom: 3px;">Поручитель</div>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px 15px; font-size: 11.5px;">
@@ -1140,7 +958,6 @@
               Совместно именуемые «Стороны», заключили настоящий Договор о нижеследующем:
             </p>
             
-            <!-- РАЗДЕЛ 1: ПРЕДМЕТ ДОГОВОРА -->
             <div style="font-weight: bold; font-size: 14px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">
               1. ПРЕДМЕТ ДОГОВОРА
             </div>
@@ -1154,7 +971,6 @@
               «Покупатель» обязуется принять и уплатить за него стоимость, указанную в Договоре.
             </p>
             
-            <!-- РАЗДЕЛ 2: ЦЕНА ТОВАРА И ПОРЯДОК РАСЧЕТОВ -->
             <div style="font-weight: bold; font-size: 14px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">
               2. ЦЕНА ТОВАРА И ПОРЯДОК РАСЧЕТОВ
             </div>
@@ -1169,7 +985,6 @@
               не позднее <b>${contract.payDate || '______'}</b> числа каждого месяца.
             </p>
             
-            <!-- ТАБЛИЦА МЕСЯЦЕВ (СВЕРХУ ВНИЗ) -->
             <div style="margin-top: 10px; border: 1px solid #000; overflow: hidden;">
               <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
                 <thead>
@@ -1185,16 +1000,11 @@
                 </tbody>
               </table>
             </div>
-            
           </div>
           
-          <!-- ================= РАЗРЫВ СТРАНИЦЫ ================= -->
           <div style="page-break-after: always; border-bottom: 2px dashed #ccc; margin: 10px 0;"></div>
           
-          <!-- ================= СТРАНИЦА 2 ================= -->
           <div style="font-size: 11px;">
-            
-            <!-- РАЗДЕЛ 3: ПРАВА И ОБЯЗАННОСТИ СТОРОН -->
             <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-top: 8px; margin-bottom: 5px;">
               3. ПРАВА И ОБЯЗАННОСТИ СТОРОН
             </div>
@@ -1217,50 +1027,20 @@
             
             <div style="font-weight: bold; font-size: 11.5px; margin-top: 6px; margin-bottom: 2px;">«Поручитель» обязан:</div>
             <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 8px;">
-              - При неисполнении или ненадлежащем исполнении «Покупателем» своих обязательств по настоящему договору «Поручитель» отвечает перед «Продавцом» в том же объеме, что и «Покупатель», включая возврат основного долга. При просрочке выплаты «Покупателем» на 7 дней от установленного срока «Поручитель» обязан выплатить просроченный платеж.
+              - При неисполнении или ненадлежащем исполнении «Покупателем» своих обязательств по настоящему договору «Поручитель» отвечает перед «Продавцом» в том же объеме, что и «Покупатель», включая возврат основного долга.
             </div>
             
-            <!-- РАЗДЕЛ 4: ПЕРЕДАЧА И ПРИНЯТИЕ ТОВАРА -->
             <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">
               4. ПЕРЕДАЧА И ПРИНЯТИЕ ТОВАРА
             </div>
             <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">
               - Товар передается «Покупателю» в месте нахождения продавца в дату подписания настоящего договора.
             </div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">
-              - «Покупатель» обязан осмотреть товар, проверить соответствие по качеству, количеству и комплектности условиям настоящего договора и принять его.
-            </div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">
-              - Право собственности на товар переходит к «Покупателю» с момента полной оплаты им цены договора. Ответственность за сохранность товара переходит к покупателю с момента подписания настоящего договора.
-            </div>
             <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 8px;">
-              - «Продавец» считается исполнившим свою обязанность по передаче товара с даты подписания настоящего договора.
+              - Право собственности на товар переходит к «Покупателю» с момента полной оплаты им цены договора.
             </div>
             
-            <!-- РАЗДЕЛ 5: РАЗРЕШЕНИЕ СПОРОВ -->
-            <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">
-              5. РАЗРЕШЕНИЕ СПОРОВ
-            </div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">
-              - Все споры и разногласия, которые могут возникнуть между сторонами по вопросам, не нашедшим своего разрешения в тексте настоящего договора, будут разрешаться путем переговоров.
-            </div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 8px;">
-              - В случае неурегулирования спорных вопросов в процессе переговоров такой спор подлежит рассмотрению в суде.
-            </div>
-            
-            <!-- РАЗДЕЛ 6: ЗАКЛЮЧИТЕЛЬНЫЕ ПОЛОЖЕНИЯ -->
-            <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">
-              6. ЗАКЛЮЧИТЕЛЬНЫЕ ПОЛОЖЕНИЯ
-            </div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">
-              - Настоящий договор вступает в силу с даты его подписания «Сторонами» и действует до полного исполнения ими обязательств по настоящему договору.
-            </div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 12px;">
-              - Любые изменения и дополнения к настоящему договору должны быть составлены в письменной форме и подписаны всеми сторонами.
-            </div>
-            
-            <!-- ПОДПИСИ СТОРОН (НА ЭТОЙ ЖЕ СТРАНИЦЕ СНИЗУ) -->
-            <div style="margin-top: 12px;">
+            <div style="margin-top: 20px;">
               <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-bottom: 8px;">
                 ПОДПИСИ СТОРОН
               </div>
@@ -1291,20 +1071,13 @@
               </table>
             </div>
             
-            <!-- Дата печати внизу -->
             <div style="margin-top: 10px; font-size: 9px; text-align: center; color: #999; border-top: 1px solid #ddd; padding-top: 6px;">
               Дата печати: ${todayStr}
             </div>
-            
           </div>
-          
         </div>
       `;
     }
-
-    // ================================================================
-    // ФУНКЦИЯ ПЕЧАТИ
-    // ================================================================
 
     function printContract() {
       const select = document.getElementById('printContractSelect');
@@ -1315,56 +1088,12 @@
       window.print();
     }
 
-    // ================================================================
-    // ОСТАЛЬНЫЕ ФУНКЦИИ
-    // ================================================================
-
-    function numberToWords(num) {
-      if (!num || num === 0) return 'ноль';
-      
-      const units = ['', 'один', 'два', 'три', 'четыре', 'пять', 'шесть', 'семь', 'восемь', 'девять'];
-      const teens = ['десять', 'одиннадцать', 'двенадцать', 'тринадцать', 'четырнадцать', 'пятнадцать', 'шестнадцать', 'семнадцать', 'восемнадцать', 'девятнадцать'];
-      const tens = ['', '', 'двадцать', 'тридцать', 'сорок', 'пятьдесят', 'шестьдесят', 'семьдесят', 'восемьдесят', 'девяносто'];
-      const hundreds = ['', 'сто', 'двести', 'триста', 'четыреста', 'пятьсот', 'шестьсот', 'семьсот', 'восемьсот', 'девятьсот'];
-      
-      function getWords(n) {
-        if (n === 0) return '';
-        if (n < 10) return units[n];
-        if (n < 20) return teens[n - 10];
-        if (n < 100) {
-          const t = Math.floor(n / 10);
-          const u = n % 10;
-          return tens[t] + (u > 0 ? ' ' + units[u] : '');
-        }
-        if (n < 1000) {
-          const h = Math.floor(n / 100);
-          const rest = n % 100;
-          return hundreds[h] + (rest > 0 ? ' ' + getWords(rest) : '');
-        }
-        if (n < 1000000) {
-          const thousands = Math.floor(n / 1000);
-          const rest = n % 1000;
-          let result = '';
-          if (thousands === 1) result = 'одна тысяча';
-          else if (thousands === 2) result = 'две тысячи';
-          else if (thousands < 5) result = getWords(thousands) + ' тысячи';
-          else result = getWords(thousands) + ' тысяч';
-          return result + (rest > 0 ? ' ' + getWords(rest) : '');
-        }
-        return String(n);
-      }
-      
-      return getWords(num);
-    }
-
     // ===== ФУНКЦИИ ДЛЯ ЛИСТА ПАРТНЁРЫ =====
     
     function renderPartners() {
       const container = document.getElementById('partnersList');
-      
       const dateFrom = document.getElementById('partnerDateFrom').value;
       const dateTo = document.getElementById('partnerDateTo').value;
-      
       const partnersMap = new Map();
       
       allContracts.forEach(contract => {
@@ -1409,7 +1138,7 @@
       }
       
       let html = `
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
             <div class="text-xs text-purple-600 font-bold">Всего партнеров</div>
             <div class="text-2xl font-bold text-purple-700">${partners.length}</div>
@@ -1508,17 +1237,16 @@
     }
 
     // ================================================================
-    // ОСНОВНАЯ ЛОГИКА МЕСЯЦЕВ (ИСПРАВЛЕННАЯ)
+    // ОСНОВНАЯ ЛОГИКА МЕСЯЦЕВ
     // ================================================================
     
     function getMonthStatus(contract) {
-      const months = contract.monthsCount || 0;
+      const months = Number(contract.monthsCount) || 0;
       const installments = contract.installments || {};
-      const monthlyPay = contract.monthlyPay || 0;
+      const monthlyPay = Number(contract.monthlyPay) || 0;
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       
-      // Парсим дату payDate
       const payDateStr = contract.payDate;
       if (!payDateStr) {
         return { months: [], overdueSum: 0 };
@@ -1527,29 +1255,22 @@
       const firstPayDate = new Date(payDateStr);
       firstPayDate.setHours(0, 0, 0, 0);
       
-      // Извлекаем день месяца из payDate
       const payDay = firstPayDate.getDate();
-      
       const result = [];
       let overdueSum = 0;
       
-      // Создаем массив месяцев
       for (let i = 1; i <= months; i++) {
-        // Базовый месяц: первыйPayDate + i месяцев (НЕ i-1, а i!)
-        // Это значит, что 1-й платеж будет через 1 месяц, а не в текущем
         const payDate = new Date(firstPayDate);
-        payDate.setMonth(payDate.getMonth() + i);
+        payDate.setMonth(payDate.getMonth() + (i - 1));
         
-        // Устанавливаем день месяца как payDay (фиксированное число)
-        // Если в месяце нет такого числа (например, 31 февраля), берем последний день месяца
         const maxDay = getDaysInMonth(payDate.getFullYear(), payDate.getMonth());
         const targetDay = Math.min(payDay, maxDay);
         payDate.setDate(targetDay);
         payDate.setHours(0, 0, 0, 0);
         
         const payment = installments[i];
-        const isPaid = !!payment && payment.amount > 0;
-        const paidAmount = isPaid ? payment.amount : 0;
+        const isPaid = !!payment && Number(payment.amount) > 0;
+        const paidAmount = isPaid ? Number(payment.amount) : 0;
         
         let status = 'future';
         if (isPaid) {
@@ -1571,7 +1292,6 @@
       return { months: result, overdueSum: overdueSum };
     }
 
-    // Вспомогательная функция: количество дней в месяце
     function getDaysInMonth(year, month) {
       return new Date(year, month + 1, 0).getDate();
     }
@@ -1586,19 +1306,16 @@
       target.setHours(0, 0, 0, 0);
       
       allContracts.forEach(contract => {
-        // Проверяем только активные договоры (с остатком > 0)
         const insts = contract.installments || {};
         let totalPaid = 0;
         Object.values(insts).forEach(p => totalPaid += Number(p.amount));
         const rest = contract.totalCost - (contract.downPayment || 0) - totalPaid;
         
-        if (rest <= 0) return; // Пропускаем закрытые договоры
+        if (rest <= 0) return;
         
-        // Получаем все месяцы и их статусы
         const monthInfo = getMonthStatus(contract);
         const months = monthInfo.months;
         
-        // Проверяем, есть ли НЕОПЛАЧЕННЫЙ месяц с датой, равной targetDate
         let hasUnpaidMonth = false;
         let unpaidMonthAmount = 0;
         
@@ -1616,7 +1333,6 @@
         }
         
         if (hasUnpaidMonth) {
-          // Пересчитываем просрочку для этого клиента
           let clientOverdue = 0;
           months.forEach(m => {
             if (m.status === 'overdue' && !m.isPaid) {
@@ -1675,7 +1391,7 @@
               <span class="client-name">${client.fio}</span>
               <span class="client-phone">📞 ${client.phone}</span>
               <span class="client-detail">💰 Мес. платеж: ${client.monthlyPay} ₽</span>
-              <span class="client-detail">📅 ${dateStr || ''}</span>
+              <span class="client-detail">${dateStr ? '📅 ' + dateStr : ''}</span>
             </div>
             <div class="flex flex-wrap items-center gap-2">
               <span class="client-overdue">Просрочка: ${clientOverdue.toLocaleString('ru-RU')} ₽</span>
@@ -1719,9 +1435,6 @@
 
     function getDebtors() {
       const result = [];
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      
       allContracts.forEach(contract => {
         const insts = contract.installments || {};
         let totalPaid = 0;
@@ -1750,66 +1463,25 @@
           });
         }
       });
-      
       return result;
     }
 
-    // ===== ФУНКЦИИ ДЛЯ WHATSAPP =====
+    // ===== WHATSAPP =====
     
     function showCopyNotification(message) {
       const notification = document.createElement('div');
       notification.className = 'copy-notification';
       notification.textContent = message;
       document.body.appendChild(notification);
-      setTimeout(() => {
-        notification.remove();
-      }, 3000);
+      setTimeout(() => { notification.remove(); }, 3000);
     }
 
     function sendWhatsAppToday() {
       const today = new Date();
       const todayStr = today.toISOString().slice(0, 10);
       const clients = getClientsForDate(todayStr);
-      
-      if (clients.length === 0) {
-        alert('📭 Нет клиентов, которые должны оплатить сегодня');
-        return;
-      }
-      
-      let message = '🔔 *Напоминание об оплате сегодня!*\n\n';
-      let phoneNumbers = [];
-      
-      clients.forEach((client, index) => {
-        const phone = client.phone.replace(/[^0-9]/g, '');
-        if (phone) phoneNumbers.push(phone);
-        
-        const monthInfo = client.monthInfo || getMonthStatus(client);
-        let overdueSum = 0;
-        monthInfo.months.forEach(m => {
-          if (m.status === 'overdue' && !m.isPaid) overdueSum += m.amount;
-        });
-        
-        message += `${index + 1}. *${client.fio}*\n`;
-        message += `   💰 Сумма: ${client.monthlyPay} ₽\n`;
-        message += `   📱 WhatsApp: wa.me/7${phone}\n`;
-        if (overdueSum > 0) {
-          message += `   ⚠️ Просрочка: ${overdueSum} ₽\n`;
-        }
-        message += `   📊 Остаток: ${client.rest} ₽\n\n`;
-      });
-      
-      message += `\n📅 Дата платежа: ${todayStr}\n`;
-      message += `👥 Всего клиентов: ${clients.length}`;
-      
-      const phoneList = phoneNumbers.map(p => `7${p}`).join(', ');
-      navigator.clipboard.writeText(phoneList).then(() => {
-        showCopyNotification(`✅ Скопировано ${phoneNumbers.length} номеров для рассылки!`);
-      }).catch(() => {
-        showCopyNotification(`⚠️ Найдено ${phoneNumbers.length} клиентов. Скопируйте номера вручную.`);
-      });
-      
-      const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-      window.open(url, '_blank');
+      if (clients.length === 0) { alert('📭 Нет клиентов, которые должны оплатить сегодня'); return; }
+      buildAndSendWhatsAppMessage('🔔 *Напоминание об оплате сегодня!*', clients, todayStr);
     }
 
     function sendWhatsAppThreeDays() {
@@ -1818,13 +1490,18 @@
       threeDaysLater.setDate(today.getDate() + 3);
       const threeDaysStr = threeDaysLater.toISOString().slice(0, 10);
       const clients = getClientsForDate(threeDaysStr);
-      
-      if (clients.length === 0) {
-        alert('📭 Нет клиентов, которым нужно оплатить через 3 дня');
-        return;
-      }
-      
-      let message = '🔔 *Напоминание об оплате через 3 дня!*\n\n';
+      if (clients.length === 0) { alert('📭 Нет клиентов, которым нужно оплатить через 3 дня'); return; }
+      buildAndSendWhatsAppMessage('🔔 *Напоминание об оплате через 3 дня!*', clients, threeDaysStr);
+    }
+
+    function sendWhatsAppDebtors() {
+      const clients = getDebtors();
+      if (clients.length === 0) { alert('📭 Нет клиентов с просрочкой'); return; }
+      buildAndSendWhatsAppMessage('🚫 *Напоминание о просроченной задолженности!*', clients, '');
+    }
+
+    function buildAndSendWhatsAppMessage(header, clients, dateStr) {
+      let message = `${header}\n\n`;
       let phoneNumbers = [];
       
       clients.forEach((client, index) => {
@@ -1840,752 +1517,516 @@
         message += `${index + 1}. *${client.fio}*\n`;
         message += `   💰 Сумма: ${client.monthlyPay} ₽\n`;
         message += `   📱 WhatsApp: wa.me/7${phone}\n`;
-        if (overdueSum > 0) {
-          message += `   ⚠️ Просрочка: ${overdueSum} ₽\n`;
-        }
+        if (overdueSum > 0) message += `   ⚠️ Просрочка: ${overdueSum} ₽\n`;
         message += `   📊 Остаток: ${client.rest} ₽\n\n`;
       });
       
-      message += `\n📅 Дата платежа: ${threeDaysStr}\n`;
+      if (dateStr) message += `\n📅 Дата: ${dateStr}\n`;
       message += `👥 Всего клиентов: ${clients.length}`;
       
       const phoneList = phoneNumbers.map(p => `7${p}`).join(', ');
       navigator.clipboard.writeText(phoneList).then(() => {
-        showCopyNotification(`✅ Скопировано ${phoneNumbers.length} номеров для рассылки!`);
+        showCopyNotification(`✅ Скопировано ${phoneNumbers.length} номеров!`);
       }).catch(() => {
-        showCopyNotification(`⚠️ Найдено ${phoneNumbers.length} клиентов. Скопируйте номера вручную.`);
+        showCopyNotification(`⚠️ Скопируйте номера вручную.`);
       });
       
-      const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-      window.open(url, '_blank');
-    }
-
-    function sendWhatsAppDebtors() {
-      const clients = getDebtors();
-      
-      if (clients.length === 0) {
-        alert('📭 Нет клиентов с просрочкой');
-        return;
-      }
-      
-      let message = '🚫 *Напоминание о просроченной задолженности!*\n\n';
-      let phoneNumbers = [];
-      
-      clients.forEach((client, index) => {
-        const phone = client.phone.replace(/[^0-9]/g, '');
-        if (phone) phoneNumbers.push(phone);
-        
-        const monthInfo = client.monthInfo || getMonthStatus(client);
-        let overdueSum = 0;
-        let overdueMonths = [];
-        monthInfo.months.forEach(m => {
-          if (m.status === 'overdue' && !m.isPaid) {
-            overdueSum += m.amount;
-            overdueMonths.push(`${m.month}-й (${m.date})`);
-          }
-        });
-        
-        message += `${index + 1}. *${client.fio}*\n`;
-        message += `   💰 Сумма: ${client.monthlyPay} ₽\n`;
-        message += `   📱 WhatsApp: wa.me/7${phone}\n`;
-        message += `   ⚠️ Просрочка: ${overdueSum} ₽ (${overdueMonths.join(', ')})\n`;
-        message += `   📊 Остаток: ${client.rest} ₽\n\n`;
-      });
-      
-      message += `\n👥 Всего должников: ${clients.length}`;
-      
-      const phoneList = phoneNumbers.map(p => `7${p}`).join(', ');
-      navigator.clipboard.writeText(phoneList).then(() => {
-        showCopyNotification(`✅ Скопировано ${phoneNumbers.length} номеров для рассылки!`);
-      }).catch(() => {
-        showCopyNotification(`⚠️ Найдено ${phoneNumbers.length} должников. Скопируйте номера вручную.`);
-      });
-      
-      const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-      window.open(url, '_blank');
+      window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
     }
 
     // ================================================================
-    // ОСНОВНЫЕ ФУНКЦИИ РАБОТЫ С ДАННЫМИ
+    // ОСНОВНОЙ РЕНДЕРИНГ И ЛОГИКА ТАБЛИЦ
     // ================================================================
 
-    function validateFinance() {
-      const months = Number(document.getElementById('monthsCount').value) || 0;
-      const monthly = Number(document.getElementById('monthlyPay').value) || 0;
-      const total = Number(document.getElementById('totalCost').value) || 0;
-      const down = Number(document.getElementById('downPayment').value) || 0;
-      const cost = Number(document.getElementById('costPrice').value) || 0;
-
-      if (months === 0 && monthly === 0 && total === 0 && down === 0 && cost === 0) {
-        document.getElementById('errorBanner').classList.add('hidden');
-        const saveBtn = document.getElementById('saveBtn');
-        saveBtn.disabled = false;
-        saveBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-        return true;
-      }
-
-      const isMathError = (months > 0 || monthly > 0 || total > 0) && (months * monthly + down !== total);
-      const isPriceError = (cost > 0 || total > 0) && (cost > total);
-      
-      const hasError = isMathError || isPriceError;
-      
-      document.getElementById('totalCost').classList.toggle('input-error', isMathError);
-      document.getElementById('monthlyPay').classList.toggle('input-error', isMathError);
-      document.getElementById('monthsCount').classList.toggle('input-error', isMathError);
-      document.getElementById('downPayment').classList.toggle('input-error', false);
-      document.getElementById('costPrice').classList.toggle('input-error', isPriceError);
-
-      document.getElementById('errorBanner').classList.toggle('hidden', !hasError);
-      
-      const saveBtn = document.getElementById('saveBtn');
-      saveBtn.disabled = hasError;
-      saveBtn.classList.toggle('opacity-50', hasError);
-      saveBtn.classList.toggle('cursor-not-allowed', hasError);
-
-      return !hasError;
-    }
-
-    const modal = document.getElementById('modal');
-    function openCreateModal() {
-      document.getElementById('contractForm').reset();
-      document.getElementById('editDocId').value = '';
-      document.getElementById('modalTitle').innerText = 'Оформление нового договора';
-      document.getElementById('downPayment').value = 0;
-      validateFinance();
-      modal.classList.remove('hidden');
-    }
-    function closeModal() { modal.classList.add('hidden'); }
-    function closePayModal() { document.getElementById('payModal').classList.add('hidden'); }
-
-    function openPayModal(id) {
-      document.getElementById('payContractId').value = id;
-      document.getElementById('payDateVal').valueAsDate = new Date();
-      document.getElementById('payModal').classList.remove('hidden');
-    }
-
-    function openEditModal(id) {
-      const contract = allContracts.find(c => c.id === id);
-      if(!contract) return;
-      document.getElementById('editDocId').value = id;
-      document.getElementById('modalTitle').innerText = `Редактирование №${contract.contractNum}`;
-      document.getElementById('fio').value = contract.fio || '';
-      document.getElementById('birthDate').value = contract.birthDate || '';
-      document.getElementById('passport').value = contract.passport || '';
-      document.getElementById('phone').value = contract.phone || '';
-      document.getElementById('extraPhone').value = contract.extraPhone || '';
-      document.getElementById('address').value = contract.address || '';
-      document.getElementById('buyDate').value = contract.buyDate || '';
-      document.getElementById('payDate').value = contract.payDate || '';
-      document.getElementById('monthsCount').value = contract.monthsCount || '';
-      document.getElementById('monthlyPay').value = contract.monthlyPay || '';
-      document.getElementById('totalCost').value = contract.totalCost || '';
-      document.getElementById('downPayment').value = contract.downPayment || 0;
-      document.getElementById('costPrice').value = contract.costPrice || '';
-      document.getElementById('shopPaid').checked = !!contract.shopPaid;
-      document.getElementById('product').value = contract.product || '';
-      document.getElementById('store').value = contract.store || '';
-      document.getElementById('guarantorFio').value = contract.guarantorFio || '';
-      document.getElementById('guarantorPhone').value = contract.guarantorPhone || '';
-      validateFinance();
-      modal.classList.remove('hidden');
-    }
-
-    document.getElementById('contractForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      if (!validateFinance()) return;
-      
-      saveState();
-
-      const editId = document.getElementById('editDocId').value;
-      const formData = {
-        fio: document.getElementById('fio').value,
-        birthDate: document.getElementById('birthDate').value || '',
-        passport: document.getElementById('passport').value || '',
-        phone: document.getElementById('phone').value,
-        extraPhone: document.getElementById('extraPhone').value || '',
-        address: document.getElementById('address').value || '',
-        buyDate: document.getElementById('buyDate').value,
-        payDate: document.getElementById('payDate').value,
-        monthsCount: Number(document.getElementById('monthsCount').value),
-        monthlyPay: Number(document.getElementById('monthlyPay').value),
-        totalCost: Number(document.getElementById('totalCost').value),
-        downPayment: Number(document.getElementById('downPayment').value) || 0,
-        costPrice: Number(document.getElementById('costPrice').value),
-        shopPaid: document.getElementById('shopPaid').checked,
-        product: document.getElementById('product').value || '',
-        store: document.getElementById('store').value || '',
-        guarantorFio: document.getElementById('guarantorFio').value || '',
-        guarantorPhone: document.getElementById('guarantorPhone').value || ''
-      };
-
-      if (editId) {
-        const index = allContracts.findIndex(c => c.id === editId);
-        if (index !== -1) allContracts[index] = { ...allContracts[index], ...formData };
-      } else {
-        const maxNum = allContracts.reduce((max, c) => (c.contractNum > max ? c.contractNum : max), 0);
-        allContracts.push({
-          id: 'doc_' + Date.now(),
-          contractNum: maxNum + 1,
-          installments: {},
-          ...formData
-        });
-      }
-      saveToStorage();
-      closeModal();
-    });
-
-    document.getElementById('payForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const id = document.getElementById('payContractId').value;
-      const contract = allContracts.find(c => c.id === id);
-      if (!contract) return;
-
-      const inputDateVal = document.getElementById('payDateVal').value;
-      const inputDate = new Date(inputDateVal);
-      const today = new Date();
-      
-      const isDifferentMonth = (inputDate.getFullYear() !== today.getFullYear()) || (inputDate.getMonth() !== today.getMonth());
-
-      if (isDifferentMonth) {
-        const confirmed = confirm(`Внимание! Дата платежа (${inputDateVal}) относится НЕ к текущему месяцу.\n\nВы уверены, что хотите сохранить эту дату?`);
-        if (!confirmed) return;
-      }
-
-      saveState();
-      const idx = document.getElementById('payIndex').value;
-      if (!contract.installments) contract.installments = {};
-      contract.installments[idx] = { 
-        amount: Number(document.getElementById('payAmount').value), 
-        date: inputDateVal 
-      };
-      saveToStorage();
-      closePayModal();
-      document.getElementById('payForm').reset();
-    });
-
-    function deleteInstallment() {
-      const id = document.getElementById('payContractId').value;
-      const idx = document.getElementById('payIndex').value;
-      const contract = allContracts.find(c => c.id === id);
-
-      if (contract && contract.installments && contract.installments[idx]) {
-        if (confirm(`Удалить ${idx}-й взнос на сумму ${contract.installments[idx].amount} ₽?`)) {
-          saveState();
-          delete contract.installments[idx];
-          saveToStorage();
-          closePayModal();
-          document.getElementById('payForm').reset();
-        }
-      } else {
-        alert("Этот взнос еще не был внесен.");
-      }
-    }
-
-    function deleteContract(id) {
-      const contract = allContracts.find(c => c.id === id);
-      if (confirm(`Удалить договор №${contract.contractNum}?`)) {
-        if (prompt('Введите "УДАЛИТЬ" для подтверждения:') === "УДАЛИТЬ") {
-          saveState();
-          allContracts = allContracts.filter(c => c.id !== id);
-          saveToStorage();
-        }
-      }
-    }
-
-    function copyToClip(text, btn) {
-      navigator.clipboard.writeText(text).then(() => {
-        const oldText = btn.innerText;
-        btn.innerText = "✓ Готово";
-        btn.classList.add("bg-green-700");
-        setTimeout(() => { btn.innerText = oldText; btn.classList.remove("bg-green-700"); }, 1000);
-      });
-    }
-
-    function copyHistory(id, btn) {
-      const c = allContracts.find(i => i.id === id);
-      let log = `Договор №${c.contractNum}\nФИО: ${c.fio}\n\nОплаты:\n`;
-      Object.keys(c.installments || {}).sort((a,b)=>a-b).forEach(k => {
-        log += `${k}-й: ${c.installments[k].amount}₽ (${c.installments[k].date})\n`;
-      });
-      copyToClip(log, btn);
-    }
-
-    function copyGuarantor(id, btn) {
-      const c = allContracts.find(i => i.id === id);
-      copyToClip(`Договор №${c.contractNum}\nКлиент: ${c.fio}\nПоручитель: ${c.guarantorFio || '—'} (${c.guarantorPhone || '—'})`, btn);
-    }
-
-    function renderTable(contracts) {
+    function renderTable(contractsToRender = allContracts) {
       const tbody = document.getElementById('contractsTable');
       tbody.innerHTML = '';
-      contracts.forEach(item => {
-        const insts = item.installments || {};
-        let totalPaid = 0;
-        Object.values(insts).forEach(p => totalPaid += Number(p.amount));
-        const rest = item.totalCost - (item.downPayment || 0) - totalPaid;
-        
+
+      contractsToRender.forEach(contract => {
         const tr = document.createElement('tr');
-        if (item.costPrice > item.totalCost) tr.className = 'row-error';
-        
-        let instHtml = '';
+        tr.className = "hover:bg-slate-50 transition border-b";
+
+        const insts = contract.installments || {};
+        let totalPaid = 0;
+        Object.values(insts).forEach(p => totalPaid += Number(p.amount || 0));
+
+        const rest = Number(contract.totalCost) - Number(contract.downPayment || 0) - totalPaid;
+        const monthInfo = getMonthStatus(contract);
+
+        // Ячейка ФИО
+        let html = `<td class="p-2 border-r font-bold">${contract.fio || ''}</td>`;
+        html += `<td class="p-2 border-r">${contract.phone || ''}</td>`;
+        html += `<td class="p-2 border-r text-[10px]">П: ${contract.buyDate || ''}<br>Г: ${contract.payDate || ''}</td>`;
+        html += `<td class="p-2 border-r font-bold text-blue-600">${Number(contract.monthlyPay || 0).toLocaleString()} ₽</td>`;
+
+        // 15 взносов
         for(let i=1; i<=15; i++) {
-          const v = insts[i];
-          instHtml += v ? `<td class="p-1 border-r text-center pay-paid" title="Дата: ${v.date}">${v.amount}</td>` : `<td class="p-1 border-r text-center text-gray-300">—</td>`;
+          const inst = insts[i];
+          if (i <= Number(contract.monthsCount)) {
+            if (inst && inst.amount > 0) {
+              html += `<td onclick="openPayModal('${contract.id}', ${i})" class="p-1 border-r text-center pay-paid" title="${inst.date}">${inst.amount}</td>`;
+            } else {
+              const mData = monthInfo.months.find(m => m.month === i);
+              const isOver = mData && mData.status === 'overdue';
+              html += `<td onclick="openPayModal('${contract.id}', ${i})" class="p-1 border-r text-center cursor-pointer hover:bg-amber-100 ${isOver ? 'bg-red-200 text-red-800 font-bold' : 'text-gray-400'}">${isOver ? '!' : '—'}</td>`;
+            }
+          } else {
+            html += `<td class="p-1 border-r bg-gray-100"></td>`;
+          }
         }
 
-        tr.innerHTML = `
-          <td class="p-2 border-r font-bold">${item.fio}</td>
-          <td class="p-2 border-r text-[10px]">${item.phone}</td>
-          <td class="p-2 border-r text-[10px]">${item.buyDate}<br><b class="text-blue-600">${item.payDate}</b></td>
-          <td class="p-2 border-r font-bold text-center">${item.monthlyPay}</td>
-          ${instHtml}
-          <td class="p-2 border-r text-red-600 font-bold text-center">0</td>
-          <td class="p-2 border-r font-bold text-center ${rest <= 0 ? 'text-green-600' : 'text-orange-600'}">${rest}</td>
-          <td class="p-2 border-r text-[10px] text-center">${item.totalCost} / ${item.downPayment}</td>
-          <td class="p-2 border-r text-center">${item.costPrice}</td>
-          <td class="p-2 border-r text-center font-black ${item.shopPaid ? 'text-green-600' : 'text-gray-300'}">${item.shopPaid ? 'Д' : '—'}</td>
-          <td class="p-2 border-r text-[10px]">${item.product || '—'}</td>
-          <td class="p-2 border-r text-[10px]">${item.guarantorFio || '—'}</td>
-          <td class="p-2 text-center space-x-1 sticky right-0 bg-white shadow-[-5px_0_10px_rgba(0,0,0,0.05)]">
-            <button onclick="openPayModal('${item.id}')" class="bg-green-600 text-white px-1 py-0.5 rounded text-[9px] font-bold">+Взнос</button>
-            <button onclick="copyHistory('${item.id}', this)" class="bg-slate-500 text-white px-1 py-0.5 rounded text-[9px]">📋 Опл.</button>
-            <button onclick="copyGuarantor('${item.id}', this)" class="bg-indigo-500 text-white px-1 py-0.5 rounded text-[9px]">👥 Пор.</button>
-            <button onclick="openEditModal('${item.id}')" class="bg-blue-500 text-white px-1 py-0.5 rounded text-[9px]">✏️</button>
-            <button onclick="deleteContract('${item.id}')" class="bg-red-500 text-white px-1 py-0.5 rounded text-[9px]">🗑️</button>
+        html += `<td class="p-2 border-r font-bold text-red-600">${monthInfo.overdueSum.toLocaleString()} ₽</td>`;
+        html += `<td class="p-2 border-r font-bold ${rest <= 0 ? 'text-green-600' : 'text-amber-600'}">${rest.toLocaleString()} ₽</td>`;
+        html += `<td class="p-2 border-r text-[10px]">${Number(contract.totalCost || 0).toLocaleString()} ₽<br><span class="text-gray-400">Пр: ${Number(contract.downPayment || 0).toLocaleString()} ₽</span></td>`;
+        html += `<td class="p-2 border-r font-bold">${Number(contract.costPrice || 0).toLocaleString()} ₽</td>`;
+        html += `<td class="p-2 border-r text-center font-bold ${contract.shopPaid ? 'text-green-600' : 'text-red-500'}">${contract.shopPaid ? 'ДА' : 'НЕТ'}</td>`;
+        html += `<td class="p-2 border-r text-[10px]">${contract.product || ''}<br><span class="text-purple-600 font-bold">${contract.store || ''}</span></td>`;
+        html += `<td class="p-2 border-r text-[10px]">${contract.guarantorFio || ''}<br>${contract.guarantorPhone || ''}</td>`;
+        
+        // Действия
+        html += `
+          <td class="p-2 text-center sticky right-0 bg-white shadow-md">
+            <div class="flex justify-center gap-1">
+              <button onclick="editContract('${contract.id}')" class="bg-amber-500 hover:bg-amber-600 text-white px-2 py-1 rounded text-[10px] font-bold">✎</button>
+              <button onclick="deleteContract('${contract.id}')" class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-[10px] font-bold">🗑</button>
+            </div>
           </td>
         `;
+
+        tr.innerHTML = html;
         tbody.appendChild(tr);
       });
     }
 
-    const accModal = document.getElementById('accModal');
-    
-    function openAccModal() {
-      document.getElementById('accForm').reset();
-      document.getElementById('accEditId').value = '';
-      document.getElementById('accModalTitle').innerText = 'Новая запись учета';
-      document.getElementById('accDate').valueAsDate = new Date();
-      accModal.classList.remove('hidden');
-    }
-
-    function closeAccModal() { accModal.classList.add('hidden'); }
-
-    function openEditAccModal(id) {
-      const item = allAccounting.find(a => a.id === id);
-      if (!item) return;
-      document.getElementById('accEditId').value = item.id;
-      document.getElementById('accModalTitle').innerText = 'Редактирование записи';
-      document.getElementById('accDate').value = item.date;
-      document.getElementById('accIncome').value = item.income || 0;
-      document.getElementById('accExpense').value = item.expense || 0;
-      document.getElementById('accNote').value = item.note || '';
-      document.getElementById('accAccount').value = item.account || '';
-      accModal.classList.remove('hidden');
-    }
-
-    document.getElementById('accForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      saveState();
-
-      const editId = document.getElementById('accEditId').value;
-      const formData = {
-        date: document.getElementById('accDate').value,
-        income: Number(document.getElementById('accIncome').value) || 0,
-        expense: Number(document.getElementById('accExpense').value) || 0,
-        note: document.getElementById('accNote').value || '—',
-        account: (document.getElementById('accAccount').value || '—').trim(),
-        createdAt: editId ? (allAccounting.find(a => a.id === editId)?.createdAt || Date.now()) : Date.now()
-      };
-
-      if (editId) {
-        const idx = allAccounting.findIndex(a => a.id === editId);
-        if (idx !== -1) allAccounting[idx] = { ...allAccounting[idx], ...formData };
-      } else {
-        allAccounting.unshift({
-          id: 'acc_' + Date.now(),
-          ...formData
-        });
-      }
-
-      saveToStorage();
-      closeAccModal();
-    });
-
-    function deleteAccItem(id) {
-      if (confirm('Удалить эту запись из учета?')) {
-        saveState();
-        allAccounting = allAccounting.filter(a => a.id !== id);
-        saveToStorage();
-      }
-    }
-
-    function renderAccountingTable(items) {
+    function renderAccountingTable(records = allAccounting) {
       const tbody = document.getElementById('accountingTable');
       tbody.innerHTML = '';
       
       let incomeSum = 0;
       let expenseSum = 0;
 
-      const sorted = [...items].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-
-      sorted.forEach(item => {
-        incomeSum += Number(item.income || 0);
-        expenseSum += Number(item.expense || 0);
+      records.forEach(rec => {
+        incomeSum += Number(rec.income || 0);
+        expenseSum += Number(rec.expense || 0);
 
         const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 border-b";
         tr.innerHTML = `
-          <td class="p-2 border-r font-medium">${item.date}</td>
-          <td class="p-2 border-r font-bold ${item.income > 0 ? 'text-emerald-600 bg-emerald-50/50' : 'text-slate-300'}">${item.income > 0 ? item.income + ' ₽' : '—'}</td>
-          <td class="p-2 border-r font-bold ${item.expense > 0 ? 'text-red-600 bg-red-50/50' : 'text-slate-300'}">${item.expense > 0 ? item.expense + ' ₽' : '—'}</td>
-          <td class="p-2 border-r text-slate-700 font-medium">${item.note}</td>
-          <td class="p-2 border-r font-bold text-blue-700">${item.account}</td>
-          <td class="p-2 text-center space-x-1 sticky right-0 bg-white shadow-[-5px_0_10px_rgba(0,0,0,0.05)]">
-            <button onclick="openEditAccModal('${item.id}')" class="bg-blue-500 text-white px-1.5 py-0.5 rounded text-[9px]">✏️</button>
-            <button onclick="deleteAccItem('${item.id}')" class="bg-red-500 text-white px-1.5 py-0.5 rounded text-[9px]">🗑️</button>
+          <td class="p-2 border-r font-bold">${rec.date || ''}</td>
+          <td class="p-2 border-r text-emerald-600 font-bold">${Number(rec.income || 0).toLocaleString()} ₽</td>
+          <td class="p-2 border-r text-red-600 font-bold">${Number(rec.expense || 0).toLocaleString()} ₽</td>
+          <td class="p-2 border-r">${rec.note || ''}</td>
+          <td class="p-2 border-r font-bold text-slate-600">${rec.account || ''}</td>
+          <td class="p-2 text-center">
+            <button onclick="deleteAccounting('${rec.id}')" class="bg-red-500 hover:bg-red-600 text-white px-2 py-0.5 rounded text-[10px]">Удалить</button>
           </td>
         `;
         tbody.appendChild(tr);
       });
 
-      document.getElementById('totalIncome').innerText = incomeSum.toLocaleString('ru-RU') + ' ₽';
-      document.getElementById('totalExpense').innerText = expenseSum.toLocaleString('ru-RU') + ' ₽';
+      document.getElementById('totalIncome').textContent = incomeSum.toLocaleString() + ' ₽';
+      document.getElementById('totalExpense').textContent = expenseSum.toLocaleString() + ' ₽';
     }
 
-    const takenModal = document.getElementById('takenModal');
+    function renderTakenSheet() {
+      const tbody = document.getElementById('takenRowsTable');
+      tbody.innerHTML = '';
 
-    function openTakenModal() {
-      document.getElementById('takenForm').reset();
-      document.getElementById('takenEditId').value = '';
-      document.getElementById('takenModalTitle').innerText = 'Новая запись Взяли / Положили';
-      takenModal.classList.remove('hidden');
+      let takenSum = 0;
+      let putSum = 0;
+
+      allTaken.forEach(rec => {
+        takenSum += Number(rec.takenAmount || 0);
+        putSum += Number(rec.putAmount || 0);
+
+        const tr = document.createElement('tr');
+        tr.className = "text-center border-b hover:bg-amber-50/40";
+        tr.innerHTML = `
+          <td></td>
+          <td class="font-bold text-amber-700">${rec.takenAmount ? Number(rec.takenAmount).toLocaleString() : ''}</td>
+          <td class="text-left text-[11px]">${rec.takenDesc || ''}</td>
+          <td class="font-bold text-emerald-600">${rec.putAmount ? Number(rec.putAmount).toLocaleString() : ''}</td>
+          <td class="text-left text-[11px]">${rec.putDesc || ''}</td>
+          <td>
+            <button onclick="deleteTaken('${rec.id}')" class="text-red-500 hover:text-red-700 font-bold">✕</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('takenTotalSum').textContent = takenSum.toLocaleString();
+      document.getElementById('putTotalSum').textContent = putSum.toLocaleString();
+      
+      const kassa = putSum - takenSum;
+      document.getElementById('kassaTotal').textContent = kassa.toLocaleString();
+
+      // Статистика
+      const totalContracts = allContracts.length;
+      let activeContracts = 0;
+      let closedContracts = 0;
+
+      allContracts.forEach(c => {
+        const insts = c.installments || {};
+        let paid = 0;
+        Object.values(insts).forEach(p => paid += Number(p.amount || 0));
+        const rest = Number(c.totalCost) - Number(c.downPayment || 0) - paid;
+        if (rest <= 0) closedContracts++;
+        else activeContracts++;
+      });
+
+      document.getElementById('statTotalContracts').textContent = totalContracts;
+      document.getElementById('statClosedContracts').textContent = closedContracts;
+      document.getElementById('statActiveContracts').textContent = activeContracts;
+
+      renderAccountsTable();
     }
 
-    function closeTakenModal() { takenModal.classList.add('hidden'); }
+    function renderAccountsTable() {
+      const tbody = document.getElementById('accountsTableBody');
+      tbody.innerHTML = '';
+      let grandTotal = 0;
 
-    function openEditTakenModal(id) {
-      const item = allTaken.find(t => t.id === id);
-      if(!item) return;
-      document.getElementById('takenEditId').value = item.id;
-      document.getElementById('takenModalTitle').innerText = 'Редактировать Взяли / Положили';
-      document.getElementById('takenAmount').value = item.takenAmount || 0;
-      document.getElementById('takenDesc').value = item.takenDesc || '';
-      document.getElementById('putAmount').value = item.putAmount || 0;
-      document.getElementById('putDesc').value = item.putDesc || '';
-      takenModal.classList.remove('hidden');
+      customAccounts.forEach((acc, idx) => {
+        let incCount = 0, incSum = 0, expCount = 0, expSum = 0;
+
+        allAccounting.forEach(a => {
+          if ((a.account || '').trim().toLowerCase() === acc.name.trim().toLowerCase()) {
+            if (Number(a.income) > 0) { incCount++; incSum += Number(a.income); }
+            if (Number(a.expense) > 0) { expCount++; expSum += Number(a.expense); }
+          }
+        });
+
+        const balance = incSum - expSum;
+        grandTotal += balance;
+
+        const tr = document.createElement('tr');
+        if (acc.color) tr.style.backgroundColor = acc.color;
+
+        tr.innerHTML = `
+          <td class="font-bold">${acc.name}</td>
+          <td class="font-bold">${balance.toLocaleString()}</td>
+          <td>${incCount}</td>
+          <td class="text-emerald-600">${incSum.toLocaleString()}</td>
+          <td>${expCount}</td>
+          <td class="text-red-600">${expSum.toLocaleString()}</td>
+          <td>
+            <input type="color" value="${acc.color || '#ffffff'}" onchange="changeAccountColor(${idx}, this.value)" class="w-6 h-6 p-0 border-0 cursor-pointer rounded">
+            <button onclick="deleteAccount(${idx})" class="text-red-500 font-bold ml-1">✕</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('accountsGrandTotal').textContent = grandTotal.toLocaleString();
     }
 
-    document.getElementById('takenForm').addEventListener('submit', (e) => {
+    function changeAccountColor(idx, color) {
+      saveState();
+      customAccounts[idx].color = color;
+      saveToStorage();
+    }
+
+    function deleteAccount(idx) {
+      if (confirm(`Удалить счет ${customAccounts[idx].name}?`)) {
+        saveState();
+        customAccounts.splice(idx, 1);
+        saveToStorage();
+      }
+    }
+
+    function addNewAccountPrompt() {
+      const name = prompt("Введите имя нового счета / карты (например, C17, S1):");
+      if (name && name.trim()) {
+        saveState();
+        customAccounts.push({ name: name.trim().toUpperCase(), color: '' });
+        saveToStorage();
+      }
+    }
+
+    // ================================================================
+    // МОДАЛЬНЫЕ ОКНА И ФОРМЫ
+    // ================================================================
+
+    function openCreateModal() {
+      document.getElementById('editDocId').value = '';
+      document.getElementById('contractForm').reset();
+      document.getElementById('modalTitle').textContent = 'Новый договор';
+      document.getElementById('buyDate').value = new Date().toISOString().slice(0, 10);
+      document.getElementById('payDate').value = new Date().toISOString().slice(0, 10);
+      document.getElementById('modal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.add('hidden');
+    }
+
+    function validateFinance() {
+      // Валидация при вводе финансовых показателей
+    }
+
+    document.getElementById('contractForm').onsubmit = function(e) {
       e.preventDefault();
       saveState();
 
-      const editId = document.getElementById('takenEditId').value;
-      const formData = {
-        takenAmount: Number(document.getElementById('takenAmount').value) || 0,
-        takenDesc: document.getElementById('takenDesc').value || '',
-        putAmount: Number(document.getElementById('putAmount').value) || 0,
-        putDesc: document.getElementById('putDesc').value || '',
-        createdAt: editId ? (allTaken.find(t => t.id === editId)?.createdAt || Date.now()) : Date.now()
+      const editId = document.getElementById('editDocId').value;
+      const contractData = {
+        id: editId || Date.now().toString(),
+        contractNum: editId ? (allContracts.find(c => c.id === editId)?.contractNum || allContracts.length + 1) : allContracts.length + 1,
+        fio: document.getElementById('fio').value,
+        birthDate: document.getElementById('birthDate').value,
+        passport: document.getElementById('passport').value,
+        phone: document.getElementById('phone').value,
+        extraPhone: document.getElementById('extraPhone').value,
+        address: document.getElementById('address').value,
+        buyDate: document.getElementById('buyDate').value,
+        payDate: document.getElementById('payDate').value,
+        monthsCount: Number(document.getElementById('monthsCount').value),
+        monthlyPay: Number(document.getElementById('monthlyPay').value),
+        totalCost: Number(document.getElementById('totalCost').value),
+        downPayment: Number(document.getElementById('downPayment').value || 0),
+        costPrice: Number(document.getElementById('costPrice').value),
+        shopPaid: document.getElementById('shopPaid').checked,
+        product: document.getElementById('product').value,
+        store: document.getElementById('store').value,
+        guarantorFio: document.getElementById('guarantorFio').value,
+        guarantorPhone: document.getElementById('guarantorPhone').value,
+        installments: editId ? (allContracts.find(c => c.id === editId)?.installments || {}) : {}
       };
 
       if (editId) {
-        const idx = allTaken.findIndex(t => t.id === editId);
-        if (idx !== -1) allTaken[idx] = { ...allTaken[idx], ...formData };
+        const idx = allContracts.findIndex(c => c.id === editId);
+        if (idx !== -1) allContracts[idx] = contractData;
       } else {
-        allTaken.push({
-          id: 'taken_' + Date.now(),
-          ...formData
-        });
+        allContracts.push(contractData);
       }
 
+      closeModal();
       saveToStorage();
-      closeTakenModal();
-    });
+    };
 
-    function deleteTakenItem(id) {
-      if(confirm('Удалить эту строку?')) {
+    function editContract(id) {
+      const c = allContracts.find(item => item.id === id);
+      if (!c) return;
+
+      document.getElementById('editDocId').value = c.id;
+      document.getElementById('fio').value = c.fio || '';
+      document.getElementById('birthDate').value = c.birthDate || '';
+      document.getElementById('passport').value = c.passport || '';
+      document.getElementById('phone').value = c.phone || '';
+      document.getElementById('extraPhone').value = c.extraPhone || '';
+      document.getElementById('address').value = c.address || '';
+      document.getElementById('buyDate').value = c.buyDate || '';
+      document.getElementById('payDate').value = c.payDate || '';
+      document.getElementById('monthsCount').value = c.monthsCount || '';
+      document.getElementById('monthlyPay').value = c.monthlyPay || '';
+      document.getElementById('totalCost').value = c.totalCost || '';
+      document.getElementById('downPayment').value = c.downPayment || 0;
+      document.getElementById('costPrice').value = c.costPrice || '';
+      document.getElementById('shopPaid').checked = !!c.shopPaid;
+      document.getElementById('product').value = c.product || '';
+      document.getElementById('store').value = c.store || '';
+      document.getElementById('guarantorFio').value = c.guarantorFio || '';
+      document.getElementById('guarantorPhone').value = c.guarantorPhone || '';
+
+      document.getElementById('modalTitle').textContent = 'Редактировать договор';
+      document.getElementById('modal').classList.remove('hidden');
+    }
+
+    function deleteContract(id) {
+      if (confirm('Вы действительно хотите удалить этот договор?')) {
+        saveState();
+        allContracts = allContracts.filter(c => c.id !== id);
+        saveToStorage();
+      }
+    }
+
+    // Взносы
+    function openPayModal(contractId, monthIndex) {
+      const contract = allContracts.find(c => c.id === contractId);
+      if (!contract) return;
+
+      document.getElementById('payContractId').value = contractId;
+      document.getElementById('payIndex').value = monthIndex;
+      
+      const existing = (contract.installments || {})[monthIndex];
+      document.getElementById('payAmount').value = existing ? existing.amount : contract.monthlyPay;
+      document.getElementById('payDateVal').value = existing ? existing.date : new Date().toISOString().slice(0, 10);
+
+      document.getElementById('payModal').classList.remove('hidden');
+    }
+
+    function closePayModal() {
+      document.getElementById('payModal').classList.add('hidden');
+    }
+
+    document.getElementById('payForm').onsubmit = function(e) {
+      e.preventDefault();
+      saveState();
+
+      const contractId = document.getElementById('payContractId').value;
+      const idx = document.getElementById('payIndex').value;
+      const amount = Number(document.getElementById('payAmount').value);
+      const date = document.getElementById('payDateVal').value;
+
+      const contract = allContracts.find(c => c.id === contractId);
+      if (contract) {
+        if (!contract.installments) contract.installments = {};
+        contract.installments[idx] = { amount, date };
+      }
+
+      closePayModal();
+      saveToStorage();
+    };
+
+    function deleteInstallment() {
+      saveState();
+      const contractId = document.getElementById('payContractId').value;
+      const idx = document.getElementById('payIndex').value;
+
+      const contract = allContracts.find(c => c.id === contractId);
+      if (contract && contract.installments && contract.installments[idx]) {
+        delete contract.installments[idx];
+      }
+
+      closePayModal();
+      saveToStorage();
+    }
+
+    // Учет
+    function openAccModal() {
+      document.getElementById('accForm').reset();
+      document.getElementById('accDate').value = new Date().toISOString().slice(0, 10);
+      document.getElementById('accModal').classList.remove('hidden');
+    }
+
+    function closeAccModal() {
+      document.getElementById('accModal').classList.add('hidden');
+    }
+
+    document.getElementById('accForm').onsubmit = function(e) {
+      e.preventDefault();
+      saveState();
+
+      const rec = {
+        id: Date.now().toString(),
+        date: document.getElementById('accDate').value,
+        income: Number(document.getElementById('accIncome').value || 0),
+        expense: Number(document.getElementById('accExpense').value || 0),
+        note: document.getElementById('accNote').value,
+        account: document.getElementById('accAccount').value
+      };
+
+      allAccounting.unshift(rec);
+      closeAccModal();
+      saveToStorage();
+    };
+
+    function deleteAccounting(id) {
+      if (confirm('Удалить эту запись учета?')) {
+        saveState();
+        allAccounting = allAccounting.filter(a => a.id !== id);
+        saveToStorage();
+      }
+    }
+
+    // Взяли / Положили
+    function openTakenModal() {
+      document.getElementById('takenForm').reset();
+      document.getElementById('takenModal').classList.remove('hidden');
+    }
+
+    function closeTakenModal() {
+      document.getElementById('takenModal').classList.add('hidden');
+    }
+
+    document.getElementById('takenForm').onsubmit = function(e) {
+      e.preventDefault();
+      saveState();
+
+      const rec = {
+        id: Date.now().toString(),
+        takenAmount: Number(document.getElementById('takenAmount').value || 0),
+        takenDesc: document.getElementById('takenDesc').value,
+        putAmount: Number(document.getElementById('putAmount').value || 0),
+        putDesc: document.getElementById('putDesc').value
+      };
+
+      allTaken.push(rec);
+      closeTakenModal();
+      saveToStorage();
+    };
+
+    function deleteTaken(id) {
+      if (confirm('Удалить эту запись?')) {
         saveState();
         allTaken = allTaken.filter(t => t.id !== id);
         saveToStorage();
       }
     }
 
-    function addNewAccountPrompt() {
-      const accName = prompt('Введите название нового счета/карты (например: S3, A1):');
-      if (accName && accName.trim()) {
-        const cleanName = accName.trim();
-        if(!customAccounts.some(a => a.name.toLowerCase() === cleanName.toLowerCase())) {
-          saveState();
-          customAccounts.push({ name: cleanName, color: '' });
-          saveToStorage();
-        } else {
-          alert('Такой счет уже существует!');
-        }
-      }
-    }
-
-    function deleteAccount(index) {
-      if (confirm(`Удалить счет "${customAccounts[index].name}"?`)) {
-        saveState();
-        customAccounts.splice(index, 1);
-        saveToStorage();
-      }
-    }
-
-    function changeAccountColor(index, color) {
-      saveState();
-      customAccounts[index].color = color;
-      saveToStorage();
-    }
-
-    function renderTakenSheet() {
-      const rowsTbody = document.getElementById('takenRowsTable');
-      rowsTbody.innerHTML = '';
-
-      let sumTaken = 0;
-      let sumPut = 0;
-
-      allTaken.forEach(item => {
-        sumTaken += Number(item.takenAmount || 0);
-        sumPut += Number(item.putAmount || 0);
-
-        const tr = document.createElement('tr');
-        tr.className = "text-center";
-        tr.innerHTML = `
-          <td></td>
-          <td class="font-bold text-amber-700">${item.takenAmount || ''}</td>
-          <td class="text-left">${item.takenDesc || ''}</td>
-          <td class="font-bold text-emerald-600">${item.putAmount || ''}</td>
-          <td class="text-left">${item.putDesc || ''}</td>
-          <td class="space-x-1">
-            <button onclick="openEditTakenModal('${item.id}')" class="text-blue-600 font-bold">✏️</button>
-            <button onclick="deleteTakenItem('${item.id}')" class="text-red-600 font-bold">🗑️</button>
-          </td>
-        `;
-        rowsTbody.appendChild(tr);
-      });
-
-      document.getElementById('takenTotalSum').innerText = sumTaken.toLocaleString('ru-RU');
-      document.getElementById('putTotalSum').innerText = sumPut.toLocaleString('ru-RU');
-
-      let totalDownPayments = 0;
-      let totalInstallments = 0;
-      let totalCostPrice = 0;
-
-      allContracts.forEach(c => {
-        totalDownPayments += Number(c.downPayment || 0);
-        totalCostPrice += Number(c.costPrice || 0);
-        const insts = c.installments || {};
-        Object.values(insts).forEach(p => {
-          totalInstallments += Number(p.amount || 0);
-        });
-      });
-
-      let totalKassa = totalDownPayments + totalInstallments - totalCostPrice - sumTaken + sumPut;
-      document.getElementById('kassaTotal').innerText = totalKassa.toLocaleString('ru-RU');
-
-      let totalUchetIncome = 0;
-      let totalUchetExpense = 0;
-      allAccounting.forEach(a => {
-        totalUchetIncome += Number(a.income || 0);
-        totalUchetExpense += Number(a.expense || 0);
-      });
-      let uchetBalance = totalUchetIncome - totalUchetExpense;
-      document.getElementById('kassaUchet').innerText = uchetBalance.toLocaleString('ru-RU');
-
-      const now = new Date();
-      const todayStr = now.toISOString().slice(0, 10);
-
-      let totalContracts = allContracts.length;
-      let closedContracts = 0;
-      let activeContracts = 0;
-
-      let planTodaySum = 0;
-      let planTodayCount = 0;
-      let factTodaySum = 0;
-      let factTodayCount = 0;
-
-      allContracts.forEach(c => {
-        const insts = c.installments || {};
-        let paidSum = 0;
-        let hasPaidToday = false;
-
-        Object.values(insts).forEach(p => {
-          paidSum += Number(p.amount);
-          if (p.date === todayStr) {
-            factTodaySum += Number(p.amount);
-            hasPaidToday = true;
-          }
-        });
-
-        if (hasPaidToday) factTodayCount++;
-
-        const rest = c.totalCost - (c.downPayment || 0) - paidSum;
-        if (rest <= 0) {
-          closedContracts++;
-        } else {
-          activeContracts++;
-        }
-
-        if (c.payDate === todayStr) {
-          planTodaySum += Number(c.monthlyPay || 0);
-          planTodayCount++;
-        }
-      });
-
-      document.getElementById('statTotalContracts').innerText = totalContracts;
-      document.getElementById('statClosedContracts').innerText = closedContracts;
-      document.getElementById('statActiveContracts').innerText = activeContracts;
-      document.getElementById('statPlanTodaySum').innerText = planTodaySum.toLocaleString('ru-RU') + ' ₽';
-      document.getElementById('statPlanTodayCount').innerText = planTodayCount;
-      document.getElementById('statFactTodaySum').innerText = factTodaySum.toLocaleString('ru-RU') + ' ₽';
-      document.getElementById('statFactTodayCount').innerText = factTodayCount;
-
-      const accountsBody = document.getElementById('accountsTableBody');
-      accountsBody.innerHTML = '';
-
-      const currentMonth = now.getMonth();
-      const currentYear = now.getFullYear();
-
-      let accountsGrandTotalSum = 0;
-
-      customAccounts.forEach((accObj, idx) => {
-        let accBalance = 0;
-        let incCountMonth = 0;
-        let incSumMonth = 0;
-        let expCountMonth = 0;
-        let expSumMonth = 0;
-
-        allAccounting.forEach(a => {
-          if (a.account && a.account.trim().toLowerCase() === accObj.name.toLowerCase()) {
-            const inc = Number(a.income || 0);
-            const exp = Number(a.expense || 0);
-            accBalance += (inc - exp);
-
-            if (a.date) {
-              const d = new Date(a.date);
-              if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
-                if (inc > 0) {
-                  incCountMonth++;
-                  incSumMonth += inc;
-                }
-                if (exp > 0) {
-                  expCountMonth++;
-                  expSumMonth += exp;
-                }
-              }
-            }
-          }
-        });
-
-        accountsGrandTotalSum += accBalance;
-
-        const isIncOverLimit = incSumMonth >= 400000;
-        const isExpOverLimit = expSumMonth >= 400000;
-        
-        let rowStyle = accObj.color ? `background-color: ${accObj.color};` : '';
-
-        const tr = document.createElement('tr');
-        tr.style = rowStyle;
-        tr.innerHTML = `
-          <td class="font-bold">${accObj.name}</td>
-          <td class="font-bold">${accBalance.toLocaleString('ru-RU')}</td>
-          <td>${incCountMonth}</td>
-          <td class="${isIncOverLimit ? 'cell-over-limit' : ''}">${incSumMonth.toLocaleString('ru-RU')}</td>
-          <td>${expCountMonth}</td>
-          <td class="${isExpOverLimit ? 'cell-over-limit' : ''}">${expSumMonth.toLocaleString('ru-RU')}</td>
-          <td class="space-x-1">
-            <input type="color" value="${accObj.color || '#ffffff'}" onchange="changeAccountColor(${idx}, this.value)" title="Изменить цвет" class="w-5 h-5 cursor-pointer align-middle border rounded">
-            <button onclick="deleteAccount(${idx})" class="text-red-700 font-bold px-1 text-[11px]" title="Удалить счет">🗑️</button>
-          </td>
-        `;
-        accountsBody.appendChild(tr);
-      });
-
-      document.getElementById('accountsGrandTotal').innerText = accountsGrandTotalSum.toLocaleString('ru-RU');
-    }
-
+    // Поиск
     function handleSearch() {
-      const q = document.getElementById('searchInput').value.toLowerCase();
-      if (activeTab === 'contracts') {
-        renderTable(allContracts.filter(c => c.fio.toLowerCase().includes(q) || String(c.contractNum).includes(q)));
-      } else if (activeTab === 'accounting') {
-        renderAccountingTable(allAccounting.filter(a => a.note.toLowerCase().includes(q) || a.account.toLowerCase().includes(q) || a.date.includes(q)));
-      } else if (activeTab === 'taken') {
-        const filtered = allTaken.filter(t => (t.takenDesc && t.takenDesc.toLowerCase().includes(q)) || (t.putDesc && t.putDesc.toLowerCase().includes(q)));
-        renderTakenFiltered(filtered);
+      const q = document.getElementById('searchInput').value.toLowerCase().trim();
+      if (!q) {
+        renderTable(allContracts);
+        return;
       }
+
+      const filtered = allContracts.filter(c => 
+        (c.fio || '').toLowerCase().includes(q) ||
+        (c.phone || '').toLowerCase().includes(q) ||
+        (c.product || '').toLowerCase().includes(q) ||
+        (c.store || '').toLowerCase().includes(q)
+      );
+
+      renderTable(filtered);
     }
 
-    function renderTakenFiltered(items) {
-      const rowsTbody = document.getElementById('takenRowsTable');
-      rowsTbody.innerHTML = '';
-      items.forEach(item => {
-        const tr = document.createElement('tr');
-        tr.className = "text-center";
-        tr.innerHTML = `
-          <td></td>
-          <td class="font-bold text-amber-700">${item.takenAmount || ''}</td>
-          <td class="text-left">${item.takenDesc || ''}</td>
-          <td class="font-bold text-emerald-600">${item.putAmount || ''}</td>
-          <td class="text-left">${item.putDesc || ''}</td>
-          <td class="space-x-1">
-            <button onclick="openEditTakenModal('${item.id}')" class="text-blue-600 font-bold">✏️</button>
-            <button onclick="deleteTakenItem('${item.id}')" class="text-red-600 font-bold">🗑️</button>
-          </td>
-        `;
-        rowsTbody.appendChild(tr);
-      });
-    }
-
+    // Экспорт / Импорт
     function exportData() {
-      const exportObject = {
+      const data = {
         contracts: allContracts,
         accounting: allAccounting,
         taken: allTaken,
         accounts: customAccounts
       };
-      const blob = new Blob([JSON.stringify(exportObject, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const a = document.createElement('a');
-      a.href = url;
-      a.download = `BAZA_FULL_${new Date().toISOString().slice(0,10)}.json`;
+      a.href = URL.createObjectURL(blob);
+      a.download = `backup_uchet_${new Date().toISOString().slice(0, 10)}.json`;
       a.click();
-      URL.revokeObjectURL(url);
     }
 
     function importData(e) {
       const file = e.target.files[0];
       if (!file) return;
+
       const reader = new FileReader();
-      reader.onload = (ev) => {
+      reader.onload = function(evt) {
         try {
-          const data = JSON.parse(ev.target.result);
-          if (confirm(`Загрузить данные из файла? Это заменит текущую базу.`)) {
+          const data = JSON.parse(evt.target.result);
+          if (data.contracts) {
             saveState();
-            if (Array.isArray(data)) {
-              allContracts = data;
-            } else {
-              allContracts = data.contracts || [];
-              allAccounting = data.accounting || [];
-              allTaken = data.taken || [];
-              customAccounts = data.accounts || customAccounts;
-            }
+            allContracts = data.contracts || [];
+            allAccounting = data.accounting || [];
+            allTaken = data.taken || [];
+            if (data.accounts) customAccounts = data.accounts;
             saveToStorage();
+            alert('База данных успешно загружена!');
           }
-        } catch { alert("Ошибка при чтении файла!"); }
+        } catch(err) {
+          alert('Ошибка при чтении файла JSON');
+        }
       };
       reader.readAsText(file);
     }
 
-    document.addEventListener('keydown', (e) => {
-      if (e.ctrlKey && (e.key === 'z' || e.key === 'я')) { e.preventDefault(); undo(); }
-      if (e.ctrlKey && (e.key === 'y' || e.key === 'н')) { e.preventDefault(); redo(); }
-    });
-
-    renderTable(allContracts);
-    renderAccountingTable(allAccounting);
-    renderTakenSheet();
-    updateHistoryButtons();
+    // Инициализация при старте
+    window.onload = function() {
+      renderTable();
+      renderAccountingTable();
+      renderTakenSheet();
+    };
   </script>
 </body>
-        </html>
+</html>
