@@ -1019,42 +1019,14 @@
     }
 
     // ================================================================
-    // ФУНКЦИЯ ПРОВЕРКИ ДАТЫ ПЛАТЕЖА
+    // ФУНКЦИЯ ПРОВЕРКИ ДАТЫ ПЛАТЕЖА (НОВАЯ ЛОГИКА)
     // ================================================================
 
     function checkPaymentDateAdjustment() {
-      const payDateStr = document.getElementById('payDate').value;
+      // Новая логика: убираем предупреждение, так как дата платежа теперь строго фиксируется
       const warningEl = document.getElementById('dateWarning');
-      
-      if (!payDateStr) {
-        warningEl.classList.remove('show');
-        return;
-      }
-      
-      try {
-        const payDateObj = new Date(payDateStr);
-        if (isNaN(payDateObj.getTime())) {
-          warningEl.classList.remove('show');
-          return;
-        }
-        
-        const payDay = payDateObj.getDate();
-        
-        // Проверяем, есть ли такой день в следующем месяце
-        const today = new Date();
-        const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
-        const lastDayOfNextMonth = new Date(nextMonth.getFullYear(), nextMonth.getMonth() + 1, 0);
-        const lastDay = lastDayOfNextMonth.getDate();
-        
-        if (payDay > lastDay) {
-          warningEl.classList.add('show');
-          warningEl.innerHTML = `⚠️ Внимание! В следующем месяце нет ${payDay}-го числа.<br>Дата платежа будет автоматически перенесена на ${lastDay}-е число.`;
-        } else {
-          warningEl.classList.remove('show');
-        }
-      } catch (e) {
-        warningEl.classList.remove('show');
-      }
+      warningEl.classList.remove('show');
+      // Оставляем только логику для отображения даты в будущем
     }
 
     // ================================================================
@@ -1091,7 +1063,7 @@
       const paidPercentage = totalPayable > 0 ? (totalPaid / totalPayable) * 100 : 0;
       const isClosed = rest <= 0;
       
-      // Расчет просрочки с учетом корректировки дат
+      // Расчет просрочки с новой логикой (без +1 день)
       let overdueSum = 0;
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -1101,15 +1073,15 @@
           const payDateObj = new Date(contract.payDate);
           if (!isNaN(payDateObj.getTime())) {
             const payDay = payDateObj.getDate();
+            // Используем дату покупки как начальную точку для расчета
             const startDate = contract.buyDate ? new Date(contract.buyDate) : new Date(contract.payDate);
             if (!isNaN(startDate.getTime())) {
               startDate.setHours(0, 0, 0, 0);
               const monthsCount = Number(contract.monthsCount) || 0;
               for (let i = 1; i <= monthsCount; i++) {
                 const payDate = new Date(startDate);
-                payDate.setMonth(payDate.getMonth() + (i - 1));
-                
-                // Корректировка дня платежа
+                payDate.setMonth(payDate.getMonth() + i);
+                // Устанавливаем день платежа строго как в payDate (без +1)
                 const lastDayOfMonth = new Date(payDate.getFullYear(), payDate.getMonth() + 1, 0);
                 const lastDay = lastDayOfMonth.getDate();
                 const targetDay = Math.min(payDay, lastDay);
@@ -1119,6 +1091,7 @@
                 const payment = installments[i];
                 const isPaid = !!payment && Number(payment.amount) > 0;
                 
+                // Проверяем, просрочен ли платеж (payDate < today)
                 if (!isPaid && payDate < today) {
                   overdueSum += monthlyPay;
                 }
@@ -1178,7 +1151,7 @@
         return;
       }
       
-      // Получаем информацию по месяцам
+      // Получаем информацию по месяцам с новой логикой (без +1 день)
       const monthInfo = getMonthStatus(contract);
       const months = monthInfo.months;
       
@@ -1629,7 +1602,7 @@
     }
 
     // ================================================================
-    // ОСНОВНАЯ ЛОГИКА МЕСЯЦЕВ (С КОРРЕКТИРОВКОЙ ДАТ)
+    // ОСНОВНАЯ ЛОГИКА МЕСЯЦЕВ (С НОВОЙ ЛОГИКОЙ БЕЗ +1 ДЕНЬ)
     // ================================================================
     
     function getMonthStatus(contract) {
@@ -1663,9 +1636,8 @@
       
       for (let i = 1; i <= months; i++) {
         const payDate = new Date(startDate);
-        payDate.setMonth(payDate.getMonth() + (i - 1));
-        
-        // Корректировка дня платежа
+        payDate.setMonth(payDate.getMonth() + i);
+        // Устанавливаем день платежа строго как в payDate (без +1)
         const lastDayOfMonth = new Date(payDate.getFullYear(), payDate.getMonth() + 1, 0);
         const lastDay = lastDayOfMonth.getDate();
         const targetDay = Math.min(payDay, lastDay);
@@ -2085,7 +2057,6 @@
       document.getElementById('guarantorFio').value = contract.guarantorFio || '';
       document.getElementById('guarantorPhone').value = contract.guarantorPhone || '';
       document.getElementById('dateWarning').classList.remove('show');
-      checkPaymentDateAdjustment();
       validateFinance();
       modal.classList.remove('hidden');
     }
