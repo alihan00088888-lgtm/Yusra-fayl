@@ -1019,14 +1019,42 @@
     }
 
     // ================================================================
-    // ФУНКЦИЯ ПРОВЕРКИ ДАТЫ ПЛАТЕЖА (НОВАЯ ЛОГИКА)
+    // ФУНКЦИЯ ПРОВЕРКИ ДАТЫ ПЛАТЕЖА
     // ================================================================
 
     function checkPaymentDateAdjustment() {
-      // Новая логика: убираем предупреждение, так как дата платежа теперь строго фиксируется
+      const payDateStr = document.getElementById('payDate').value;
       const warningEl = document.getElementById('dateWarning');
-      warningEl.classList.remove('show');
-      // Оставляем только логику для отображения даты в будущем
+      
+      if (!payDateStr) {
+        warningEl.classList.remove('show');
+        return;
+      }
+      
+      try {
+        const payDateObj = new Date(payDateStr);
+        if (isNaN(payDateObj.getTime())) {
+          warningEl.classList.remove('show');
+          return;
+        }
+        
+        const payDay = payDateObj.getDate();
+        
+        // Проверяем, есть ли такой день в следующем месяце
+        const today = new Date();
+        const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+        const lastDayOfNextMonth = new Date(nextMonth.getFullYear(), nextMonth.getMonth() + 1, 0);
+        const lastDay = lastDayOfNextMonth.getDate();
+        
+        if (payDay > lastDay) {
+          warningEl.classList.add('show');
+          warningEl.innerHTML = `⚠️ Внимание! В следующем месяце нет ${payDay}-го числа.<br>Дата платежа будет автоматически перенесена на ${lastDay}-е число.`;
+        } else {
+          warningEl.classList.remove('show');
+        }
+      } catch (e) {
+        warningEl.classList.remove('show');
+      }
     }
 
     // ================================================================
@@ -1063,7 +1091,7 @@
       const paidPercentage = totalPayable > 0 ? (totalPaid / totalPayable) * 100 : 0;
       const isClosed = rest <= 0;
       
-      // Расчет просрочки с новой логикой (без +1 день)
+      // Расчет просрочки с учетом корректировки дат
       let overdueSum = 0;
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -1073,15 +1101,15 @@
           const payDateObj = new Date(contract.payDate);
           if (!isNaN(payDateObj.getTime())) {
             const payDay = payDateObj.getDate();
-            // Используем дату покупки как начальную точку для расчета
             const startDate = contract.buyDate ? new Date(contract.buyDate) : new Date(contract.payDate);
             if (!isNaN(startDate.getTime())) {
               startDate.setHours(0, 0, 0, 0);
               const monthsCount = Number(contract.monthsCount) || 0;
               for (let i = 1; i <= monthsCount; i++) {
                 const payDate = new Date(startDate);
-                payDate.setMonth(payDate.getMonth() + i);
-                // Устанавливаем день платежа строго как в payDate (без +1)
+                payDate.setMonth(payDate.getMonth() + (i - 1));
+                
+                // Корректировка дня платежа
                 const lastDayOfMonth = new Date(payDate.getFullYear(), payDate.getMonth() + 1, 0);
                 const lastDay = lastDayOfMonth.getDate();
                 const targetDay = Math.min(payDay, lastDay);
@@ -1091,7 +1119,6 @@
                 const payment = installments[i];
                 const isPaid = !!payment && Number(payment.amount) > 0;
                 
-                // Проверяем, просрочен ли платеж (payDate < today)
                 if (!isPaid && payDate < today) {
                   overdueSum += monthlyPay;
                 }
@@ -1151,7 +1178,7 @@
         return;
       }
       
-      // Получаем информацию по месяцам с новой логикой (без +1 день)
+      // Получаем информацию по месяцам
       const monthInfo = getMonthStatus(contract);
       const months = monthInfo.months;
       
@@ -1417,7 +1444,7 @@
       if (!num || num === 0) return 'ноль';
       
       const units = ['', 'один', 'два', 'три', 'четыре', 'пять', 'шесть', 'семь', 'восемь', 'девять'];
-      const teens = ['десять', 'одиннадцать', 'двенадцать', 'тринадцать', 'четырнадцать', 'пятнадцать', 'шестнадцать', 'семнадцать', 'восемнадцать', 'девятнадцать'];
+      const teens = ['десять', 'одиннадцать', 'двенадцать', 'тринадцать', 'четырнадцать', 'пятнадцать', 'шестнадцать', 'семнадцать', 'восемьнадцать', 'девятнадцать'];
       const tens = ['', '', 'двадцать', 'тридцать', 'сорок', 'пятьдесят', 'шестьдесят', 'семьдесят', 'восемьдесят', 'девяносто'];
       const hundreds = ['', 'сто', 'двести', 'триста', 'четыреста', 'пятьсот', 'шестьсот', 'семьсот', 'восемьсот', 'девятьсот'];
       
@@ -1503,7 +1530,7 @@
       }
       
       let html = `
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
             <div class="text-xs text-purple-600 font-bold">Всего партнеров</div>
             <div class="text-2xl font-bold text-purple-700">${partners.length}</div>
@@ -1602,7 +1629,7 @@
     }
 
     // ================================================================
-    // ОСНОВНАЯ ЛОГИКА МЕСЯЦЕВ (С НОВОЙ ЛОГИКОЙ БЕЗ +1 ДЕНЬ)
+    // ОСНОВНАЯ ЛОГИКА МЕСЯЦЕВ (С КОРРЕКТИРОВКОЙ ДАТ)
     // ================================================================
     
     function getMonthStatus(contract) {
@@ -1636,8 +1663,9 @@
       
       for (let i = 1; i <= months; i++) {
         const payDate = new Date(startDate);
-        payDate.setMonth(payDate.getMonth() + i);
-        // Устанавливаем день платежа строго как в payDate (без +1)
+        payDate.setMonth(payDate.getMonth() + (i - 1));
+        
+        // Корректировка дня платежа
         const lastDayOfMonth = new Date(payDate.getFullYear(), payDate.getMonth() + 1, 0);
         const lastDay = lastDayOfMonth.getDate();
         const targetDay = Math.min(payDay, lastDay);
@@ -1864,21 +1892,11 @@
         if (overdueSum > 0) {
           message += `   ⚠️ Просрочка: ${overdueSum} ₽\n`;
         }
-        message += `   📊 Остаток: ${client.rest} ₽\n\n`;
+        message += `\n`;
       });
-      
-      message += `\n📅 Дата платежа: ${todayStr}\n`;
-      message += `👥 Всего клиентов: ${clients.length}`;
-      
-      const phoneList = phoneNumbers.map(p => `7${p}`).join(', ');
-      navigator.clipboard.writeText(phoneList).then(() => {
-        showCopyNotification(`✅ Скопировано ${phoneNumbers.length} номеров для рассылки!`);
-      }).catch(() => {
-        showCopyNotification(`⚠️ Найдено ${phoneNumbers.length} клиентов. Скопируйте номера вручную.`);
-      });
-      
-      const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-      window.open(url, '_blank');
+
+      navigator.clipboard.writeText(message);
+      showCopyNotification('📋 Сообщение скопировано! Номера: ' + phoneNumbers.join(', '));
     }
 
     function sendWhatsAppThreeDays() {
@@ -1893,7 +1911,31 @@
         return;
       }
       
-      let message = '🔔 *Напоминание об оплате через 3 дня!*\n\n';
+      let message = '⏰ *Напоминание об оплате через 3 дня!*\n\n';
+      let phoneNumbers = [];
+      
+      clients.forEach((client, index) => {
+        const phone = client.phone.replace(/[^0-9]/g, '');
+        if (phone) phoneNumbers.push(phone);
+        
+        message += `${index + 1}. *${client.fio}*\n`;
+        message += `   💰 Сумма: ${client.monthlyPay} ₽\n`;
+        message += `   📱 WhatsApp: wa.me/7${phone}\n\n`;
+      });
+
+      navigator.clipboard.writeText(message);
+      showCopyNotification('📋 Сообщение скопировано! Номера: ' + phoneNumbers.join(', '));
+    }
+
+    function sendWhatsAppDebtors() {
+      const clients = getDebtors();
+      
+      if (clients.length === 0) {
+        alert('📭 Нет клиентов с просрочкой');
+        return;
+      }
+      
+      let message = '🚫 *Внимание! Должники (просрочка)*\n\n';
       let phoneNumbers = [];
       
       clients.forEach((client, index) => {
@@ -1907,174 +1949,442 @@
         });
         
         message += `${index + 1}. *${client.fio}*\n`;
-        message += `   💰 Сумма: ${client.monthlyPay} ₽\n`;
-        message += `   📱 WhatsApp: wa.me/7${phone}\n`;
-        if (overdueSum > 0) {
-          message += `   ⚠️ Просрочка: ${overdueSum} ₽\n`;
-        }
-        message += `   📊 Остаток: ${client.rest} ₽\n\n`;
+        message += `   🔴 Просрочка: ${overdueSum} ₽\n`;
+        message += `   💰 Остаток: ${client.rest} ₽\n`;
+        message += `   📱 WhatsApp: wa.me/7${phone}\n\n`;
       });
-      
-      message += `\n📅 Дата платежа: ${threeDaysStr}\n`;
-      message += `👥 Всего клиентов: ${clients.length}`;
-      
-      const phoneList = phoneNumbers.map(p => `7${p}`).join(', ');
-      navigator.clipboard.writeText(phoneList).then(() => {
-        showCopyNotification(`✅ Скопировано ${phoneNumbers.length} номеров для рассылки!`);
-      }).catch(() => {
-        showCopyNotification(`⚠️ Найдено ${phoneNumbers.length} клиентов. Скопируйте номера вручную.`);
-      });
-      
-      const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-      window.open(url, '_blank');
+
+      navigator.clipboard.writeText(message);
+      showCopyNotification('📋 Сообщение скопировано! Номера: ' + phoneNumbers.join(', '));
     }
 
-    function sendWhatsAppDebtors() {
-      const clients = getDebtors();
-      
-      if (clients.length === 0) {
-        alert('📭 Нет клиентов с просрочкой');
+    // ================================================================
+    // ЛОГИКА ТАБЛИЦЫ ДОГОВОРОВ И ПОИСКА
+    // ================================================================
+
+    function renderTable(data) {
+      const tbody = document.getElementById('contractsTable');
+      tbody.innerHTML = '';
+
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="23" class="text-center p-8 text-gray-400">Нет договоров для отображения</td></tr>`;
         return;
       }
-      
-      let message = '🚫 *Напоминание о просроченной задолженности!*\n\n';
-      let phoneNumbers = [];
-      
-      clients.forEach((client, index) => {
-        const phone = client.phone.replace(/[^0-9]/g, '');
-        if (phone) phoneNumbers.push(phone);
-        
-        const monthInfo = client.monthInfo || getMonthStatus(client);
-        let overdueSum = 0;
-        let overdueMonths = [];
-        monthInfo.months.forEach(m => {
-          if (m.status === 'overdue' && !m.isPaid) {
-            overdueSum += m.amount;
-            overdueMonths.push(`${m.month}-й (${m.date})`);
+
+      data.forEach(item => {
+        const metrics = calculateContractMetrics(item);
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition text-[11px] border-b";
+
+        if (metrics.isClosed) {
+          tr.classList.add('bg-green-50');
+        } else if (metrics.overdueSum > 0) {
+          tr.classList.add('bg-red-50');
+        }
+
+        let installmentsCells = '';
+        for (let i = 1; i <= 15; i++) {
+          const inst = item.installments ? item.installments[i] : null;
+          if (inst && Number(inst.amount) > 0) {
+            installmentsCells += `<td onclick="openPayModal('${item.id}', ${i})" class="pay-paid text-center p-1 text-[10px]" title="${inst.date || ''}">${inst.amount}</td>`;
+          } else {
+            installmentsCells += `<td onclick="openPayModal('${item.id}', ${i})" class="text-center p-1 text-gray-300 cursor-pointer hover:bg-slate-200 transition text-[10px]">—</td>`;
           }
-        });
-        
-        message += `${index + 1}. *${client.fio}*\n`;
-        message += `   💰 Сумма: ${client.monthlyPay} ₽\n`;
-        message += `   📱 WhatsApp: wa.me/7${phone}\n`;
-        message += `   ⚠️ Просрочка: ${overdueSum} ₽ (${overdueMonths.join(', ')})\n`;
-        message += `   📊 Остаток: ${client.rest} ₽\n\n`;
+        }
+
+        const shopPaidBadge = item.shopPaid 
+          ? `<span class="bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold text-[9px]">Да</span>` 
+          : `<span class="bg-red-100 text-red-800 px-1.5 py-0.5 rounded font-bold text-[9px]">Нет</span>`;
+
+        tr.innerHTML = `
+          <td class="p-2 border-r font-bold text-slate-800 min-w-[150px]">
+            ${item.fio}
+            <div class="text-[9px] text-gray-400 font-normal">№ ${item.contractNum || ''}</div>
+          </td>
+          <td class="p-2 border-r text-slate-600 min-w-[100px]">${item.phone || '—'}</td>
+          <td class="p-2 border-r text-gray-500 whitespace-nowrap text-[10px]">
+            📅 ${item.buyDate || '—'}<br>
+            ⏱ ${item.payDate || '—'}
+          </td>
+          <td class="p-2 border-r font-bold text-blue-600">${Number(item.monthlyPay || 0).toLocaleString('ru-RU')} ₽</td>
+          ${installmentsCells}
+          <td class="p-2 border-r font-bold ${metrics.overdueSum > 0 ? 'text-red-600' : 'text-gray-400'}">${metrics.overdueSum > 0 ? metrics.overdueSum.toLocaleString('ru-RU') + ' ₽' : '0 ₽'}</td>
+          <td class="p-2 border-r font-bold ${metrics.isClosed ? 'text-emerald-600' : 'text-amber-600'}">${metrics.rest.toLocaleString('ru-RU')} ₽</td>
+          <td class="p-2 border-r text-gray-600">
+            ${Number(item.totalCost || 0).toLocaleString('ru-RU')} ₽
+            ${item.downPayment > 0 ? `<div class="text-[9px] text-emerald-600">пред: ${item.downPayment}</div>` : ''}
+          </td>
+          <td class="p-2 border-r text-gray-500">${Number(item.costPrice || 0).toLocaleString('ru-RU')} ₽</td>
+          <td class="p-2 border-r text-center">${shopPaidBadge}</td>
+          <td class="p-2 border-r text-gray-700">
+            <div class="font-bold">${item.product || '—'}</div>
+            <div class="text-[9px] text-purple-600">${item.store || ''}</div>
+          </td>
+          <td class="p-2 border-r text-gray-600">
+            <div>${item.guarantorFio || '—'}</div>
+            <div class="text-[9px] text-gray-400">${item.guarantorPhone || ''}</div>
+          </td>
+          <td class="p-2 text-center sticky right-0 bg-white shadow-md flex justify-center gap-1 items-center min-w-[210px] h-full">
+            <button onclick="openEditModal('${item.id}')" class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-2 py-1 rounded font-bold text-[10px]">✏️ Ред.</button>
+            <button onclick="quickSelectForPrint('${item.id}')" class="bg-amber-100 text-amber-700 hover:bg-amber-200 px-2 py-1 rounded font-bold text-[10px]">🖨️ Печать</button>
+            <button onclick="deleteContract('${item.id}')" class="bg-red-100 text-red-600 hover:bg-red-200 px-2 py-1 rounded font-bold text-[10px]">🗑️</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
       });
+    }
+
+    function quickSelectForPrint(id) {
+      switchTab('print');
+      const select = document.getElementById('printContractSelect');
+      select.value = id;
+      loadContractForPrint();
+    }
+
+    function handleSearch() {
+      const query = document.getElementById('searchInput').value.toLowerCase().trim();
       
-      message += `\n👥 Всего должников: ${clients.length}`;
-      
-      const phoneList = phoneNumbers.map(p => `7${p}`).join(', ');
-      navigator.clipboard.writeText(phoneList).then(() => {
-        showCopyNotification(`✅ Скопировано ${phoneNumbers.length} номеров для рассылки!`);
-      }).catch(() => {
-        showCopyNotification(`⚠️ Найдено ${phoneNumbers.length} должников. Скопируйте номера вручную.`);
-      });
-      
-      const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-      window.open(url, '_blank');
+      if (activeTab === 'contracts') {
+        const filtered = allContracts.filter(c => 
+          (c.fio && c.fio.toLowerCase().includes(query)) ||
+          (c.phone && c.phone.includes(query)) ||
+          (c.product && c.product.toLowerCase().includes(query)) ||
+          (c.store && c.store.toLowerCase().includes(query)) ||
+          (c.contractNum && c.contractNum.toString().includes(query))
+        );
+        renderTable(filtered);
+      } else if (activeTab === 'accounting') {
+        const filtered = allAccounting.filter(a => 
+          (a.note && a.note.toLowerCase().includes(query)) ||
+          (a.account && a.account.toLowerCase().includes(query)) ||
+          (a.date && a.date.includes(query))
+        );
+        renderAccountingTable(filtered);
+      }
     }
 
     // ================================================================
-    // ОСНОВНЫЕ ФУНКЦИИ РАБОТЫ С ДАННЫМИ
+    // ЛОГИКА УЧЕТА (ДОХОДЫ И РАСХОДЫ)
     // ================================================================
+
+    function renderAccountingTable(data) {
+      const tbody = document.getElementById('accountingTable');
+      tbody.innerHTML = '';
+
+      let totalInc = 0;
+      let totalExp = 0;
+
+      data.forEach(item => {
+        totalInc += Number(item.income || 0);
+        totalExp += Number(item.expense || 0);
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition text-xs border-b";
+
+        tr.innerHTML = `
+          <td class="p-3 border-r font-medium text-slate-700">${item.date || '—'}</td>
+          <td class="p-3 border-r font-bold text-emerald-600">${Number(item.income || 0) > 0 ? '+' + Number(item.income).toLocaleString('ru-RU') + ' ₽' : '—'}</td>
+          <td class="p-3 border-r font-bold text-red-600">${Number(item.expense || 0) > 0 ? '-' + Number(item.expense).toLocaleString('ru-RU') + ' ₽' : '—'}</td>
+          <td class="p-3 border-r text-slate-800 font-medium">${item.note || '—'}</td>
+          <td class="p-3 border-r font-bold text-purple-700">${item.account || '—'}</td>
+          <td class="p-3 text-center sticky right-0 bg-white flex justify-center gap-1">
+            <button onclick="openAccEditModal('${item.id}')" class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-2 py-1 rounded font-bold text-[10px]">✏️</button>
+            <button onclick="deleteAccounting('${item.id}')" class="bg-red-100 text-red-600 hover:bg-red-200 px-2 py-1 rounded font-bold text-[10px]">🗑️</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('totalIncome').textContent = totalInc.toLocaleString('ru-RU') + ' ₽';
+      document.getElementById('totalExpense').textContent = totalExp.toLocaleString('ru-RU') + ' ₽';
+    }
+
+    // ================================================================
+    // ЛОГИКА ЛИСТА "ВЗЯЛИ / ПОЛОЖИЛИ" И СЧЕТОВ
+    // ================================================================
+
+    function renderTakenSheet() {
+      // 1. Таблица Взяли / Положили
+      const tbody = document.getElementById('takenRowsTable');
+      tbody.innerHTML = '';
+
+      let takenSum = 0;
+      let putSum = 0;
+
+      allTaken.forEach(item => {
+        const tVal = Number(item.takenAmount || 0);
+        const pVal = Number(item.putAmount || 0);
+        takenSum += tVal;
+        putSum += pVal;
+
+        const tr = document.createElement('tr');
+        tr.className = "text-center text-xs";
+        tr.innerHTML = `
+          <td></td>
+          <td class="font-bold text-amber-700">${tVal > 0 ? tVal.toLocaleString('ru-RU') : ''}</td>
+          <td class="text-left">${item.takenDesc || ''}</td>
+          <td class="font-bold text-emerald-600">${pVal > 0 ? pVal.toLocaleString('ru-RU') : ''}</td>
+          <td class="text-left">${item.putDesc || ''}</td>
+          <td>
+            <button onclick="openTakenEditModal('${item.id}')" class="text-blue-600 hover:text-blue-800 font-bold px-1">✏️</button>
+            <button onclick="deleteTakenRow('${item.id}')" class="text-red-600 hover:text-red-800 font-bold px-1">🗑️</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // Расчет кассы Учета
+      let totalAccIncome = 0;
+      let totalAccExpense = 0;
+      allAccounting.forEach(a => {
+        totalAccIncome += Number(a.income || 0);
+        totalAccExpense += Number(a.expense || 0);
+      });
+      const uchetBalance = totalAccIncome - totalAccExpense;
+      const kassaTotal = uchetBalance + putSum - takenSum;
+
+      document.getElementById('takenTotalSum').textContent = takenSum.toLocaleString('ru-RU');
+      document.getElementById('putTotalSum').textContent = putSum.toLocaleString('ru-RU');
+      document.getElementById('kassaUchet').textContent = uchetBalance.toLocaleString('ru-RU');
+      document.getElementById('kassaTotal').textContent = kassaTotal.toLocaleString('ru-RU');
+
+      // 2. Статистика договоров
+      const totalContractsCount = allContracts.length;
+      let closedCount = 0;
+      let activeCount = 0;
+      let planTodaySum = 0;
+      let planTodayCount = 0;
+      let factTodaySum = 0;
+      let factTodayCount = 0;
+
+      const todayStr = new Date().toISOString().slice(0, 10);
+
+      allContracts.forEach(c => {
+        const metrics = calculateContractMetrics(c);
+        if (metrics.isClosed) {
+          closedCount++;
+        } else {
+          activeCount++;
+        }
+
+        // Проверка плановых и фактических оплат на сегодня
+        const mInfo = getMonthStatus(c);
+        mInfo.months.forEach(m => {
+          if (m.date === todayStr) {
+            if (!m.isPaid) {
+              planTodaySum += Number(c.monthlyPay || 0);
+              planTodayCount++;
+            }
+          }
+        });
+
+        if (c.installments) {
+          Object.values(c.installments).forEach(inst => {
+            if (inst && inst.date === todayStr && Number(inst.amount) > 0) {
+              factTodaySum += Number(inst.amount);
+              factTodayCount++;
+            }
+          });
+        }
+      });
+
+      document.getElementById('statTotalContracts').textContent = totalContractsCount;
+      document.getElementById('statClosedContracts').textContent = closedCount;
+      document.getElementById('statActiveContracts').textContent = activeCount;
+      document.getElementById('statPlanTodaySum').textContent = planTodaySum.toLocaleString('ru-RU') + ' ₽';
+      document.getElementById('statPlanTodayCount').textContent = planTodayCount;
+      document.getElementById('statFactTodaySum').textContent = factTodaySum.toLocaleString('ru-RU') + ' ₽';
+      document.getElementById('statFactTodayCount').textContent = factTodayCount;
+
+      // 3. Таблица счетов и карт
+      renderAccountsTable();
+    }
+
+    function renderAccountsTable() {
+      const tbody = document.getElementById('accountsTableBody');
+      tbody.innerHTML = '';
+
+      let grandTotal = 0;
+
+      customAccounts.forEach((accObj, idx) => {
+        const accName = typeof accObj === 'string' ? accObj : accObj.name;
+        const accColor = (typeof accObj === 'object' && accObj.color) ? accObj.color : '';
+
+        let inCount = 0;
+        let inMonthSum = 0;
+        let outCount = 0;
+        let outMonthSum = 0;
+
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
+
+        allAccounting.forEach(a => {
+          if (a.account && a.account.trim().toLowerCase() === accName.trim().toLowerCase()) {
+            const inc = Number(a.income || 0);
+            const exp = Number(a.expense || 0);
+            
+            let aDate = new Date(a.date);
+            const isThisMonth = !isNaN(aDate.getTime()) && aDate.getMonth() === currentMonth && aDate.getFullYear() === currentYear;
+
+            if (inc > 0) {
+              inCount++;
+              if (isThisMonth) inMonthSum += inc;
+            }
+            if (exp > 0) {
+              outCount++;
+              if (isThisMonth) outMonthSum += exp;
+            }
+          }
+        });
+
+        const accBalance = inMonthSum - outMonthSum;
+        grandTotal += accBalance;
+
+        const tr = document.createElement('tr');
+        if (accColor) {
+          tr.style.backgroundColor = accColor;
+        }
+
+        tr.innerHTML = `
+          <td class="font-bold text-left p-2">${accName}</td>
+          <td class="font-bold">${accBalance.toLocaleString('ru-RU')}</td>
+          <td>${inCount}</td>
+          <td class="text-emerald-700 font-medium">${inMonthSum > 0 ? inMonthSum.toLocaleString('ru-RU') : 0}</td>
+          <td>${outCount}</td>
+          <td class="text-red-700 font-medium">${outMonthSum > 0 ? outMonthSum.toLocaleString('ru-RU') : 0}</td>
+          <td class="flex justify-center items-center gap-1 p-1">
+            <input type="color" value="${accColor || '#ffffff'}" onchange="changeAccountColor(${idx}, this.value)" class="w-6 h-6 p-0 border-0 rounded cursor-pointer" title="Изменить цвет">
+            <button onclick="deleteAccount(${idx})" class="text-red-500 hover:text-red-700 font-bold px-1">✕</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('accountsGrandTotal').textContent = grandTotal.toLocaleString('ru-RU');
+    }
+
+    function changeAccountColor(index, color) {
+      saveState();
+      if (typeof customAccounts[index] === 'string') {
+        customAccounts[index] = { name: customAccounts[index], color: color };
+      } else {
+        customAccounts[index].color = color;
+      }
+      finishAction();
+    }
+
+    function addNewAccountPrompt() {
+      const name = prompt("Введите название нового счета / карты:");
+      if (name && name.trim()) {
+        const exists = customAccounts.some(a => (typeof a === 'string' ? a : a.name).toLowerCase() === name.trim().toLowerCase());
+        if (exists) {
+          alert("Счет с таким названием уже существует!");
+          return;
+        }
+        saveState();
+        customAccounts.push({ name: name.trim(), color: '' });
+        finishAction();
+      }
+    }
+
+    function deleteAccount(index) {
+      const accName = typeof customAccounts[index] === 'string' ? customAccounts[index] : customAccounts[index].name;
+      if (confirm(`Удалить счет "${accName}"?`)) {
+        saveState();
+        customAccounts.splice(index, 1);
+        finishAction();
+      }
+    }
+
+    // ================================================================
+    // МОДАЛЬНЫЕ ОКНА И ОПЕРАЦИИ CRUD
+    // ================================================================
+
+    // --- Договоры ---
+    function openCreateModal() {
+      saveState();
+      document.getElementById('contractForm').reset();
+      document.getElementById('editDocId').value = '';
+      document.getElementById('modalTitle').textContent = 'Новый Договор';
+      document.getElementById('errorBanner').classList.add('hidden');
+      document.getElementById('dateWarning').classList.remove('show');
+      
+      const todayStr = new Date().toISOString().slice(0, 10);
+      document.getElementById('buyDate').value = todayStr;
+      document.getElementById('payDate').value = todayStr;
+      
+      document.getElementById('modal').classList.remove('hidden');
+    }
+
+    function openEditModal(id) {
+      saveState();
+      const item = allContracts.find(c => c.id === id);
+      if (!item) return;
+
+      document.getElementById('editDocId').value = item.id;
+      document.getElementById('fio').value = item.fio || '';
+      document.getElementById('birthDate').value = item.birthDate || '';
+      document.getElementById('passport').value = item.passport || '';
+      document.getElementById('phone').value = item.phone || '';
+      document.getElementById('extraPhone').value = item.extraPhone || '';
+      document.getElementById('address').value = item.address || '';
+      document.getElementById('buyDate').value = item.buyDate || '';
+      document.getElementById('payDate').value = item.payDate || '';
+      document.getElementById('monthsCount').value = item.monthsCount || '';
+      document.getElementById('monthlyPay').value = item.monthlyPay || '';
+      document.getElementById('totalCost').value = item.totalCost || '';
+      document.getElementById('downPayment').value = item.downPayment || 0;
+      document.getElementById('costPrice').value = item.costPrice || '';
+      document.getElementById('shopPaid').checked = !!item.shopPaid;
+      document.getElementById('product').value = item.product || '';
+      document.getElementById('store').value = item.store || '';
+      document.getElementById('guarantorFio').value = item.guarantorFio || '';
+      document.getElementById('guarantorPhone').value = item.guarantorPhone || '';
+
+      document.getElementById('modalTitle').textContent = 'Редактировать Договор';
+      document.getElementById('errorBanner').classList.add('hidden');
+      checkPaymentDateAdjustment();
+      document.getElementById('modal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.add('hidden');
+    }
 
     function validateFinance() {
       const months = Number(document.getElementById('monthsCount').value) || 0;
       const monthly = Number(document.getElementById('monthlyPay').value) || 0;
       const total = Number(document.getElementById('totalCost').value) || 0;
       const down = Number(document.getElementById('downPayment').value) || 0;
-      const cost = Number(document.getElementById('costPrice').value) || 0;
+      const banner = document.getElementById('errorBanner');
 
-      if (months === 0 && monthly === 0 && total === 0 && down === 0 && cost === 0) {
-        document.getElementById('errorBanner').classList.add('hidden');
-        const saveBtn = document.getElementById('saveBtn');
-        saveBtn.disabled = false;
-        saveBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-        return true;
+      if (months > 0 && monthly > 0 && total > 0) {
+        const expectedTotal = (monthly * months) + down;
+        if (Math.abs(expectedTotal - total) > 1) {
+          banner.classList.remove('hidden');
+          return false;
+        }
       }
-
-      const isMathError = (months > 0 || monthly > 0 || total > 0) && (months * monthly + down !== total);
-      const isPriceError = (cost > 0 || total > 0) && (cost > total);
-      
-      const hasError = isMathError || isPriceError;
-      
-      document.getElementById('totalCost').classList.toggle('input-error', isMathError);
-      document.getElementById('monthlyPay').classList.toggle('input-error', isMathError);
-      document.getElementById('monthsCount').classList.toggle('input-error', isMathError);
-      document.getElementById('downPayment').classList.toggle('input-error', false);
-      document.getElementById('costPrice').classList.toggle('input-error', isPriceError);
-
-      document.getElementById('errorBanner').classList.toggle('hidden', !hasError);
-      
-      const saveBtn = document.getElementById('saveBtn');
-      saveBtn.disabled = hasError;
-      saveBtn.classList.toggle('opacity-50', hasError);
-      saveBtn.classList.toggle('cursor-not-allowed', hasError);
-
-      return !hasError;
+      banner.classList.add('hidden');
+      return true;
     }
 
-    const modal = document.getElementById('modal');
-    function openCreateModal() {
-      document.getElementById('contractForm').reset();
-      document.getElementById('editDocId').value = '';
-      document.getElementById('modalTitle').innerText = 'Оформление нового договора';
-      document.getElementById('downPayment').value = 0;
-      document.getElementById('dateWarning').classList.remove('show');
-      validateFinance();
-      modal.classList.remove('hidden');
-    }
-    function closeModal() { modal.classList.add('hidden'); }
-    function closePayModal() { document.getElementById('payModal').classList.add('hidden'); }
-
-    function openPayModal(id) {
-      document.getElementById('payContractId').value = id;
-      document.getElementById('payDateVal').valueAsDate = new Date();
-      document.getElementById('payModal').classList.remove('hidden');
-    }
-
-    function openEditModal(id) {
-      const contract = allContracts.find(c => c.id === id);
-      if(!contract) return;
-      document.getElementById('editDocId').value = id;
-      document.getElementById('modalTitle').innerText = `Редактирование №${contract.contractNum}`;
-      document.getElementById('fio').value = contract.fio || '';
-      document.getElementById('birthDate').value = contract.birthDate || '';
-      document.getElementById('passport').value = contract.passport || '';
-      document.getElementById('phone').value = contract.phone || '';
-      document.getElementById('extraPhone').value = contract.extraPhone || '';
-      document.getElementById('address').value = contract.address || '';
-      document.getElementById('buyDate').value = contract.buyDate || '';
-      document.getElementById('payDate').value = contract.payDate || '';
-      document.getElementById('monthsCount').value = contract.monthsCount || '';
-      document.getElementById('monthlyPay').value = contract.monthlyPay || '';
-      document.getElementById('totalCost').value = contract.totalCost || '';
-      document.getElementById('downPayment').value = contract.downPayment || 0;
-      document.getElementById('costPrice').value = contract.costPrice || '';
-      document.getElementById('shopPaid').checked = !!contract.shopPaid;
-      document.getElementById('product').value = contract.product || '';
-      document.getElementById('store').value = contract.store || '';
-      document.getElementById('guarantorFio').value = contract.guarantorFio || '';
-      document.getElementById('guarantorPhone').value = contract.guarantorPhone || '';
-      document.getElementById('dateWarning').classList.remove('show');
-      validateFinance();
-      modal.classList.remove('hidden');
-    }
-
-    document.getElementById('contractForm').addEventListener('submit', (e) => {
+    document.getElementById('contractForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      if (!validateFinance()) return;
       
-      saveState();
-
       const editId = document.getElementById('editDocId').value;
-      const formData = {
-        fio: document.getElementById('fio').value,
-        birthDate: document.getElementById('birthDate').value || '',
-        passport: document.getElementById('passport').value || '',
-        phone: document.getElementById('phone').value,
-        extraPhone: document.getElementById('extraPhone').value || '',
-        address: document.getElementById('address').value || '',
+      const existing = editId ? allContracts.find(c => c.id === editId) : null;
+
+      const newContract = {
+        id: editId || 'doc_' + Date.now(),
+        contractNum: existing ? existing.contractNum : (allContracts.length + 1),
+        fio: document.getElementById('fio').value.trim(),
+        birthDate: document.getElementById('birthDate').value,
+        passport: document.getElementById('passport').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        extraPhone: document.getElementById('extraPhone').value.trim(),
+        address: document.getElementById('address').value.trim(),
         buyDate: document.getElementById('buyDate').value,
         payDate: document.getElementById('payDate').value,
         monthsCount: Number(document.getElementById('monthsCount').value),
@@ -2083,601 +2393,284 @@
         downPayment: Number(document.getElementById('downPayment').value) || 0,
         costPrice: Number(document.getElementById('costPrice').value),
         shopPaid: document.getElementById('shopPaid').checked,
-        product: document.getElementById('product').value || '',
-        store: document.getElementById('store').value || '',
-        guarantorFio: document.getElementById('guarantorFio').value || '',
-        guarantorPhone: document.getElementById('guarantorPhone').value || ''
+        product: document.getElementById('product').value.trim(),
+        store: document.getElementById('store').value.trim(),
+        guarantorFio: document.getElementById('guarantorFio').value.trim(),
+        guarantorPhone: document.getElementById('guarantorPhone').value.trim(),
+        installments: existing ? existing.installments : {}
       };
-
-      // Автоматическая установка shopPaid, если остаток 0
-      const totalCost = formData.totalCost;
-      const downPayment = formData.downPayment;
-      const installments = editId ? (allContracts.find(c => c.id === editId)?.installments || {}) : {};
-      let totalPaid = 0;
-      Object.values(installments).forEach(p => totalPaid += Number(p.amount));
-      const rest = totalCost - downPayment - totalPaid;
-      if (rest <= 0) {
-        formData.shopPaid = true;
-      }
 
       if (editId) {
-        const index = allContracts.findIndex(c => c.id === editId);
-        if (index !== -1) {
-          allContracts[index] = { ...allContracts[index], ...formData };
-          if (!allContracts[index].installments) allContracts[index].installments = {};
-        }
+        const idx = allContracts.findIndex(c => c.id === editId);
+        if (idx !== -1) allContracts[idx] = newContract;
       } else {
-        const maxNum = allContracts.reduce((max, c) => (c.contractNum > max ? c.contractNum : max), 0);
-        allContracts.push({
-          id: 'doc_' + Date.now(),
-          contractNum: maxNum + 1,
-          installments: {},
-          ...formData
-        });
+        allContracts.unshift(newContract);
       }
-      saveToStorage();
+
       closeModal();
+      finishAction();
     });
 
-    document.getElementById('payForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const id = document.getElementById('payContractId').value;
-      const contract = allContracts.find(c => c.id === id);
+    function deleteContract(id) {
+      if (confirm('Вы действительно хотите удалить этот договор?')) {
+        saveState();
+        allContracts = allContracts.filter(c => c.id !== id);
+        finishAction();
+      }
+    }
+
+    // --- Оплата взносов ---
+    function openPayModal(contractId, index) {
+      saveState();
+      const contract = allContracts.find(c => c.id === contractId);
       if (!contract) return;
 
-      const inputDateVal = document.getElementById('payDateVal').value;
-      const inputDate = new Date(inputDateVal);
-      const today = new Date();
-      
-      const isDifferentMonth = (inputDate.getFullYear() !== today.getFullYear()) || (inputDate.getMonth() !== today.getMonth());
+      document.getElementById('payContractId').value = contractId;
+      document.getElementById('payIndex').value = index;
 
-      if (isDifferentMonth) {
-        const confirmed = confirm(`Внимание! Дата платежа (${inputDateVal}) относится НЕ к текущему месяцу.\n\nВы уверены, что хотите сохранить эту дату?`);
-        if (!confirmed) return;
+      const inst = contract.installments ? contract.installments[index] : null;
+      document.getElementById('payAmount').value = inst ? inst.amount : contract.monthlyPay;
+      document.getElementById('payDateVal').value = inst ? inst.date : new Date().toISOString().slice(0, 10);
+
+      document.getElementById('payModal').classList.remove('hidden');
+    }
+
+    function closePayModal() {
+      document.getElementById('payModal').classList.add('hidden');
+    }
+
+    document.getElementById('payForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const contractId = document.getElementById('payContractId').value;
+      const index = document.getElementById('payIndex').value;
+      const amount = Number(document.getElementById('payAmount').value);
+      const date = document.getElementById('payDateVal').value;
+
+      const contract = allContracts.find(c => c.id === contractId);
+      if (contract) {
+        if (!contract.installments) contract.installments = {};
+        contract.installments[index] = { amount, date };
+
+        // Автоматически добавляем запись в Учет при оплате
+        allAccounting.unshift({
+          id: 'acc_' + Date.now(),
+          date: date,
+          income: amount,
+          expense: 0,
+          note: `Оплата взноса №${index} - ${contract.fio}`,
+          account: 'Касса'
+        });
       }
 
-      saveState();
-      const idx = document.getElementById('payIndex').value;
-      if (!contract.installments) contract.installments = {};
-      contract.installments[idx] = { 
-        amount: Number(document.getElementById('payAmount').value), 
-        date: inputDateVal 
-      };
-      
-      // Проверяем, закрыт ли договор
-      const metrics = calculateContractMetrics(contract);
-      if (metrics.isClosed) {
-        contract.shopPaid = true;
-      }
-      
-      saveToStorage();
       closePayModal();
-      document.getElementById('payForm').reset();
+      finishAction();
     });
 
     function deleteInstallment() {
-      const id = document.getElementById('payContractId').value;
-      const idx = document.getElementById('payIndex').value;
-      const contract = allContracts.find(c => c.id === id);
+      const contractId = document.getElementById('payContractId').value;
+      const index = document.getElementById('payIndex').value;
+      const contract = allContracts.find(c => c.id === contractId);
 
-      if (contract && contract.installments && contract.installments[idx]) {
-        if (confirm(`Удалить ${idx}-й взнос на сумму ${contract.installments[idx].amount} ₽?`)) {
-          saveState();
-          delete contract.installments[idx];
-          contract.shopPaid = false;
-          saveToStorage();
+      if (contract && contract.installments && contract.installments[index]) {
+        if (confirm(`Удалить ${index}-й взнос?`)) {
+          delete contract.installments[index];
           closePayModal();
-          document.getElementById('payForm').reset();
-        }
-      } else {
-        alert("Этот взнос еще не был внесен.");
-      }
-    }
-
-    function deleteContract(id) {
-      const contract = allContracts.find(c => c.id === id);
-      if (confirm(`Удалить договор №${contract.contractNum}?`)) {
-        if (prompt('Введите "УДАЛИТЬ" для подтверждения:') === "УДАЛИТЬ") {
-          saveState();
-          allContracts = allContracts.filter(c => c.id !== id);
-          saveToStorage();
+          finishAction();
         }
       }
     }
 
-    function copyToClip(text, btn) {
-      navigator.clipboard.writeText(text).then(() => {
-        const oldText = btn.innerText;
-        btn.innerText = "✓ Готово";
-        btn.classList.add("bg-green-700");
-        setTimeout(() => { btn.innerText = oldText; btn.classList.remove("bg-green-700"); }, 1000);
-      });
-    }
-
-    function copyHistory(id, btn) {
-      const c = allContracts.find(i => i.id === id);
-      let log = `Договор №${c.contractNum}\nФИО: ${c.fio}\n\nОплаты:\n`;
-      Object.keys(c.installments || {}).sort((a,b)=>Number(a)-Number(b)).forEach(k => {
-        log += `${k}-й: ${c.installments[k].amount}₽ (${c.installments[k].date})\n`;
-      });
-      copyToClip(log, btn);
-    }
-
-    function copyGuarantor(id, btn) {
-      const c = allContracts.find(i => i.id === id);
-      copyToClip(`Договор №${c.contractNum}\nКлиент: ${c.fio}\nПоручитель: ${c.guarantorFio || '—'} (${c.guarantorPhone || '—'})`, btn);
-    }
-
-    function renderTable(contracts) {
-      const tbody = document.getElementById('contractsTable');
-      tbody.innerHTML = '';
-      
-      contracts.forEach(item => {
-        const metrics = calculateContractMetrics(item);
-        const rest = metrics.rest;
-        const overdueSum = metrics.overdueSum;
-        const insts = item.installments || {};
-        
-        const tr = document.createElement('tr');
-        if (Number(item.costPrice) > Number(item.totalCost)) tr.className = 'row-error';
-        
-        let instHtml = '';
-        for(let i=1; i<=15; i++) {
-          const v = insts[i];
-          instHtml += v ? `<td class="p-1 border-r text-center pay-paid" title="Дата: ${v.date}">${v.amount}</td>` : `<td class="p-1 border-r text-center text-gray-300">—</td>`;
-        }
-
-        tr.innerHTML = `
-          <td class="p-2 border-r font-bold">${item.fio}</td>
-          <td class="p-2 border-r text-[10px]">${item.phone}</td>
-          <td class="p-2 border-r text-[10px]">${item.buyDate}<br><b class="text-blue-600">${item.payDate}</b></td>
-          <td class="p-2 border-r font-bold text-center">${item.monthlyPay}</td>
-          ${instHtml}
-          <td class="p-2 border-r text-red-600 font-bold text-center">${overdueSum > 0 ? overdueSum.toLocaleString('ru-RU') : 0}</td>
-          <td class="p-2 border-r font-bold text-center ${rest <= 0 ? 'text-green-600' : 'text-orange-600'}">${rest.toLocaleString('ru-RU')}</td>
-          <td class="p-2 border-r text-[10px] text-center">${item.totalCost} / ${item.downPayment}</td>
-          <td class="p-2 border-r text-center">${item.costPrice}</td>
-          <td class="p-2 border-r text-center font-black ${item.shopPaid ? 'text-green-600' : 'text-gray-300'}">${item.shopPaid ? 'Д' : '—'}</td>
-          <td class="p-2 border-r text-[10px]">${item.product || '—'}</td>
-          <td class="p-2 border-r text-[10px]">${item.guarantorFio || '—'}</td>
-          <td class="p-2 text-center space-x-1 sticky right-0 bg-white shadow-[-5px_0_10px_rgba(0,0,0,0.05)]">
-            <button onclick="openPayModal('${item.id}')" class="bg-green-600 text-white px-1 py-0.5 rounded text-[9px] font-bold">+Взнос</button>
-            <button onclick="copyHistory('${item.id}', this)" class="bg-slate-500 text-white px-1 py-0.5 rounded text-[9px]">📋 Опл.</button>
-            <button onclick="copyGuarantor('${item.id}', this)" class="bg-indigo-500 text-white px-1 py-0.5 rounded text-[9px]">👥 Пор.</button>
-            <button onclick="openEditModal('${item.id}')" class="bg-blue-500 text-white px-1 py-0.5 rounded text-[9px]">✏️</button>
-            <button onclick="deleteContract('${item.id}')" class="bg-red-500 text-white px-1 py-0.5 rounded text-[9px]">🗑️</button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    const accModal = document.getElementById('accModal');
-    
+    // --- Учет ---
     function openAccModal() {
+      saveState();
       document.getElementById('accForm').reset();
       document.getElementById('accEditId').value = '';
-      document.getElementById('accModalTitle').innerText = 'Новая запись учета';
-      document.getElementById('accDate').valueAsDate = new Date();
-      accModal.classList.remove('hidden');
+      document.getElementById('accModalTitle').textContent = 'Новая Запись Учета';
+      document.getElementById('accDate').value = new Date().toISOString().slice(0, 10);
+      document.getElementById('accModal').classList.remove('hidden');
     }
 
-    function closeAccModal() { accModal.classList.add('hidden'); }
-
-    function openEditAccModal(id) {
+    function openAccEditModal(id) {
+      saveState();
       const item = allAccounting.find(a => a.id === id);
       if (!item) return;
+
       document.getElementById('accEditId').value = item.id;
-      document.getElementById('accModalTitle').innerText = 'Редактирование записи';
-      document.getElementById('accDate').value = item.date;
+      document.getElementById('accDate').value = item.date || '';
       document.getElementById('accIncome').value = item.income || 0;
       document.getElementById('accExpense').value = item.expense || 0;
       document.getElementById('accNote').value = item.note || '';
       document.getElementById('accAccount').value = item.account || '';
-      accModal.classList.remove('hidden');
+
+      document.getElementById('accModalTitle').textContent = 'Редактировать Учет';
+      document.getElementById('accModal').classList.remove('hidden');
     }
 
-    document.getElementById('accForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      saveState();
+    function closeAccModal() {
+      document.getElementById('accModal').classList.add('hidden');
+    }
 
+    document.getElementById('accForm').addEventListener('submit', function(e) {
+      e.preventDefault();
       const editId = document.getElementById('accEditId').value;
-      const formData = {
+
+      const newItem = {
+        id: editId || 'acc_' + Date.now(),
         date: document.getElementById('accDate').value,
         income: Number(document.getElementById('accIncome').value) || 0,
         expense: Number(document.getElementById('accExpense').value) || 0,
-        note: document.getElementById('accNote').value || '—',
-        account: (document.getElementById('accAccount').value || '—').trim(),
-        createdAt: editId ? (allAccounting.find(a => a.id === editId)?.createdAt || Date.now()) : Date.now()
+        note: document.getElementById('accNote').value.trim(),
+        account: document.getElementById('accAccount').value.trim()
       };
 
       if (editId) {
         const idx = allAccounting.findIndex(a => a.id === editId);
-        if (idx !== -1) allAccounting[idx] = { ...allAccounting[idx], ...formData };
+        if (idx !== -1) allAccounting[idx] = newItem;
       } else {
-        allAccounting.unshift({
-          id: 'acc_' + Date.now(),
-          ...formData
-        });
+        allAccounting.unshift(newItem);
       }
 
-      saveToStorage();
       closeAccModal();
+      finishAction();
     });
 
-    function deleteAccItem(id) {
-      if (confirm('Удалить эту запись из учета?')) {
+    function deleteAccounting(id) {
+      if (confirm('Удалить эту запись учета?')) {
         saveState();
         allAccounting = allAccounting.filter(a => a.id !== id);
-        saveToStorage();
+        finishAction();
       }
     }
 
-    function renderAccountingTable(items) {
-      const tbody = document.getElementById('accountingTable');
-      tbody.innerHTML = '';
-      
-      let incomeSum = 0;
-      let expenseSum = 0;
-
-      const sorted = [...items].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-
-      sorted.forEach(item => {
-        incomeSum += Number(item.income || 0);
-        expenseSum += Number(item.expense || 0);
-
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td class="p-2 border-r font-medium">${item.date}</td>
-          <td class="p-2 border-r font-bold ${item.income > 0 ? 'text-emerald-600 bg-emerald-50/50' : 'text-slate-300'}">${item.income > 0 ? item.income + ' ₽' : '—'}</td>
-          <td class="p-2 border-r font-bold ${item.expense > 0 ? 'text-red-600 bg-red-50/50' : 'text-slate-300'}">${item.expense > 0 ? item.expense + ' ₽' : '—'}</td>
-          <td class="p-2 border-r text-slate-700 font-medium">${item.note}</td>
-          <td class="p-2 border-r font-bold text-blue-700">${item.account}</td>
-          <td class="p-2 text-center space-x-1 sticky right-0 bg-white shadow-[-5px_0_10px_rgba(0,0,0,0.05)]">
-            <button onclick="openEditAccModal('${item.id}')" class="bg-blue-500 text-white px-1.5 py-0.5 rounded text-[9px]">✏️</button>
-            <button onclick="deleteAccItem('${item.id}')" class="bg-red-500 text-white px-1.5 py-0.5 rounded text-[9px]">🗑️</button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-
-      document.getElementById('totalIncome').innerText = incomeSum.toLocaleString('ru-RU') + ' ₽';
-      document.getElementById('totalExpense').innerText = expenseSum.toLocaleString('ru-RU') + ' ₽';
-    }
-
-    const takenModal = document.getElementById('takenModal');
-
+    // --- Взяли / Положили ---
     function openTakenModal() {
+      saveState();
       document.getElementById('takenForm').reset();
       document.getElementById('takenEditId').value = '';
-      document.getElementById('takenModalTitle').innerText = 'Новая запись Взяли / Положили';
-      takenModal.classList.remove('hidden');
+      document.getElementById('takenModalTitle').textContent = 'Запись Взяли / Положили';
+      document.getElementById('takenModal').classList.remove('hidden');
     }
 
-    function closeTakenModal() { takenModal.classList.add('hidden'); }
-
-    function openEditTakenModal(id) {
+    function openTakenEditModal(id) {
+      saveState();
       const item = allTaken.find(t => t.id === id);
-      if(!item) return;
+      if (!item) return;
+
       document.getElementById('takenEditId').value = item.id;
-      document.getElementById('takenModalTitle').innerText = 'Редактировать Взяли / Положили';
       document.getElementById('takenAmount').value = item.takenAmount || 0;
       document.getElementById('takenDesc').value = item.takenDesc || '';
       document.getElementById('putAmount').value = item.putAmount || 0;
       document.getElementById('putDesc').value = item.putDesc || '';
-      takenModal.classList.remove('hidden');
+
+      document.getElementById('takenModalTitle').textContent = 'Редактировать Взяли / Положили';
+      document.getElementById('takenModal').classList.remove('hidden');
     }
 
-    document.getElementById('takenForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      saveState();
+    function closeTakenModal() {
+      document.getElementById('takenModal').classList.add('hidden');
+    }
 
+    document.getElementById('takenForm').addEventListener('submit', function(e) {
+      e.preventDefault();
       const editId = document.getElementById('takenEditId').value;
-      const formData = {
+
+      const newItem = {
+        id: editId || 'taken_' + Date.now(),
         takenAmount: Number(document.getElementById('takenAmount').value) || 0,
-        takenDesc: document.getElementById('takenDesc').value || '',
+        takenDesc: document.getElementById('takenDesc').value.trim(),
         putAmount: Number(document.getElementById('putAmount').value) || 0,
-        putDesc: document.getElementById('putDesc').value || '',
-        createdAt: editId ? (allTaken.find(t => t.id === editId)?.createdAt || Date.now()) : Date.now()
+        putDesc: document.getElementById('putDesc').value.trim()
       };
 
       if (editId) {
         const idx = allTaken.findIndex(t => t.id === editId);
-        if (idx !== -1) allTaken[idx] = { ...allTaken[idx], ...formData };
+        if (idx !== -1) allTaken[idx] = newItem;
       } else {
-        allTaken.push({
-          id: 'taken_' + Date.now(),
-          ...formData
-        });
+        allTaken.push(newItem);
       }
 
-      saveToStorage();
       closeTakenModal();
+      finishAction();
     });
 
-    function deleteTakenItem(id) {
-      if(confirm('Удалить эту строку?')) {
+    function deleteTakenRow(id) {
+      if (confirm('Удалить эту строку?')) {
         saveState();
         allTaken = allTaken.filter(t => t.id !== id);
-        saveToStorage();
+        finishAction();
       }
     }
 
-    function addNewAccountPrompt() {
-      const accName = prompt('Введите название нового счета/карты (например: S3, A1):');
-      if (accName && accName.trim()) {
-        const cleanName = accName.trim();
-        if(!customAccounts.some(a => a.name.toLowerCase() === cleanName.toLowerCase())) {
-          saveState();
-          customAccounts.push({ name: cleanName, color: '' });
-          saveToStorage();
-        } else {
-          alert('Такой счет уже существует!');
-        }
-      }
-    }
-
-    function deleteAccount(index) {
-      if (confirm(`Удалить счет "${customAccounts[index].name}"?`)) {
-        saveState();
-        customAccounts.splice(index, 1);
-        saveToStorage();
-      }
-    }
-
-    function changeAccountColor(index, color) {
-      saveState();
-      customAccounts[index].color = color;
-      saveToStorage();
-    }
-
-    function renderTakenSheet() {
-      const rowsTbody = document.getElementById('takenRowsTable');
-      rowsTbody.innerHTML = '';
-
-      let sumTaken = 0;
-      let sumPut = 0;
-
-      allTaken.forEach(item => {
-        sumTaken += Number(item.takenAmount || 0);
-        sumPut += Number(item.putAmount || 0);
-
-        const tr = document.createElement('tr');
-        tr.className = "text-center";
-        tr.innerHTML = `
-          <td></td>
-          <td class="font-bold text-amber-700">${item.takenAmount || ''}</td>
-          <td class="text-left">${item.takenDesc || ''}</td>
-          <td class="font-bold text-emerald-600">${item.putAmount || ''}</td>
-          <td class="text-left">${item.putDesc || ''}</td>
-          <td class="space-x-1">
-            <button onclick="openEditTakenModal('${item.id}')" class="text-blue-600 font-bold">✏️</button>
-            <button onclick="deleteTakenItem('${item.id}')" class="text-red-600 font-bold">🗑️</button>
-          </td>
-        `;
-        rowsTbody.appendChild(tr);
-      });
-
-      document.getElementById('takenTotalSum').innerText = sumTaken.toLocaleString('ru-RU');
-      document.getElementById('putTotalSum').innerText = sumPut.toLocaleString('ru-RU');
-
-      let totalDownPayments = 0;
-      let totalInstallments = 0;
-      let totalCostPrice = 0;
-
-      allContracts.forEach(c => {
-        totalDownPayments += Number(c.downPayment || 0);
-        totalCostPrice += Number(c.costPrice || 0);
-        const insts = c.installments || {};
-        Object.values(insts).forEach(p => {
-          totalInstallments += Number(p.amount || 0);
-        });
-      });
-
-      let totalKassa = totalDownPayments + totalInstallments - totalCostPrice - sumTaken + sumPut;
-      document.getElementById('kassaTotal').innerText = totalKassa.toLocaleString('ru-RU');
-
-      let totalUchetIncome = 0;
-      let totalUchetExpense = 0;
-      allAccounting.forEach(a => {
-        totalUchetIncome += Number(a.income || 0);
-        totalUchetExpense += Number(a.expense || 0);
-      });
-      let uchetBalance = totalUchetIncome - totalUchetExpense;
-      document.getElementById('kassaUchet').innerText = uchetBalance.toLocaleString('ru-RU');
-
-      const now = new Date();
-      const todayStr = now.toISOString().slice(0, 10);
-
-      let totalContracts = allContracts.length;
-      let closedContracts = 0;
-      let activeContracts = 0;
-
-      let planTodaySum = 0;
-      let planTodayCount = 0;
-      let factTodaySum = 0;
-      let factTodayCount = 0;
-
-      allContracts.forEach(c => {
-        const metrics = calculateContractMetrics(c);
-        if (metrics.isClosed) {
-          closedContracts++;
-        } else {
-          activeContracts++;
-        }
-        
-        const insts = c.installments || {};
-        let hasPaidToday = false;
-        Object.values(insts).forEach(p => {
-          if (p.date === todayStr) {
-            factTodaySum += Number(p.amount);
-            hasPaidToday = true;
-          }
-        });
-        if (hasPaidToday) factTodayCount++;
-
-        if (c.payDate === todayStr) {
-          planTodaySum += Number(c.monthlyPay || 0);
-          planTodayCount++;
-        }
-      });
-
-      document.getElementById('statTotalContracts').innerText = totalContracts;
-      document.getElementById('statClosedContracts').innerText = closedContracts;
-      document.getElementById('statActiveContracts').innerText = activeContracts;
-      document.getElementById('statPlanTodaySum').innerText = planTodaySum.toLocaleString('ru-RU') + ' ₽';
-      document.getElementById('statPlanTodayCount').innerText = planTodayCount;
-      document.getElementById('statFactTodaySum').innerText = factTodaySum.toLocaleString('ru-RU') + ' ₽';
-      document.getElementById('statFactTodayCount').innerText = factTodayCount;
-
-      const accountsBody = document.getElementById('accountsTableBody');
-      accountsBody.innerHTML = '';
-
-      const currentMonth = now.getMonth();
-      const currentYear = now.getFullYear();
-
-      let accountsGrandTotalSum = 0;
-
-      customAccounts.forEach((accObj, idx) => {
-        let accBalance = 0;
-        let incCountMonth = 0;
-        let incSumMonth = 0;
-        let expCountMonth = 0;
-        let expSumMonth = 0;
-
-        allAccounting.forEach(a => {
-          if (a.account && a.account.trim().toLowerCase() === accObj.name.toLowerCase()) {
-            const inc = Number(a.income || 0);
-            const exp = Number(a.expense || 0);
-            accBalance += (inc - exp);
-
-            if (a.date) {
-              try {
-                const d = new Date(a.date);
-                if (!isNaN(d.getTime()) && d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
-                  if (inc > 0) {
-                    incCountMonth++;
-                    incSumMonth += inc;
-                  }
-                  if (exp > 0) {
-                    expCountMonth++;
-                    expSumMonth += exp;
-                  }
-                }
-              } catch (e) {}
-            }
-          }
-        });
-
-        accountsGrandTotalSum += accBalance;
-
-        const isIncOverLimit = incSumMonth >= 400000;
-        const isExpOverLimit = expSumMonth >= 400000;
-        
-        let rowStyle = accObj.color ? `background-color: ${accObj.color};` : '';
-
-        const tr = document.createElement('tr');
-        tr.style = rowStyle;
-        tr.innerHTML = `
-          <td class="font-bold">${accObj.name}</td>
-          <td class="font-bold">${accBalance.toLocaleString('ru-RU')}</td>
-          <td>${incCountMonth}</td>
-          <td class="${isIncOverLimit ? 'cell-over-limit' : ''}">${incSumMonth.toLocaleString('ru-RU')}</td>
-          <td>${expCountMonth}</td>
-          <td class="${isExpOverLimit ? 'cell-over-limit' : ''}">${expSumMonth.toLocaleString('ru-RU')}</td>
-          <td class="space-x-1">
-            <input type="color" value="${accObj.color || '#ffffff'}" onchange="changeAccountColor(${idx}, this.value)" title="Изменить цвет" class="w-5 h-5 cursor-pointer align-middle border rounded">
-            <button onclick="deleteAccount(${idx})" class="text-red-700 font-bold px-1 text-[11px]" title="Удалить счет">🗑️</button>
-          </td>
-        `;
-        accountsBody.appendChild(tr);
-      });
-
-      document.getElementById('accountsGrandTotal').innerText = accountsGrandTotalSum.toLocaleString('ru-RU');
-    }
-
-    function handleSearch() {
-      const q = document.getElementById('searchInput').value.toLowerCase();
-      if (activeTab === 'contracts') {
-        renderTable(allContracts.filter(c => c.fio.toLowerCase().includes(q) || String(c.contractNum).includes(q)));
-      } else if (activeTab === 'accounting') {
-        renderAccountingTable(allAccounting.filter(a => a.note.toLowerCase().includes(q) || a.account.toLowerCase().includes(q) || a.date.includes(q)));
-      } else if (activeTab === 'taken') {
-        const filtered = allTaken.filter(t => (t.takenDesc && t.takenDesc.toLowerCase().includes(q)) || (t.putDesc && t.putDesc.toLowerCase().includes(q)));
-        renderTakenFiltered(filtered);
-      }
-    }
-
-    function renderTakenFiltered(items) {
-      const rowsTbody = document.getElementById('takenRowsTable');
-      rowsTbody.innerHTML = '';
-      items.forEach(item => {
-        const tr = document.createElement('tr');
-        tr.className = "text-center";
-        tr.innerHTML = `
-          <td></td>
-          <td class="font-bold text-amber-700">${item.takenAmount || ''}</td>
-          <td class="text-left">${item.takenDesc || ''}</td>
-          <td class="font-bold text-emerald-600">${item.putAmount || ''}</td>
-          <td class="text-left">${item.putDesc || ''}</td>
-          <td class="space-x-1">
-            <button onclick="openEditTakenModal('${item.id}')" class="text-blue-600 font-bold">✏️</button>
-            <button onclick="deleteTakenItem('${item.id}')" class="text-red-600 font-bold">🗑️</button>
-          </td>
-        `;
-        rowsTbody.appendChild(tr);
-      });
-    }
+    // ================================================================
+    // ЭКСПОРТ И ИМПОРТ БАЗЫ ДАННЫХ
+    // ================================================================
 
     function exportData() {
-      const exportObject = {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({
         contracts: allContracts,
         accounting: allAccounting,
         taken: allTaken,
         accounts: customAccounts
-      };
-      const blob = new Blob([JSON.stringify(exportObject, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `BAZA_FULL_${new Date().toISOString().slice(0,10)}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
+      }, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `installment_db_backup_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
     }
 
-    function importData(e) {
-      const file = e.target.files[0];
+    function importData(event) {
+      const file = event.target.files[0];
       if (!file) return;
+
       const reader = new FileReader();
-      reader.onload = (ev) => {
+      reader.onload = function(e) {
         try {
-          const data = JSON.parse(ev.target.result);
-          if (confirm(`Загрузить данные из файла? Это заменит текущую базу.`)) {
+          const imported = JSON.parse(e.target.result);
+          if (imported.contracts && Array.isArray(imported.contracts)) {
             saveState();
-            if (Array.isArray(data)) {
-              allContracts = data;
-            } else {
-              allContracts = data.contracts || [];
-              allAccounting = data.accounting || [];
-              allTaken = data.taken || [];
-              customAccounts = data.accounts || customAccounts;
-            }
-            saveToStorage();
+            allContracts = imported.contracts;
+            allAccounting = imported.accounting || [];
+            allTaken = imported.taken || [];
+            customAccounts = imported.accounts || customAccounts;
+            finishAction();
+            alert('База данных успешно загружена!');
+          } else {
+            alert('Некорректный формат файла резервной копии');
           }
-        } catch (err) { alert("Ошибка при чтении файла: " + err.message); }
+        } catch (err) {
+          alert('Ошибка при чтении файла JSON: ' + err.message);
+        }
       };
       reader.readAsText(file);
     }
 
-    document.addEventListener('keydown', (e) => {
-      if (e.ctrlKey && (e.key === 'z' || e.key === 'я')) { e.preventDefault(); undo(); }
-      if (e.ctrlKey && (e.key === 'y' || e.key === 'н')) { e.preventDefault(); redo(); }
+    // ================================================================
+    // ГОРЯЧИЕ КЛАВИШИ (Ctrl+Z, Ctrl+Y)
+    // ================================================================
+
+    document.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+        if (!e.shiftKey) {
+          e.preventDefault();
+          undo();
+        }
+      } else if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'y' || (e.shiftKey && e.key.toLowerCase() === 'z'))) {
+        e.preventDefault();
+        redo();
+      }
     });
 
-    renderTable(allContracts);
-    renderAccountingTable(allAccounting);
-    renderTakenSheet();
-    updateHistoryButtons();
+    // ================================================================
+    // ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ
+    // ================================================================
+
+    window.onload = function() {
+      renderTable(allContracts);
+      renderAccountingTable(allAccounting);
+      updateHistoryButtons();
+    };
   </script>
 </body>
 </html>
