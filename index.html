@@ -6,7 +6,6 @@
   <title>Система Учета и Договоров</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* --- Ваши стили --- */
     .row-error { background-color: #fee2e2 !important; }
     .pay-paid { background-color: #22c55e; color: white; font-weight: bold; cursor: pointer; }
     .btn-history-active { background-color: #f59e0b !important; color: white !important; cursor: pointer !important; }
@@ -124,126 +123,18 @@
     .client-overdue { color: #ef4444; font-weight: bold; }
     .client-rest { color: #f59e0b; font-weight: bold; }
 
-    .partner-stat {
+    .date-warning {
+      background-color: #fef3c7;
+      border: 1px solid #f59e0b;
+      color: #92400e;
       padding: 8px 12px;
-      border-bottom: 1px solid #e5e7eb;
-    }
-    .partner-stat:last-child {
-      border-bottom: none;
-    }
-    .partner-name { font-weight: bold; font-size: 14px; color: #7c3aed; }
-    .partner-value { font-weight: bold; font-size: 13px; }
-
-    /* Стили для печати договора */
-    .print-contract {
-      font-family: 'Times New Roman', serif;
-      font-size: 12px;
-      line-height: 1.4;
-      padding: 20px 30px;
-      background: white;
-      max-width: 210mm;
-      margin: 0 auto;
-    }
-    .print-contract h1 {
-      font-size: 16px;
-      font-weight: bold;
-      text-align: center;
-      text-transform: uppercase;
-      margin-bottom: 12px;
-    }
-    .print-contract .contract-num {
-      font-weight: bold;
-      text-align: right;
-      font-size: 13px;
-    }
-    .print-contract .section-title {
-      font-weight: bold;
-      font-size: 14px;
-      margin-top: 12px;
-      margin-bottom: 6px;
-      text-transform: uppercase;
-      text-decoration: underline;
-    }
-    .print-contract .sub-section {
-      font-weight: bold;
-      margin-top: 8px;
-      margin-bottom: 3px;
-      font-size: 12px;
-    }
-    .print-contract .list-item {
-      padding-left: 18px;
-      margin-bottom: 2px;
-      font-size: 11.5px;
-    }
-    .print-contract .signatures {
-      margin-top: 20px;
-      display: flex;
-      justify-content: space-between;
-    }
-    .print-contract .signature-block {
-      text-align: center;
-      min-width: 120px;
-    }
-    .print-contract .signature-line {
-      border-top: 1px solid black;
-      width: 140px;
-      margin: 20px auto 4px;
-    }
-    .print-contract .signature-label {
-      font-size: 10px;
-    }
-    .print-contract .page-break {
-      page-break-after: always;
-      border-bottom: 2px dashed #ccc;
-      margin: 10px 0;
-    }
-
-    .months-table {
-      width: 100%;
-      border-collapse: collapse;
+      border-radius: 6px;
       font-size: 11px;
-      margin-top: 10px;
+      margin-top: 6px;
+      display: none;
     }
-    .months-table th {
-      background-color: #e2e8f0;
-      font-weight: bold;
-      text-align: center;
-      padding: 4px 8px;
-      border: 1px solid #000;
-    }
-    .months-table td {
-      padding: 4px 8px;
-      text-align: center;
-      border: 1px solid #000;
-    }
-    .month-paid-cell { color: #22c55e; font-weight: bold; }
-    .month-unpaid-cell { color: #ef4444; font-weight: bold; }
-
-    .person-block {
-      border: 1px solid #000;
-      padding: 6px 10px;
-      margin-bottom: 8px;
-    }
-    .person-block .title {
-      font-weight: bold;
-      font-size: 13px;
-      margin-bottom: 3px;
-    }
-    .person-block .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2px 15px;
-      font-size: 11.5px;
-    }
-    .person-block .grid-full {
-      grid-column: span 2;
-    }
-
-    .seller-block {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
-      font-size: 11.5px;
+    .date-warning.show {
+      display: block;
     }
 
     @media print {
@@ -259,11 +150,6 @@
         background: white;
       }
       .no-print { display: none !important; }
-      .print-contract { padding: 12px 20px; font-size: 10px; }
-      .print-contract .page-break { border-bottom: none; page-break-after: always; margin: 0; }
-      .print-contract .signature-line { width: 100px; }
-      .print-contract h1 { font-size: 14px; }
-      .print-contract .section-title { font-size: 12px; }
     }
 
     .copy-notification {
@@ -282,20 +168,6 @@
     @keyframes slideIn {
       from { transform: translateX(100%); opacity: 0; }
       to { transform: translateX(0); opacity: 1; }
-    }
-
-    .date-warning {
-      background-color: #fef3c7;
-      border: 1px solid #f59e0b;
-      color: #92400e;
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-size: 11px;
-      margin-top: 6px;
-      display: none;
-    }
-    .date-warning.show {
-      display: block;
     }
   </style>
 </head>
@@ -627,7 +499,7 @@
       </div>
 
       <div id="dateWarning" class="date-warning">
-        ⚠️ Внимание! В следующем месяце нет выбранного числа. Дата платежа будет перенесена на последний день месяца.
+        ⚠️ Внимание! В выбранном месяце нет такого числа. Дата платежа будет автоматически перенесена на последний день месяца.
       </div>
 
       <form id="contractForm" class="space-y-4">
@@ -806,7 +678,7 @@
 
   <script>
     // ================================================================
-    // ВСЕ ПЕРЕМЕННЫЕ И БАЗОВЫЕ ФУНКЦИИ
+    // ВСЕ ПЕРЕМЕННЫЕ
     // ================================================================
     
     let allContracts = JSON.parse(localStorage.getItem('contracts_db') || '[]');
@@ -814,18 +686,11 @@
     let allTaken = JSON.parse(localStorage.getItem('taken_db') || '[]');
     let customAccounts = JSON.parse(localStorage.getItem('accounts_db') || 'null');
 
-    // Инициализация счетов по умолчанию
     if (!customAccounts) {
       const defaultNames = ['N', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12', 'T13', 'T14', 'T15', 'T16', 'B1', 'B2', 'B3', 'B4'];
-      customAccounts = defaultNames.map(name => ({
-        name,
-        color: name === 'C1' ? '#86efac' : (name === 'T1' ? '#fef08a' : '')
-      }));
+      customAccounts = defaultNames.map(name => ({ name, color: name === 'C1' ? '#86efac' : (name === 'T1' ? '#fef08a' : '') }));
     } else if (typeof customAccounts[0] === 'string') {
-      customAccounts = customAccounts.map(name => ({
-        name,
-        color: name === 'C1' ? '#86efac' : (name === 'T1' ? '#fef08a' : '')
-      }));
+      customAccounts = customAccounts.map(name => ({ name, color: name === 'C1' ? '#86efac' : (name === 'T1' ? '#fef08a' : '') }));
     }
 
     let activeTab = 'contracts';
@@ -838,96 +703,46 @@
 
     function switchTab(tab) {
       activeTab = tab;
-      const cTab = document.getElementById('contractsTabContent');
-      const aTab = document.getElementById('accountingTabContent');
-      const tTab = document.getElementById('takenTabContent');
-      const todayTab = document.getElementById('todayTabContent');
-      const threeDaysTab = document.getElementById('threeDaysTabContent');
-      const debtorsTab = document.getElementById('debtorsTabContent');
-      const partnersTab = document.getElementById('partnersTabContent');
-      const printTab = document.getElementById('printTabContent');
+      const tabs = ['contracts', 'accounting', 'taken', 'today', 'threeDays', 'debtors', 'partners', 'print'];
+      tabs.forEach(t => {
+        document.getElementById(t + 'TabContent').classList.toggle('hidden', t !== tab);
+      });
+      
+      const buttons = ['Contracts', 'Accounting', 'Taken', 'Today', 'ThreeDays', 'Debtors', 'Partners', 'Print'];
+      buttons.forEach(b => {
+        const btn = document.getElementById('tabBtn' + b);
+        btn.className = "tab-btn px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
+        if (b === 'Today') btn.className = "tab-btn today-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
+        if (b === 'ThreeDays') btn.className = "tab-btn three-days-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
+        if (b === 'Debtors') btn.className = "tab-btn debtors-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
+        if (b === 'Partners') btn.className = "tab-btn partners-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
+        if (b === 'Print') btn.className = "tab-btn print-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
+      });
+      
+      document.getElementById('tabBtn' + tab.charAt(0).toUpperCase() + tab.slice(1)).className = "tab-btn active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
+      if (tab === 'today') document.getElementById('tabBtnToday').className = "tab-btn today-tab active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
+      if (tab === 'threeDays') document.getElementById('tabBtnThreeDays').className = "tab-btn three-days-tab active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
+      if (tab === 'debtors') document.getElementById('tabBtnDebtors').className = "tab-btn debtors-tab active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
+      if (tab === 'partners') document.getElementById('tabBtnPartners').className = "tab-btn partners-tab active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
+      if (tab === 'print') document.getElementById('tabBtnPrint').className = "tab-btn print-tab active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
 
-      const cBtn = document.getElementById('tabBtnContracts');
-      const aBtn = document.getElementById('tabBtnAccounting');
-      const tBtn = document.getElementById('tabBtnTaken');
-      const todayBtn = document.getElementById('tabBtnToday');
-      const threeDaysBtn = document.getElementById('tabBtnThreeDays');
-      const debtorsBtn = document.getElementById('tabBtnDebtors');
-      const partnersBtn = document.getElementById('tabBtnPartners');
-      const printBtn = document.getElementById('tabBtnPrint');
+      document.getElementById('addContractBtn').classList.toggle('hidden', tab !== 'contracts');
+      document.getElementById('addAccBtn').classList.toggle('hidden', tab !== 'accounting');
+      document.getElementById('addTakenBtn').classList.toggle('hidden', tab !== 'taken');
 
-      const addC = document.getElementById('addContractBtn');
-      const addA = document.getElementById('addAccBtn');
-      const addT = document.getElementById('addTakenBtn');
-
-      cTab.classList.add('hidden');
-      aTab.classList.add('hidden');
-      tTab.classList.add('hidden');
-      todayTab.classList.add('hidden');
-      threeDaysTab.classList.add('hidden');
-      debtorsTab.classList.add('hidden');
-      partnersTab.classList.add('hidden');
-      printTab.classList.add('hidden');
-      addC.classList.add('hidden');
-      addA.classList.add('hidden');
-      addT.classList.add('hidden');
-
-      cBtn.className = "tab-btn px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
-      aBtn.className = "tab-btn px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
-      tBtn.className = "tab-btn px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
-      todayBtn.className = "tab-btn today-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
-      threeDaysBtn.className = "tab-btn three-days-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
-      debtorsBtn.className = "tab-btn debtors-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
-      partnersBtn.className = "tab-btn partners-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
-      printBtn.className = "tab-btn print-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
-
-      if (tab === 'contracts') {
-        cTab.classList.remove('hidden');
-        cBtn.className = "tab-btn active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
-        addC.classList.remove('hidden');
-      } else if (tab === 'accounting') {
-        aTab.classList.remove('hidden');
-        aBtn.className = "tab-btn active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
-        addA.classList.remove('hidden');
-      } else if (tab === 'taken') {
-        tTab.classList.remove('hidden');
-        tBtn.className = "tab-btn active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
-        addT.classList.remove('hidden');
-        renderTakenSheet();
-      } else if (tab === 'today') {
-        todayTab.classList.remove('hidden');
-        todayBtn.className = "tab-btn today-tab active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
-        renderTodayClients();
-      } else if (tab === 'threeDays') {
-        threeDaysTab.classList.remove('hidden');
-        threeDaysBtn.className = "tab-btn three-days-tab active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
-        renderThreeDaysClients();
-      } else if (tab === 'debtors') {
-        debtorsTab.classList.remove('hidden');
-        debtorsBtn.className = "tab-btn debtors-tab active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
-        renderDebtorsClients();
-      } else if (tab === 'partners') {
-        partnersTab.classList.remove('hidden');
-        partnersBtn.className = "tab-btn partners-tab active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
-        renderPartners();
-      } else if (tab === 'print') {
-        printTab.classList.remove('hidden');
-        printBtn.className = "tab-btn print-tab active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
-        updatePrintSelect();
-        loadContractForPrint();
-      }
+      if (tab === 'taken') renderTakenSheet();
+      else if (tab === 'today') renderTodayClients();
+      else if (tab === 'threeDays') renderThreeDaysClients();
+      else if (tab === 'debtors') renderDebtorsClients();
+      else if (tab === 'partners') renderPartners();
+      else if (tab === 'print') { updatePrintSelect(); loadContractForPrint(); }
+      
       handleSearch();
     }
 
-    // --- Функции истории ---
     function saveState() {
-      const stateSnapshot = {
-        contracts: JSON.parse(JSON.stringify(allContracts)),
-        accounting: JSON.parse(JSON.stringify(allAccounting)),
-        taken: JSON.parse(JSON.stringify(allTaken)),
-        accounts: JSON.parse(JSON.stringify(customAccounts))
-      };
-      undoStack.push(JSON.stringify(stateSnapshot));
+      const state = { contracts: JSON.parse(JSON.stringify(allContracts)), accounting: JSON.parse(JSON.stringify(allAccounting)), taken: JSON.parse(JSON.stringify(allTaken)), accounts: JSON.parse(JSON.stringify(customAccounts)) };
+      undoStack.push(JSON.stringify(state));
       if (undoStack.length > 50) undoStack.shift();
       redoStack = [];
       updateHistoryButtons();
@@ -935,37 +750,25 @@
 
     function undo() {
       if (undoStack.length === 0) return;
-      const currentState = {
-        contracts: JSON.parse(JSON.stringify(allContracts)),
-        accounting: JSON.parse(JSON.stringify(allAccounting)),
-        taken: JSON.parse(JSON.stringify(allTaken)),
-        accounts: JSON.parse(JSON.stringify(customAccounts))
-      };
-      redoStack.push(JSON.stringify(currentState));
-      
-      const previousState = JSON.parse(undoStack.pop());
-      allContracts = previousState.contracts;
-      allAccounting = previousState.accounting;
-      allTaken = previousState.taken || [];
-      customAccounts = previousState.accounts || customAccounts;
+      const current = { contracts: JSON.parse(JSON.stringify(allContracts)), accounting: JSON.parse(JSON.stringify(allAccounting)), taken: JSON.parse(JSON.stringify(allTaken)), accounts: JSON.parse(JSON.stringify(customAccounts)) };
+      redoStack.push(JSON.stringify(current));
+      const prev = JSON.parse(undoStack.pop());
+      allContracts = prev.contracts;
+      allAccounting = prev.accounting;
+      allTaken = prev.taken || [];
+      customAccounts = prev.accounts || customAccounts;
       finishAction();
     }
 
     function redo() {
       if (redoStack.length === 0) return;
-      const currentState = {
-        contracts: JSON.parse(JSON.stringify(allContracts)),
-        accounting: JSON.parse(JSON.stringify(allAccounting)),
-        taken: JSON.parse(JSON.stringify(allTaken)),
-        accounts: JSON.parse(JSON.stringify(customAccounts))
-      };
-      undoStack.push(JSON.stringify(currentState));
-      
-      const nextState = JSON.parse(redoStack.pop());
-      allContracts = nextState.contracts;
-      allAccounting = nextState.accounting;
-      allTaken = nextState.taken || [];
-      customAccounts = nextState.accounts || customAccounts;
+      const current = { contracts: JSON.parse(JSON.stringify(allContracts)), accounting: JSON.parse(JSON.stringify(allAccounting)), taken: JSON.parse(JSON.stringify(allTaken)), accounts: JSON.parse(JSON.stringify(customAccounts)) };
+      undoStack.push(JSON.stringify(current));
+      const next = JSON.parse(redoStack.pop());
+      allContracts = next.contracts;
+      allAccounting = next.accounting;
+      allTaken = next.taken || [];
+      customAccounts = next.accounts || customAccounts;
       finishAction();
     }
 
@@ -981,22 +784,15 @@
       if (activeTab === 'threeDays') renderThreeDaysClients();
       if (activeTab === 'debtors') renderDebtorsClients();
       if (activeTab === 'partners') renderPartners();
-      if (activeTab === 'print') {
-        updatePrintSelect();
-        loadContractForPrint();
-      }
+      if (activeTab === 'print') { updatePrintSelect(); loadContractForPrint(); }
       updateHistoryButtons();
     }
 
     function updateHistoryButtons() {
-      const uBtn = document.getElementById('undoBtn');
-      const rBtn = document.getElementById('redoBtn');
-      
-      uBtn.disabled = undoStack.length === 0;
-      uBtn.className = uBtn.disabled ? "px-3 py-1.5 rounded text-xs font-bold text-gray-400 bg-gray-100 cursor-not-allowed transition" : "px-3 py-1.5 rounded text-xs font-bold btn-history-active transition";
-      
-      rBtn.disabled = redoStack.length === 0;
-      rBtn.className = rBtn.disabled ? "px-3 py-1.5 rounded text-xs font-bold text-gray-400 bg-gray-100 cursor-not-allowed transition" : "px-3 py-1.5 rounded text-xs font-bold btn-history-active transition";
+      document.getElementById('undoBtn').disabled = undoStack.length === 0;
+      document.getElementById('redoBtn').disabled = redoStack.length === 0;
+      document.getElementById('undoBtn').className = undoStack.length === 0 ? "px-3 py-1.5 rounded text-xs font-bold text-gray-400 bg-gray-100 cursor-not-allowed transition" : "px-3 py-1.5 rounded text-xs font-bold btn-history-active transition";
+      document.getElementById('redoBtn').className = redoStack.length === 0 ? "px-3 py-1.5 rounded text-xs font-bold text-gray-400 bg-gray-100 cursor-not-allowed transition" : "px-3 py-1.5 rounded text-xs font-bold btn-history-active transition";
     }
 
     function saveToStorage() {
@@ -1011,10 +807,7 @@
       if (activeTab === 'threeDays') renderThreeDaysClients();
       if (activeTab === 'debtors') renderDebtorsClients();
       if (activeTab === 'partners') renderPartners();
-      if (activeTab === 'print') {
-        updatePrintSelect();
-        loadContractForPrint();
-      }
+      if (activeTab === 'print') { updatePrintSelect(); loadContractForPrint(); }
       updateHistoryButtons();
     }
 
@@ -1068,30 +861,14 @@
       const installments = contract.installments || {};
       
       let totalPaid = 0;
-      let paidCount = 0;
-      let lastPaymentDate = null;
-      
       for (const key in installments) {
-        const payment = installments[key];
-        const amount = Number(payment.amount) || 0;
-        totalPaid += amount;
-        paidCount++;
-        if (payment.date) {
-          try {
-            const d = new Date(payment.date);
-            if (!isNaN(d.getTime())) {
-              if (!lastPaymentDate || d > lastPaymentDate) lastPaymentDate = d;
-            }
-          } catch (e) {}
-        }
+        totalPaid += Number(installments[key].amount) || 0;
       }
       
       const rest = totalCost - downPayment - totalPaid;
-      const totalPayable = totalCost - downPayment;
-      const paidPercentage = totalPayable > 0 ? (totalPaid / totalPayable) * 100 : 0;
       const isClosed = rest <= 0;
       
-      // Расчет просрочки с учетом корректировки дат
+      // Расчет просрочки с КОРРЕКТНОЙ корректировкой дат
       let overdueSum = 0;
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -1109,7 +886,7 @@
                 const payDate = new Date(startDate);
                 payDate.setMonth(payDate.getMonth() + (i - 1));
                 
-                // Корректировка дня платежа
+                // КОРРЕКТНАЯ корректировка дня платежа
                 const lastDayOfMonth = new Date(payDate.getFullYear(), payDate.getMonth() + 1, 0);
                 const lastDay = lastDayOfMonth.getDate();
                 const targetDay = Math.min(payDay, lastDay);
@@ -1125,511 +902,14 @@
               }
             }
           }
-        } catch (e) {
-          console.warn('Ошибка расчета просрочки для договора', contract.id);
-        }
+        } catch (e) {}
       }
       
-      return {
-        rest: Math.max(0, rest),
-        totalPaid,
-        paidCount,
-        lastPaymentDate,
-        paidPercentage,
-        isClosed,
-        overdueSum
-      };
+      return { rest: Math.max(0, rest), totalPaid, isClosed, overdueSum };
     }
 
     // ================================================================
-    // ФУНКЦИЯ ЗАГРУЗКИ ДОГОВОРА ДЛЯ ПЕЧАТИ
-    // ================================================================
-
-    function updatePrintSelect() {
-      const select = document.getElementById('printContractSelect');
-      const currentValue = select.value;
-      select.innerHTML = '<option value="">-- Выберите договор --</option>';
-      
-      allContracts.forEach(contract => {
-        const option = document.createElement('option');
-        option.value = contract.id;
-        option.textContent = `№${contract.contractNum} - ${contract.fio} (${contract.phone})`;
-        select.appendChild(option);
-      });
-      
-      if (currentValue && [...select.options].some(o => o.value === currentValue)) {
-        select.value = currentValue;
-      }
-    }
-
-    function loadContractForPrint() {
-      const select = document.getElementById('printContractSelect');
-      const contractId = select.value;
-      const container = document.getElementById('printContent');
-      
-      if (!contractId) {
-        container.innerHTML = `<div class="text-center text-gray-400 py-20 text-lg">Выберите договор для распечатки</div>`;
-        return;
-      }
-      
-      const contract = allContracts.find(c => c.id === contractId);
-      if (!contract) {
-        container.innerHTML = `<div class="text-center text-red-500 py-20 text-lg">Договор не найден</div>`;
-        return;
-      }
-      
-      // Получаем информацию по месяцам
-      const monthInfo = getMonthStatus(contract);
-      const months = monthInfo.months;
-      
-      let monthsHtml = '';
-      for (let i = 0; i < months.length; i++) {
-        const m = months[i];
-        const isPaid = m.isPaid;
-        const statusText = isPaid ? '✅ Оплачен' : '⏳ Ожидает';
-        const statusColor = isPaid ? 'color: #22c55e; font-weight: bold;' : 'color: #ef4444; font-weight: bold;';
-        monthsHtml += `
-          <tr>
-            <td style="padding: 3px 8px; text-align: center; font-weight: bold; border: 1px solid #000;">${m.month}</td>
-            <td style="padding: 3px 8px; text-align: center; border: 1px solid #000;">${m.date}</td>
-            <td style="padding: 3px 8px; text-align: center; ${statusColor}">${isPaid ? m.amount.toLocaleString('ru-RU') + ' ₽' : '—'}</td>
-            <td style="padding: 3px 8px; text-align: center; ${statusColor}">${statusText}</td>
-          </tr>
-        `;
-      }
-      
-      const today = new Date();
-      const todayStr = today.toLocaleDateString('ru-RU');
-      
-      container.innerHTML = `
-        <div style="font-family: 'Times New Roman', serif; font-size: 12px; line-height: 1.4; padding: 15px 25px; max-width: 210mm; margin: 0 auto; background: white;">
-          
-          <!-- ================= СТРАНИЦА 1 ================= -->
-          <div style="position: relative;">
-            
-            <!-- Номер договора справа сверху -->
-            <div style="position: absolute; top: 0; right: 0; font-size: 13px; font-weight: bold;">
-              № ${contract.contractNum}
-            </div>
-            
-            <!-- ЗАГОЛОВОК -->
-            <h1 style="font-size: 16px; font-weight: bold; text-align: center; text-transform: uppercase; margin-bottom: 10px;">
-              ДОГОВОР КУПЛИ-ПРОДАЖИ ТОВАРА В РАССРОЧКУ
-            </h1>
-            
-            <!-- ШАПКА С ДАННЫМИ ПРОДАВЦА -->
-            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 11.5px;">
-              <div>
-                <b>Чеченская Республика</b><br>
-                Дата: ${contract.buyDate || '______'}<br>
-                Продавец: Компания "YUSRA"<br>
-                рабочий номер: ${contract.phone || '______'}
-              </div>
-              <div style="text-align: right;">
-                <b>ИНН/ОГРН:</b> ______<br>
-                <b>Юр. адрес:</b> ______
-              </div>
-            </div>
-            
-            <!-- БЛОК ПОКУПАТЕЛЯ -->
-            <div style="border: 1px solid #000; padding: 6px 10px; margin-bottom: 8px;">
-              <div style="font-weight: bold; font-size: 13px; margin-bottom: 3px;">Покупатель</div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px 15px; font-size: 11.5px;">
-                <div><b>ФИО:</b> ${contract.fio || '______'}</div>
-                <div><b>Паспорт серия:</b> ${contract.passport || '______'}</div>
-                <div><b>Дата рождения:</b> ${contract.birthDate || '______'}</div>
-                <div><b>Телефон:</b> ${contract.phone || '______'}</div>
-                <div style="grid-column: span 2;"><b>Адрес:</b> ${contract.address || '______'}</div>
-                <div><b>Доп. Телефон:</b> ${contract.extraPhone || '______'}</div>
-              </div>
-            </div>
-            
-            <!-- БЛОК ПОРУЧИТЕЛЯ -->
-            <div style="border: 1px solid #000; padding: 6px 10px; margin-bottom: 10px;">
-              <div style="font-weight: bold; font-size: 13px; margin-bottom: 3px;">Поручитель</div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px 15px; font-size: 11.5px;">
-                <div><b>ФИО:</b> ${contract.guarantorFio || '______'}</div>
-                <div><b>Паспорт серия:</b> ______</div>
-                <div><b>Дата рождения:</b> ______</div>
-                <div><b>Телефон:</b> ${contract.guarantorPhone || '______'}</div>
-                <div style="grid-column: span 2;"><b>Адрес:</b> ______</div>
-                <div><b>Доп. Телефон:</b> ______</div>
-              </div>
-            </div>
-            
-            <p style="text-align: justify; font-size: 11.5px; margin-bottom: 10px;">
-              Совместно именуемые «Стороны», заключили настоящий Договор о нижеследующем:
-            </p>
-            
-            <!-- РАЗДЕЛ 1: ПРЕДМЕТ ДОГОВОРА -->
-            <div style="font-weight: bold; font-size: 14px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">
-              1. ПРЕДМЕТ ДОГОВОРА
-            </div>
-            <p style="text-align: justify; font-size: 11.5px; padding-left: 12px; margin-bottom: 2px;">
-              По настоящему Договору «Продавец» обязуется передать в собственность «Покупателя»:
-            </p>
-            <p style="text-align: justify; font-size: 11.5px; padding-left: 25px; font-weight: bold;">
-              Товар: ${contract.product || '______'}
-            </p>
-            <p style="text-align: justify; font-size: 11.5px; padding-left: 12px;">
-              «Покупатель» обязуется принять и уплатить за него стоимость, указанную в Договоре.
-            </p>
-            
-            <!-- РАЗДЕЛ 2: ЦЕНА ТОВАРА И ПОРЯДОК РАСЧЕТОВ -->
-            <div style="font-weight: bold; font-size: 14px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">
-              2. ЦЕНА ТОВАРА И ПОРЯДОК РАСЧЕТОВ
-            </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px 25px; font-size: 11.5px; padding-left: 12px;">
-              <div><b>Цена Товара:</b> ${Number(contract.totalCost).toLocaleString('ru-RU')} руб.</div>
-              <div><b>Первый взнос:</b> ${Number(contract.downPayment || 0).toLocaleString('ru-RU')} руб.</div>
-              <div style="grid-column: span 2; text-align: right; font-size: 10px; color: #666;">подпись: ______</div>
-            </div>
-            <p style="text-align: justify; font-size: 11.5px; padding-left: 12px; margin-top: 3px;">
-              Оставшуюся сумму Покупатель выплачивает в течение <b>${contract.monthsCount}</b> месяцев, 
-              равными частями в размере <b>${Number(contract.monthlyPay).toLocaleString('ru-RU')}</b> руб. 
-              не позднее <b>${contract.payDate || '______'}</b> числа каждого месяца.
-            </p>
-            
-            <!-- ТАБЛИЦА МЕСЯЦЕВ (СВЕРХУ ВНИЗ) -->
-            <div style="margin-top: 10px; border: 1px solid #000; overflow: hidden;">
-              <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
-                <thead>
-                  <tr>
-                    <th style="padding: 3px 8px; border: 1px solid #000; width: 15%; background: #e2e8f0;">№</th>
-                    <th style="padding: 3px 8px; border: 1px solid #000; width: 35%; background: #e2e8f0;">Дата</th>
-                    <th style="padding: 3px 8px; border: 1px solid #000; width: 25%; background: #e2e8f0;">Сумма</th>
-                    <th style="padding: 3px 8px; border: 1px solid #000; width: 25%; background: #e2e8f0;">Статус</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${monthsHtml}
-                </tbody>
-              </table>
-            </div>
-            
-          </div>
-          
-          <!-- ================= РАЗРЫВ СТРАНИЦЫ ================= -->
-          <div style="page-break-after: always; border-bottom: 2px dashed #ccc; margin: 10px 0;"></div>
-          
-          <!-- ================= СТРАНИЦА 2 ================= -->
-          <div style="font-size: 11px;">
-            
-            <!-- РАЗДЕЛ 3: ПРАВА И ОБЯЗАННОСТИ СТОРОН -->
-            <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-top: 8px; margin-bottom: 5px;">
-              3. ПРАВА И ОБЯЗАННОСТИ СТОРОН
-            </div>
-            
-            <div style="font-weight: bold; font-size: 11.5px; margin-top: 6px; margin-bottom: 2px;">«Продавец» обязан:</div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 6px;">
-              - Передать «Покупателю» Товар надлежащего качества, в надлежащей упаковке, в порядке и в сроки, установленные настоящим Договором.
-            </div>
-            
-            <div style="font-weight: bold; font-size: 11.5px; margin-top: 6px; margin-bottom: 2px;">«Покупатель» обязан:</div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">
-              - Принять Товар в порядке, предусмотренном настоящим Договором.
-            </div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">
-              - Оплатить Товар в порядке и в сроки, предусмотренные настоящим Договором.
-            </div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 6px;">
-              - Не имеет право менять контактный номер без предупреждения. При наступлении непредвиденных обстоятельств обязан всеми возможными способами оповестить продавца.
-            </div>
-            
-            <div style="font-weight: bold; font-size: 11.5px; margin-top: 6px; margin-bottom: 2px;">«Поручитель» обязан:</div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 8px;">
-              - При неисполнении или ненадлежащем исполнении «Покупателем» своих обязательств по настоящему договору «Поручитель» отвечает перед «Продавцом» в том же объеме, что и «Покупатель», включая возврат основного долга. При просрочке выплаты «Покупателем» на 7 дней от установленного срока «Поручитель» обязан выплатить просроченный платеж.
-            </div>
-            
-            <!-- РАЗДЕЛ 4: ПЕРЕДАЧА И ПРИНЯТИЕ ТОВАРА -->
-            <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">
-              4. ПЕРЕДАЧА И ПРИНЯТИЕ ТОВАРА
-            </div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">
-              - Товар передается «Покупателю» в месте нахождения продавца в дату подписания настоящего договора.
-            </div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">
-              - «Покупатель» обязан осмотреть товар, проверить соответствие по качеству, количеству и комплектности условиям настоящего договора и принять его.
-            </div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">
-              - Право собственности на товар переходит к «Покупателю» с момента полной оплаты им цены договора. Ответственность за сохранность товара переходит к покупателю с момента подписания настоящего договора.
-            </div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 8px;">
-              - «Продавец» считается исполнившим свою обязанность по передаче товара с даты подписания настоящего договора.
-            </div>
-            
-            <!-- РАЗДЕЛ 5: РАЗРЕШЕНИЕ СПОРОВ -->
-            <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">
-              5. РАЗРЕШЕНИЕ СПОРОВ
-            </div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">
-              - Все споры и разногласия, которые могут возникнуть между сторонами по вопросам, не нашедшим своего разрешения в тексте настоящего договора, будут разрешаться путем переговоров.
-            </div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 8px;">
-              - В случае неурегулирования спорных вопросов в процессе переговоров такой спор подлежит рассмотрению в суде.
-            </div>
-            
-            <!-- РАЗДЕЛ 6: ЗАКЛЮЧИТЕЛЬНЫЕ ПОЛОЖЕНИЯ -->
-            <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">
-              6. ЗАКЛЮЧИТЕЛЬНЫЕ ПОЛОЖЕНИЯ
-            </div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">
-              - Настоящий договор вступает в силу с даты его подписания «Сторонами» и действует до полного исполнения ими обязательств по настоящему договору.
-            </div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 12px;">
-              - Любые изменения и дополнения к настоящему договору должны быть составлены в письменной форме и подписаны всеми сторонами.
-            </div>
-            
-            <!-- ПОДПИСИ СТОРОН (НА ЭТОЙ ЖЕ СТРАНИЦЕ СНИЗУ) -->
-            <div style="margin-top: 12px;">
-              <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-bottom: 8px;">
-                ПОДПИСИ СТОРОН
-              </div>
-              
-              <table style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: center;">
-                <thead>
-                  <tr>
-                    <th style="padding: 5px; border: 1px solid #000; width: 33%;">«Продавец»</th>
-                    <th style="padding: 5px; border: 1px solid #000; width: 33%;">«Покупатель»</th>
-                    <th style="padding: 5px; border: 1px solid #000; width: 34%;">«Поручитель»</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td style="padding: 18px 5px; border: 1px solid #000; vertical-align: bottom;">
-                      <div style="border-top: 1px solid #000; width: 60%; margin: 0 auto; padding-top: 3px;">______</div>
-                    </td>
-                    <td style="padding: 18px 5px; border: 1px solid #000; vertical-align: bottom;">
-                      <div style="border-top: 1px solid #000; width: 60%; margin: 0 auto; padding-top: 3px;">______</div>
-                      <div style="font-size: 9px; margin-top: 2px; color: #555;">${contract.fio || ''}</div>
-                    </td>
-                    <td style="padding: 18px 5px; border: 1px solid #000; vertical-align: bottom;">
-                      <div style="border-top: 1px solid #000; width: 60%; margin: 0 auto; padding-top: 3px;">______</div>
-                      <div style="font-size: 9px; margin-top: 2px; color: #555;">${contract.guarantorFio || ''}</div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            
-            <!-- Дата печати внизу -->
-            <div style="margin-top: 10px; font-size: 9px; text-align: center; color: #999; border-top: 1px solid #ddd; padding-top: 6px;">
-              Дата печати: ${todayStr}
-            </div>
-            
-          </div>
-          
-        </div>
-      `;
-    }
-
-    // ================================================================
-    // ФУНКЦИЯ ПЕЧАТИ
-    // ================================================================
-
-    function printContract() {
-      const select = document.getElementById('printContractSelect');
-      if (!select.value) {
-        alert('Пожалуйста, выберите договор для печати');
-        return;
-      }
-      window.print();
-    }
-
-    // ================================================================
-    // ОСТАЛЬНЫЕ ФУНКЦИИ
-    // ================================================================
-
-    function numberToWords(num) {
-      if (!num || num === 0) return 'ноль';
-      
-      const units = ['', 'один', 'два', 'три', 'четыре', 'пять', 'шесть', 'семь', 'восемь', 'девять'];
-      const teens = ['десять', 'одиннадцать', 'двенадцать', 'тринадцать', 'четырнадцать', 'пятнадцать', 'шестнадцать', 'семнадцать', 'восемнадцать', 'девятнадцать'];
-      const tens = ['', '', 'двадцать', 'тридцать', 'сорок', 'пятьдесят', 'шестьдесят', 'семьдесят', 'восемьдесят', 'девяносто'];
-      const hundreds = ['', 'сто', 'двести', 'триста', 'четыреста', 'пятьсот', 'шестьсот', 'семьсот', 'восемьсот', 'девятьсот'];
-      
-      function getWords(n) {
-        if (n === 0) return '';
-        if (n < 10) return units[n];
-        if (n < 20) return teens[n - 10];
-        if (n < 100) {
-          const t = Math.floor(n / 10);
-          const u = n % 10;
-          return tens[t] + (u > 0 ? ' ' + units[u] : '');
-        }
-        if (n < 1000) {
-          const h = Math.floor(n / 100);
-          const rest = n % 100;
-          return hundreds[h] + (rest > 0 ? ' ' + getWords(rest) : '');
-        }
-        if (n < 1000000) {
-          const thousands = Math.floor(n / 1000);
-          const rest = n % 1000;
-          let result = '';
-          if (thousands === 1) result = 'одна тысяча';
-          else if (thousands === 2) result = 'две тысячи';
-          else if (thousands < 5) result = getWords(thousands) + ' тысячи';
-          else result = getWords(thousands) + ' тысяч';
-          return result + (rest > 0 ? ' ' + getWords(rest) : '');
-        }
-        return String(n);
-      }
-      
-      return getWords(num);
-    }
-
-    // ===== ФУНКЦИИ ДЛЯ ЛИСТА ПАРТНЁРЫ =====
-    
-    function renderPartners() {
-      const container = document.getElementById('partnersList');
-      
-      const dateFrom = document.getElementById('partnerDateFrom').value;
-      const dateTo = document.getElementById('partnerDateTo').value;
-      
-      const partnersMap = new Map();
-      
-      allContracts.forEach(contract => {
-        const store = contract.store || '';
-        if (!store.trim()) return;
-        
-        if (dateFrom || dateTo) {
-          const buyDate = contract.buyDate || '';
-          if (buyDate) {
-            if (dateFrom && buyDate < dateFrom) return;
-            if (dateTo && buyDate > dateTo) return;
-          }
-        }
-        
-        if (!partnersMap.has(store)) {
-          partnersMap.set(store, {
-            name: store,
-            debtContracts: 0,
-            debtSum: 0,
-            totalContracts: 0,
-            totalSum: 0,
-            contracts: []
-          });
-        }
-        
-        const partner = partnersMap.get(store);
-        partner.totalContracts++;
-        partner.totalSum += Number(contract.totalCost || 0);
-        partner.contracts.push(contract);
-        
-        if (!contract.shopPaid) {
-          partner.debtContracts++;
-          partner.debtSum += Number(contract.totalCost || 0);
-        }
-      });
-      
-      const partners = Array.from(partnersMap.values()).sort((a, b) => a.name.localeCompare(b.name));
-      
-      if (partners.length === 0) {
-        container.innerHTML = '<div class="text-center text-gray-500 py-8 text-sm">🤝 Нет партнеров/магазинов</div>';
-        return;
-      }
-      
-      let html = `
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-          <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
-            <div class="text-xs text-purple-600 font-bold">Всего партнеров</div>
-            <div class="text-2xl font-bold text-purple-700">${partners.length}</div>
-          </div>
-          <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
-            <div class="text-xs text-blue-600 font-bold">Всего договоров</div>
-            <div class="text-2xl font-bold text-blue-700">${partners.reduce((sum, p) => sum + p.totalContracts, 0)}</div>
-          </div>
-          <div class="bg-red-50 p-4 rounded-lg border border-red-200">
-            <div class="text-xs text-red-600 font-bold">Договоров в долг (без "Д")</div>
-            <div class="text-2xl font-bold text-red-700">${partners.reduce((sum, p) => sum + p.debtContracts, 0)}</div>
-          </div>
-        </div>
-        <div class="overflow-x-auto">
-          <table class="w-full border-collapse excel-table">
-            <thead>
-              <tr class="bg-purple-700 text-white font-bold text-xs">
-                <th class="p-3">Партнёр / Магазин</th>
-                <th class="p-3">Договоров в долг</th>
-                <th class="p-3">Сумма долга</th>
-                <th class="p-3">Всего договоров</th>
-                <th class="p-3">Общая сумма</th>
-                <th class="p-3">Детали</th>
-              </tr>
-            </thead>
-            <tbody>
-      `;
-      
-      partners.forEach(partner => {
-        html += `
-          <tr class="hover:bg-purple-50">
-            <td class="p-3 font-bold text-purple-700">${partner.name}</td>
-            <td class="p-3 text-center font-bold ${partner.debtContracts > 0 ? 'text-red-600' : 'text-green-600'}">${partner.debtContracts}</td>
-            <td class="p-3 text-center font-bold ${partner.debtSum > 0 ? 'text-red-600' : 'text-green-600'}">${partner.debtSum.toLocaleString('ru-RU')} ₽</td>
-            <td class="p-3 text-center font-bold">${partner.totalContracts}</td>
-            <td class="p-3 text-center font-bold">${partner.totalSum.toLocaleString('ru-RU')} ₽</td>
-            <td class="p-3 text-center">
-              <button onclick="showPartnerDetails('${partner.name}')" class="bg-purple-500 hover:bg-purple-600 text-white px-2 py-1 rounded text-xs">📋 Детали</button>
-            </td>
-          </tr>
-        `;
-      });
-      
-      html += `
-            </tbody>
-          </table>
-        </div>
-      `;
-      
-      container.innerHTML = html;
-    }
-
-    function showPartnerDetails(partnerName) {
-      const dateFrom = document.getElementById('partnerDateFrom').value;
-      const dateTo = document.getElementById('partnerDateTo').value;
-      
-      const contracts = allContracts.filter(c => {
-        if (c.store !== partnerName) return false;
-        if (dateFrom && c.buyDate && c.buyDate < dateFrom) return false;
-        if (dateTo && c.buyDate && c.buyDate > dateTo) return false;
-        return true;
-      });
-      
-      if (contracts.length === 0) {
-        alert(`Нет договоров с партнером "${partnerName}" за выбранный период`);
-        return;
-      }
-      
-      let message = `📋 Детали по партнеру: ${partnerName}\n`;
-      message += `━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-      message += `📅 Период: ${dateFrom || 'с начала'} - ${dateTo || 'по сегодня'}\n`;
-      message += `📊 Всего договоров: ${contracts.length}\n`;
-      message += `━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
-      
-      contracts.forEach((c, i) => {
-        const status = c.shopPaid ? '✅ Оплачен' : '❌ В долгу';
-        const rest = c.totalCost - (c.downPayment || 0) - Object.values(c.installments || {}).reduce((sum, p) => sum + Number(p.amount || 0), 0);
-        message += `${i+1}. ${c.fio} - ${c.totalCost} ₽ (${status})\n`;
-        message += `   📅 ${c.buyDate} | Остаток: ${rest} ₽\n`;
-        message += `   📞 ${c.phone}\n\n`;
-      });
-      
-      const detailsWindow = window.open('', '_blank', 'width=600,height=400');
-      detailsWindow.document.write(`
-        <html><head><title>Детали: ${partnerName}</title>
-        <style>body { font-family: Arial; padding: 20px; white-space: pre-wrap; }</style>
-        </head><body>${message.replace(/\n/g, '<br>')}</body></html>
-      `);
-      detailsWindow.document.close();
-    }
-
-    function clearPartnerDates() {
-      document.getElementById('partnerDateFrom').value = '';
-      document.getElementById('partnerDateTo').value = '';
-      renderPartners();
-    }
-
-    // ================================================================
-    // ОСНОВНАЯ ЛОГИКА МЕСЯЦЕВ (С КОРРЕКТИРОВКОЙ ДАТ)
+    // ОСНОВНАЯ ЛОГИКА МЕСЯЦЕВ (С КОРРЕКТНОЙ КОРРЕКТИРОВКОЙ ДАТ)
     // ================================================================
     
     function getMonthStatus(contract) {
@@ -1640,22 +920,16 @@
       today.setHours(0, 0, 0, 0);
       
       const payDateStr = contract.payDate;
-      if (!payDateStr) {
-        return { months: [], overdueSum: 0 };
-      }
+      if (!payDateStr) return { months: [], overdueSum: 0 };
       
       const payDateObj = new Date(payDateStr);
-      if (isNaN(payDateObj.getTime())) {
-        return { months: [], overdueSum: 0 };
-      }
+      if (isNaN(payDateObj.getTime())) return { months: [], overdueSum: 0 };
       
       const payDay = payDateObj.getDate();
       
       const buyDateStr = contract.buyDate;
       let startDate = new Date(buyDateStr || payDateStr);
-      if (isNaN(startDate.getTime())) {
-        startDate = new Date(payDateStr);
-      }
+      if (isNaN(startDate.getTime())) startDate = new Date(payDateStr);
       startDate.setHours(0, 0, 0, 0);
       
       const result = [];
@@ -1665,7 +939,7 @@
         const payDate = new Date(startDate);
         payDate.setMonth(payDate.getMonth() + (i - 1));
         
-        // Корректировка дня платежа
+        // КОРРЕКТНАЯ корректировка дня платежа
         const lastDayOfMonth = new Date(payDate.getFullYear(), payDate.getMonth() + 1, 0);
         const lastDay = lastDayOfMonth.getDate();
         const targetDay = Math.min(payDay, lastDay);
@@ -1677,9 +951,8 @@
         const paidAmount = isPaid ? Number(payment.amount) : 0;
         
         let status = 'future';
-        if (isPaid) {
-          status = 'paid';
-        } else if (payDate < today) {
+        if (isPaid) status = 'paid';
+        else if (payDate < today) {
           status = 'overdue';
           overdueSum += monthlyPay;
         }
@@ -1689,8 +962,7 @@
           date: payDate.toISOString().slice(0, 10),
           status: status,
           amount: isPaid ? paidAmount : monthlyPay,
-          isPaid: isPaid,
-          payDateObj: payDate
+          isPaid: isPaid
         });
       }
       
@@ -1698,7 +970,7 @@
     }
 
     // ================================================================
-    // ФУНКЦИИ ДЛЯ ЛИСТОВ "СЕГОДНЯ" И "3 ДНЯ"
+    // ФУНКЦИИ ДЛЯ ЛИСТОВ "СЕГОДНЯ", "3 ДНЯ", "НЕПЛАТЕЛЬЩИКИ"
     // ================================================================
     
     function getClientsForDate(targetDateStr) {
@@ -1715,8 +987,6 @@
         const months = monthInfo.months;
         
         let hasUnpaidMonth = false;
-        let unpaidMonthAmount = 0;
-        
         for (let i = 0; i < months.length; i++) {
           const m = months[i];
           if (!m.isPaid) {
@@ -1725,7 +995,6 @@
               payDate.setHours(0, 0, 0, 0);
               if (payDate.getTime() === target.getTime()) {
                 hasUnpaidMonth = true;
-                unpaidMonthAmount = m.amount;
                 break;
               }
             }
@@ -1738,8 +1007,7 @@
             rest: metrics.rest,
             phone: contract.phone || '',
             fio: contract.fio || '',
-            monthInfo: { months: months, overdueSum: metrics.overdueSum },
-            unpaidMonthAmount: unpaidMonthAmount
+            monthInfo: { months: months, overdueSum: metrics.overdueSum }
           });
         }
       });
@@ -1791,14 +1059,9 @@
               <span class="client-overdue">Просрочка: ${clientOverdue.toLocaleString('ru-RU')} ₽</span>
               <span class="client-rest">Остаток: ${rest.toLocaleString('ru-RU')} ₽</span>
               <a href="https://wa.me/7${client.phone.replace(/[^0-9]/g, '')}?text=Здравствуйте! Напоминаем о платеже." 
-                 target="_blank" 
-                 class="text-green-600 hover:text-green-800 font-bold text-sm">
-                💬
-              </a>
+                 target="_blank" class="text-green-600 hover:text-green-800 font-bold text-sm">💬</a>
             </div>
-            <div class="w-full mt-1 flex flex-wrap gap-1">
-              ${monthsHtml}
-            </div>
+            <div class="w-full mt-1 flex flex-wrap gap-1">${monthsHtml}</div>
           </div>
         `;
       });
@@ -1829,14 +1092,11 @@
 
     function getDebtors() {
       const result = [];
-      
       allContracts.forEach(contract => {
         const metrics = calculateContractMetrics(contract);
         if (metrics.isClosed) return;
-        
         const monthInfo = getMonthStatus(contract);
         const hasOverdue = monthInfo.months.some(m => m.status === 'overdue' && !m.isPaid);
-        
         if (hasOverdue) {
           result.push({
             ...contract,
@@ -1847,7 +1107,6 @@
           });
         }
       });
-      
       return result;
     }
 
@@ -1858,9 +1117,7 @@
       notification.className = 'copy-notification';
       notification.textContent = message;
       document.body.appendChild(notification);
-      setTimeout(() => {
-        notification.remove();
-      }, 3000);
+      setTimeout(() => notification.remove(), 3000);
     }
 
     function sendWhatsAppToday() {
@@ -1879,24 +1136,19 @@
       clients.forEach((client, index) => {
         const phone = client.phone.replace(/[^0-9]/g, '');
         if (phone) phoneNumbers.push(phone);
-        
         const monthInfo = client.monthInfo || getMonthStatus(client);
         let overdueSum = 0;
         monthInfo.months.forEach(m => {
           if (m.status === 'overdue' && !m.isPaid) overdueSum += m.amount;
         });
-        
         message += `${index + 1}. *${client.fio}*\n`;
         message += `   💰 Сумма: ${client.monthlyPay} ₽\n`;
         message += `   📱 WhatsApp: wa.me/7${phone}\n`;
-        if (overdueSum > 0) {
-          message += `   ⚠️ Просрочка: ${overdueSum} ₽\n`;
-        }
+        if (overdueSum > 0) message += `   ⚠️ Просрочка: ${overdueSum} ₽\n`;
         message += `   📊 Остаток: ${client.rest} ₽\n\n`;
       });
       
-      message += `\n📅 Дата платежа: ${todayStr}\n`;
-      message += `👥 Всего клиентов: ${clients.length}`;
+      message += `\n📅 Дата платежа: ${todayStr}\n👥 Всего клиентов: ${clients.length}`;
       
       const phoneList = phoneNumbers.map(p => `7${p}`).join(', ');
       navigator.clipboard.writeText(phoneList).then(() => {
@@ -1905,8 +1157,7 @@
         showCopyNotification(`⚠️ Найдено ${phoneNumbers.length} клиентов. Скопируйте номера вручную.`);
       });
       
-      const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-      window.open(url, '_blank');
+      window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
     }
 
     function sendWhatsAppThreeDays() {
@@ -1927,24 +1178,19 @@
       clients.forEach((client, index) => {
         const phone = client.phone.replace(/[^0-9]/g, '');
         if (phone) phoneNumbers.push(phone);
-        
         const monthInfo = client.monthInfo || getMonthStatus(client);
         let overdueSum = 0;
         monthInfo.months.forEach(m => {
           if (m.status === 'overdue' && !m.isPaid) overdueSum += m.amount;
         });
-        
         message += `${index + 1}. *${client.fio}*\n`;
         message += `   💰 Сумма: ${client.monthlyPay} ₽\n`;
         message += `   📱 WhatsApp: wa.me/7${phone}\n`;
-        if (overdueSum > 0) {
-          message += `   ⚠️ Просрочка: ${overdueSum} ₽\n`;
-        }
+        if (overdueSum > 0) message += `   ⚠️ Просрочка: ${overdueSum} ₽\n`;
         message += `   📊 Остаток: ${client.rest} ₽\n\n`;
       });
       
-      message += `\n📅 Дата платежа: ${threeDaysStr}\n`;
-      message += `👥 Всего клиентов: ${clients.length}`;
+      message += `\n📅 Дата платежа: ${threeDaysStr}\n👥 Всего клиентов: ${clients.length}`;
       
       const phoneList = phoneNumbers.map(p => `7${p}`).join(', ');
       navigator.clipboard.writeText(phoneList).then(() => {
@@ -1953,8 +1199,7 @@
         showCopyNotification(`⚠️ Найдено ${phoneNumbers.length} клиентов. Скопируйте номера вручную.`);
       });
       
-      const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-      window.open(url, '_blank');
+      window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
     }
 
     function sendWhatsAppDebtors() {
@@ -1971,7 +1216,6 @@
       clients.forEach((client, index) => {
         const phone = client.phone.replace(/[^0-9]/g, '');
         if (phone) phoneNumbers.push(phone);
-        
         const monthInfo = client.monthInfo || getMonthStatus(client);
         let overdueSum = 0;
         let overdueMonths = [];
@@ -1981,7 +1225,6 @@
             overdueMonths.push(`${m.month}-й (${m.date})`);
           }
         });
-        
         message += `${index + 1}. *${client.fio}*\n`;
         message += `   💰 Сумма: ${client.monthlyPay} ₽\n`;
         message += `   📱 WhatsApp: wa.me/7${phone}\n`;
@@ -1998,8 +1241,7 @@
         showCopyNotification(`⚠️ Найдено ${phoneNumbers.length} должников. Скопируйте номера вручную.`);
       });
       
-      const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-      window.open(url, '_blank');
+      window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
     }
 
     // ================================================================
@@ -2015,29 +1257,24 @@
 
       if (months === 0 && monthly === 0 && total === 0 && down === 0 && cost === 0) {
         document.getElementById('errorBanner').classList.add('hidden');
-        const saveBtn = document.getElementById('saveBtn');
-        saveBtn.disabled = false;
-        saveBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        document.getElementById('saveBtn').disabled = false;
+        document.getElementById('saveBtn').classList.remove('opacity-50', 'cursor-not-allowed');
         return true;
       }
 
       const isMathError = (months > 0 || monthly > 0 || total > 0) && (months * monthly + down !== total);
       const isPriceError = (cost > 0 || total > 0) && (cost > total);
-      
       const hasError = isMathError || isPriceError;
       
       document.getElementById('totalCost').classList.toggle('input-error', isMathError);
       document.getElementById('monthlyPay').classList.toggle('input-error', isMathError);
       document.getElementById('monthsCount').classList.toggle('input-error', isMathError);
-      document.getElementById('downPayment').classList.toggle('input-error', false);
       document.getElementById('costPrice').classList.toggle('input-error', isPriceError);
 
       document.getElementById('errorBanner').classList.toggle('hidden', !hasError);
-      
-      const saveBtn = document.getElementById('saveBtn');
-      saveBtn.disabled = hasError;
-      saveBtn.classList.toggle('opacity-50', hasError);
-      saveBtn.classList.toggle('cursor-not-allowed', hasError);
+      document.getElementById('saveBtn').disabled = hasError;
+      document.getElementById('saveBtn').classList.toggle('opacity-50', hasError);
+      document.getElementById('saveBtn').classList.toggle('cursor-not-allowed', hasError);
 
       return !hasError;
     }
@@ -2118,17 +1355,6 @@
         guarantorPhone: document.getElementById('guarantorPhone').value || ''
       };
 
-      // Автоматическая установка shopPaid, если остаток 0
-      const totalCost = formData.totalCost;
-      const downPayment = formData.downPayment;
-      const installments = editId ? (allContracts.find(c => c.id === editId)?.installments || {}) : {};
-      let totalPaid = 0;
-      Object.values(installments).forEach(p => totalPaid += Number(p.amount));
-      const rest = totalCost - downPayment - totalPaid;
-      if (rest <= 0) {
-        formData.shopPaid = true;
-      }
-
       if (editId) {
         const index = allContracts.findIndex(c => c.id === editId);
         if (index !== -1) {
@@ -2173,11 +1399,8 @@
         date: inputDateVal 
       };
       
-      // Проверяем, закрыт ли договор
       const metrics = calculateContractMetrics(contract);
-      if (metrics.isClosed) {
-        contract.shopPaid = true;
-      }
+      if (metrics.isClosed) contract.shopPaid = true;
       
       saveToStorage();
       closePayModal();
@@ -2696,6 +1919,327 @@
         } catch (err) { alert("Ошибка при чтении файла: " + err.message); }
       };
       reader.readAsText(file);
+    }
+
+    function updatePrintSelect() {
+      const select = document.getElementById('printContractSelect');
+      const currentValue = select.value;
+      select.innerHTML = '<option value="">-- Выберите договор --</option>';
+      allContracts.forEach(contract => {
+        const option = document.createElement('option');
+        option.value = contract.id;
+        option.textContent = `№${contract.contractNum} - ${contract.fio} (${contract.phone})`;
+        select.appendChild(option);
+      });
+      if (currentValue && [...select.options].some(o => o.value === currentValue)) {
+        select.value = currentValue;
+      }
+    }
+
+    function loadContractForPrint() {
+      const select = document.getElementById('printContractSelect');
+      const contractId = select.value;
+      const container = document.getElementById('printContent');
+      
+      if (!contractId) {
+        container.innerHTML = `<div class="text-center text-gray-400 py-20 text-lg">Выберите договор для распечатки</div>`;
+        return;
+      }
+      
+      const contract = allContracts.find(c => c.id === contractId);
+      if (!contract) {
+        container.innerHTML = `<div class="text-center text-red-500 py-20 text-lg">Договор не найден</div>`;
+        return;
+      }
+      
+      const monthInfo = getMonthStatus(contract);
+      const months = monthInfo.months;
+      
+      let monthsHtml = '';
+      for (let i = 0; i < months.length; i++) {
+        const m = months[i];
+        const isPaid = m.isPaid;
+        const statusText = isPaid ? '✅ Оплачен' : '⏳ Ожидает';
+        const statusColor = isPaid ? 'color: #22c55e; font-weight: bold;' : 'color: #ef4444; font-weight: bold;';
+        monthsHtml += `
+          <tr>
+            <td style="padding: 3px 8px; text-align: center; font-weight: bold; border: 1px solid #000;">${m.month}</td>
+            <td style="padding: 3px 8px; text-align: center; border: 1px solid #000;">${m.date}</td>
+            <td style="padding: 3px 8px; text-align: center; ${statusColor}">${isPaid ? m.amount.toLocaleString('ru-RU') + ' ₽' : '—'}</td>
+            <td style="padding: 3px 8px; text-align: center; ${statusColor}">${statusText}</td>
+          </tr>
+        `;
+      }
+      
+      const today = new Date();
+      const todayStr = today.toLocaleDateString('ru-RU');
+      
+      container.innerHTML = `
+        <div style="font-family: 'Times New Roman', serif; font-size: 12px; line-height: 1.4; padding: 15px 25px; max-width: 210mm; margin: 0 auto; background: white;">
+          <div style="position: relative;">
+            <div style="position: absolute; top: 0; right: 0; font-size: 13px; font-weight: bold;">№ ${contract.contractNum}</div>
+            <h1 style="font-size: 16px; font-weight: bold; text-align: center; text-transform: uppercase; margin-bottom: 10px;">ДОГОВОР КУПЛИ-ПРОДАЖИ ТОВАРА В РАССРОЧКУ</h1>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 11.5px;">
+              <div><b>Чеченская Республика</b><br>Дата: ${contract.buyDate || '______'}<br>Продавец: Компания "YUSRA"<br>рабочий номер: ${contract.phone || '______'}</div>
+              <div style="text-align: right;"><b>ИНН/ОГРН:</b> ______<br><b>Юр. адрес:</b> ______</div>
+            </div>
+            <div style="border: 1px solid #000; padding: 6px 10px; margin-bottom: 8px;">
+              <div style="font-weight: bold; font-size: 13px; margin-bottom: 3px;">Покупатель</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px 15px; font-size: 11.5px;">
+                <div><b>ФИО:</b> ${contract.fio || '______'}</div>
+                <div><b>Паспорт серия:</b> ${contract.passport || '______'}</div>
+                <div><b>Дата рождения:</b> ${contract.birthDate || '______'}</div>
+                <div><b>Телефон:</b> ${contract.phone || '______'}</div>
+                <div style="grid-column: span 2;"><b>Адрес:</b> ${contract.address || '______'}</div>
+                <div><b>Доп. Телефон:</b> ${contract.extraPhone || '______'}</div>
+              </div>
+            </div>
+            <div style="border: 1px solid #000; padding: 6px 10px; margin-bottom: 10px;">
+              <div style="font-weight: bold; font-size: 13px; margin-bottom: 3px;">Поручитель</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px 15px; font-size: 11.5px;">
+                <div><b>ФИО:</b> ${contract.guarantorFio || '______'}</div>
+                <div><b>Паспорт серия:</b> ______</div>
+                <div><b>Дата рождения:</b> ______</div>
+                <div><b>Телефон:</b> ${contract.guarantorPhone || '______'}</div>
+                <div style="grid-column: span 2;"><b>Адрес:</b> ______</div>
+                <div><b>Доп. Телефон:</b> ______</div>
+              </div>
+            </div>
+            <p style="text-align: justify; font-size: 11.5px; margin-bottom: 10px;">Совместно именуемые «Стороны», заключили настоящий Договор о нижеследующем:</p>
+            <div style="font-weight: bold; font-size: 14px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">1. ПРЕДМЕТ ДОГОВОРА</div>
+            <p style="text-align: justify; font-size: 11.5px; padding-left: 12px; margin-bottom: 2px;">По настоящему Договору «Продавец» обязуется передать в собственность «Покупателя»:</p>
+            <p style="text-align: justify; font-size: 11.5px; padding-left: 25px; font-weight: bold;">Товар: ${contract.product || '______'}</p>
+            <p style="text-align: justify; font-size: 11.5px; padding-left: 12px;">«Покупатель» обязуется принять и уплатить за него стоимость, указанную в Договоре.</p>
+            <div style="font-weight: bold; font-size: 14px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">2. ЦЕНА ТОВАРА И ПОРЯДОК РАСЧЕТОВ</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px 25px; font-size: 11.5px; padding-left: 12px;">
+              <div><b>Цена Товара:</b> ${Number(contract.totalCost).toLocaleString('ru-RU')} руб.</div>
+              <div><b>Первый взнос:</b> ${Number(contract.downPayment || 0).toLocaleString('ru-RU')} руб.</div>
+              <div style="grid-column: span 2; text-align: right; font-size: 10px; color: #666;">подпись: ______</div>
+            </div>
+            <p style="text-align: justify; font-size: 11.5px; padding-left: 12px; margin-top: 3px;">Оставшуюся сумму Покупатель выплачивает в течение <b>${contract.monthsCount}</b> месяцев, равными частями в размере <b>${Number(contract.monthlyPay).toLocaleString('ru-RU')}</b> руб. не позднее <b>${contract.payDate || '______'}</b> числа каждого месяца.</p>
+            <div style="margin-top: 10px; border: 1px solid #000; overflow: hidden;">
+              <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                <thead>
+                  <tr>
+                    <th style="padding: 3px 8px; border: 1px solid #000; width: 15%; background: #e2e8f0;">№</th>
+                    <th style="padding: 3px 8px; border: 1px solid #000; width: 35%; background: #e2e8f0;">Дата</th>
+                    <th style="padding: 3px 8px; border: 1px solid #000; width: 25%; background: #e2e8f0;">Сумма</th>
+                    <th style="padding: 3px 8px; border: 1px solid #000; width: 25%; background: #e2e8f0;">Статус</th>
+                  </tr>
+                </thead>
+                <tbody>${monthsHtml}</tbody>
+              </table>
+            </div>
+          </div>
+          <div style="page-break-after: always; border-bottom: 2px dashed #ccc; margin: 10px 0;"></div>
+          <div style="font-size: 11px;">
+            <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-top: 8px; margin-bottom: 5px;">3. ПРАВА И ОБЯЗАННОСТИ СТОРОН</div>
+            <div style="font-weight: bold; font-size: 11.5px; margin-top: 6px; margin-bottom: 2px;">«Продавец» обязан:</div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 6px;">- Передать «Покупателю» Товар надлежащего качества, в надлежащей упаковке, в порядке и в сроки, установленные настоящим Договором.</div>
+            <div style="font-weight: bold; font-size: 11.5px; margin-top: 6px; margin-bottom: 2px;">«Покупатель» обязан:</div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">- Принять Товар в порядке, предусмотренном настоящим Договором.</div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">- Оплатить Товар в порядке и в сроки, предусмотренные настоящим Договором.</div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 6px;">- Не имеет право менять контактный номер без предупреждения. При наступлении непредвиденных обстоятельств обязан всеми возможными способами оповестить продавца.</div>
+            <div style="font-weight: bold; font-size: 11.5px; margin-top: 6px; margin-bottom: 2px;">«Поручитель» обязан:</div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 8px;">- При неисполнении или ненадлежащем исполнении «Покупателем» своих обязательств по настоящему договору «Поручитель» отвечает перед «Продавцом» в том же объеме, что и «Покупатель», включая возврат основного долга. При просрочке выплаты «Покупателем» на 7 дней от установленного срока «Поручитель» обязан выплатить просроченный платеж.</div>
+            <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">4. ПЕРЕДАЧА И ПРИНЯТИЕ ТОВАРА</div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">- Товар передается «Покупателю» в месте нахождения продавца в дату подписания настоящего договора.</div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">- «Покупатель» обязан осмотреть товар, проверить соответствие по качеству, количеству и комплектности условиям настоящего договора и принять его.</div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">- Право собственности на товар переходит к «Покупателю» с момента полной оплаты им цены договора. Ответственность за сохранность товара переходит к покупателю с момента подписания настоящего договора.</div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 8px;">- «Продавец» считается исполнившим свою обязанность по передаче товара с даты подписания настоящего договора.</div>
+            <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">5. РАЗРЕШЕНИЕ СПОРОВ</div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">- Все споры и разногласия, которые могут возникнуть между сторонами по вопросам, не нашедшим своего разрешения в тексте настоящего договора, будут разрешаться путем переговоров.</div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 8px;">- В случае неурегулирования спорных вопросов в процессе переговоров такой спор подлежит рассмотрению в суде.</div>
+            <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">6. ЗАКЛЮЧИТЕЛЬНЫЕ ПОЛОЖЕНИЯ</div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">- Настоящий договор вступает в силу с даты его подписания «Сторонами» и действует до полного исполнения ими обязательств по настоящему договору.</div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 12px;">- Любые изменения и дополнения к настоящему договору должны быть составлены в письменной форме и подписаны всеми сторонами.</div>
+            <div style="margin-top: 12px;">
+              <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-bottom: 8px;">ПОДПИСИ СТОРОН</div>
+              <table style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: center;">
+                <thead>
+                  <tr>
+                    <th style="padding: 5px; border: 1px solid #000; width: 33%;">«Продавец»</th>
+                    <th style="padding: 5px; border: 1px solid #000; width: 33%;">«Покупатель»</th>
+                    <th style="padding: 5px; border: 1px solid #000; width: 34%;">«Поручитель»</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="padding: 18px 5px; border: 1px solid #000; vertical-align: bottom;">
+                      <div style="border-top: 1px solid #000; width: 60%; margin: 0 auto; padding-top: 3px;">______</div>
+                    </td>
+                    <td style="padding: 18px 5px; border: 1px solid #000; vertical-align: bottom;">
+                      <div style="border-top: 1px solid #000; width: 60%; margin: 0 auto; padding-top: 3px;">______</div>
+                      <div style="font-size: 9px; margin-top: 2px; color: #555;">${contract.fio || ''}</div>
+                    </td>
+                    <td style="padding: 18px 5px; border: 1px solid #000; vertical-align: bottom;">
+                      <div style="border-top: 1px solid #000; width: 60%; margin: 0 auto; padding-top: 3px;">______</div>
+                      <div style="font-size: 9px; margin-top: 2px; color: #555;">${contract.guarantorFio || ''}</div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div style="margin-top: 10px; font-size: 9px; text-align: center; color: #999; border-top: 1px solid #ddd; padding-top: 6px;">Дата печати: ${todayStr}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function printContract() {
+      const select = document.getElementById('printContractSelect');
+      if (!select.value) {
+        alert('Пожалуйста, выберите договор для печати');
+        return;
+      }
+      window.print();
+    }
+
+    function renderPartners() {
+      const container = document.getElementById('partnersList');
+      const dateFrom = document.getElementById('partnerDateFrom').value;
+      const dateTo = document.getElementById('partnerDateTo').value;
+      
+      const partnersMap = new Map();
+      
+      allContracts.forEach(contract => {
+        const store = contract.store || '';
+        if (!store.trim()) return;
+        
+        if (dateFrom || dateTo) {
+          const buyDate = contract.buyDate || '';
+          if (buyDate) {
+            if (dateFrom && buyDate < dateFrom) return;
+            if (dateTo && buyDate > dateTo) return;
+          }
+        }
+        
+        if (!partnersMap.has(store)) {
+          partnersMap.set(store, {
+            name: store,
+            debtContracts: 0,
+            debtSum: 0,
+            totalContracts: 0,
+            totalSum: 0,
+            contracts: []
+          });
+        }
+        
+        const partner = partnersMap.get(store);
+        partner.totalContracts++;
+        partner.totalSum += Number(contract.totalCost || 0);
+        partner.contracts.push(contract);
+        
+        if (!contract.shopPaid) {
+          partner.debtContracts++;
+          partner.debtSum += Number(contract.totalCost || 0);
+        }
+      });
+      
+      const partners = Array.from(partnersMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+      
+      if (partners.length === 0) {
+        container.innerHTML = '<div class="text-center text-gray-500 py-8 text-sm">🤝 Нет партнеров/магазинов</div>';
+        return;
+      }
+      
+      let html = `
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+          <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+            <div class="text-xs text-purple-600 font-bold">Всего партнеров</div>
+            <div class="text-2xl font-bold text-purple-700">${partners.length}</div>
+          </div>
+          <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+            <div class="text-xs text-blue-600 font-bold">Всего договоров</div>
+            <div class="text-2xl font-bold text-blue-700">${partners.reduce((sum, p) => sum + p.totalContracts, 0)}</div>
+          </div>
+          <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+            <div class="text-xs text-red-600 font-bold">Договоров в долг (без "Д")</div>
+            <div class="text-2xl font-bold text-red-700">${partners.reduce((sum, p) => sum + p.debtContracts, 0)}</div>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse excel-table">
+            <thead>
+              <tr class="bg-purple-700 text-white font-bold text-xs">
+                <th class="p-3">Партнёр / Магазин</th>
+                <th class="p-3">Договоров в долг</th>
+                <th class="p-3">Сумма долга</th>
+                <th class="p-3">Всего договоров</th>
+                <th class="p-3">Общая сумма</th>
+                <th class="p-3">Детали</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+      
+      partners.forEach(partner => {
+        html += `
+          <tr class="hover:bg-purple-50">
+            <td class="p-3 font-bold text-purple-700">${partner.name}</td>
+            <td class="p-3 text-center font-bold ${partner.debtContracts > 0 ? 'text-red-600' : 'text-green-600'}">${partner.debtContracts}</td>
+            <td class="p-3 text-center font-bold ${partner.debtSum > 0 ? 'text-red-600' : 'text-green-600'}">${partner.debtSum.toLocaleString('ru-RU')} ₽</td>
+            <td class="p-3 text-center font-bold">${partner.totalContracts}</td>
+            <td class="p-3 text-center font-bold">${partner.totalSum.toLocaleString('ru-RU')} ₽</td>
+            <td class="p-3 text-center">
+              <button onclick="showPartnerDetails('${partner.name}')" class="bg-purple-500 hover:bg-purple-600 text-white px-2 py-1 rounded text-xs">📋 Детали</button>
+            </td>
+          </tr>
+        `;
+      });
+      
+      html += `
+            </tbody>
+          </table>
+        </div>
+      `;
+      
+      container.innerHTML = html;
+    }
+
+    function showPartnerDetails(partnerName) {
+      const dateFrom = document.getElementById('partnerDateFrom').value;
+      const dateTo = document.getElementById('partnerDateTo').value;
+      
+      const contracts = allContracts.filter(c => {
+        if (c.store !== partnerName) return false;
+        if (dateFrom && c.buyDate && c.buyDate < dateFrom) return false;
+        if (dateTo && c.buyDate && c.buyDate > dateTo) return false;
+        return true;
+      });
+      
+      if (contracts.length === 0) {
+        alert(`Нет договоров с партнером "${partnerName}" за выбранный период`);
+        return;
+      }
+      
+      let message = `📋 Детали по партнеру: ${partnerName}\n`;
+      message += `━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+      message += `📅 Период: ${dateFrom || 'с начала'} - ${dateTo || 'по сегодня'}\n`;
+      message += `📊 Всего договоров: ${contracts.length}\n`;
+      message += `━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+      
+      contracts.forEach((c, i) => {
+        const status = c.shopPaid ? '✅ Оплачен' : '❌ В долгу';
+        const rest = c.totalCost - (c.downPayment || 0) - Object.values(c.installments || {}).reduce((sum, p) => sum + Number(p.amount || 0), 0);
+        message += `${i+1}. ${c.fio} - ${c.totalCost} ₽ (${status})\n`;
+        message += `   📅 ${c.buyDate} | Остаток: ${rest} ₽\n`;
+        message += `   📞 ${c.phone}\n\n`;
+      });
+      
+      const detailsWindow = window.open('', '_blank', 'width=600,height=400');
+      detailsWindow.document.write(`
+        <html><head><title>Детали: ${partnerName}</title>
+        <style>body { font-family: Arial; padding: 20px; white-space: pre-wrap; }</style>
+        </head><body>${message.replace(/\n/g, '<br>')}</body></html>
+      `);
+      detailsWindow.document.close();
+    }
+
+    function clearPartnerDates() {
+      document.getElementById('partnerDateFrom').value = '';
+      document.getElementById('partnerDateTo').value = '';
+      renderPartners();
     }
 
     document.addEventListener('keydown', (e) => {
