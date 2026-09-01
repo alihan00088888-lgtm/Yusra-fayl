@@ -297,23 +297,6 @@
     .date-warning.show {
       display: block;
     }
-
-    /* Стиль для новой кнопки копирования */
-    .copy-client-btn {
-      background-color: #8b5cf6;
-      color: white;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 9px;
-      font-weight: bold;
-      border: none;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .copy-client-btn:hover {
-      background-color: #7c3aed;
-      transform: scale(1.05);
-    }
   </style>
 </head>
 <body class="bg-slate-100 text-gray-800 text-xs min-h-screen pb-20">
@@ -384,7 +367,7 @@
               <th class="p-3 border-r border-slate-700 text-center">«Д»</th>
               <th class="p-3 border-r border-slate-700">Товар / Магазин</th>
               <th class="p-3 border-r border-slate-700">Поручитель</th>
-              <th class="p-3 text-center sticky right-0 bg-slate-900 min-w-[110px]">Действия</th>
+              <th class="p-3 text-center sticky right-0 bg-slate-900 min-w-[210px]">Действия</th>
             </tr>
           </thead>
           <tbody id="contractsTable" class="divide-y"></tbody>
@@ -1180,7 +1163,7 @@
     }
 
     // ================================================================
-    // ФУНКЦИЯ ЗАГРУЗКИ ДОГОВОРА ДЛЯ ПЕЧАТИ (с новой логикой дат)
+    // ФУНКЦИЯ ЗАГРУЗКИ ДОГОВОРА ДЛЯ ПЕЧАТИ (исправленная логика дат)
     // ================================================================
 
     function updatePrintSelect() {
@@ -1216,7 +1199,7 @@
         return;
       }
       
-      // Получаем информацию по месяцам с новой логикой
+      // Получаем информацию по месяцам с ИСПРАВЛЕННОЙ логикой (без смещения)
       const paymentDates = calculatePaymentDates(contract);
       const installments = contract.installments || {};
       
@@ -1473,71 +1456,6 @@
         return;
       }
       window.print();
-    }
-
-    // ================================================================
-    // НОВАЯ ФУНКЦИЯ КОПИРОВАНИЯ ДАННЫХ КЛИЕНТА (вместо двух старых кнопок)
-    // ================================================================
-
-    function copyClientData(id, btn) {
-      const contract = allContracts.find(c => c.id === id);
-      if (!contract) return;
-
-      // Формируем данные для копирования
-      const metrics = calculateContractMetrics(contract);
-      const rest = metrics.rest;
-      
-      let text = `Договор №${contract.contractNum}\n`;
-      text += `━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-      text += `👤 ПОКУПАТЕЛЬ:\n`;
-      text += `ФИО: ${contract.fio || '—'}\n`;
-      text += `Дата рождения: ${contract.birthDate || '—'}\n`;
-      text += `Телефон: ${contract.phone || '—'}\n`;
-      text += `Адрес: ${contract.address || '—'}\n`;
-      text += `━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-      text += `🤝 ПОРУЧИТЕЛЬ:\n`;
-      text += `ФИО: ${contract.guarantorFio || '—'}\n`;
-      text += `Телефон: ${contract.guarantorPhone || '—'}\n`;
-      text += `━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-      text += `💰 ФИНАНСЫ:\n`;
-      text += `Сумма рассрочки: ${Number(contract.totalCost).toLocaleString('ru-RU')} ₽\n`;
-      text += `Предоплата: ${Number(contract.downPayment || 0).toLocaleString('ru-RU')} ₽\n`;
-      text += `Мес. платеж: ${Number(contract.monthlyPay).toLocaleString('ru-RU')} ₽\n`;
-      text += `Остаток: ${rest.toLocaleString('ru-RU')} ₽\n`;
-      text += `Срок: ${contract.monthsCount} мес.\n`;
-      text += `Дата покупки: ${contract.buyDate || '—'}\n`;
-      text += `Дата платежа: ${contract.payDate || '—'}\n`;
-      text += `━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-      text += `📦 ТОВАР:\n`;
-      text += `Наименование: ${contract.product || '—'}\n`;
-      text += `Магазин: ${contract.store || '—'}\n`;
-      text += `Себестоимость: ${Number(contract.costPrice).toLocaleString('ru-RU')} ₽\n`;
-
-      // Копируем в буфер обмена
-      navigator.clipboard.writeText(text).then(() => {
-        const oldText = btn.innerText;
-        btn.innerText = "✓ Готово";
-        btn.classList.add("bg-green-700");
-        setTimeout(() => { 
-          btn.innerText = oldText; 
-          btn.classList.remove("bg-green-700");
-        }, 1500);
-      }).catch(() => {
-        // Fallback для старых браузеров
-        const textarea = document.createElement('textarea');
-        textarea.value = text;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-        const oldText = btn.innerText;
-        btn.innerText = "✓ Готово";
-        btn.classList.add("bg-green-700");
-        setTimeout(() => { 
-          btn.innerText = oldText; 
-          btn.classList.remove("bg-green-700");
-        }, 1500);
-      });
     }
 
     // ================================================================
@@ -2293,13 +2211,18 @@
       });
     }
 
-    // Функция для обратной совместимости (старые кнопки удалены, но оставляем для безопасности)
     function copyHistory(id, btn) {
-      copyClientData(id, btn);
+      const c = allContracts.find(i => i.id === id);
+      let log = `Договор №${c.contractNum}\nФИО: ${c.fio}\n\nОплаты:\n`;
+      Object.keys(c.installments || {}).sort((a,b)=>Number(a)-Number(b)).forEach(k => {
+        log += `${k}-й: ${c.installments[k].amount}₽ (${c.installments[k].date})\n`;
+      });
+      copyToClip(log, btn);
     }
 
     function copyGuarantor(id, btn) {
-      copyClientData(id, btn);
+      const c = allContracts.find(i => i.id === id);
+      copyToClip(`Договор №${c.contractNum}\nКлиент: ${c.fio}\nПоручитель: ${c.guarantorFio || '—'} (${c.guarantorPhone || '—'})`, btn);
     }
 
     function renderTable(contracts) {
@@ -2336,7 +2259,8 @@
           <td class="p-2 border-r text-[10px]">${item.guarantorFio || '—'}</td>
           <td class="p-2 text-center space-x-1 sticky right-0 bg-white shadow-[-5px_0_10px_rgba(0,0,0,0.05)]">
             <button onclick="openPayModal('${item.id}')" class="bg-green-600 text-white px-1 py-0.5 rounded text-[9px] font-bold">+Взнос</button>
-            <button onclick="copyClientData('${item.id}', this)" class="copy-client-btn px-1 py-0.5 rounded text-[9px]">📋 Копировать</button>
+            <button onclick="copyHistory('${item.id}', this)" class="bg-slate-500 text-white px-1 py-0.5 rounded text-[9px]">📋 Опл.</button>
+            <button onclick="copyGuarantor('${item.id}', this)" class="bg-indigo-500 text-white px-1 py-0.5 rounded text-[9px]">👥 Пор.</button>
             <button onclick="openEditModal('${item.id}')" class="bg-blue-500 text-white px-1 py-0.5 rounded text-[9px]">✏️</button>
             <button onclick="deleteContract('${item.id}')" class="bg-red-500 text-white px-1 py-0.5 rounded text-[9px]">🗑️</button>
           </td>
