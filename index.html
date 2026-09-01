@@ -1019,14 +1019,86 @@
     }
 
     // ================================================================
-    // ФУНКЦИЯ ПРОВЕРКИ ДАТЫ ПЛАТЕЖА (НОВАЯ ЛОГИКА)
+    // ФУНКЦИЯ ПРОВЕРКИ ДАТЫ ПЛАТЕЖА (только предупреждение)
     // ================================================================
 
     function checkPaymentDateAdjustment() {
-      // Новая логика: убираем предупреждение, так как дата платежа теперь строго фиксируется
+      const payDateStr = document.getElementById('payDate').value;
       const warningEl = document.getElementById('dateWarning');
-      warningEl.classList.remove('show');
-      // Оставляем только логику для отображения даты в будущем
+      
+      if (!payDateStr) {
+        warningEl.classList.remove('show');
+        return;
+      }
+      
+      try {
+        const payDateObj = new Date(payDateStr);
+        if (isNaN(payDateObj.getTime())) {
+          warningEl.classList.remove('show');
+          return;
+        }
+        
+        const payDay = payDateObj.getDate();
+        
+        // Проверяем, есть ли такой день в следующем месяце
+        const today = new Date();
+        const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+        const lastDayOfNextMonth = new Date(nextMonth.getFullYear(), nextMonth.getMonth() + 1, 0);
+        const lastDay = lastDayOfNextMonth.getDate();
+        
+        if (payDay > lastDay) {
+          warningEl.classList.add('show');
+          warningEl.innerHTML = `⚠️ Внимание! В следующем месяце нет ${payDay}-го числа.<br>Дата платежа будет автоматически перенесена на ${lastDay}-е число.`;
+        } else {
+          warningEl.classList.remove('show');
+        }
+      } catch (e) {
+        warningEl.classList.remove('show');
+      }
+    }
+
+    // ================================================================
+    // НОВАЯ ЛОГИКА РАСЧЕТА ДАТ ПЛАТЕЖЕЙ (без +1 и -1 дней)
+    // ================================================================
+    
+    function calculatePaymentDates(contract) {
+      const payDateStr = contract.payDate;
+      if (!payDateStr) return [];
+      
+      const payDateObj = new Date(payDateStr);
+      if (isNaN(payDateObj.getTime())) return [];
+      
+      const payDay = payDateObj.getDate();
+      const monthsCount = Number(contract.monthsCount) || 0;
+      
+      // Используем дату покупки как точку отсчета, если она есть, иначе дату платежа
+      let startDate = new Date(contract.buyDate || payDateStr);
+      if (isNaN(startDate.getTime())) {
+        startDate = new Date(payDateStr);
+      }
+      startDate.setHours(0, 0, 0, 0);
+      
+      const dates = [];
+      for (let i = 1; i <= monthsCount; i++) {
+        const paymentDate = new Date(startDate);
+        paymentDate.setMonth(paymentDate.getMonth() + (i - 1));
+        
+        // Корректируем день на указанный в payDate, но не выходим за пределы месяца
+        const lastDayOfMonth = new Date(paymentDate.getFullYear(), paymentDate.getMonth() + 1, 0);
+        const lastDay = lastDayOfMonth.getDate();
+        const targetDay = Math.min(payDay, lastDay);
+        paymentDate.setDate(targetDay);
+        paymentDate.setHours(0, 0, 0, 0);
+        
+        dates.push({
+          index: i,
+          date: paymentDate,
+          dateStr: paymentDate.toISOString().slice(0, 10),
+          amount: Number(contract.monthlyPay) || 0
+        });
+      }
+      
+      return dates;
     }
 
     // ================================================================
@@ -1063,43 +1135,19 @@
       const paidPercentage = totalPayable > 0 ? (totalPaid / totalPayable) * 100 : 0;
       const isClosed = rest <= 0;
       
-      // Расчет просрочки с новой логикой (без +1 день)
+      // Расчет просрочки с использованием новой логики дат
       let overdueSum = 0;
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       
-      if (contract.payDate && contract.monthsCount && !isClosed) {
-        try {
-          const payDateObj = new Date(contract.payDate);
-          if (!isNaN(payDateObj.getTime())) {
-            const payDay = payDateObj.getDate();
-            // Используем дату покупки как начальную точку для расчета
-            const startDate = contract.buyDate ? new Date(contract.buyDate) : new Date(contract.payDate);
-            if (!isNaN(startDate.getTime())) {
-              startDate.setHours(0, 0, 0, 0);
-              const monthsCount = Number(contract.monthsCount) || 0;
-              for (let i = 1; i <= monthsCount; i++) {
-                const payDate = new Date(startDate);
-                payDate.setMonth(payDate.getMonth() + i);
-                // Устанавливаем день платежа строго как в payDate (без +1)
-                const lastDayOfMonth = new Date(payDate.getFullYear(), payDate.getMonth() + 1, 0);
-                const lastDay = lastDayOfMonth.getDate();
-                const targetDay = Math.min(payDay, lastDay);
-                payDate.setDate(targetDay);
-                payDate.setHours(0, 0, 0, 0);
-                
-                const payment = installments[i];
-                const isPaid = !!payment && Number(payment.amount) > 0;
-                
-                // Проверяем, просрочен ли платеж (payDate < today)
-                if (!isPaid && payDate < today) {
-                  overdueSum += monthlyPay;
-                }
-              }
-            }
+      if (!isClosed && contract.payDate && contract.monthsCount) {
+        const paymentDates = calculatePaymentDates(contract);
+        for (const pd of paymentDates) {
+          const payment = installments[pd.index];
+          const isPaid = !!payment && Number(payment.amount) > 0;
+          if (!isPaid && pd.date < today) {
+            overdueSum += monthlyPay;
           }
-        } catch (e) {
-          console.warn('Ошибка расчета просрочки для договора', contract.id);
         }
       }
       
@@ -1115,7 +1163,7 @@
     }
 
     // ================================================================
-    // ФУНКЦИЯ ЗАГРУЗКИ ДОГОВОРА ДЛЯ ПЕЧАТИ
+    // ФУНКЦИЯ ЗАГРУЗКИ ДОГОВОРА ДЛЯ ПЕЧАТИ (с новой логикой дат)
     // ================================================================
 
     function updatePrintSelect() {
@@ -1151,21 +1199,22 @@
         return;
       }
       
-      // Получаем информацию по месяцам с новой логикой (без +1 день)
-      const monthInfo = getMonthStatus(contract);
-      const months = monthInfo.months;
+      // Получаем информацию по месяцам с новой логикой
+      const paymentDates = calculatePaymentDates(contract);
+      const installments = contract.installments || {};
       
       let monthsHtml = '';
-      for (let i = 0; i < months.length; i++) {
-        const m = months[i];
-        const isPaid = m.isPaid;
+      for (const pd of paymentDates) {
+        const payment = installments[pd.index];
+        const isPaid = !!payment && Number(payment.amount) > 0;
+        const amount = isPaid ? Number(payment.amount) : pd.amount;
         const statusText = isPaid ? '✅ Оплачен' : '⏳ Ожидает';
         const statusColor = isPaid ? 'color: #22c55e; font-weight: bold;' : 'color: #ef4444; font-weight: bold;';
         monthsHtml += `
           <tr>
-            <td style="padding: 3px 8px; text-align: center; font-weight: bold; border: 1px solid #000;">${m.month}</td>
-            <td style="padding: 3px 8px; text-align: center; border: 1px solid #000;">${m.date}</td>
-            <td style="padding: 3px 8px; text-align: center; ${statusColor}">${isPaid ? m.amount.toLocaleString('ru-RU') + ' ₽' : '—'}</td>
+            <td style="padding: 3px 8px; text-align: center; font-weight: bold; border: 1px solid #000;">${pd.index}</td>
+            <td style="padding: 3px 8px; text-align: center; border: 1px solid #000;">${pd.dateStr}</td>
+            <td style="padding: 3px 8px; text-align: center; ${statusColor}">${amount.toLocaleString('ru-RU')} ₽</td>
             <td style="padding: 3px 8px; text-align: center; ${statusColor}">${statusText}</td>
           </tr>
         `;
@@ -1410,7 +1459,7 @@
     }
 
     // ================================================================
-    // ОСТАЛЬНЫЕ ФУНКЦИИ
+    // ОСТАЛЬНЫЕ ФУНКЦИИ (без изменений или с использованием новой логики)
     // ================================================================
 
     function numberToWords(num) {
@@ -1602,67 +1651,39 @@
     }
 
     // ================================================================
-    // ОСНОВНАЯ ЛОГИКА МЕСЯЦЕВ (С НОВОЙ ЛОГИКОЙ БЕЗ +1 ДЕНЬ)
+    // ОСНОВНАЯ ЛОГИКА МЕСЯЦЕВ (с новой логикой дат)
     // ================================================================
     
     function getMonthStatus(contract) {
-      const months = contract.monthsCount || 0;
+      const paymentDates = calculatePaymentDates(contract);
       const installments = contract.installments || {};
-      const monthlyPay = contract.monthlyPay || 0;
+      const monthlyPay = Number(contract.monthlyPay) || 0;
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      
-      const payDateStr = contract.payDate;
-      if (!payDateStr) {
-        return { months: [], overdueSum: 0 };
-      }
-      
-      const payDateObj = new Date(payDateStr);
-      if (isNaN(payDateObj.getTime())) {
-        return { months: [], overdueSum: 0 };
-      }
-      
-      const payDay = payDateObj.getDate();
-      
-      const buyDateStr = contract.buyDate;
-      let startDate = new Date(buyDateStr || payDateStr);
-      if (isNaN(startDate.getTime())) {
-        startDate = new Date(payDateStr);
-      }
-      startDate.setHours(0, 0, 0, 0);
       
       const result = [];
       let overdueSum = 0;
       
-      for (let i = 1; i <= months; i++) {
-        const payDate = new Date(startDate);
-        payDate.setMonth(payDate.getMonth() + i);
-        // Устанавливаем день платежа строго как в payDate (без +1)
-        const lastDayOfMonth = new Date(payDate.getFullYear(), payDate.getMonth() + 1, 0);
-        const lastDay = lastDayOfMonth.getDate();
-        const targetDay = Math.min(payDay, lastDay);
-        payDate.setDate(targetDay);
-        payDate.setHours(0, 0, 0, 0);
-        
-        const payment = installments[i];
+      for (const pd of paymentDates) {
+        const payment = installments[pd.index];
         const isPaid = !!payment && Number(payment.amount) > 0;
         const paidAmount = isPaid ? Number(payment.amount) : 0;
         
         let status = 'future';
         if (isPaid) {
           status = 'paid';
-        } else if (payDate < today) {
+        } else if (pd.date < today) {
           status = 'overdue';
           overdueSum += monthlyPay;
         }
         
         result.push({
-          month: i,
-          date: payDate.toISOString().slice(0, 10),
+          month: pd.index,
+          date: pd.dateStr,
           status: status,
           amount: isPaid ? paidAmount : monthlyPay,
           isPaid: isPaid,
-          payDateObj: payDate
+          payDateObj: pd.date
         });
       }
       
@@ -1670,7 +1691,7 @@
     }
 
     // ================================================================
-    // ФУНКЦИИ ДЛЯ ЛИСТОВ "СЕГОДНЯ" И "3 ДНЯ"
+    // ФУНКЦИИ ДЛЯ ЛИСТОВ "СЕГОДНЯ" И "3 ДНЯ" (с новой логикой)
     // ================================================================
     
     function getClientsForDate(targetDateStr) {
@@ -1683,24 +1704,19 @@
         const metrics = calculateContractMetrics(contract);
         if (metrics.isClosed) return;
         
-        const monthInfo = getMonthStatus(contract);
-        const months = monthInfo.months;
+        const paymentDates = calculatePaymentDates(contract);
+        const installments = contract.installments || {};
         
         let hasUnpaidMonth = false;
         let unpaidMonthAmount = 0;
         
-        for (let i = 0; i < months.length; i++) {
-          const m = months[i];
-          if (!m.isPaid) {
-            const payDate = new Date(m.date);
-            if (!isNaN(payDate.getTime())) {
-              payDate.setHours(0, 0, 0, 0);
-              if (payDate.getTime() === target.getTime()) {
-                hasUnpaidMonth = true;
-                unpaidMonthAmount = m.amount;
-                break;
-              }
-            }
+        for (const pd of paymentDates) {
+          const payment = installments[pd.index];
+          const isPaid = !!payment && Number(payment.amount) > 0;
+          if (!isPaid && pd.date.getTime() === target.getTime()) {
+            hasUnpaidMonth = true;
+            unpaidMonthAmount = pd.amount;
+            break;
           }
         }
         
@@ -1710,7 +1726,7 @@
             rest: metrics.rest,
             phone: contract.phone || '',
             fio: contract.fio || '',
-            monthInfo: { months: months, overdueSum: metrics.overdueSum },
+            monthInfo: getMonthStatus(contract),
             unpaidMonthAmount: unpaidMonthAmount
           });
         }
@@ -1815,7 +1831,7 @@
             rest: metrics.rest,
             phone: contract.phone || '',
             fio: contract.fio || '',
-            monthInfo: { months: monthInfo.months, overdueSum: metrics.overdueSum }
+            monthInfo: monthInfo
           });
         }
       });
@@ -2057,6 +2073,7 @@
       document.getElementById('guarantorFio').value = contract.guarantorFio || '';
       document.getElementById('guarantorPhone').value = contract.guarantorPhone || '';
       document.getElementById('dateWarning').classList.remove('show');
+      checkPaymentDateAdjustment();
       validateFinance();
       modal.classList.remove('hidden');
     }
@@ -2516,9 +2533,17 @@
         });
         if (hasPaidToday) factTodayCount++;
 
-        if (c.payDate === todayStr) {
-          planTodaySum += Number(c.monthlyPay || 0);
-          planTodayCount++;
+        // Проверяем, есть ли сегодня платеж по новому графику
+        const paymentDates = calculatePaymentDates(c);
+        for (const pd of paymentDates) {
+          if (pd.dateStr === todayStr) {
+            const payment = insts[pd.index];
+            if (!payment || Number(payment.amount) === 0) {
+              planTodaySum += Number(c.monthlyPay || 0);
+              planTodayCount++;
+            }
+            break;
+          }
         }
       });
 
