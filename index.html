@@ -297,6 +297,15 @@
     .date-warning.show {
       display: block;
     }
+
+    /* Подсказка для дат в таблице */
+    .payment-date-tip {
+      font-size: 9px;
+      color: #4b5563;
+      display: block;
+      margin-top: 2px;
+      font-weight: normal;
+    }
   </style>
 </head>
 <body class="bg-slate-100 text-gray-800 text-xs min-h-screen pb-20">
@@ -1071,7 +1080,7 @@
       const payDay = payDateObj.getDate();
       const monthsCount = Number(contract.monthsCount) || 0;
       
-      // Используем дату покупки как точку отсчета, если она есть, иначе дату платежа
+      // Используем дату покупки как точку отсчета
       let startDate = new Date(contract.buyDate || payDateStr);
       if (isNaN(startDate.getTime())) {
         startDate = new Date(payDateStr);
@@ -1081,6 +1090,7 @@
       const dates = [];
       for (let i = 1; i <= monthsCount; i++) {
         const paymentDate = new Date(startDate);
+        // Добавляем (i-1) месяцев, чтобы первый платеж был в месяц покупки
         paymentDate.setMonth(paymentDate.getMonth() + (i - 1));
         
         // Корректируем день на указанный в payDate, но не выходим за пределы месяца
@@ -1163,7 +1173,7 @@
     }
 
     // ================================================================
-    // ФУНКЦИЯ ЗАГРУЗКИ ДОГОВОРА ДЛЯ ПЕЧАТИ (только фактические платежи)
+    // ФУНКЦИЯ ЗАГРУЗКИ ДОГОВОРА ДЛЯ ПЕЧАТИ (с плановыми и фактическими датами)
     // ================================================================
 
     function updatePrintSelect() {
@@ -1203,29 +1213,45 @@
       const installments = contract.installments || {};
       const paymentKeys = Object.keys(installments).sort((a, b) => Number(a) - Number(b));
       
+      // Получаем плановые даты платежей
+      const paymentDates = calculatePaymentDates(contract);
+      
       let paymentsHtml = '';
       let totalPaidSum = 0;
       
-      if (paymentKeys.length === 0) {
+      // Создаем карту фактических платежей
+      const actualPaymentsMap = {};
+      paymentKeys.forEach(key => {
+        actualPaymentsMap[key] = installments[key];
+      });
+      
+      // Проходим по всем плановым платежам
+      if (paymentDates.length === 0) {
         paymentsHtml = `
           <tr>
-            <td colspan="3" style="padding: 8px; text-align: center; color: #999; border: 1px solid #000;">
-              Нет внесенных платежей
+            <td colspan="4" style="padding: 8px; text-align: center; color: #999; border: 1px solid #000;">
+              Нет запланированных платежей
             </td>
           </tr>
         `;
       } else {
-        paymentKeys.forEach((key, index) => {
-          const payment = installments[key];
-          const amount = Number(payment.amount) || 0;
-          const date = payment.date || '—';
-          totalPaidSum += amount;
+        paymentDates.forEach((pd, index) => {
+          const actual = actualPaymentsMap[pd.index];
+          const isPaid = !!actual && Number(actual.amount) > 0;
+          const actualAmount = isPaid ? Number(actual.amount) : 0;
+          const actualDate = isPaid ? (actual.date || '—') : '—';
+          
+          totalPaidSum += actualAmount;
           
           paymentsHtml += `
             <tr>
-              <td style="padding: 3px 8px; text-align: center; font-weight: bold; border: 1px solid #000;">${index + 1}</td>
-              <td style="padding: 3px 8px; text-align: center; border: 1px solid #000;">${date}</td>
-              <td style="padding: 3px 8px; text-align: center; font-weight: bold; color: #22c55e; border: 1px solid #000;">${amount.toLocaleString('ru-RU')} ₽</td>
+              <td style="padding: 3px 8px; text-align: center; font-weight: bold; border: 1px solid #000;">${pd.index}</td>
+              <td style="padding: 3px 8px; text-align: center; border: 1px solid #000;">${pd.dateStr}</td>
+              <td style="padding: 3px 8px; text-align: center; border: 1px solid #000;">${pd.amount.toLocaleString('ru-RU')} ₽</td>
+              <td style="padding: 3px 8px; text-align: center; border: 1px solid #000; ${isPaid ? 'font-weight: bold; color: #22c55e;' : 'color: #999;'}">
+                ${isPaid ? actualAmount.toLocaleString('ru-RU') + ' ₽' : '—'}
+                ${isPaid ? `<br><span style="font-size: 9px; color: #6b7280;">${actualDate}</span>` : ''}
+              </td>
             </tr>
           `;
         });
@@ -1233,7 +1259,7 @@
         // Добавляем итоговую строку
         paymentsHtml += `
           <tr style="background-color: #e2e8f0; font-weight: bold;">
-            <td style="padding: 3px 8px; text-align: center; border: 1px solid #000;" colspan="2">ИТОГО ВНЕСЕНО:</td>
+            <td style="padding: 3px 8px; text-align: center; border: 1px solid #000;" colspan="3">ИТОГО ВНЕСЕНО:</td>
             <td style="padding: 3px 8px; text-align: center; border: 1px solid #000; color: #22c55e;">${totalPaidSum.toLocaleString('ru-RU')} ₽</td>
           </tr>
         `;
@@ -1331,17 +1357,18 @@
               не позднее <b>${contract.payDate || '______'}</b> числа каждого месяца.
             </p>
             
-            <!-- ТАБЛИЦА ФАКТИЧЕСКИХ ПЛАТЕЖЕЙ -->
+            <!-- ТАБЛИЦА ПЛАТЕЖЕЙ (плановые + фактические) -->
             <div style="margin-top: 10px; border: 1px solid #000; overflow: hidden;">
               <div style="background-color: #e2e8f0; font-weight: bold; text-align: center; padding: 4px; font-size: 12px; border-bottom: 1px solid #000;">
-                📋 ВНЕСЕННЫЕ ПЛАТЕЖИ
+                📋 ГРАФИК ПЛАТЕЖЕЙ И ФАКТИЧЕСКИЕ ОПЛАТЫ
               </div>
               <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
                 <thead>
                   <tr>
-                    <th style="padding: 3px 8px; border: 1px solid #000; width: 15%; background: #e2e8f0;">№</th>
-                    <th style="padding: 3px 8px; border: 1px solid #000; width: 45%; background: #e2e8f0;">Дата оплаты</th>
-                    <th style="padding: 3px 8px; border: 1px solid #000; width: 40%; background: #e2e8f0;">Сумма</th>
+                    <th style="padding: 3px 8px; border: 1px solid #000; width: 8%; background: #e2e8f0;">№</th>
+                    <th style="padding: 3px 8px; border: 1px solid #000; width: 22%; background: #e2e8f0;">Плановая дата</th>
+                    <th style="padding: 3px 8px; border: 1px solid #000; width: 20%; background: #e2e8f0;">Сумма по графику</th>
+                    <th style="padding: 3px 8px; border: 1px solid #000; width: 50%; background: #e2e8f0;">Фактическая оплата (дата / сумма)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -2259,10 +2286,22 @@
         const tr = document.createElement('tr');
         if (Number(item.costPrice) > Number(item.totalCost)) tr.className = 'row-error';
         
+        // Получаем плановые даты для отображения
+        const paymentDates = calculatePaymentDates(item);
+        const paymentDatesMap = {};
+        paymentDates.forEach(pd => {
+          paymentDatesMap[pd.index] = pd.dateStr;
+        });
+        
         let instHtml = '';
         for(let i=1; i<=15; i++) {
           const v = insts[i];
-          instHtml += v ? `<td class="p-1 border-r text-center pay-paid" title="Дата: ${v.date}">${v.amount}</td>` : `<td class="p-1 border-r text-center text-gray-300">—</td>`;
+          const plannedDate = paymentDatesMap[i] || '';
+          if (v) {
+            instHtml += `<td class="p-1 border-r text-center pay-paid" title="Факт: ${v.date} | План: ${plannedDate}">${v.amount}</td>`;
+          } else {
+            instHtml += `<td class="p-1 border-r text-center text-gray-300">—</td>`;
+          }
         }
 
         tr.innerHTML = `
