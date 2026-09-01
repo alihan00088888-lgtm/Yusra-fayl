@@ -1163,7 +1163,7 @@
     }
 
     // ================================================================
-    // ФУНКЦИЯ ЗАГРУЗКИ ДОГОВОРА ДЛЯ ПЕЧАТИ (с двумя датами в таблице)
+    // ФУНКЦИЯ ЗАГРУЗКИ ДОГОВОРА ДЛЯ ПЕЧАТИ (только фактические платежи)
     // ================================================================
 
     function updatePrintSelect() {
@@ -1199,26 +1199,42 @@
         return;
       }
       
-      // Получаем информацию по месяцам с новой логикой
-      const paymentDates = calculatePaymentDates(contract);
+      // Получаем все внесенные платежи из installments
       const installments = contract.installments || {};
+      const paymentKeys = Object.keys(installments).sort((a, b) => Number(a) - Number(b));
       
-      let monthsHtml = '';
-      for (const pd of paymentDates) {
-        const payment = installments[pd.index];
-        const isPaid = !!payment && Number(payment.amount) > 0;
-        const amount = isPaid ? Number(payment.amount) : pd.amount;
-        const statusText = isPaid ? '✅ Оплачен' : '⏳ Ожидает';
-        const statusColor = isPaid ? 'color: #22c55e; font-weight: bold;' : 'color: #ef4444; font-weight: bold;';
-        const actualDate = isPaid ? payment.date : '—';
-        
-        monthsHtml += `
+      let paymentsHtml = '';
+      let totalPaidSum = 0;
+      
+      if (paymentKeys.length === 0) {
+        paymentsHtml = `
           <tr>
-            <td style="padding: 3px 8px; text-align: center; font-weight: bold; border: 1px solid #000;">${pd.index}</td>
-            <td style="padding: 3px 8px; text-align: center; border: 1px solid #000;">${pd.dateStr}</td>
-            <td style="padding: 3px 8px; text-align: center; border: 1px solid #000;">${actualDate}</td>
-            <td style="padding: 3px 8px; text-align: center; ${statusColor}">${amount.toLocaleString('ru-RU')} ₽</td>
-            <td style="padding: 3px 8px; text-align: center; ${statusColor}">${statusText}</td>
+            <td colspan="3" style="padding: 8px; text-align: center; color: #999; border: 1px solid #000;">
+              Нет внесенных платежей
+            </td>
+          </tr>
+        `;
+      } else {
+        paymentKeys.forEach((key, index) => {
+          const payment = installments[key];
+          const amount = Number(payment.amount) || 0;
+          const date = payment.date || '—';
+          totalPaidSum += amount;
+          
+          paymentsHtml += `
+            <tr>
+              <td style="padding: 3px 8px; text-align: center; font-weight: bold; border: 1px solid #000;">${index + 1}</td>
+              <td style="padding: 3px 8px; text-align: center; border: 1px solid #000;">${date}</td>
+              <td style="padding: 3px 8px; text-align: center; font-weight: bold; color: #22c55e; border: 1px solid #000;">${amount.toLocaleString('ru-RU')} ₽</td>
+            </tr>
+          `;
+        });
+        
+        // Добавляем итоговую строку
+        paymentsHtml += `
+          <tr style="background-color: #e2e8f0; font-weight: bold;">
+            <td style="padding: 3px 8px; text-align: center; border: 1px solid #000;" colspan="2">ИТОГО ВНЕСЕНО:</td>
+            <td style="padding: 3px 8px; text-align: center; border: 1px solid #000; color: #22c55e;">${totalPaidSum.toLocaleString('ru-RU')} ₽</td>
           </tr>
         `;
       }
@@ -1315,20 +1331,21 @@
               не позднее <b>${contract.payDate || '______'}</b> числа каждого месяца.
             </p>
             
-            <!-- ТАБЛИЦА МЕСЯЦЕВ с двумя датами -->
+            <!-- ТАБЛИЦА ФАКТИЧЕСКИХ ПЛАТЕЖЕЙ -->
             <div style="margin-top: 10px; border: 1px solid #000; overflow: hidden;">
+              <div style="background-color: #e2e8f0; font-weight: bold; text-align: center; padding: 4px; font-size: 12px; border-bottom: 1px solid #000;">
+                📋 ВНЕСЕННЫЕ ПЛАТЕЖИ
+              </div>
               <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
                 <thead>
                   <tr>
-                    <th style="padding: 3px 8px; border: 1px solid #000; width: 10%; background: #e2e8f0;">№</th>
-                    <th style="padding: 3px 8px; border: 1px solid #000; width: 22%; background: #e2e8f0;">Плановая дата</th>
-                    <th style="padding: 3px 8px; border: 1px solid #000; width: 22%; background: #e2e8f0;">Фактическая дата оплаты</th>
-                    <th style="padding: 3px 8px; border: 1px solid #000; width: 21%; background: #e2e8f0;">Сумма</th>
-                    <th style="padding: 3px 8px; border: 1px solid #000; width: 25%; background: #e2e8f0;">Статус</th>
+                    <th style="padding: 3px 8px; border: 1px solid #000; width: 15%; background: #e2e8f0;">№</th>
+                    <th style="padding: 3px 8px; border: 1px solid #000; width: 45%; background: #e2e8f0;">Дата оплаты</th>
+                    <th style="padding: 3px 8px; border: 1px solid #000; width: 40%; background: #e2e8f0;">Сумма</th>
                   </tr>
                 </thead>
                 <tbody>
-                  ${monthsHtml}
+                  ${paymentsHtml}
                 </tbody>
               </table>
             </div>
