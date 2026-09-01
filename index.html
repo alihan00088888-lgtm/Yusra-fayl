@@ -33,6 +33,11 @@
       background-color: #ef4444;
       color: #ffffff;
     }
+
+    .tab-btn.exit-tab.active {
+      background-color: #dc2626;
+      color: #ffffff;
+    }
     
     .tab-btn.partners-tab.active {
       background-color: #8b5cf6;
@@ -111,6 +116,7 @@
     .month-paid { background-color: #22c55e; color: white; }
     .month-overdue { background-color: #ef4444; color: white; }
     .month-future { background-color: #3b82f6; color: white; }
+    .month-exit { background-color: #dc2626; color: white; }
     
     .client-info {
       display: flex;
@@ -296,15 +302,6 @@
     }
     .date-warning.show {
       display: block;
-    }
-
-    /* Подсказка для дат в таблице */
-    .payment-date-tip {
-      font-size: 9px;
-      color: #4b5563;
-      display: block;
-      margin-top: 2px;
-      font-weight: normal;
     }
   </style>
 </head>
@@ -551,7 +548,21 @@
       </div>
     </div>
 
-    <!-- ================= Лист 7: Партнёры ================= -->
+    <!-- ================= Лист 7: Выезд (просрочка 2+ месяца) ================= -->
+    <div id="exitTabContent" class="hidden space-y-4">
+      <div class="bg-white shadow-xl rounded-xl p-6 border border-red-200">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold text-red-700">🚗 Выезд (просрочка 2+ месяца)</h2>
+          <button onclick="sendWhatsAppExit()" class="whatsapp-btn">
+            <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Отправить всем WhatsApp
+          </button>
+        </div>
+        <div id="exitClientsList" class="client-list"></div>
+      </div>
+    </div>
+
+    <!-- ================= Лист 8: Партнёры ================= -->
     <div id="partnersTabContent" class="hidden space-y-4">
       <div class="bg-white shadow-xl rounded-xl p-6 border">
         <div class="flex justify-between items-center mb-4">
@@ -572,7 +583,7 @@
       </div>
     </div>
 
-    <!-- ================= Лист 8: Распечатка ================= -->
+    <!-- ================= Лист 9: Распечатка ================= -->
     <div id="printTabContent" class="hidden space-y-4">
       <div class="bg-white shadow-xl rounded-xl p-6 border">
         <div class="flex justify-between items-center mb-4 no-print">
@@ -616,6 +627,9 @@
       </button>
       <button type="button" onclick="switchTab('debtors')" id="tabBtnDebtors" class="tab-btn debtors-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
         🚫 Неплательщики
+      </button>
+      <button type="button" onclick="switchTab('exit')" id="tabBtnExit" class="tab-btn exit-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
+        🚗 Выезд
       </button>
       <button type="button" onclick="switchTab('partners')" id="tabBtnPartners" class="tab-btn partners-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
         🤝 Партнёры
@@ -853,6 +867,7 @@
       const todayTab = document.getElementById('todayTabContent');
       const threeDaysTab = document.getElementById('threeDaysTabContent');
       const debtorsTab = document.getElementById('debtorsTabContent');
+      const exitTab = document.getElementById('exitTabContent');
       const partnersTab = document.getElementById('partnersTabContent');
       const printTab = document.getElementById('printTabContent');
 
@@ -862,6 +877,7 @@
       const todayBtn = document.getElementById('tabBtnToday');
       const threeDaysBtn = document.getElementById('tabBtnThreeDays');
       const debtorsBtn = document.getElementById('tabBtnDebtors');
+      const exitBtn = document.getElementById('tabBtnExit');
       const partnersBtn = document.getElementById('tabBtnPartners');
       const printBtn = document.getElementById('tabBtnPrint');
 
@@ -875,6 +891,7 @@
       todayTab.classList.add('hidden');
       threeDaysTab.classList.add('hidden');
       debtorsTab.classList.add('hidden');
+      exitTab.classList.add('hidden');
       partnersTab.classList.add('hidden');
       printTab.classList.add('hidden');
       addC.classList.add('hidden');
@@ -887,6 +904,7 @@
       todayBtn.className = "tab-btn today-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       threeDaysBtn.className = "tab-btn three-days-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       debtorsBtn.className = "tab-btn debtors-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
+      exitBtn.className = "tab-btn exit-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       partnersBtn.className = "tab-btn partners-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       printBtn.className = "tab-btn print-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
 
@@ -915,6 +933,10 @@
         debtorsTab.classList.remove('hidden');
         debtorsBtn.className = "tab-btn debtors-tab active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
         renderDebtorsClients();
+      } else if (tab === 'exit') {
+        exitTab.classList.remove('hidden');
+        exitBtn.className = "tab-btn exit-tab active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
+        renderExitClients();
       } else if (tab === 'partners') {
         partnersTab.classList.remove('hidden');
         partnersBtn.className = "tab-btn partners-tab active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
@@ -989,6 +1011,7 @@
       if (activeTab === 'today') renderTodayClients();
       if (activeTab === 'threeDays') renderThreeDaysClients();
       if (activeTab === 'debtors') renderDebtorsClients();
+      if (activeTab === 'exit') renderExitClients();
       if (activeTab === 'partners') renderPartners();
       if (activeTab === 'print') {
         updatePrintSelect();
@@ -1019,6 +1042,7 @@
       if (activeTab === 'today') renderTodayClients();
       if (activeTab === 'threeDays') renderThreeDaysClients();
       if (activeTab === 'debtors') renderDebtorsClients();
+      if (activeTab === 'exit') renderExitClients();
       if (activeTab === 'partners') renderPartners();
       if (activeTab === 'print') {
         updatePrintSelect();
@@ -1080,7 +1104,7 @@
       const payDay = payDateObj.getDate();
       const monthsCount = Number(contract.monthsCount) || 0;
       
-      // Используем дату покупки как точку отсчета
+      // Используем дату покупки как точку отсчета, если она есть, иначе дату платежа
       let startDate = new Date(contract.buyDate || payDateStr);
       if (isNaN(startDate.getTime())) {
         startDate = new Date(payDateStr);
@@ -1090,7 +1114,6 @@
       const dates = [];
       for (let i = 1; i <= monthsCount; i++) {
         const paymentDate = new Date(startDate);
-        // Добавляем (i-1) месяцев, чтобы первый платеж был в месяц покупки
         paymentDate.setMonth(paymentDate.getMonth() + (i - 1));
         
         // Корректируем день на указанный в payDate, но не выходим за пределы месяца
@@ -1173,7 +1196,7 @@
     }
 
     // ================================================================
-    // ФУНКЦИЯ ЗАГРУЗКИ ДОГОВОРА ДЛЯ ПЕЧАТИ (с плановыми и фактическими датами)
+    // ФУНКЦИЯ ЗАГРУЗКИ ДОГОВОРА ДЛЯ ПЕЧАТИ (только фактические платежи)
     // ================================================================
 
     function updatePrintSelect() {
@@ -1213,45 +1236,29 @@
       const installments = contract.installments || {};
       const paymentKeys = Object.keys(installments).sort((a, b) => Number(a) - Number(b));
       
-      // Получаем плановые даты платежей
-      const paymentDates = calculatePaymentDates(contract);
-      
       let paymentsHtml = '';
       let totalPaidSum = 0;
       
-      // Создаем карту фактических платежей
-      const actualPaymentsMap = {};
-      paymentKeys.forEach(key => {
-        actualPaymentsMap[key] = installments[key];
-      });
-      
-      // Проходим по всем плановым платежам
-      if (paymentDates.length === 0) {
+      if (paymentKeys.length === 0) {
         paymentsHtml = `
           <tr>
-            <td colspan="4" style="padding: 8px; text-align: center; color: #999; border: 1px solid #000;">
-              Нет запланированных платежей
+            <td colspan="3" style="padding: 8px; text-align: center; color: #999; border: 1px solid #000;">
+              Нет внесенных платежей
             </td>
           </tr>
         `;
       } else {
-        paymentDates.forEach((pd, index) => {
-          const actual = actualPaymentsMap[pd.index];
-          const isPaid = !!actual && Number(actual.amount) > 0;
-          const actualAmount = isPaid ? Number(actual.amount) : 0;
-          const actualDate = isPaid ? (actual.date || '—') : '—';
-          
-          totalPaidSum += actualAmount;
+        paymentKeys.forEach((key, index) => {
+          const payment = installments[key];
+          const amount = Number(payment.amount) || 0;
+          const date = payment.date || '—';
+          totalPaidSum += amount;
           
           paymentsHtml += `
             <tr>
-              <td style="padding: 3px 8px; text-align: center; font-weight: bold; border: 1px solid #000;">${pd.index}</td>
-              <td style="padding: 3px 8px; text-align: center; border: 1px solid #000;">${pd.dateStr}</td>
-              <td style="padding: 3px 8px; text-align: center; border: 1px solid #000;">${pd.amount.toLocaleString('ru-RU')} ₽</td>
-              <td style="padding: 3px 8px; text-align: center; border: 1px solid #000; ${isPaid ? 'font-weight: bold; color: #22c55e;' : 'color: #999;'}">
-                ${isPaid ? actualAmount.toLocaleString('ru-RU') + ' ₽' : '—'}
-                ${isPaid ? `<br><span style="font-size: 9px; color: #6b7280;">${actualDate}</span>` : ''}
-              </td>
+              <td style="padding: 3px 8px; text-align: center; font-weight: bold; border: 1px solid #000;">${index + 1}</td>
+              <td style="padding: 3px 8px; text-align: center; border: 1px solid #000;">${date}</td>
+              <td style="padding: 3px 8px; text-align: center; font-weight: bold; color: #22c55e; border: 1px solid #000;">${amount.toLocaleString('ru-RU')} ₽</td>
             </tr>
           `;
         });
@@ -1259,7 +1266,7 @@
         // Добавляем итоговую строку
         paymentsHtml += `
           <tr style="background-color: #e2e8f0; font-weight: bold;">
-            <td style="padding: 3px 8px; text-align: center; border: 1px solid #000;" colspan="3">ИТОГО ВНЕСЕНО:</td>
+            <td style="padding: 3px 8px; text-align: center; border: 1px solid #000;" colspan="2">ИТОГО ВНЕСЕНО:</td>
             <td style="padding: 3px 8px; text-align: center; border: 1px solid #000; color: #22c55e;">${totalPaidSum.toLocaleString('ru-RU')} ₽</td>
           </tr>
         `;
@@ -1357,18 +1364,17 @@
               не позднее <b>${contract.payDate || '______'}</b> числа каждого месяца.
             </p>
             
-            <!-- ТАБЛИЦА ПЛАТЕЖЕЙ (плановые + фактические) -->
+            <!-- ТАБЛИЦА ФАКТИЧЕСКИХ ПЛАТЕЖЕЙ -->
             <div style="margin-top: 10px; border: 1px solid #000; overflow: hidden;">
               <div style="background-color: #e2e8f0; font-weight: bold; text-align: center; padding: 4px; font-size: 12px; border-bottom: 1px solid #000;">
-                📋 ГРАФИК ПЛАТЕЖЕЙ И ФАКТИЧЕСКИЕ ОПЛАТЫ
+                📋 ВНЕСЕННЫЕ ПЛАТЕЖИ
               </div>
               <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
                 <thead>
                   <tr>
-                    <th style="padding: 3px 8px; border: 1px solid #000; width: 8%; background: #e2e8f0;">№</th>
-                    <th style="padding: 3px 8px; border: 1px solid #000; width: 22%; background: #e2e8f0;">Плановая дата</th>
-                    <th style="padding: 3px 8px; border: 1px solid #000; width: 20%; background: #e2e8f0;">Сумма по графику</th>
-                    <th style="padding: 3px 8px; border: 1px solid #000; width: 50%; background: #e2e8f0;">Фактическая оплата (дата / сумма)</th>
+                    <th style="padding: 3px 8px; border: 1px solid #000; width: 15%; background: #e2e8f0;">№</th>
+                    <th style="padding: 3px 8px; border: 1px solid #000; width: 45%; background: #e2e8f0;">Дата оплаты</th>
+                    <th style="padding: 3px 8px; border: 1px solid #000; width: 40%; background: #e2e8f0;">Сумма</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1507,7 +1513,7 @@
     }
 
     // ================================================================
-    // ОСТАЛЬНЫЕ ФУНКЦИИ (без изменений или с использованием новой логики)
+    // ОСТАЛЬНЫЕ ФУНКЦИИ
     // ================================================================
 
     function numberToWords(num) {
@@ -1863,15 +1869,88 @@
       renderClientList('debtorsClientsList', clients, 'Нет клиентов с просрочкой', '');
     }
 
+    // ================================================================
+    // ФУНКЦИЯ ДЛЯ ЛИСТА "ВЫЕЗД" (просрочка 2+ месяца)
+    // ================================================================
+    
+    function renderExitClients() {
+      const clients = getExitClients();
+      
+      const container = document.getElementById('exitClientsList');
+      if (clients.length === 0) {
+        container.innerHTML = `<div class="text-center text-gray-500 py-8 text-sm">🚗 Нет клиентов с просрочкой 2+ месяца</div>`;
+        return;
+      }
+      
+      let html = '<div class="divide-y">';
+      clients.forEach((client) => {
+        const monthInfo = client.monthInfo || getMonthStatus(client);
+        let monthsHtml = '';
+        let overdueSum = 0;
+        
+        monthInfo.months.forEach(m => {
+          let statusClass = 'month-future';
+          let statusText = '⏳ Ожидает';
+          if (m.status === 'paid') {
+            statusClass = 'month-paid';
+            statusText = `✅ ${m.amount} ₽`;
+          } else if (m.status === 'overdue') {
+            statusClass = 'month-overdue';
+            statusText = `❌ ${m.amount} ₽`;
+            overdueSum += m.amount;
+          } else {
+            statusText = `📅 ${m.amount} ₽`;
+          }
+          monthsHtml += `<span class="month-status ${statusClass}" title="${m.date}">${m.month}-й: ${statusText}</span>`;
+        });
+        
+        const rest = client.rest || calculateContractMetrics(client).rest;
+        const phone = client.phone.replace(/[^0-9]/g, '');
+        
+        html += `
+          <div class="client-item" style="border-left: 4px solid #dc2626;">
+            <div class="client-info">
+              <span class="client-name">${client.fio}</span>
+              <span class="client-phone">📞 ${client.phone}</span>
+              <span class="client-detail">💰 Мес. платеж: ${client.monthlyPay} ₽</span>
+              <span class="client-detail" style="color: #dc2626; font-weight: bold;">🚗 ВЫЕЗД (2+ мес.)</span>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="client-overdue">Просрочка: ${overdueSum.toLocaleString('ru-RU')} ₽</span>
+              <span class="client-rest">Остаток: ${rest.toLocaleString('ru-RU')} ₽</span>
+              <a href="https://wa.me/7${phone}?text=Здравствуйте! У вас просрочка более 2 месяцев. Просим связаться с нами." 
+                 target="_blank" 
+                 class="text-green-600 hover:text-green-800 font-bold text-sm">
+                💬
+              </a>
+            </div>
+            <div class="w-full mt-1 flex flex-wrap gap-1">
+              ${monthsHtml}
+            </div>
+          </div>
+        `;
+      });
+      html += '</div>';
+      container.innerHTML = html;
+    }
+
     function getDebtors() {
       const result = [];
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
       
       allContracts.forEach(contract => {
         const metrics = calculateContractMetrics(contract);
         if (metrics.isClosed) return;
         
         const monthInfo = getMonthStatus(contract);
-        const hasOverdue = monthInfo.months.some(m => m.status === 'overdue' && !m.isPaid);
+        let hasOverdue = false;
+        for (const m of monthInfo.months) {
+          if (m.status === 'overdue' && !m.isPaid && m.payDateObj < today) {
+            hasOverdue = true;
+            break;
+          }
+        }
         
         if (hasOverdue) {
           result.push({
@@ -1885,6 +1964,47 @@
       });
       
       return result;
+    }
+
+    // Функция для получения клиентов с просрочкой 2+ месяца
+    function getExitClients() {
+      const result = [];
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const twoMonthsAgo = new Date(today);
+      twoMonthsAgo.setMonth(today.getMonth() - 2);
+      
+      allContracts.forEach(contract => {
+        const metrics = calculateContractMetrics(contract);
+        if (metrics.isClosed) return;
+        
+        const monthInfo = getMonthStatus(contract);
+        let overdueCount = 0;
+        for (const m of monthInfo.months) {
+          if (m.status === 'overdue' && !m.isPaid && m.payDateObj < today) {
+            // Проверяем, что платеж был просрочен как минимум 2 месяца назад
+            const twoMonthsAgoDate = new Date(today);
+            twoMonthsAgoDate.setMonth(today.getMonth() - 2);
+            if (m.payDateObj <= twoMonthsAgoDate) {
+              overdueCount++;
+            }
+          }
+        }
+        
+        // Если есть хотя бы 2 просроченных платежа (или один, но старше 2 месяцев)
+        if (overdueCount >= 2) {
+          result.push({
+            ...contract,
+            rest: metrics.rest,
+            phone: contract.phone || '',
+            fio: contract.fio || '',
+            monthInfo: monthInfo,
+            overdueCount: overdueCount
+          });
+        }
+      });
+      
+      return result.sort((a, b) => (b.overdueCount || 0) - (a.overdueCount || 0));
     }
 
     // ===== ФУНКЦИИ ДЛЯ WHATSAPP =====
@@ -2032,6 +2152,52 @@
         showCopyNotification(`✅ Скопировано ${phoneNumbers.length} номеров для рассылки!`);
       }).catch(() => {
         showCopyNotification(`⚠️ Найдено ${phoneNumbers.length} должников. Скопируйте номера вручную.`);
+      });
+      
+      const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+      window.open(url, '_blank');
+    }
+
+    function sendWhatsAppExit() {
+      const clients = getExitClients();
+      
+      if (clients.length === 0) {
+        alert('🚗 Нет клиентов с просрочкой 2+ месяца');
+        return;
+      }
+      
+      let message = '🚗 *Выезд! Просрочка более 2 месяцев!*\n\n';
+      let phoneNumbers = [];
+      
+      clients.forEach((client, index) => {
+        const phone = client.phone.replace(/[^0-9]/g, '');
+        if (phone) phoneNumbers.push(phone);
+        
+        const monthInfo = client.monthInfo || getMonthStatus(client);
+        let overdueSum = 0;
+        let overdueMonths = [];
+        monthInfo.months.forEach(m => {
+          if (m.status === 'overdue' && !m.isPaid) {
+            overdueSum += m.amount;
+            overdueMonths.push(`${m.month}-й (${m.date})`);
+          }
+        });
+        
+        message += `${index + 1}. *${client.fio}*\n`;
+        message += `   💰 Сумма: ${client.monthlyPay} ₽\n`;
+        message += `   📱 WhatsApp: wa.me/7${phone}\n`;
+        message += `   ⚠️ Просрочка: ${overdueSum} ₽ (${overdueMonths.join(', ')})\n`;
+        message += `   📊 Остаток: ${client.rest} ₽\n`;
+        message += `   🚗 *Выезд обязателен!*\n\n`;
+      });
+      
+      message += `\n👥 Всего клиентов на выезд: ${clients.length}`;
+      
+      const phoneList = phoneNumbers.map(p => `7${p}`).join(', ');
+      navigator.clipboard.writeText(phoneList).then(() => {
+        showCopyNotification(`✅ Скопировано ${phoneNumbers.length} номеров для рассылки!`);
+      }).catch(() => {
+        showCopyNotification(`⚠️ Найдено ${phoneNumbers.length} клиентов. Скопируйте номера вручную.`);
       });
       
       const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
@@ -2286,22 +2452,10 @@
         const tr = document.createElement('tr');
         if (Number(item.costPrice) > Number(item.totalCost)) tr.className = 'row-error';
         
-        // Получаем плановые даты для отображения
-        const paymentDates = calculatePaymentDates(item);
-        const paymentDatesMap = {};
-        paymentDates.forEach(pd => {
-          paymentDatesMap[pd.index] = pd.dateStr;
-        });
-        
         let instHtml = '';
         for(let i=1; i<=15; i++) {
           const v = insts[i];
-          const plannedDate = paymentDatesMap[i] || '';
-          if (v) {
-            instHtml += `<td class="p-1 border-r text-center pay-paid" title="Факт: ${v.date} | План: ${plannedDate}">${v.amount}</td>`;
-          } else {
-            instHtml += `<td class="p-1 border-r text-center text-gray-300">—</td>`;
-          }
+          instHtml += v ? `<td class="p-1 border-r text-center pay-paid" title="Дата: ${v.date}">${v.amount}</td>` : `<td class="p-1 border-r text-center text-gray-300">—</td>`;
         }
 
         tr.innerHTML = `
