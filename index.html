@@ -6,7 +6,6 @@
   <title>Система Учета и Договоров</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* --- Ваши стили (без изменений) --- */
     .row-error { background-color: #fee2e2 !important; }
     .pay-paid { background-color: #22c55e; color: white; font-weight: bold; cursor: pointer; }
     .btn-history-active { background-color: #f59e0b !important; color: white !important; cursor: pointer !important; }
@@ -31,11 +30,6 @@
     
     .tab-btn.debtors-tab.active {
       background-color: #ef4444;
-      color: #ffffff;
-    }
-
-    .tab-btn.exit-tab.active {
-      background-color: #dc2626;
       color: #ffffff;
     }
     
@@ -116,7 +110,6 @@
     .month-paid { background-color: #22c55e; color: white; }
     .month-overdue { background-color: #ef4444; color: white; }
     .month-future { background-color: #3b82f6; color: white; }
-    .month-exit { background-color: #dc2626; color: white; }
     
     .client-info {
       display: flex;
@@ -140,7 +133,6 @@
     .partner-name { font-weight: bold; font-size: 14px; color: #7c3aed; }
     .partner-value { font-weight: bold; font-size: 13px; }
 
-    /* Стили для печати договора */
     .print-contract {
       font-family: 'Times New Roman', serif;
       font-size: 12px;
@@ -548,21 +540,7 @@
       </div>
     </div>
 
-    <!-- ================= Лист 7: Выезд (просрочка 2+ месяца) ================= -->
-    <div id="exitTabContent" class="hidden space-y-4">
-      <div class="bg-white shadow-xl rounded-xl p-6 border border-red-200">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold text-red-700">🚗 Выезд (просрочка 2+ месяца)</h2>
-          <button onclick="sendWhatsAppExit()" class="whatsapp-btn">
-            <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            Отправить всем WhatsApp
-          </button>
-        </div>
-        <div id="exitClientsList" class="client-list"></div>
-      </div>
-    </div>
-
-    <!-- ================= Лист 8: Партнёры ================= -->
+    <!-- ================= Лист 7: Партнёры ================= -->
     <div id="partnersTabContent" class="hidden space-y-4">
       <div class="bg-white shadow-xl rounded-xl p-6 border">
         <div class="flex justify-between items-center mb-4">
@@ -583,7 +561,7 @@
       </div>
     </div>
 
-    <!-- ================= Лист 9: Распечатка ================= -->
+    <!-- ================= Лист 8: Распечатка ================= -->
     <div id="printTabContent" class="hidden space-y-4">
       <div class="bg-white shadow-xl rounded-xl p-6 border">
         <div class="flex justify-between items-center mb-4 no-print">
@@ -627,9 +605,6 @@
       </button>
       <button type="button" onclick="switchTab('debtors')" id="tabBtnDebtors" class="tab-btn debtors-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
         🚫 Неплательщики
-      </button>
-      <button type="button" onclick="switchTab('exit')" id="tabBtnExit" class="tab-btn exit-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
-        🚗 Выезд
       </button>
       <button type="button" onclick="switchTab('partners')" id="tabBtnPartners" class="tab-btn partners-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
         🤝 Партнёры
@@ -837,7 +812,6 @@
     let allTaken = JSON.parse(localStorage.getItem('taken_db') || '[]');
     let customAccounts = JSON.parse(localStorage.getItem('accounts_db') || 'null');
 
-    // Инициализация счетов по умолчанию
     if (!customAccounts) {
       const defaultNames = ['N', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12', 'T13', 'T14', 'T15', 'T16', 'B1', 'B2', 'B3', 'B4'];
       customAccounts = defaultNames.map(name => ({
@@ -856,20 +830,6 @@
     let redoStack = [];
 
     // ================================================================
-    // ФУНКЦИЯ ПОЛУЧЕНИЯ ТЕКУЩЕЙ ДАТЫ ПО МОСКОВСКОМУ ВРЕМЕНИ (UTC+3)
-    // ================================================================
-    function getMoscowDate() {
-      const now = new Date();
-      const moscowOffset = 3 * 60; // минут
-      const localOffset = now.getTimezoneOffset();
-      const diff = moscowOffset + localOffset;
-      const moscowTime = new Date(now.getTime() + diff * 60000);
-      // Устанавливаем время на 00:00:00, чтобы получить только дату
-      moscowTime.setHours(0, 0, 0, 0);
-      return moscowTime;
-    }
-
-    // ================================================================
     // ФУНКЦИИ ПЕРЕКЛЮЧЕНИЯ ВКЛАДОК И ИСТОРИИ
     // ================================================================
 
@@ -881,7 +841,6 @@
       const todayTab = document.getElementById('todayTabContent');
       const threeDaysTab = document.getElementById('threeDaysTabContent');
       const debtorsTab = document.getElementById('debtorsTabContent');
-      const exitTab = document.getElementById('exitTabContent');
       const partnersTab = document.getElementById('partnersTabContent');
       const printTab = document.getElementById('printTabContent');
 
@@ -891,7 +850,6 @@
       const todayBtn = document.getElementById('tabBtnToday');
       const threeDaysBtn = document.getElementById('tabBtnThreeDays');
       const debtorsBtn = document.getElementById('tabBtnDebtors');
-      const exitBtn = document.getElementById('tabBtnExit');
       const partnersBtn = document.getElementById('tabBtnPartners');
       const printBtn = document.getElementById('tabBtnPrint');
 
@@ -905,7 +863,6 @@
       todayTab.classList.add('hidden');
       threeDaysTab.classList.add('hidden');
       debtorsTab.classList.add('hidden');
-      exitTab.classList.add('hidden');
       partnersTab.classList.add('hidden');
       printTab.classList.add('hidden');
       addC.classList.add('hidden');
@@ -918,7 +875,6 @@
       todayBtn.className = "tab-btn today-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       threeDaysBtn.className = "tab-btn three-days-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       debtorsBtn.className = "tab-btn debtors-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
-      exitBtn.className = "tab-btn exit-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       partnersBtn.className = "tab-btn partners-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       printBtn.className = "tab-btn print-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
 
@@ -947,10 +903,6 @@
         debtorsTab.classList.remove('hidden');
         debtorsBtn.className = "tab-btn debtors-tab active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
         renderDebtorsClients();
-      } else if (tab === 'exit') {
-        exitTab.classList.remove('hidden');
-        exitBtn.className = "tab-btn exit-tab active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
-        renderExitClients();
       } else if (tab === 'partners') {
         partnersTab.classList.remove('hidden');
         partnersBtn.className = "tab-btn partners-tab active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
@@ -964,7 +916,6 @@
       handleSearch();
     }
 
-    // --- Функции истории ---
     function saveState() {
       const stateSnapshot = {
         contracts: JSON.parse(JSON.stringify(allContracts)),
@@ -1025,7 +976,6 @@
       if (activeTab === 'today') renderTodayClients();
       if (activeTab === 'threeDays') renderThreeDaysClients();
       if (activeTab === 'debtors') renderDebtorsClients();
-      if (activeTab === 'exit') renderExitClients();
       if (activeTab === 'partners') renderPartners();
       if (activeTab === 'print') {
         updatePrintSelect();
@@ -1056,7 +1006,6 @@
       if (activeTab === 'today') renderTodayClients();
       if (activeTab === 'threeDays') renderThreeDaysClients();
       if (activeTab === 'debtors') renderDebtorsClients();
-      if (activeTab === 'exit') renderExitClients();
       if (activeTab === 'partners') renderPartners();
       if (activeTab === 'print') {
         updatePrintSelect();
@@ -1066,7 +1015,7 @@
     }
 
     // ================================================================
-    // ФУНКЦИЯ ПРОВЕРКИ ДАТЫ ПЛАТЕЖА (только предупреждение)
+    // ФУНКЦИЯ ПРОВЕРКИ ДАТЫ ПЛАТЕЖА
     // ================================================================
 
     function checkPaymentDateAdjustment() {
@@ -1087,8 +1036,7 @@
         
         const payDay = payDateObj.getDate();
         
-        // Проверяем, есть ли такой день в следующем месяце
-        const today = getMoscowDate();
+        const today = new Date();
         const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
         const lastDayOfNextMonth = new Date(nextMonth.getFullYear(), nextMonth.getMonth() + 1, 0);
         const lastDay = lastDayOfNextMonth.getDate();
@@ -1105,51 +1053,7 @@
     }
 
     // ================================================================
-    // НОВАЯ ЛОГИКА РАСЧЕТА ДАТ ПЛАТЕЖЕЙ (без +1 и -1 дней)
-    // ================================================================
-    
-    function calculatePaymentDates(contract) {
-      const payDateStr = contract.payDate;
-      if (!payDateStr) return [];
-      
-      const payDateObj = new Date(payDateStr);
-      if (isNaN(payDateObj.getTime())) return [];
-      
-      const payDay = payDateObj.getDate();
-      const monthsCount = Number(contract.monthsCount) || 0;
-      
-      // Используем дату покупки как точку отсчета, если она есть, иначе дату платежа
-      let startDate = new Date(contract.buyDate || payDateStr);
-      if (isNaN(startDate.getTime())) {
-        startDate = new Date(payDateStr);
-      }
-      startDate.setHours(0, 0, 0, 0);
-      
-      const dates = [];
-      for (let i = 1; i <= monthsCount; i++) {
-        const paymentDate = new Date(startDate);
-        paymentDate.setMonth(paymentDate.getMonth() + (i - 1));
-        
-        // Корректируем день на указанный в payDate, но не выходим за пределы месяца
-        const lastDayOfMonth = new Date(paymentDate.getFullYear(), paymentDate.getMonth() + 1, 0);
-        const lastDay = lastDayOfMonth.getDate();
-        const targetDay = Math.min(payDay, lastDay);
-        paymentDate.setDate(targetDay);
-        paymentDate.setHours(0, 0, 0, 0);
-        
-        dates.push({
-          index: i,
-          date: paymentDate,
-          dateStr: paymentDate.toISOString().slice(0, 10),
-          amount: Number(contract.monthlyPay) || 0
-        });
-      }
-      
-      return dates;
-    }
-
-    // ================================================================
-    // УНИВЕРСАЛЬНАЯ ФУНКЦИЯ РАСЧЕТА ПОКАЗАТЕЛЕЙ ПО ДОГОВОРУ
+    // 🔧 ИЗМЕНЕНИЕ №1: ФУНКЦИЯ calculateContractMetrics (ИСПРАВЛЕНА)
     // ================================================================
     
     function calculateContractMetrics(contract) {
@@ -1182,20 +1086,47 @@
       const paidPercentage = totalPayable > 0 ? (totalPaid / totalPayable) * 100 : 0;
       const isClosed = rest <= 0;
       
-      // Расчет просрочки с использованием московской даты
+      // ⬇️⬇️⬇️ ИСПРАВЛЕННАЯ ЧАСТЬ - РАСЧЕТ ПРОСРОЧКИ ⬇️⬇️⬇️
       let overdueSum = 0;
-      const today = getMoscowDate();
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
       
-      if (!isClosed && contract.payDate && contract.monthsCount) {
-        const paymentDates = calculatePaymentDates(contract);
-        for (const pd of paymentDates) {
-          const payment = installments[pd.index];
-          const isPaid = !!payment && Number(payment.amount) > 0;
-          if (!isPaid && pd.date < today) {
-            overdueSum += monthlyPay;
+      if (contract.payDate && contract.monthsCount && !isClosed) {
+        try {
+          const payDateObj = new Date(contract.payDate);
+          if (!isNaN(payDateObj.getTime())) {
+            const payDay = payDateObj.getDate();
+            const startDate = contract.buyDate ? new Date(contract.buyDate) : new Date(contract.payDate);
+            if (!isNaN(startDate.getTime())) {
+              startDate.setHours(0, 0, 0, 0);
+              const monthsCount = Number(contract.monthsCount) || 0;
+              
+              for (let i = 1; i <= monthsCount; i++) {
+                // ✅ ПРАВИЛЬНО: добавляем месяцы к дате покупки
+                const payDate = new Date(startDate);
+                payDate.setMonth(payDate.getMonth() + (i - 1));
+                
+                // ✅ ПРАВИЛЬНО: корректируем день (если нет такого дня в месяце)
+                const lastDayOfMonth = new Date(payDate.getFullYear(), payDate.getMonth() + 1, 0);
+                const lastDay = lastDayOfMonth.getDate();
+                const targetDay = Math.min(payDay, lastDay);
+                payDate.setDate(targetDay);
+                payDate.setHours(0, 0, 0, 0);
+                
+                const payment = installments[i];
+                const isPaid = !!payment && Number(payment.amount) > 0;
+                
+                if (!isPaid && payDate < today) {
+                  overdueSum += monthlyPay;
+                }
+              }
+            }
           }
+        } catch (e) {
+          console.warn('Ошибка расчета просрочки для договора', contract.id);
         }
       }
+      // ⬆️⬆️⬆️ КОНЕЦ ИСПРАВЛЕННОЙ ЧАСТИ ⬆️⬆️⬆️
       
       return {
         rest: Math.max(0, rest),
@@ -1209,7 +1140,7 @@
     }
 
     // ================================================================
-    // ФУНКЦИЯ ЗАГРУЗКИ ДОГОВОРА ДЛЯ ПЕЧАТИ (только фактические платежи)
+    // ФУНКЦИЯ ЗАГРУЗКИ ДОГОВОРА ДЛЯ ПЕЧАТИ
     // ================================================================
 
     function updatePrintSelect() {
@@ -1245,66 +1176,40 @@
         return;
       }
       
-      // Получаем все внесенные платежи из installments
-      const installments = contract.installments || {};
-      const paymentKeys = Object.keys(installments).sort((a, b) => Number(a) - Number(b));
+      const monthInfo = getMonthStatus(contract);
+      const months = monthInfo.months;
       
-      let paymentsHtml = '';
-      let totalPaidSum = 0;
-      
-      if (paymentKeys.length === 0) {
-        paymentsHtml = `
+      let monthsHtml = '';
+      for (let i = 0; i < months.length; i++) {
+        const m = months[i];
+        const isPaid = m.isPaid;
+        const statusText = isPaid ? '✅ Оплачен' : '⏳ Ожидает';
+        const statusColor = isPaid ? 'color: #22c55e; font-weight: bold;' : 'color: #ef4444; font-weight: bold;';
+        monthsHtml += `
           <tr>
-            <td colspan="3" style="padding: 8px; text-align: center; color: #999; border: 1px solid #000;">
-              Нет внесенных платежей
-            </td>
-          </tr>
-        `;
-      } else {
-        paymentKeys.forEach((key, index) => {
-          const payment = installments[key];
-          const amount = Number(payment.amount) || 0;
-          const date = payment.date || '—';
-          totalPaidSum += amount;
-          
-          paymentsHtml += `
-            <tr>
-              <td style="padding: 3px 8px; text-align: center; font-weight: bold; border: 1px solid #000;">${index + 1}</td>
-              <td style="padding: 3px 8px; text-align: center; border: 1px solid #000;">${date}</td>
-              <td style="padding: 3px 8px; text-align: center; font-weight: bold; color: #22c55e; border: 1px solid #000;">${amount.toLocaleString('ru-RU')} ₽</td>
-            </tr>
-          `;
-        });
-        
-        // Добавляем итоговую строку
-        paymentsHtml += `
-          <tr style="background-color: #e2e8f0; font-weight: bold;">
-            <td style="padding: 3px 8px; text-align: center; border: 1px solid #000;" colspan="2">ИТОГО ВНЕСЕНО:</td>
-            <td style="padding: 3px 8px; text-align: center; border: 1px solid #000; color: #22c55e;">${totalPaidSum.toLocaleString('ru-RU')} ₽</td>
+            <td style="padding: 3px 8px; text-align: center; font-weight: bold; border: 1px solid #000;">${m.month}</td>
+            <td style="padding: 3px 8px; text-align: center; border: 1px solid #000;">${m.date}</td>
+            <td style="padding: 3px 8px; text-align: center; ${statusColor}">${isPaid ? m.amount.toLocaleString('ru-RU') + ' ₽' : '—'}</td>
+            <td style="padding: 3px 8px; text-align: center; ${statusColor}">${statusText}</td>
           </tr>
         `;
       }
       
-      const today = getMoscowDate();
+      const today = new Date();
       const todayStr = today.toLocaleDateString('ru-RU');
       
       container.innerHTML = `
         <div style="font-family: 'Times New Roman', serif; font-size: 12px; line-height: 1.4; padding: 15px 25px; max-width: 210mm; margin: 0 auto; background: white;">
           
-          <!-- ================= СТРАНИЦА 1 ================= -->
           <div style="position: relative;">
-            
-            <!-- Номер договора справа сверху -->
             <div style="position: absolute; top: 0; right: 0; font-size: 13px; font-weight: bold;">
               № ${contract.contractNum}
             </div>
             
-            <!-- ЗАГОЛОВОК -->
             <h1 style="font-size: 16px; font-weight: bold; text-align: center; text-transform: uppercase; margin-bottom: 10px;">
               ДОГОВОР КУПЛИ-ПРОДАЖИ ТОВАРА В РАССРОЧКУ
             </h1>
             
-            <!-- ШАПКА С ДАННЫМИ ПРОДАВЦА -->
             <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 11.5px;">
               <div>
                 <b>Чеченская Республика</b><br>
@@ -1318,7 +1223,6 @@
               </div>
             </div>
             
-            <!-- БЛОК ПОКУПАТЕЛЯ -->
             <div style="border: 1px solid #000; padding: 6px 10px; margin-bottom: 8px;">
               <div style="font-weight: bold; font-size: 13px; margin-bottom: 3px;">Покупатель</div>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px 15px; font-size: 11.5px;">
@@ -1331,7 +1235,6 @@
               </div>
             </div>
             
-            <!-- БЛОК ПОРУЧИТЕЛЯ -->
             <div style="border: 1px solid #000; padding: 6px 10px; margin-bottom: 10px;">
               <div style="font-weight: bold; font-size: 13px; margin-bottom: 3px;">Поручитель</div>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px 15px; font-size: 11.5px;">
@@ -1348,7 +1251,6 @@
               Совместно именуемые «Стороны», заключили настоящий Договор о нижеследующем:
             </p>
             
-            <!-- РАЗДЕЛ 1: ПРЕДМЕТ ДОГОВОРА -->
             <div style="font-weight: bold; font-size: 14px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">
               1. ПРЕДМЕТ ДОГОВОРА
             </div>
@@ -1362,7 +1264,6 @@
               «Покупатель» обязуется принять и уплатить за него стоимость, указанную в Договоре.
             </p>
             
-            <!-- РАЗДЕЛ 2: ЦЕНА ТОВАРА И ПОРЯДОК РАСЧЕТОВ -->
             <div style="font-weight: bold; font-size: 14px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">
               2. ЦЕНА ТОВАРА И ПОРЯДОК РАСЧЕТОВ
             </div>
@@ -1377,34 +1278,28 @@
               не позднее <b>${contract.payDate || '______'}</b> числа каждого месяца.
             </p>
             
-            <!-- ТАБЛИЦА ФАКТИЧЕСКИХ ПЛАТЕЖЕЙ -->
             <div style="margin-top: 10px; border: 1px solid #000; overflow: hidden;">
-              <div style="background-color: #e2e8f0; font-weight: bold; text-align: center; padding: 4px; font-size: 12px; border-bottom: 1px solid #000;">
-                📋 ВНЕСЕННЫЕ ПЛАТЕЖИ
-              </div>
               <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
                 <thead>
                   <tr>
                     <th style="padding: 3px 8px; border: 1px solid #000; width: 15%; background: #e2e8f0;">№</th>
-                    <th style="padding: 3px 8px; border: 1px solid #000; width: 45%; background: #e2e8f0;">Дата оплаты</th>
-                    <th style="padding: 3px 8px; border: 1px solid #000; width: 40%; background: #e2e8f0;">Сумма</th>
+                    <th style="padding: 3px 8px; border: 1px solid #000; width: 35%; background: #e2e8f0;">Дата</th>
+                    <th style="padding: 3px 8px; border: 1px solid #000; width: 25%; background: #e2e8f0;">Сумма</th>
+                    <th style="padding: 3px 8px; border: 1px solid #000; width: 25%; background: #e2e8f0;">Статус</th>
                   </tr>
                 </thead>
                 <tbody>
-                  ${paymentsHtml}
+                  ${monthsHtml}
                 </tbody>
               </table>
             </div>
             
           </div>
           
-          <!-- ================= РАЗРЫВ СТРАНИЦЫ ================= -->
           <div style="page-break-after: always; border-bottom: 2px dashed #ccc; margin: 10px 0;"></div>
           
-          <!-- ================= СТРАНИЦА 2 ================= -->
           <div style="font-size: 11px;">
             
-            <!-- РАЗДЕЛ 3: ПРАВА И ОБЯЗАННОСТИ СТОРОН -->
             <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-top: 8px; margin-bottom: 5px;">
               3. ПРАВА И ОБЯЗАННОСТИ СТОРОН
             </div>
@@ -1430,7 +1325,6 @@
               - При неисполнении или ненадлежащем исполнении «Покупателем» своих обязательств по настоящему договору «Поручитель» отвечает перед «Продавцом» в том же объеме, что и «Покупатель», включая возврат основного долга. При просрочке выплаты «Покупателем» на 7 дней от установленного срока «Поручитель» обязан выплатить просроченный платеж.
             </div>
             
-            <!-- РАЗДЕЛ 4: ПЕРЕДАЧА И ПРИНЯТИЕ ТОВАРА -->
             <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">
               4. ПЕРЕДАЧА И ПРИНЯТИЕ ТОВАРА
             </div>
@@ -1447,7 +1341,6 @@
               - «Продавец» считается исполнившим свою обязанность по передаче товара с даты подписания настоящего договора.
             </div>
             
-            <!-- РАЗДЕЛ 5: РАЗРЕШЕНИЕ СПОРОВ -->
             <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">
               5. РАЗРЕШЕНИЕ СПОРОВ
             </div>
@@ -1458,7 +1351,6 @@
               - В случае неурегулирования спорных вопросов в процессе переговоров такой спор подлежит рассмотрению в суде.
             </div>
             
-            <!-- РАЗДЕЛ 6: ЗАКЛЮЧИТЕЛЬНЫЕ ПОЛОЖЕНИЯ -->
             <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">
               6. ЗАКЛЮЧИТЕЛЬНЫЕ ПОЛОЖЕНИЯ
             </div>
@@ -1469,7 +1361,6 @@
               - Любые изменения и дополнения к настоящему договору должны быть составлены в письменной форме и подписаны всеми сторонами.
             </div>
             
-            <!-- ПОДПИСИ СТОРОН (НА ЭТОЙ ЖЕ СТРАНИЦЕ СНИЗУ) -->
             <div style="margin-top: 12px;">
               <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-bottom: 8px;">
                 ПОДПИСИ СТОРОН
@@ -1501,7 +1392,6 @@
               </table>
             </div>
             
-            <!-- Дата печати внизу -->
             <div style="margin-top: 10px; font-size: 9px; text-align: center; color: #999; border-top: 1px solid #ddd; padding-top: 6px;">
               Дата печати: ${todayStr}
             </div>
@@ -1511,10 +1401,6 @@
         </div>
       `;
     }
-
-    // ================================================================
-    // ФУНКЦИЯ ПЕЧАТИ
-    // ================================================================
 
     function printContract() {
       const select = document.getElementById('printContractSelect');
@@ -1718,38 +1604,71 @@
     }
 
     // ================================================================
-    // ОСНОВНАЯ ЛОГИКА МЕСЯЦЕВ (с новой логикой дат)
+    // 🔧 ИЗМЕНЕНИЕ №2: ФУНКЦИЯ getMonthStatus (ИСПРАВЛЕНА)
     // ================================================================
     
     function getMonthStatus(contract) {
-      const paymentDates = calculatePaymentDates(contract);
+      const months = contract.monthsCount || 0;
       const installments = contract.installments || {};
-      const monthlyPay = Number(contract.monthlyPay) || 0;
-      const today = getMoscowDate();
+      const monthlyPay = contract.monthlyPay || 0;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const payDateStr = contract.payDate;
+      if (!payDateStr) {
+        return { months: [], overdueSum: 0 };
+      }
+      
+      const payDateObj = new Date(payDateStr);
+      if (isNaN(payDateObj.getTime())) {
+        return { months: [], overdueSum: 0 };
+      }
+      
+      const payDay = payDateObj.getDate();
+      
+      const buyDateStr = contract.buyDate;
+      let startDate = new Date(buyDateStr || payDateStr);
+      if (isNaN(startDate.getTime())) {
+        startDate = new Date(payDateStr);
+      }
+      startDate.setHours(0, 0, 0, 0);
       
       const result = [];
       let overdueSum = 0;
       
-      for (const pd of paymentDates) {
-        const payment = installments[pd.index];
+      for (let i = 1; i <= months; i++) {
+        // ⬇️⬇️⬇️ ИСПРАВЛЕННАЯ ЧАСТЬ - РАСЧЕТ ДАТЫ ⬇️⬇️⬇️
+        // ✅ ПРАВИЛЬНО: добавляем месяцы к дате покупки
+        const payDate = new Date(startDate);
+        payDate.setMonth(payDate.getMonth() + (i - 1));
+        
+        // ✅ ПРАВИЛЬНО: корректируем день (если нет такого дня в месяце)
+        const lastDayOfMonth = new Date(payDate.getFullYear(), payDate.getMonth() + 1, 0);
+        const lastDay = lastDayOfMonth.getDate();
+        const targetDay = Math.min(payDay, lastDay);
+        payDate.setDate(targetDay);
+        payDate.setHours(0, 0, 0, 0);
+        // ⬆️⬆️⬆️ КОНЕЦ ИСПРАВЛЕННОЙ ЧАСТИ ⬆️⬆️⬆️
+        
+        const payment = installments[i];
         const isPaid = !!payment && Number(payment.amount) > 0;
         const paidAmount = isPaid ? Number(payment.amount) : 0;
         
         let status = 'future';
         if (isPaid) {
           status = 'paid';
-        } else if (pd.date < today) {
+        } else if (payDate < today) {
           status = 'overdue';
           overdueSum += monthlyPay;
         }
         
         result.push({
-          month: pd.index,
-          date: pd.dateStr,
+          month: i,
+          date: payDate.toISOString().slice(0, 10),
           status: status,
           amount: isPaid ? paidAmount : monthlyPay,
           isPaid: isPaid,
-          payDateObj: pd.date
+          payDateObj: payDate
         });
       }
       
@@ -1757,7 +1676,7 @@
     }
 
     // ================================================================
-    // ФУНКЦИИ ДЛЯ ЛИСТОВ "СЕГОДНЯ" И "3 ДНЯ" (с новой логикой)
+    // ФУНКЦИИ ДЛЯ ЛИСТОВ "СЕГОДНЯ" И "3 ДНЯ"
     // ================================================================
     
     function getClientsForDate(targetDateStr) {
@@ -1770,19 +1689,24 @@
         const metrics = calculateContractMetrics(contract);
         if (metrics.isClosed) return;
         
-        const paymentDates = calculatePaymentDates(contract);
-        const installments = contract.installments || {};
+        const monthInfo = getMonthStatus(contract);
+        const months = monthInfo.months;
         
         let hasUnpaidMonth = false;
         let unpaidMonthAmount = 0;
         
-        for (const pd of paymentDates) {
-          const payment = installments[pd.index];
-          const isPaid = !!payment && Number(payment.amount) > 0;
-          if (!isPaid && pd.date.getTime() === target.getTime()) {
-            hasUnpaidMonth = true;
-            unpaidMonthAmount = pd.amount;
-            break;
+        for (let i = 0; i < months.length; i++) {
+          const m = months[i];
+          if (!m.isPaid) {
+            const payDate = new Date(m.date);
+            if (!isNaN(payDate.getTime())) {
+              payDate.setHours(0, 0, 0, 0);
+              if (payDate.getTime() === target.getTime()) {
+                hasUnpaidMonth = true;
+                unpaidMonthAmount = m.amount;
+                break;
+              }
+            }
           }
         }
         
@@ -1792,7 +1716,7 @@
             rest: metrics.rest,
             phone: contract.phone || '',
             fio: contract.fio || '',
-            monthInfo: getMonthStatus(contract),
+            monthInfo: { months: months, overdueSum: metrics.overdueSum },
             unpaidMonthAmount: unpaidMonthAmount
           });
         }
@@ -1861,14 +1785,14 @@
     }
 
     function renderTodayClients() {
-      const today = getMoscowDate();
+      const today = new Date();
       const todayStr = today.toISOString().slice(0, 10);
       const clients = getClientsForDate(todayStr);
       renderClientList('todayClientsList', clients, 'Нет клиентов, которые должны оплатить сегодня', `Сегодня (${todayStr})`);
     }
 
     function renderThreeDaysClients() {
-      const today = getMoscowDate();
+      const today = new Date();
       const threeDaysLater = new Date(today);
       threeDaysLater.setDate(today.getDate() + 3);
       const threeDaysStr = threeDaysLater.toISOString().slice(0, 10);
@@ -1881,87 +1805,15 @@
       renderClientList('debtorsClientsList', clients, 'Нет клиентов с просрочкой', '');
     }
 
-    // ================================================================
-    // ФУНКЦИЯ ДЛЯ ЛИСТА "ВЫЕЗД" (просрочка 2+ месяца)
-    // ================================================================
-    
-    function renderExitClients() {
-      const clients = getExitClients();
-      
-      const container = document.getElementById('exitClientsList');
-      if (clients.length === 0) {
-        container.innerHTML = `<div class="text-center text-gray-500 py-8 text-sm">🚗 Нет клиентов с просрочкой 2+ месяца</div>`;
-        return;
-      }
-      
-      let html = '<div class="divide-y">';
-      clients.forEach((client) => {
-        const monthInfo = client.monthInfo || getMonthStatus(client);
-        let monthsHtml = '';
-        let overdueSum = 0;
-        
-        monthInfo.months.forEach(m => {
-          let statusClass = 'month-future';
-          let statusText = '⏳ Ожидает';
-          if (m.status === 'paid') {
-            statusClass = 'month-paid';
-            statusText = `✅ ${m.amount} ₽`;
-          } else if (m.status === 'overdue') {
-            statusClass = 'month-overdue';
-            statusText = `❌ ${m.amount} ₽`;
-            overdueSum += m.amount;
-          } else {
-            statusText = `📅 ${m.amount} ₽`;
-          }
-          monthsHtml += `<span class="month-status ${statusClass}" title="${m.date}">${m.month}-й: ${statusText}</span>`;
-        });
-        
-        const rest = client.rest || calculateContractMetrics(client).rest;
-        const phone = client.phone.replace(/[^0-9]/g, '');
-        
-        html += `
-          <div class="client-item" style="border-left: 4px solid #dc2626;">
-            <div class="client-info">
-              <span class="client-name">${client.fio}</span>
-              <span class="client-phone">📞 ${client.phone}</span>
-              <span class="client-detail">💰 Мес. платеж: ${client.monthlyPay} ₽</span>
-              <span class="client-detail" style="color: #dc2626; font-weight: bold;">🚗 ВЫЕЗД (2+ мес.)</span>
-            </div>
-            <div class="flex flex-wrap items-center gap-2">
-              <span class="client-overdue">Просрочка: ${overdueSum.toLocaleString('ru-RU')} ₽</span>
-              <span class="client-rest">Остаток: ${rest.toLocaleString('ru-RU')} ₽</span>
-              <a href="https://wa.me/7${phone}?text=Здравствуйте! У вас просрочка более 2 месяцев. Просим связаться с нами." 
-                 target="_blank" 
-                 class="text-green-600 hover:text-green-800 font-bold text-sm">
-                💬
-              </a>
-            </div>
-            <div class="w-full mt-1 flex flex-wrap gap-1">
-              ${monthsHtml}
-            </div>
-          </div>
-        `;
-      });
-      html += '</div>';
-      container.innerHTML = html;
-    }
-
     function getDebtors() {
       const result = [];
-      const today = getMoscowDate();
       
       allContracts.forEach(contract => {
         const metrics = calculateContractMetrics(contract);
         if (metrics.isClosed) return;
         
         const monthInfo = getMonthStatus(contract);
-        let hasOverdue = false;
-        for (const m of monthInfo.months) {
-          if (m.status === 'overdue' && !m.isPaid && m.payDateObj < today) {
-            hasOverdue = true;
-            break;
-          }
-        }
+        const hasOverdue = monthInfo.months.some(m => m.status === 'overdue' && !m.isPaid);
         
         if (hasOverdue) {
           result.push({
@@ -1969,52 +1821,12 @@
             rest: metrics.rest,
             phone: contract.phone || '',
             fio: contract.fio || '',
-            monthInfo: monthInfo
+            monthInfo: { months: monthInfo.months, overdueSum: metrics.overdueSum }
           });
         }
       });
       
       return result;
-    }
-
-    // Функция для получения клиентов с просрочкой 2+ месяца
-    function getExitClients() {
-      const result = [];
-      const today = getMoscowDate();
-      const twoMonthsAgo = new Date(today);
-      twoMonthsAgo.setMonth(today.getMonth() - 2);
-      
-      allContracts.forEach(contract => {
-        const metrics = calculateContractMetrics(contract);
-        if (metrics.isClosed) return;
-        
-        const monthInfo = getMonthStatus(contract);
-        let overdueCount = 0;
-        for (const m of monthInfo.months) {
-          if (m.status === 'overdue' && !m.isPaid && m.payDateObj < today) {
-            // Проверяем, что платеж был просрочен как минимум 2 месяца назад
-            const twoMonthsAgoDate = new Date(today);
-            twoMonthsAgoDate.setMonth(today.getMonth() - 2);
-            if (m.payDateObj <= twoMonthsAgoDate) {
-              overdueCount++;
-            }
-          }
-        }
-        
-        // Если есть хотя бы 2 просроченных платежа (или один, но старше 2 месяцев)
-        if (overdueCount >= 2) {
-          result.push({
-            ...contract,
-            rest: metrics.rest,
-            phone: contract.phone || '',
-            fio: contract.fio || '',
-            monthInfo: monthInfo,
-            overdueCount: overdueCount
-          });
-        }
-      });
-      
-      return result.sort((a, b) => (b.overdueCount || 0) - (a.overdueCount || 0));
     }
 
     // ===== ФУНКЦИИ ДЛЯ WHATSAPP =====
@@ -2030,7 +1842,7 @@
     }
 
     function sendWhatsAppToday() {
-      const today = getMoscowDate();
+      const today = new Date();
       const todayStr = today.toISOString().slice(0, 10);
       const clients = getClientsForDate(todayStr);
       
@@ -2076,7 +1888,7 @@
     }
 
     function sendWhatsAppThreeDays() {
-      const today = getMoscowDate();
+      const today = new Date();
       const threeDaysLater = new Date(today);
       threeDaysLater.setDate(today.getDate() + 3);
       const threeDaysStr = threeDaysLater.toISOString().slice(0, 10);
@@ -2162,52 +1974,6 @@
         showCopyNotification(`✅ Скопировано ${phoneNumbers.length} номеров для рассылки!`);
       }).catch(() => {
         showCopyNotification(`⚠️ Найдено ${phoneNumbers.length} должников. Скопируйте номера вручную.`);
-      });
-      
-      const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-      window.open(url, '_blank');
-    }
-
-    function sendWhatsAppExit() {
-      const clients = getExitClients();
-      
-      if (clients.length === 0) {
-        alert('🚗 Нет клиентов с просрочкой 2+ месяца');
-        return;
-      }
-      
-      let message = '🚗 *Выезд! Просрочка более 2 месяцев!*\n\n';
-      let phoneNumbers = [];
-      
-      clients.forEach((client, index) => {
-        const phone = client.phone.replace(/[^0-9]/g, '');
-        if (phone) phoneNumbers.push(phone);
-        
-        const monthInfo = client.monthInfo || getMonthStatus(client);
-        let overdueSum = 0;
-        let overdueMonths = [];
-        monthInfo.months.forEach(m => {
-          if (m.status === 'overdue' && !m.isPaid) {
-            overdueSum += m.amount;
-            overdueMonths.push(`${m.month}-й (${m.date})`);
-          }
-        });
-        
-        message += `${index + 1}. *${client.fio}*\n`;
-        message += `   💰 Сумма: ${client.monthlyPay} ₽\n`;
-        message += `   📱 WhatsApp: wa.me/7${phone}\n`;
-        message += `   ⚠️ Просрочка: ${overdueSum} ₽ (${overdueMonths.join(', ')})\n`;
-        message += `   📊 Остаток: ${client.rest} ₽\n`;
-        message += `   🚗 *Выезд обязателен!*\n\n`;
-      });
-      
-      message += `\n👥 Всего клиентов на выезд: ${clients.length}`;
-      
-      const phoneList = phoneNumbers.map(p => `7${p}`).join(', ');
-      navigator.clipboard.writeText(phoneList).then(() => {
-        showCopyNotification(`✅ Скопировано ${phoneNumbers.length} номеров для рассылки!`);
-      }).catch(() => {
-        showCopyNotification(`⚠️ Найдено ${phoneNumbers.length} клиентов. Скопируйте номера вручную.`);
       });
       
       const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
@@ -2330,7 +2096,6 @@
         guarantorPhone: document.getElementById('guarantorPhone').value || ''
       };
 
-      // Автоматическая установка shopPaid, если остаток 0
       const totalCost = formData.totalCost;
       const downPayment = formData.downPayment;
       const installments = editId ? (allContracts.find(c => c.id === editId)?.installments || {}) : {};
@@ -2368,7 +2133,7 @@
 
       const inputDateVal = document.getElementById('payDateVal').value;
       const inputDate = new Date(inputDateVal);
-      const today = getMoscowDate();
+      const today = new Date();
       
       const isDifferentMonth = (inputDate.getFullYear() !== today.getFullYear()) || (inputDate.getMonth() !== today.getMonth());
 
@@ -2385,7 +2150,6 @@
         date: inputDateVal 
       };
       
-      // Проверяем, закрыт ли договор
       const metrics = calculateContractMetrics(contract);
       if (metrics.isClosed) {
         contract.shopPaid = true;
@@ -2727,7 +2491,7 @@
       let uchetBalance = totalUchetIncome - totalUchetExpense;
       document.getElementById('kassaUchet').innerText = uchetBalance.toLocaleString('ru-RU');
 
-      const now = getMoscowDate();
+      const now = new Date();
       const todayStr = now.toISOString().slice(0, 10);
 
       let totalContracts = allContracts.length;
@@ -2757,17 +2521,9 @@
         });
         if (hasPaidToday) factTodayCount++;
 
-        // Проверяем, есть ли сегодня платеж по новому графику
-        const paymentDates = calculatePaymentDates(c);
-        for (const pd of paymentDates) {
-          if (pd.dateStr === todayStr) {
-            const payment = insts[pd.index];
-            if (!payment || Number(payment.amount) === 0) {
-              planTodaySum += Number(c.monthlyPay || 0);
-              planTodayCount++;
-            }
-            break;
-          }
+        if (c.payDate === todayStr) {
+          planTodaySum += Number(c.monthlyPay || 0);
+          planTodayCount++;
         }
       });
 
