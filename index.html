@@ -1058,7 +1058,7 @@
     }
 
     // ================================================================
-    // ПРАВИЛЬНАЯ ЛОГИКА РАСЧЕТА ДАТ ПЛАТЕЖЕЙ (без смещения)
+    // НОВАЯ ЛОГИКА РАСЧЕТА ДАТ ПЛАТЕЖЕЙ (без +1 и -1 дней)
     // ================================================================
     
     function calculatePaymentDates(contract) {
@@ -1071,6 +1071,7 @@
       const payDay = payDateObj.getDate();
       const monthsCount = Number(contract.monthsCount) || 0;
       
+      // Используем дату покупки как точку отсчета, если она есть, иначе дату платежа
       let startDate = new Date(contract.buyDate || payDateStr);
       if (isNaN(startDate.getTime())) {
         startDate = new Date(payDateStr);
@@ -1082,6 +1083,7 @@
         const paymentDate = new Date(startDate);
         paymentDate.setMonth(paymentDate.getMonth() + (i - 1));
         
+        // Корректируем день на указанный в payDate, но не выходим за пределы месяца
         const lastDayOfMonth = new Date(paymentDate.getFullYear(), paymentDate.getMonth() + 1, 0);
         const lastDay = lastDayOfMonth.getDate();
         const targetDay = Math.min(payDay, lastDay);
@@ -1133,6 +1135,7 @@
       const paidPercentage = totalPayable > 0 ? (totalPaid / totalPayable) * 100 : 0;
       const isClosed = rest <= 0;
       
+      // Расчет просрочки с использованием новой логики дат
       let overdueSum = 0;
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -1160,7 +1163,7 @@
     }
 
     // ================================================================
-    // НОВАЯ ФУНКЦИЯ ЗАГРУЗКИ ДОГОВОРА ДЛЯ ПЕЧАТИ (полностью переписана)
+    // ФУНКЦИЯ ЗАГРУЗКИ ДОГОВОРА ДЛЯ ПЕЧАТИ (с двумя датами в таблице)
     // ================================================================
 
     function updatePrintSelect() {
@@ -1180,7 +1183,6 @@
       }
     }
 
-    // ПОЛНОСТЬЮ ПЕРЕПИСАННАЯ ФУНКЦИЯ
     function loadContractForPrint() {
       const select = document.getElementById('printContractSelect');
       const contractId = select.value;
@@ -1197,11 +1199,10 @@
         return;
       }
       
-      // Используем функцию calculatePaymentDates для получения дат (без смещения)
+      // Получаем информацию по месяцам с новой логикой
       const paymentDates = calculatePaymentDates(contract);
       const installments = contract.installments || {};
       
-      // Формируем HTML таблицы месяцев
       let monthsHtml = '';
       for (const pd of paymentDates) {
         const payment = installments[pd.index];
@@ -1209,10 +1210,13 @@
         const amount = isPaid ? Number(payment.amount) : pd.amount;
         const statusText = isPaid ? '✅ Оплачен' : '⏳ Ожидает';
         const statusColor = isPaid ? 'color: #22c55e; font-weight: bold;' : 'color: #ef4444; font-weight: bold;';
+        const actualDate = isPaid ? payment.date : '—';
+        
         monthsHtml += `
           <tr>
             <td style="padding: 3px 8px; text-align: center; font-weight: bold; border: 1px solid #000;">${pd.index}</td>
             <td style="padding: 3px 8px; text-align: center; border: 1px solid #000;">${pd.dateStr}</td>
+            <td style="padding: 3px 8px; text-align: center; border: 1px solid #000;">${actualDate}</td>
             <td style="padding: 3px 8px; text-align: center; ${statusColor}">${amount.toLocaleString('ru-RU')} ₽</td>
             <td style="padding: 3px 8px; text-align: center; ${statusColor}">${statusText}</td>
           </tr>
@@ -1222,7 +1226,6 @@
       const today = new Date();
       const todayStr = today.toLocaleDateString('ru-RU');
       
-      // ВОТ ЗДЕСЬ ВЕСЬ HTML РАСПЕЧАТКИ С НОВОЙ ЛОГИКОЙ
       container.innerHTML = `
         <div style="font-family: 'Times New Roman', serif; font-size: 12px; line-height: 1.4; padding: 15px 25px; max-width: 210mm; margin: 0 auto; background: white;">
           
@@ -1312,14 +1315,15 @@
               не позднее <b>${contract.payDate || '______'}</b> числа каждого месяца.
             </p>
             
-            <!-- ТАБЛИЦА МЕСЯЦЕВ (СВЕРХУ ВНИЗ) -->
+            <!-- ТАБЛИЦА МЕСЯЦЕВ с двумя датами -->
             <div style="margin-top: 10px; border: 1px solid #000; overflow: hidden;">
               <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
                 <thead>
                   <tr>
-                    <th style="padding: 3px 8px; border: 1px solid #000; width: 15%; background: #e2e8f0;">№</th>
-                    <th style="padding: 3px 8px; border: 1px solid #000; width: 35%; background: #e2e8f0;">Дата</th>
-                    <th style="padding: 3px 8px; border: 1px solid #000; width: 25%; background: #e2e8f0;">Сумма</th>
+                    <th style="padding: 3px 8px; border: 1px solid #000; width: 10%; background: #e2e8f0;">№</th>
+                    <th style="padding: 3px 8px; border: 1px solid #000; width: 22%; background: #e2e8f0;">Плановая дата</th>
+                    <th style="padding: 3px 8px; border: 1px solid #000; width: 22%; background: #e2e8f0;">Фактическая дата оплаты</th>
+                    <th style="padding: 3px 8px; border: 1px solid #000; width: 21%; background: #e2e8f0;">Сумма</th>
                     <th style="padding: 3px 8px; border: 1px solid #000; width: 25%; background: #e2e8f0;">Статус</th>
                   </tr>
                 </thead>
@@ -1459,7 +1463,7 @@
     }
 
     // ================================================================
-    // ОСТАЛЬНЫЕ ФУНКЦИИ
+    // ОСТАЛЬНЫЕ ФУНКЦИИ (без изменений или с использованием новой логики)
     // ================================================================
 
     function numberToWords(num) {
