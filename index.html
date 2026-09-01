@@ -6,7 +6,7 @@
   <title>Система Учета и Договоров</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* --- Ваши стили --- */
+    /* --- Ваши стили (без изменений) --- */
     .row-error { background-color: #fee2e2 !important; }
     .pay-paid { background-color: #22c55e; color: white; font-weight: bold; cursor: pointer; }
     .btn-history-active { background-color: #f59e0b !important; color: white !important; cursor: pointer !important; }
@@ -303,22 +303,6 @@
     .date-warning.show {
       display: block;
     }
-
-    /* Индикатор текущей даты */
-    .current-date-indicator {
-      background: #1e293b;
-      color: white;
-      padding: 4px 12px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: bold;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .current-date-indicator span {
-      color: #60a5fa;
-    }
   </style>
 </head>
 <body class="bg-slate-100 text-gray-800 text-xs min-h-screen pb-20">
@@ -337,11 +321,6 @@
             class="px-3 py-1.5 rounded text-xs font-bold text-gray-400 bg-gray-100 cursor-not-allowed transition">
             ↻ Вперед
           </button>
-        </div>
-
-        <!-- ИНДИКАТОР ТЕКУЩЕЙ ДАТЫ -->
-        <div class="current-date-indicator">
-          📅 <span id="currentDateDisplay">--</span>
         </div>
 
         <button type="button" onclick="exportData()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-3 py-1.5 rounded-lg text-xs transition shadow-sm">
@@ -850,35 +829,6 @@
 
   <script>
     // ================================================================
-    // ФУНКЦИЯ ПОЛУЧЕНИЯ ТЕКУЩЕЙ ДАТЫ (ВСЕГДА СВЕЖАЯ)
-    // ================================================================
-    
-    function getCurrentDate() {
-      const now = new Date();
-      // Обнуляем время, чтобы сравнивать только даты
-      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      return today;
-    }
-
-    function getTodayStr() {
-      const now = getCurrentDate();
-      return now.toISOString().slice(0, 10);
-    }
-
-    // Обновление индикатора даты
-    function updateDateIndicator() {
-      const now = new Date();
-      const dateStr = now.toLocaleDateString('ru-RU', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-      document.getElementById('currentDateDisplay').textContent = dateStr;
-    }
-
-    // ================================================================
     // ВСЕ ПЕРЕМЕННЫЕ И БАЗОВЫЕ ФУНКЦИИ
     // ================================================================
     
@@ -905,9 +855,19 @@
     let undoStack = [];
     let redoStack = [];
 
-    // Обновляем индикатор каждую минуту
-    setInterval(updateDateIndicator, 60000);
-    updateDateIndicator();
+    // ================================================================
+    // ФУНКЦИЯ ПОЛУЧЕНИЯ ТЕКУЩЕЙ ДАТЫ ПО МОСКОВСКОМУ ВРЕМЕНИ (UTC+3)
+    // ================================================================
+    function getMoscowDate() {
+      const now = new Date();
+      const moscowOffset = 3 * 60; // минут
+      const localOffset = now.getTimezoneOffset();
+      const diff = moscowOffset + localOffset;
+      const moscowTime = new Date(now.getTime() + diff * 60000);
+      // Устанавливаем время на 00:00:00, чтобы получить только дату
+      moscowTime.setHours(0, 0, 0, 0);
+      return moscowTime;
+    }
 
     // ================================================================
     // ФУНКЦИИ ПЕРЕКЛЮЧЕНИЯ ВКЛАДОК И ИСТОРИИ
@@ -1002,8 +962,6 @@
         loadContractForPrint();
       }
       handleSearch();
-      // Обновляем индикатор при переключении
-      updateDateIndicator();
     }
 
     // --- Функции истории ---
@@ -1074,7 +1032,6 @@
         loadContractForPrint();
       }
       updateHistoryButtons();
-      updateDateIndicator();
     }
 
     function updateHistoryButtons() {
@@ -1106,7 +1063,6 @@
         loadContractForPrint();
       }
       updateHistoryButtons();
-      updateDateIndicator();
     }
 
     // ================================================================
@@ -1132,7 +1088,7 @@
         const payDay = payDateObj.getDate();
         
         // Проверяем, есть ли такой день в следующем месяце
-        const today = getCurrentDate();
+        const today = getMoscowDate();
         const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
         const lastDayOfNextMonth = new Date(nextMonth.getFullYear(), nextMonth.getMonth() + 1, 0);
         const lastDay = lastDayOfNextMonth.getDate();
@@ -1226,9 +1182,9 @@
       const paidPercentage = totalPayable > 0 ? (totalPaid / totalPayable) * 100 : 0;
       const isClosed = rest <= 0;
       
-      // Расчет просрочки с использованием новой логики дат
+      // Расчет просрочки с использованием московской даты
       let overdueSum = 0;
-      const today = getCurrentDate();
+      const today = getMoscowDate();
       
       if (!isClosed && contract.payDate && contract.monthsCount) {
         const paymentDates = calculatePaymentDates(contract);
@@ -1329,7 +1285,7 @@
         `;
       }
       
-      const today = new Date();
+      const today = getMoscowDate();
       const todayStr = today.toLocaleDateString('ru-RU');
       
       container.innerHTML = `
@@ -1769,7 +1725,7 @@
       const paymentDates = calculatePaymentDates(contract);
       const installments = contract.installments || {};
       const monthlyPay = Number(contract.monthlyPay) || 0;
-      const today = getCurrentDate();
+      const today = getMoscowDate();
       
       const result = [];
       let overdueSum = 0;
@@ -1905,13 +1861,14 @@
     }
 
     function renderTodayClients() {
-      const todayStr = getTodayStr();
+      const today = getMoscowDate();
+      const todayStr = today.toISOString().slice(0, 10);
       const clients = getClientsForDate(todayStr);
       renderClientList('todayClientsList', clients, 'Нет клиентов, которые должны оплатить сегодня', `Сегодня (${todayStr})`);
     }
 
     function renderThreeDaysClients() {
-      const today = getCurrentDate();
+      const today = getMoscowDate();
       const threeDaysLater = new Date(today);
       threeDaysLater.setDate(today.getDate() + 3);
       const threeDaysStr = threeDaysLater.toISOString().slice(0, 10);
@@ -1991,7 +1948,7 @@
 
     function getDebtors() {
       const result = [];
-      const today = getCurrentDate();
+      const today = getMoscowDate();
       
       allContracts.forEach(contract => {
         const metrics = calculateContractMetrics(contract);
@@ -2023,7 +1980,7 @@
     // Функция для получения клиентов с просрочкой 2+ месяца
     function getExitClients() {
       const result = [];
-      const today = getCurrentDate();
+      const today = getMoscowDate();
       const twoMonthsAgo = new Date(today);
       twoMonthsAgo.setMonth(today.getMonth() - 2);
       
@@ -2073,7 +2030,8 @@
     }
 
     function sendWhatsAppToday() {
-      const todayStr = getTodayStr();
+      const today = getMoscowDate();
+      const todayStr = today.toISOString().slice(0, 10);
       const clients = getClientsForDate(todayStr);
       
       if (clients.length === 0) {
@@ -2118,7 +2076,7 @@
     }
 
     function sendWhatsAppThreeDays() {
-      const today = getCurrentDate();
+      const today = getMoscowDate();
       const threeDaysLater = new Date(today);
       threeDaysLater.setDate(today.getDate() + 3);
       const threeDaysStr = threeDaysLater.toISOString().slice(0, 10);
@@ -2410,7 +2368,7 @@
 
       const inputDateVal = document.getElementById('payDateVal').value;
       const inputDate = new Date(inputDateVal);
-      const today = new Date();
+      const today = getMoscowDate();
       
       const isDifferentMonth = (inputDate.getFullYear() !== today.getFullYear()) || (inputDate.getMonth() !== today.getMonth());
 
@@ -2769,8 +2727,8 @@
       let uchetBalance = totalUchetIncome - totalUchetExpense;
       document.getElementById('kassaUchet').innerText = uchetBalance.toLocaleString('ru-RU');
 
-      const now = new Date();
-      const todayStr = getTodayStr();
+      const now = getMoscowDate();
+      const todayStr = now.toISOString().slice(0, 10);
 
       let totalContracts = allContracts.length;
       let closedContracts = 0;
@@ -2931,7 +2889,7 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `BAZA_FULL_${getTodayStr()}.json`;
+      a.download = `BAZA_FULL_${new Date().toISOString().slice(0,10)}.json`;
       a.click();
       URL.revokeObjectURL(url);
     }
