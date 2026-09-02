@@ -6,7 +6,7 @@
   <title>Система Учета и Договоров</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* --- Ваши стили (без изменений) --- */
+    /* --- Ваши стили --- */
     .row-error { background-color: #fee2e2 !important; }
     .pay-paid { background-color: #22c55e; color: white; font-weight: bold; cursor: pointer; }
     .btn-history-active { background-color: #f59e0b !important; color: white !important; cursor: pointer !important; }
@@ -31,11 +31,6 @@
     
     .tab-btn.debtors-tab.active {
       background-color: #ef4444;
-      color: #ffffff;
-    }
-
-    .tab-btn.exit-tab.active {
-      background-color: #dc2626;
       color: #ffffff;
     }
     
@@ -116,7 +111,6 @@
     .month-paid { background-color: #22c55e; color: white; }
     .month-overdue { background-color: #ef4444; color: white; }
     .month-future { background-color: #3b82f6; color: white; }
-    .month-exit { background-color: #dc2626; color: white; }
     
     .client-info {
       display: flex;
@@ -548,21 +542,7 @@
       </div>
     </div>
 
-    <!-- ================= Лист 7: Выезд (просрочка 2+ месяца) ================= -->
-    <div id="exitTabContent" class="hidden space-y-4">
-      <div class="bg-white shadow-xl rounded-xl p-6 border border-red-200">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold text-red-700">🚗 Выезд (просрочка 2+ месяца)</h2>
-          <button onclick="sendWhatsAppExit()" class="whatsapp-btn">
-            <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            Отправить всем WhatsApp
-          </button>
-        </div>
-        <div id="exitClientsList" class="client-list"></div>
-      </div>
-    </div>
-
-    <!-- ================= Лист 8: Партнёры ================= -->
+    <!-- ================= Лист 7: Партнёры ================= -->
     <div id="partnersTabContent" class="hidden space-y-4">
       <div class="bg-white shadow-xl rounded-xl p-6 border">
         <div class="flex justify-between items-center mb-4">
@@ -583,7 +563,7 @@
       </div>
     </div>
 
-    <!-- ================= Лист 9: Распечатка ================= -->
+    <!-- ================= Лист 8: Распечатка ================= -->
     <div id="printTabContent" class="hidden space-y-4">
       <div class="bg-white shadow-xl rounded-xl p-6 border">
         <div class="flex justify-between items-center mb-4 no-print">
@@ -627,9 +607,6 @@
       </button>
       <button type="button" onclick="switchTab('debtors')" id="tabBtnDebtors" class="tab-btn debtors-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
         🚫 Неплательщики
-      </button>
-      <button type="button" onclick="switchTab('exit')" id="tabBtnExit" class="tab-btn exit-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
-        🚗 Выезд
       </button>
       <button type="button" onclick="switchTab('partners')" id="tabBtnPartners" class="tab-btn partners-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
         🤝 Партнёры
@@ -856,20 +833,6 @@
     let redoStack = [];
 
     // ================================================================
-    // ФУНКЦИЯ ПОЛУЧЕНИЯ ТЕКУЩЕЙ ДАТЫ ПО МОСКОВСКОМУ ВРЕМЕНИ (UTC+3)
-    // ================================================================
-    function getMoscowDate() {
-      const now = new Date();
-      const moscowOffset = 3 * 60; // минут
-      const localOffset = now.getTimezoneOffset();
-      const diff = moscowOffset + localOffset;
-      const moscowTime = new Date(now.getTime() + diff * 60000);
-      // Устанавливаем время на 00:00:00, чтобы получить только дату
-      moscowTime.setHours(0, 0, 0, 0);
-      return moscowTime;
-    }
-
-    // ================================================================
     // ФУНКЦИИ ПЕРЕКЛЮЧЕНИЯ ВКЛАДОК И ИСТОРИИ
     // ================================================================
 
@@ -881,7 +844,6 @@
       const todayTab = document.getElementById('todayTabContent');
       const threeDaysTab = document.getElementById('threeDaysTabContent');
       const debtorsTab = document.getElementById('debtorsTabContent');
-      const exitTab = document.getElementById('exitTabContent');
       const partnersTab = document.getElementById('partnersTabContent');
       const printTab = document.getElementById('printTabContent');
 
@@ -891,7 +853,6 @@
       const todayBtn = document.getElementById('tabBtnToday');
       const threeDaysBtn = document.getElementById('tabBtnThreeDays');
       const debtorsBtn = document.getElementById('tabBtnDebtors');
-      const exitBtn = document.getElementById('tabBtnExit');
       const partnersBtn = document.getElementById('tabBtnPartners');
       const printBtn = document.getElementById('tabBtnPrint');
 
@@ -905,7 +866,6 @@
       todayTab.classList.add('hidden');
       threeDaysTab.classList.add('hidden');
       debtorsTab.classList.add('hidden');
-      exitTab.classList.add('hidden');
       partnersTab.classList.add('hidden');
       printTab.classList.add('hidden');
       addC.classList.add('hidden');
@@ -918,7 +878,6 @@
       todayBtn.className = "tab-btn today-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       threeDaysBtn.className = "tab-btn three-days-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       debtorsBtn.className = "tab-btn debtors-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
-      exitBtn.className = "tab-btn exit-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       partnersBtn.className = "tab-btn partners-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       printBtn.className = "tab-btn print-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
 
@@ -947,10 +906,6 @@
         debtorsTab.classList.remove('hidden');
         debtorsBtn.className = "tab-btn debtors-tab active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
         renderDebtorsClients();
-      } else if (tab === 'exit') {
-        exitTab.classList.remove('hidden');
-        exitBtn.className = "tab-btn exit-tab active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
-        renderExitClients();
       } else if (tab === 'partners') {
         partnersTab.classList.remove('hidden');
         partnersBtn.className = "tab-btn partners-tab active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
@@ -1025,7 +980,6 @@
       if (activeTab === 'today') renderTodayClients();
       if (activeTab === 'threeDays') renderThreeDaysClients();
       if (activeTab === 'debtors') renderDebtorsClients();
-      if (activeTab === 'exit') renderExitClients();
       if (activeTab === 'partners') renderPartners();
       if (activeTab === 'print') {
         updatePrintSelect();
@@ -1056,7 +1010,6 @@
       if (activeTab === 'today') renderTodayClients();
       if (activeTab === 'threeDays') renderThreeDaysClients();
       if (activeTab === 'debtors') renderDebtorsClients();
-      if (activeTab === 'exit') renderExitClients();
       if (activeTab === 'partners') renderPartners();
       if (activeTab === 'print') {
         updatePrintSelect();
@@ -1088,7 +1041,7 @@
         const payDay = payDateObj.getDate();
         
         // Проверяем, есть ли такой день в следующем месяце
-        const today = getMoscowDate();
+        const today = new Date();
         const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
         const lastDayOfNextMonth = new Date(nextMonth.getFullYear(), nextMonth.getMonth() + 1, 0);
         const lastDay = lastDayOfNextMonth.getDate();
@@ -1182,9 +1135,10 @@
       const paidPercentage = totalPayable > 0 ? (totalPaid / totalPayable) * 100 : 0;
       const isClosed = rest <= 0;
       
-      // Расчет просрочки с использованием московской даты
+      // Расчет просрочки с использованием новой логики дат
       let overdueSum = 0;
-      const today = getMoscowDate();
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
       
       if (!isClosed && contract.payDate && contract.monthsCount) {
         const paymentDates = calculatePaymentDates(contract);
@@ -1285,7 +1239,7 @@
         `;
       }
       
-      const today = getMoscowDate();
+      const today = new Date();
       const todayStr = today.toLocaleDateString('ru-RU');
       
       container.innerHTML = `
@@ -1526,7 +1480,7 @@
     }
 
     // ================================================================
-    // ОСТАЛЬНЫЕ ФУНКЦИИ
+    // ОСТАЛЬНЫЕ ФУНКЦИИ (без изменений или с использованием новой логики)
     // ================================================================
 
     function numberToWords(num) {
@@ -1725,7 +1679,8 @@
       const paymentDates = calculatePaymentDates(contract);
       const installments = contract.installments || {};
       const monthlyPay = Number(contract.monthlyPay) || 0;
-      const today = getMoscowDate();
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
       
       const result = [];
       let overdueSum = 0;
@@ -1861,14 +1816,14 @@
     }
 
     function renderTodayClients() {
-      const today = getMoscowDate();
+      const today = new Date();
       const todayStr = today.toISOString().slice(0, 10);
       const clients = getClientsForDate(todayStr);
       renderClientList('todayClientsList', clients, 'Нет клиентов, которые должны оплатить сегодня', `Сегодня (${todayStr})`);
     }
 
     function renderThreeDaysClients() {
-      const today = getMoscowDate();
+      const today = new Date();
       const threeDaysLater = new Date(today);
       threeDaysLater.setDate(today.getDate() + 3);
       const threeDaysStr = threeDaysLater.toISOString().slice(0, 10);
@@ -1881,87 +1836,15 @@
       renderClientList('debtorsClientsList', clients, 'Нет клиентов с просрочкой', '');
     }
 
-    // ================================================================
-    // ФУНКЦИЯ ДЛЯ ЛИСТА "ВЫЕЗД" (просрочка 2+ месяца)
-    // ================================================================
-    
-    function renderExitClients() {
-      const clients = getExitClients();
-      
-      const container = document.getElementById('exitClientsList');
-      if (clients.length === 0) {
-        container.innerHTML = `<div class="text-center text-gray-500 py-8 text-sm">🚗 Нет клиентов с просрочкой 2+ месяца</div>`;
-        return;
-      }
-      
-      let html = '<div class="divide-y">';
-      clients.forEach((client) => {
-        const monthInfo = client.monthInfo || getMonthStatus(client);
-        let monthsHtml = '';
-        let overdueSum = 0;
-        
-        monthInfo.months.forEach(m => {
-          let statusClass = 'month-future';
-          let statusText = '⏳ Ожидает';
-          if (m.status === 'paid') {
-            statusClass = 'month-paid';
-            statusText = `✅ ${m.amount} ₽`;
-          } else if (m.status === 'overdue') {
-            statusClass = 'month-overdue';
-            statusText = `❌ ${m.amount} ₽`;
-            overdueSum += m.amount;
-          } else {
-            statusText = `📅 ${m.amount} ₽`;
-          }
-          monthsHtml += `<span class="month-status ${statusClass}" title="${m.date}">${m.month}-й: ${statusText}</span>`;
-        });
-        
-        const rest = client.rest || calculateContractMetrics(client).rest;
-        const phone = client.phone.replace(/[^0-9]/g, '');
-        
-        html += `
-          <div class="client-item" style="border-left: 4px solid #dc2626;">
-            <div class="client-info">
-              <span class="client-name">${client.fio}</span>
-              <span class="client-phone">📞 ${client.phone}</span>
-              <span class="client-detail">💰 Мес. платеж: ${client.monthlyPay} ₽</span>
-              <span class="client-detail" style="color: #dc2626; font-weight: bold;">🚗 ВЫЕЗД (2+ мес.)</span>
-            </div>
-            <div class="flex flex-wrap items-center gap-2">
-              <span class="client-overdue">Просрочка: ${overdueSum.toLocaleString('ru-RU')} ₽</span>
-              <span class="client-rest">Остаток: ${rest.toLocaleString('ru-RU')} ₽</span>
-              <a href="https://wa.me/7${phone}?text=Здравствуйте! У вас просрочка более 2 месяцев. Просим связаться с нами." 
-                 target="_blank" 
-                 class="text-green-600 hover:text-green-800 font-bold text-sm">
-                💬
-              </a>
-            </div>
-            <div class="w-full mt-1 flex flex-wrap gap-1">
-              ${monthsHtml}
-            </div>
-          </div>
-        `;
-      });
-      html += '</div>';
-      container.innerHTML = html;
-    }
-
     function getDebtors() {
       const result = [];
-      const today = getMoscowDate();
       
       allContracts.forEach(contract => {
         const metrics = calculateContractMetrics(contract);
         if (metrics.isClosed) return;
         
         const monthInfo = getMonthStatus(contract);
-        let hasOverdue = false;
-        for (const m of monthInfo.months) {
-          if (m.status === 'overdue' && !m.isPaid && m.payDateObj < today) {
-            hasOverdue = true;
-            break;
-          }
-        }
+        const hasOverdue = monthInfo.months.some(m => m.status === 'overdue' && !m.isPaid);
         
         if (hasOverdue) {
           result.push({
@@ -1977,46 +1860,6 @@
       return result;
     }
 
-    // Функция для получения клиентов с просрочкой 2+ месяца
-    function getExitClients() {
-      const result = [];
-      const today = getMoscowDate();
-      const twoMonthsAgo = new Date(today);
-      twoMonthsAgo.setMonth(today.getMonth() - 2);
-      
-      allContracts.forEach(contract => {
-        const metrics = calculateContractMetrics(contract);
-        if (metrics.isClosed) return;
-        
-        const monthInfo = getMonthStatus(contract);
-        let overdueCount = 0;
-        for (const m of monthInfo.months) {
-          if (m.status === 'overdue' && !m.isPaid && m.payDateObj < today) {
-            // Проверяем, что платеж был просрочен как минимум 2 месяца назад
-            const twoMonthsAgoDate = new Date(today);
-            twoMonthsAgoDate.setMonth(today.getMonth() - 2);
-            if (m.payDateObj <= twoMonthsAgoDate) {
-              overdueCount++;
-            }
-          }
-        }
-        
-        // Если есть хотя бы 2 просроченных платежа (или один, но старше 2 месяцев)
-        if (overdueCount >= 2) {
-          result.push({
-            ...contract,
-            rest: metrics.rest,
-            phone: contract.phone || '',
-            fio: contract.fio || '',
-            monthInfo: monthInfo,
-            overdueCount: overdueCount
-          });
-        }
-      });
-      
-      return result.sort((a, b) => (b.overdueCount || 0) - (a.overdueCount || 0));
-    }
-
     // ===== ФУНКЦИИ ДЛЯ WHATSAPP =====
     
     function showCopyNotification(message) {
@@ -2030,7 +1873,7 @@
     }
 
     function sendWhatsAppToday() {
-      const today = getMoscowDate();
+      const today = new Date();
       const todayStr = today.toISOString().slice(0, 10);
       const clients = getClientsForDate(todayStr);
       
@@ -2076,7 +1919,7 @@
     }
 
     function sendWhatsAppThreeDays() {
-      const today = getMoscowDate();
+      const today = new Date();
       const threeDaysLater = new Date(today);
       threeDaysLater.setDate(today.getDate() + 3);
       const threeDaysStr = threeDaysLater.toISOString().slice(0, 10);
@@ -2162,52 +2005,6 @@
         showCopyNotification(`✅ Скопировано ${phoneNumbers.length} номеров для рассылки!`);
       }).catch(() => {
         showCopyNotification(`⚠️ Найдено ${phoneNumbers.length} должников. Скопируйте номера вручную.`);
-      });
-      
-      const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-      window.open(url, '_blank');
-    }
-
-    function sendWhatsAppExit() {
-      const clients = getExitClients();
-      
-      if (clients.length === 0) {
-        alert('🚗 Нет клиентов с просрочкой 2+ месяца');
-        return;
-      }
-      
-      let message = '🚗 *Выезд! Просрочка более 2 месяцев!*\n\n';
-      let phoneNumbers = [];
-      
-      clients.forEach((client, index) => {
-        const phone = client.phone.replace(/[^0-9]/g, '');
-        if (phone) phoneNumbers.push(phone);
-        
-        const monthInfo = client.monthInfo || getMonthStatus(client);
-        let overdueSum = 0;
-        let overdueMonths = [];
-        monthInfo.months.forEach(m => {
-          if (m.status === 'overdue' && !m.isPaid) {
-            overdueSum += m.amount;
-            overdueMonths.push(`${m.month}-й (${m.date})`);
-          }
-        });
-        
-        message += `${index + 1}. *${client.fio}*\n`;
-        message += `   💰 Сумма: ${client.monthlyPay} ₽\n`;
-        message += `   📱 WhatsApp: wa.me/7${phone}\n`;
-        message += `   ⚠️ Просрочка: ${overdueSum} ₽ (${overdueMonths.join(', ')})\n`;
-        message += `   📊 Остаток: ${client.rest} ₽\n`;
-        message += `   🚗 *Выезд обязателен!*\n\n`;
-      });
-      
-      message += `\n👥 Всего клиентов на выезд: ${clients.length}`;
-      
-      const phoneList = phoneNumbers.map(p => `7${p}`).join(', ');
-      navigator.clipboard.writeText(phoneList).then(() => {
-        showCopyNotification(`✅ Скопировано ${phoneNumbers.length} номеров для рассылки!`);
-      }).catch(() => {
-        showCopyNotification(`⚠️ Найдено ${phoneNumbers.length} клиентов. Скопируйте номера вручную.`);
       });
       
       const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
@@ -2368,7 +2165,7 @@
 
       const inputDateVal = document.getElementById('payDateVal').value;
       const inputDate = new Date(inputDateVal);
-      const today = getMoscowDate();
+      const today = new Date();
       
       const isDifferentMonth = (inputDate.getFullYear() !== today.getFullYear()) || (inputDate.getMonth() !== today.getMonth());
 
@@ -2727,7 +2524,7 @@
       let uchetBalance = totalUchetIncome - totalUchetExpense;
       document.getElementById('kassaUchet').innerText = uchetBalance.toLocaleString('ru-RU');
 
-      const now = getMoscowDate();
+      const now = new Date();
       const todayStr = now.toISOString().slice(0, 10);
 
       let totalContracts = allContracts.length;
