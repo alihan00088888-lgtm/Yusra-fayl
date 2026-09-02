@@ -1053,7 +1053,7 @@
     }
 
     // ================================================================
-    // 🔧 ИЗМЕНЕННАЯ ФУНКЦИЯ calculateContractMetrics
+    // 🔧 ИЗМЕНЕНИЕ №1: ФУНКЦИЯ calculateContractMetrics (ИСПРАВЛЕНА)
     // ================================================================
     
     function calculateContractMetrics(contract) {
@@ -1086,6 +1086,7 @@
       const paidPercentage = totalPayable > 0 ? (totalPaid / totalPayable) * 100 : 0;
       const isClosed = rest <= 0;
       
+      // ⬇️⬇️⬇️ ИСПРАВЛЕННАЯ ЧАСТЬ - РАСЧЕТ ПРОСРОЧКИ ⬇️⬇️⬇️
       let overdueSum = 0;
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -1101,11 +1102,11 @@
               const monthsCount = Number(contract.monthsCount) || 0;
               
               for (let i = 1; i <= monthsCount; i++) {
-                // ✅ НОВАЯ ЛОГИКА: первый платеж через месяц от даты покупки
+                // ✅ ПРАВИЛЬНО: добавляем месяцы к дате покупки
                 const payDate = new Date(startDate);
-                payDate.setMonth(payDate.getMonth() + i); // +1 месяц для первого платежа
+                payDate.setMonth(payDate.getMonth() + (i - 1));
                 
-                // Корректируем день (если нет такого дня в месяце)
+                // ✅ ПРАВИЛЬНО: корректируем день (если нет такого дня в месяце)
                 const lastDayOfMonth = new Date(payDate.getFullYear(), payDate.getMonth() + 1, 0);
                 const lastDay = lastDayOfMonth.getDate();
                 const targetDay = Math.min(payDay, lastDay);
@@ -1125,6 +1126,7 @@
           console.warn('Ошибка расчета просрочки для договора', contract.id);
         }
       }
+      // ⬆️⬆️⬆️ КОНЕЦ ИСПРАВЛЕННОЙ ЧАСТИ ⬆️⬆️⬆️
       
       return {
         rest: Math.max(0, rest),
@@ -1602,7 +1604,7 @@
     }
 
     // ================================================================
-    // 🔧 ИЗМЕНЕННАЯ ФУНКЦИЯ getMonthStatus
+    // 🔧 ИЗМЕНЕНИЕ №2: ФУНКЦИЯ getMonthStatus (ИСПРАВЛЕНА)
     // ================================================================
     
     function getMonthStatus(contract) {
@@ -1635,16 +1637,18 @@
       let overdueSum = 0;
       
       for (let i = 1; i <= months; i++) {
-        // ✅ НОВАЯ ЛОГИКА: первый платеж через месяц от даты покупки
+        // ⬇️⬇️⬇️ ИСПРАВЛЕННАЯ ЧАСТЬ - РАСЧЕТ ДАТЫ ⬇️⬇️⬇️
+        // ✅ ПРАВИЛЬНО: добавляем месяцы к дате покупки
         const payDate = new Date(startDate);
-        payDate.setMonth(payDate.getMonth() + i); // +1 месяц для первого платежа
+        payDate.setMonth(payDate.getMonth() + (i - 1));
         
-        // Корректируем день (если нет такого дня в месяце)
+        // ✅ ПРАВИЛЬНО: корректируем день (если нет такого дня в месяце)
         const lastDayOfMonth = new Date(payDate.getFullYear(), payDate.getMonth() + 1, 0);
         const lastDay = lastDayOfMonth.getDate();
         const targetDay = Math.min(payDay, lastDay);
         payDate.setDate(targetDay);
         payDate.setHours(0, 0, 0, 0);
+        // ⬆️⬆️⬆️ КОНЕЦ ИСПРАВЛЕННОЙ ЧАСТИ ⬆️⬆️⬆️
         
         const payment = installments[i];
         const isPaid = !!payment && Number(payment.amount) > 0;
@@ -2517,17 +2521,7 @@
         });
         if (hasPaidToday) factTodayCount++;
 
-        // Проверяем, должен ли клиент платить сегодня (по новой логике)
-        const monthInfo = getMonthStatus(c);
-        const hasUnpaidToday = monthInfo.months.some(m => {
-          if (m.isPaid) return false;
-          const payDate = new Date(m.date);
-          if (isNaN(payDate.getTime())) return false;
-          payDate.setHours(0, 0, 0, 0);
-          return payDate.toISOString().slice(0, 10) === todayStr;
-        });
-        
-        if (hasUnpaidToday && !metrics.isClosed) {
+        if (c.payDate === todayStr) {
           planTodaySum += Number(c.monthlyPay || 0);
           planTodayCount++;
         }
