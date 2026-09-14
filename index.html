@@ -6,7 +6,6 @@
   <title>Система Учета и Договоров</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* --- Ваши стили --- */
     .row-error { background-color: #fee2e2 !important; }
     .pay-paid { background-color: #22c55e; color: white; font-weight: bold; cursor: pointer; }
     .btn-history-active { background-color: #f59e0b !important; color: white !important; cursor: pointer !important; }
@@ -19,30 +18,12 @@
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
     
-    .tab-btn.today-tab.active {
-      background-color: #22c55e;
-      color: #ffffff;
-    }
-    
-    .tab-btn.three-days-tab.active {
-      background-color: #3b82f6;
-      color: #ffffff;
-    }
-    
-    .tab-btn.debtors-tab.active {
-      background-color: #ef4444;
-      color: #ffffff;
-    }
-    
-    .tab-btn.partners-tab.active {
-      background-color: #8b5cf6;
-      color: #ffffff;
-    }
-    
-    .tab-btn.print-tab.active {
-      background-color: #f59e0b;
-      color: #ffffff;
-    }
+    .tab-btn.today-tab.active { background-color: #22c55e; color: #ffffff; }
+    .tab-btn.three-days-tab.active { background-color: #3b82f6; color: #ffffff; }
+    .tab-btn.debtors-tab.active { background-color: #ef4444; color: #ffffff; }
+    .tab-btn.partners-tab.active { background-color: #8b5cf6; color: #ffffff; }
+    .tab-btn.print-tab.active { background-color: #f59e0b; color: #ffffff; }
+    .tab-btn.income-tab.active { background-color: #0d9488; color: #ffffff; }
 
     .excel-table td, .excel-table th {
       border: 1px solid #cbd5e1;
@@ -73,15 +54,8 @@
       border: none;
       font-size: 14px;
     }
-    .whatsapp-btn:hover {
-      background-color: #128C7E;
-      transform: scale(1.02);
-    }
-    .whatsapp-btn svg {
-      width: 24px;
-      height: 24px;
-      fill: white;
-    }
+    .whatsapp-btn:hover { background-color: #128C7E; transform: scale(1.02); }
+    .whatsapp-btn svg { width: 24px; height: 24px; fill: white; }
 
     .client-item {
       padding: 12px 16px;
@@ -92,172 +66,63 @@
       flex-wrap: wrap;
       gap: 8px;
     }
-    .client-item:last-child {
-      border-bottom: none;
-    }
-    .client-list {
-      max-height: 500px;
-      overflow-y: auto;
-    }
+    .client-item:last-child { border-bottom: none; }
+    .client-list { max-height: 500px; overflow-y: auto; }
     
     .month-status {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 4px;
-      margin: 2px;
-      font-size: 10px;
-      font-weight: bold;
+      display: inline-block; padding: 2px 8px; border-radius: 4px;
+      margin: 2px; font-size: 10px; font-weight: bold;
     }
     .month-paid { background-color: #22c55e; color: white; }
     .month-overdue { background-color: #ef4444; color: white; }
     .month-future { background-color: #3b82f6; color: white; }
     
-    .client-info {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 12px;
-    }
+    .client-info { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
     .client-name { font-weight: bold; font-size: 14px; }
     .client-phone { color: #6b7280; font-size: 12px; }
     .client-detail { font-size: 12px; color: #4b5563; }
     .client-overdue { color: #ef4444; font-weight: bold; }
     .client-rest { color: #f59e0b; font-weight: bold; }
 
-    .partner-stat {
-      padding: 8px 12px;
-      border-bottom: 1px solid #e5e7eb;
-    }
-    .partner-stat:last-child {
-      border-bottom: none;
-    }
+    .partner-stat { padding: 8px 12px; border-bottom: 1px solid #e5e7eb; }
+    .partner-stat:last-child { border-bottom: none; }
     .partner-name { font-weight: bold; font-size: 14px; color: #7c3aed; }
     .partner-value { font-weight: bold; font-size: 13px; }
 
-    /* Стили для печати договора */
     .print-contract {
       font-family: 'Times New Roman', serif;
-      font-size: 12px;
-      line-height: 1.4;
-      padding: 20px 30px;
-      background: white;
-      max-width: 210mm;
-      margin: 0 auto;
+      font-size: 12px; line-height: 1.4;
+      padding: 20px 30px; background: white;
+      max-width: 210mm; margin: 0 auto;
     }
-    .print-contract h1 {
-      font-size: 16px;
-      font-weight: bold;
-      text-align: center;
-      text-transform: uppercase;
-      margin-bottom: 12px;
-    }
-    .print-contract .contract-num {
-      font-weight: bold;
-      text-align: right;
-      font-size: 13px;
-    }
-    .print-contract .section-title {
-      font-weight: bold;
-      font-size: 14px;
-      margin-top: 12px;
-      margin-bottom: 6px;
-      text-transform: uppercase;
-      text-decoration: underline;
-    }
-    .print-contract .sub-section {
-      font-weight: bold;
-      margin-top: 8px;
-      margin-bottom: 3px;
-      font-size: 12px;
-    }
-    .print-contract .list-item {
-      padding-left: 18px;
-      margin-bottom: 2px;
-      font-size: 11.5px;
-    }
-    .print-contract .signatures {
-      margin-top: 20px;
-      display: flex;
-      justify-content: space-between;
-    }
-    .print-contract .signature-block {
-      text-align: center;
-      min-width: 120px;
-    }
-    .print-contract .signature-line {
-      border-top: 1px solid black;
-      width: 140px;
-      margin: 20px auto 4px;
-    }
-    .print-contract .signature-label {
-      font-size: 10px;
-    }
-    .print-contract .page-break {
-      page-break-after: always;
-      border-bottom: 2px dashed #ccc;
-      margin: 10px 0;
-    }
+    .print-contract h1 { font-size: 16px; font-weight: bold; text-align: center; text-transform: uppercase; margin-bottom: 12px; }
+    .print-contract .contract-num { font-weight: bold; text-align: right; font-size: 13px; }
+    .print-contract .section-title { font-weight: bold; font-size: 14px; margin-top: 12px; margin-bottom: 6px; text-transform: uppercase; text-decoration: underline; }
+    .print-contract .sub-section { font-weight: bold; margin-top: 8px; margin-bottom: 3px; font-size: 12px; }
+    .print-contract .list-item { padding-left: 18px; margin-bottom: 2px; font-size: 11.5px; }
+    .print-contract .signatures { margin-top: 20px; display: flex; justify-content: space-between; }
+    .print-contract .signature-block { text-align: center; min-width: 120px; }
+    .print-contract .signature-line { border-top: 1px solid black; width: 140px; margin: 20px auto 4px; }
+    .print-contract .signature-label { font-size: 10px; }
+    .print-contract .page-break { page-break-after: always; border-bottom: 2px dashed #ccc; margin: 10px 0; }
 
-    .months-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 11px;
-      margin-top: 10px;
-    }
-    .months-table th {
-      background-color: #e2e8f0;
-      font-weight: bold;
-      text-align: center;
-      padding: 4px 8px;
-      border: 1px solid #000;
-    }
-    .months-table td {
-      padding: 4px 8px;
-      text-align: center;
-      border: 1px solid #000;
-    }
+    .months-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 10px; }
+    .months-table th { background-color: #e2e8f0; font-weight: bold; text-align: center; padding: 4px 8px; border: 1px solid #000; }
+    .months-table td { padding: 4px 8px; text-align: center; border: 1px solid #000; }
     .month-paid-cell { color: #22c55e; font-weight: bold; }
     .month-unpaid-cell { color: #ef4444; font-weight: bold; }
 
-    .person-block {
-      border: 1px solid #000;
-      padding: 6px 10px;
-      margin-bottom: 8px;
-    }
-    .person-block .title {
-      font-weight: bold;
-      font-size: 13px;
-      margin-bottom: 3px;
-    }
-    .person-block .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2px 15px;
-      font-size: 11.5px;
-    }
-    .person-block .grid-full {
-      grid-column: span 2;
-    }
+    .person-block { border: 1px solid #000; padding: 6px 10px; margin-bottom: 8px; }
+    .person-block .title { font-weight: bold; font-size: 13px; margin-bottom: 3px; }
+    .person-block .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 15px; font-size: 11.5px; }
+    .person-block .grid-full { grid-column: span 2; }
 
-    .seller-block {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
-      font-size: 11.5px;
-    }
+    .seller-block { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 11.5px; }
 
     @media print {
       body * { visibility: hidden; }
       #printContent, #printContent * { visibility: visible; }
-      #printContent {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        padding: 0;
-        margin: 0;
-        background: white;
-      }
+      #printContent { position: absolute; left: 0; top: 0; width: 100%; padding: 0; margin: 0; background: white; }
       .no-print { display: none !important; }
       .print-contract { padding: 12px 20px; font-size: 10px; }
       .print-contract .page-break { border-bottom: none; page-break-after: always; margin: 0; }
@@ -267,15 +132,10 @@
     }
 
     .copy-notification {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: #22c55e;
-      color: white;
-      padding: 12px 24px;
-      border-radius: 8px;
-      font-weight: bold;
-      z-index: 9999;
+      position: fixed; top: 20px; right: 20px;
+      background: #22c55e; color: white;
+      padding: 12px 24px; border-radius: 8px;
+      font-weight: bold; z-index: 9999;
       animation: slideIn 0.5s ease;
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
@@ -285,17 +145,32 @@
     }
 
     .date-warning {
-      background-color: #fef3c7;
-      border: 1px solid #f59e0b;
-      color: #92400e;
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-size: 11px;
-      margin-top: 6px;
-      display: none;
+      background-color: #fef3c7; border: 1px solid #f59e0b;
+      color: #92400e; padding: 8px 12px; border-radius: 6px;
+      font-size: 11px; margin-top: 6px; display: none;
     }
-    .date-warning.show {
-      display: block;
+    .date-warning.show { display: block; }
+
+    /* Страница Доход / Расход */
+    .income-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .income-table th, .income-table td {
+      border: 1px solid #94a3b8; padding: 8px 10px; text-align: center;
+    }
+    .income-table th {
+      background-color: #0f766e; color: #ffffff;
+      font-weight: bold; font-size: 11px;
+      text-transform: uppercase; letter-spacing: 0.3px;
+    }
+    .income-table .left-section { background-color: #ccfbf1; color: #0f172a; }
+    .income-table .left-section td { color: #0f172a; font-weight: 600; }
+    .income-table .right-section { background-color: #fee2e2; color: #0f172a; }
+    .income-table .right-section td { color: #0f172a; font-weight: 600; }
+    .income-table .sep-col { background-color: #0f172a !important; width: 5px; padding: 0; }
+    .income-table tbody tr:hover .left-section { background-color: #99f6e4; }
+    .income-table tbody tr:hover .right-section { background-color: #fecaca; }
+    .income-table tfoot td {
+      background-color: #1e293b; color: #ffffff !important;
+      font-weight: bold; font-size: 12px;
     }
   </style>
 </head>
@@ -337,6 +212,9 @@
         </button>
         <button type="button" id="addTakenBtn" onclick="openTakenModal()" class="hidden bg-amber-600 hover:bg-amber-700 text-white font-bold px-3 py-1.5 rounded-lg shadow transition">
           + Запись Взяли / Положили
+        </button>
+        <button type="button" id="addIncomeExpBtn" onclick="openIncomeExpModal()" class="hidden bg-teal-600 hover:bg-teal-700 text-white font-bold px-3 py-1.5 rounded-lg shadow transition">
+          + Добавить расход
         </button>
       </div>
 
@@ -585,6 +463,57 @@
       </div>
     </div>
 
+    <!-- ================= Лист 9: Доход ================= -->
+    <div id="incomeTabContent" class="hidden space-y-4">
+      <div class="bg-white shadow-xl rounded-xl p-6 border">
+        <div class="flex justify-between items-center mb-4 flex-wrap gap-3">
+          <h2 class="text-xl font-bold text-teal-700">💵 Доход / Расход</h2>
+          <button onclick="openIncomeExpModal()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-3 py-1.5 rounded-lg shadow transition text-xs">
+            + Добавить расход
+          </button>
+        </div>
+
+        <div class="overflow-x-auto border rounded-lg">
+          <table class="income-table">
+            <thead>
+              <tr>
+                <th class="left-section" colspan="6">ДОХОД</th>
+                <th class="sep-col"></th>
+                <th class="right-section" colspan="4">РАСХОД</th>
+              </tr>
+              <tr>
+                <th class="left-section">№ Договора</th>
+                <th class="left-section">Доход</th>
+                <th class="left-section">% на себест.</th>
+                <th class="left-section">% от итога</th>
+                <th class="left-section">Дата</th>
+                <th class="left-section"></th>
+                <th class="sep-col"></th>
+                <th class="right-section">Расход</th>
+                <th class="right-section">Дата</th>
+                <th class="right-section">Отметка</th>
+                <th class="right-section">Действия</th>
+              </tr>
+            </thead>
+            <tbody id="incomeTableBody"></tbody>
+            <tfoot>
+              <tr>
+                <td class="text-right">ИТОГО:</td>
+                <td id="incomeFooterProfit">0</td>
+                <td id="incomeFooterPercentCost">0%</td>
+                <td id="incomeFooterPercentTotal">0%</td>
+                <td></td>
+                <td></td>
+                <td class="sep-col"></td>
+                <td id="incomeFooterExpense">0</td>
+                <td colspan="3"></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- НИЖНЯЯ ПАНЕЛЬ ПЕРЕКЛЮЧЕНИЯ ЛИСТОВ -->
@@ -598,6 +527,9 @@
       </button>
       <button type="button" onclick="switchTab('taken')" id="tabBtnTaken" class="tab-btn px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
         📙 Взяли
+      </button>
+      <button type="button" onclick="switchTab('income')" id="tabBtnIncome" class="tab-btn income-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
+        💵 Доход
       </button>
       <button type="button" onclick="switchTab('today')" id="tabBtnToday" class="tab-btn today-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
         📅 Сегодня
@@ -804,6 +736,33 @@
     </div>
   </div>
 
+  <!-- МОДАЛЬНОЕ ОКНО ДЛЯ РАСХОДА В ДОХОДЕ -->
+  <div id="incomeExpModal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl border-t-4 border-red-500">
+      <h3 id="incomeExpModalTitle" class="font-bold text-base text-slate-800 mb-4 border-b pb-2 uppercase">Добавить расход</h3>
+      <form id="incomeExpForm" class="space-y-3">
+        <input type="hidden" id="incomeExpEditId">
+        <div>
+          <label class="block text-[10px] font-bold text-red-600 uppercase mb-1">Расход (₽)</label>
+          <input type="number" id="incomeExpAmount" required min="0" class="p-2 border rounded-md w-full font-bold text-red-600 outline-none">
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Дата</label>
+          <input type="date" id="incomeExpDate" required class="p-2 border rounded-md w-full outline-none">
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Отметка (описание)</label>
+          <input type="text" id="incomeExpNote" placeholder="Например: Реклама, Топливо..." class="p-2 border rounded-md w-full outline-none">
+        </div>
+
+        <div class="flex justify-end gap-2 pt-4 border-t">
+          <button type="button" onclick="closeIncomeExpModal()" class="px-4 py-2 text-slate-500 font-bold">Отмена</button>
+          <button type="submit" class="px-6 py-2 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 transition shadow">Сохранить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
     // ================================================================
     // ВСЕ ПЕРЕМЕННЫЕ И БАЗОВЫЕ ФУНКЦИИ
@@ -812,9 +771,9 @@
     let allContracts = JSON.parse(localStorage.getItem('contracts_db') || '[]');
     let allAccounting = JSON.parse(localStorage.getItem('accounting_db') || '[]');
     let allTaken = JSON.parse(localStorage.getItem('taken_db') || '[]');
+    let allIncomeExpenses = JSON.parse(localStorage.getItem('income_expenses_db') || '[]');
     let customAccounts = JSON.parse(localStorage.getItem('accounts_db') || 'null');
 
-    // Инициализация счетов по умолчанию
     if (!customAccounts) {
       const defaultNames = ['N', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12', 'T13', 'T14', 'T15', 'T16', 'B1', 'B2', 'B3', 'B4'];
       customAccounts = defaultNames.map(name => ({
@@ -841,6 +800,7 @@
       const cTab = document.getElementById('contractsTabContent');
       const aTab = document.getElementById('accountingTabContent');
       const tTab = document.getElementById('takenTabContent');
+      const iTab = document.getElementById('incomeTabContent');
       const todayTab = document.getElementById('todayTabContent');
       const threeDaysTab = document.getElementById('threeDaysTabContent');
       const debtorsTab = document.getElementById('debtorsTabContent');
@@ -850,6 +810,7 @@
       const cBtn = document.getElementById('tabBtnContracts');
       const aBtn = document.getElementById('tabBtnAccounting');
       const tBtn = document.getElementById('tabBtnTaken');
+      const iBtn = document.getElementById('tabBtnIncome');
       const todayBtn = document.getElementById('tabBtnToday');
       const threeDaysBtn = document.getElementById('tabBtnThreeDays');
       const debtorsBtn = document.getElementById('tabBtnDebtors');
@@ -859,10 +820,12 @@
       const addC = document.getElementById('addContractBtn');
       const addA = document.getElementById('addAccBtn');
       const addT = document.getElementById('addTakenBtn');
+      const addI = document.getElementById('addIncomeExpBtn');
 
       cTab.classList.add('hidden');
       aTab.classList.add('hidden');
       tTab.classList.add('hidden');
+      iTab.classList.add('hidden');
       todayTab.classList.add('hidden');
       threeDaysTab.classList.add('hidden');
       debtorsTab.classList.add('hidden');
@@ -871,10 +834,12 @@
       addC.classList.add('hidden');
       addA.classList.add('hidden');
       addT.classList.add('hidden');
+      addI.classList.add('hidden');
 
       cBtn.className = "tab-btn px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       aBtn.className = "tab-btn px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       tBtn.className = "tab-btn px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
+      iBtn.className = "tab-btn income-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       todayBtn.className = "tab-btn today-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       threeDaysBtn.className = "tab-btn three-days-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       debtorsBtn.className = "tab-btn debtors-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
@@ -894,6 +859,11 @@
         tBtn.className = "tab-btn active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
         addT.classList.remove('hidden');
         renderTakenSheet();
+      } else if (tab === 'income') {
+        iTab.classList.remove('hidden');
+        iBtn.className = "tab-btn income-tab active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
+        addI.classList.remove('hidden');
+        renderIncomePage();
       } else if (tab === 'today') {
         todayTab.classList.remove('hidden');
         todayBtn.className = "tab-btn today-tab active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
@@ -919,12 +889,12 @@
       handleSearch();
     }
 
-    // --- Функции истории ---
     function saveState() {
       const stateSnapshot = {
         contracts: JSON.parse(JSON.stringify(allContracts)),
         accounting: JSON.parse(JSON.stringify(allAccounting)),
         taken: JSON.parse(JSON.stringify(allTaken)),
+        incomeExpenses: JSON.parse(JSON.stringify(allIncomeExpenses)),
         accounts: JSON.parse(JSON.stringify(customAccounts))
       };
       undoStack.push(JSON.stringify(stateSnapshot));
@@ -939,6 +909,7 @@
         contracts: JSON.parse(JSON.stringify(allContracts)),
         accounting: JSON.parse(JSON.stringify(allAccounting)),
         taken: JSON.parse(JSON.stringify(allTaken)),
+        incomeExpenses: JSON.parse(JSON.stringify(allIncomeExpenses)),
         accounts: JSON.parse(JSON.stringify(customAccounts))
       };
       redoStack.push(JSON.stringify(currentState));
@@ -947,6 +918,7 @@
       allContracts = previousState.contracts;
       allAccounting = previousState.accounting;
       allTaken = previousState.taken || [];
+      allIncomeExpenses = previousState.incomeExpenses || [];
       customAccounts = previousState.accounts || customAccounts;
       finishAction();
     }
@@ -957,6 +929,7 @@
         contracts: JSON.parse(JSON.stringify(allContracts)),
         accounting: JSON.parse(JSON.stringify(allAccounting)),
         taken: JSON.parse(JSON.stringify(allTaken)),
+        incomeExpenses: JSON.parse(JSON.stringify(allIncomeExpenses)),
         accounts: JSON.parse(JSON.stringify(customAccounts))
       };
       undoStack.push(JSON.stringify(currentState));
@@ -965,6 +938,7 @@
       allContracts = nextState.contracts;
       allAccounting = nextState.accounting;
       allTaken = nextState.taken || [];
+      allIncomeExpenses = nextState.incomeExpenses || [];
       customAccounts = nextState.accounts || customAccounts;
       finishAction();
     }
@@ -973,10 +947,12 @@
       localStorage.setItem('contracts_db', JSON.stringify(allContracts));
       localStorage.setItem('accounting_db', JSON.stringify(allAccounting));
       localStorage.setItem('taken_db', JSON.stringify(allTaken));
+      localStorage.setItem('income_expenses_db', JSON.stringify(allIncomeExpenses));
       localStorage.setItem('accounts_db', JSON.stringify(customAccounts));
       renderTable(allContracts);
       renderAccountingTable(allAccounting);
       renderTakenSheet();
+      if (activeTab === 'income') renderIncomePage();
       if (activeTab === 'today') renderTodayClients();
       if (activeTab === 'threeDays') renderThreeDaysClients();
       if (activeTab === 'debtors') renderDebtorsClients();
@@ -1003,10 +979,12 @@
       localStorage.setItem('contracts_db', JSON.stringify(allContracts));
       localStorage.setItem('accounting_db', JSON.stringify(allAccounting));
       localStorage.setItem('taken_db', JSON.stringify(allTaken));
+      localStorage.setItem('income_expenses_db', JSON.stringify(allIncomeExpenses));
       localStorage.setItem('accounts_db', JSON.stringify(customAccounts));
       renderTable(allContracts);
       renderAccountingTable(allAccounting);
       renderTakenSheet();
+      if (activeTab === 'income') renderIncomePage();
       if (activeTab === 'today') renderTodayClients();
       if (activeTab === 'threeDays') renderThreeDaysClients();
       if (activeTab === 'debtors') renderDebtorsClients();
@@ -1019,8 +997,7 @@
     }
 
     // ================================================================
-    // ИСПРАВЛЕННАЯ ЛОГИКА РАСЧЕТА ДАТ ПЛАТЕЖЕЙ
-    // ПЕРВЫЙ ПЛАТЕЖ - В СЛЕДУЮЩЕМ МЕСЯЦЕ
+    // ЛОГИКА РАСЧЕТА ДАТ ПЛАТЕЖЕЙ
     // ================================================================
     
     function calculatePaymentDates(contract) {
@@ -1061,10 +1038,6 @@
       return dates;
     }
 
-    // ================================================================
-    // УНИВЕРСАЛЬНАЯ ФУНКЦИЯ РАСЧЕТА ПОКАЗАТЕЛЕЙ ПО ДОГОВОРУ
-    // ================================================================
-    
     function calculateContractMetrics(contract) {
       const totalCost = Number(contract.totalCost) || 0;
       const downPayment = Number(contract.downPayment) || 0;
@@ -1121,10 +1094,6 @@
       };
     }
 
-    // ================================================================
-    // ФУНКЦИЯ ПРОВЕРКИ ДАТЫ ПЛАТЕЖА
-    // ================================================================
-
     function checkPaymentDateAdjustment() {
       const payDateStr = document.getElementById('payDate').value;
       const warningEl = document.getElementById('dateWarning');
@@ -1157,10 +1126,6 @@
         warningEl.classList.remove('show');
       }
     }
-
-    // ================================================================
-    // ФУНКЦИЯ ЗАГРУЗКИ ДОГОВОРА ДЛЯ ПЕЧАТИ
-    // ================================================================
 
     function updatePrintSelect() {
       const select = document.getElementById('printContractSelect');
@@ -1453,6 +1418,145 @@
     }
 
     // ================================================================
+    // СТРАНИЦА: ДОХОД / РАСХОД
+    // ================================================================
+
+    function renderIncomePage() {
+      const tbody = document.getElementById('incomeTableBody');
+      tbody.innerHTML = '';
+
+      // Левая часть — из договоров
+      const sortedContracts = [...allContracts].sort((a, b) => (b.contractNum || 0) - (a.contractNum || 0));
+      
+      let totalProfit = 0;        // сумма (итоговая - себестоимость)
+      let totalCost = 0;          // сумма себестоимости
+      let totalFinal = 0;         // сумма итоговой стоимости
+      
+      const rowsLeft = sortedContracts.map((c) => {
+        const cost = Number(c.costPrice) || 0;
+        const finalCost = Number(c.totalCost) || 0;
+        const profit = finalCost - cost;  // <-- Доход = итоговая - себестоимость
+        const percentOnCost = cost > 0 ? (profit / cost) * 100 : 0;
+        const percentFromFinal = finalCost > 0 ? (profit / finalCost) * 100 : 0;
+        
+        totalProfit += profit;
+        totalCost += cost;
+        totalFinal += finalCost;
+        
+        return `
+          <tr class="left-section">
+            <td>${c.contractNum}</td>
+            <td>${profit.toLocaleString('ru-RU')}</td>
+            <td>${percentOnCost.toFixed(1)}%</td>
+            <td>${percentFromFinal.toFixed(1)}%</td>
+            <td>${c.buyDate || '—'}</td>
+            <td></td>
+          </tr>
+        `;
+      });
+
+      // Правая часть — ручные расходы
+      let totalExpense = 0;
+      const rightRows = allIncomeExpenses.map(e => {
+        const amount = Number(e.amount) || 0;
+        totalExpense += amount;
+        return `
+          <tr class="right-section">
+            <td>${amount.toLocaleString('ru-RU')}</td>
+            <td>${e.date || '—'}</td>
+            <td>${e.note || '—'}</td>
+            <td>
+              <button onclick="openEditIncomeExpModal('${e.id}')" class="text-blue-700 font-bold px-1">✏️</button>
+              <button onclick="deleteIncomeExpItem('${e.id}')" class="text-red-700 font-bold px-1">🗑️</button>
+            </td>
+          </tr>
+        `;
+      });
+
+      // Объединяем по индексу
+      const maxLen = Math.max(rowsLeft.length, rightRows.length);
+      let html = '';
+      for (let i = 0; i < maxLen; i++) {
+        html += '<tr>';
+        html += rowsLeft[i] ? rowsLeft[i].replace('<tr class="left-section">', '').replace('</tr>', '') : '<td class="left-section"></td><td class="left-section"></td><td class="left-section"></td><td class="left-section"></td><td class="left-section"></td><td class="left-section"></td>';
+        html += '<td class="sep-col"></td>';
+        html += rightRows[i] ? rightRows[i].replace('<tr class="right-section">', '').replace('</tr>', '') : '<td class="right-section"></td><td class="right-section"></td><td class="right-section"></td><td class="right-section"></td>';
+        html += '</tr>';
+      }
+      tbody.innerHTML = html;
+
+      // Итоги
+      const overallPercent = totalCost > 0 ? (totalProfit / totalCost) * 100 : 0;
+      const overallPercentFromFinal = totalFinal > 0 ? (totalProfit / totalFinal) * 100 : 0;
+
+      document.getElementById('incomeFooterProfit').innerText = totalProfit.toLocaleString('ru-RU');
+      document.getElementById('incomeFooterPercentCost').innerText = overallPercent.toFixed(1) + '%';
+      document.getElementById('incomeFooterPercentTotal').innerText = overallPercentFromFinal.toFixed(1) + '%';
+      document.getElementById('incomeFooterExpense').innerText = totalExpense.toLocaleString('ru-RU');
+    }
+
+    const incomeExpModal = document.getElementById('incomeExpModal');
+
+    function openIncomeExpModal() {
+      document.getElementById('incomeExpForm').reset();
+      document.getElementById('incomeExpEditId').value = '';
+      document.getElementById('incomeExpModalTitle').innerText = 'Добавить расход';
+      document.getElementById('incomeExpDate').valueAsDate = new Date();
+      incomeExpModal.classList.remove('hidden');
+    }
+
+    function openEditIncomeExpModal(id) {
+      const item = allIncomeExpenses.find(e => e.id === id);
+      if (!item) return;
+      document.getElementById('incomeExpEditId').value = item.id;
+      document.getElementById('incomeExpModalTitle').innerText = 'Редактировать расход';
+      document.getElementById('incomeExpAmount').value = item.amount || 0;
+      document.getElementById('incomeExpDate').value = item.date || '';
+      document.getElementById('incomeExpNote').value = item.note || '';
+      incomeExpModal.classList.remove('hidden');
+    }
+
+    function closeIncomeExpModal() {
+      incomeExpModal.classList.add('hidden');
+    }
+
+    function deleteIncomeExpItem(id) {
+      if (confirm('Удалить этот расход?')) {
+        saveState();
+        allIncomeExpenses = allIncomeExpenses.filter(e => e.id !== id);
+        saveToStorage();
+      }
+    }
+
+    document.getElementById('incomeExpForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      saveState();
+
+      const editId = document.getElementById('incomeExpEditId').value;
+      const amount = Number(document.getElementById('incomeExpAmount').value) || 0;
+      const date = document.getElementById('incomeExpDate').value;
+      const note = document.getElementById('incomeExpNote').value || '';
+
+      if (editId) {
+        const idx = allIncomeExpenses.findIndex(e => e.id === editId);
+        if (idx !== -1) {
+          allIncomeExpenses[idx] = { ...allIncomeExpenses[idx], amount, date, note };
+        }
+      } else {
+        allIncomeExpenses.push({
+          id: 'inc_' + Date.now(),
+          amount,
+          date,
+          note,
+          createdAt: Date.now()
+        });
+      }
+
+      saveToStorage();
+      closeIncomeExpModal();
+    });
+
+    // ================================================================
     // ФУНКЦИИ ДЛЯ ЛИСТА ПАРТНЁРЫ
     // ================================================================
     
@@ -1644,10 +1748,6 @@
       return { months: result, overdueSum: overdueSum };
     }
 
-    // ================================================================
-    // ФУНКЦИИ ДЛЯ ЛИСТОВ "СЕГОДНЯ" И "3 ДНЯ"
-    // ================================================================
-    
     function getClientsForDate(targetDateStr) {
       const result = [];
       const target = new Date(targetDateStr);
@@ -1793,8 +1893,6 @@
       return result;
     }
 
-    // ===== ФУНКЦИИ ДЛЯ WHATSAPP =====
-    
     function showCopyNotification(message) {
       const notification = document.createElement('div');
       notification.className = 'copy-notification';
@@ -2337,11 +2435,6 @@
       takenModal.classList.remove('hidden');
     }
 
-    // ================================================================
-    // ИСПРАВЛЕННАЯ ЛОГИКА ДЛЯ "ВЗЯЛИ / ПОЛОЖИЛИ"
-    // При добавлении записи - автоматически создается запись в учете
-    // ================================================================
-
     document.getElementById('takenForm').addEventListener('submit', (e) => {
       e.preventDefault();
       saveState();
@@ -2354,11 +2447,9 @@
       
       const today = new Date().toISOString().slice(0, 10);
 
-      // Если это редактирование
       if (editId) {
         const oldItem = allTaken.find(t => t.id === editId);
         if (oldItem) {
-          // Удаляем старые записи из учета
           const oldTakenAmount = Number(oldItem.takenAmount) || 0;
           const oldPutAmount = Number(oldItem.putAmount) || 0;
           
@@ -2369,7 +2460,6 @@
             allAccounting = allAccounting.filter(a => a._source !== editId || a.type !== 'put');
           }
           
-          // Обновляем запись в taken
           const idx = allTaken.findIndex(t => t.id === editId);
           if (idx !== -1) {
             allTaken[idx] = {
@@ -2383,7 +2473,6 @@
           }
         }
       } else {
-        // Новая запись
         allTaken.push({
           id: 'taken_' + Date.now(),
           takenAmount,
@@ -2394,7 +2483,6 @@
         });
       }
 
-      // Добавляем записи в учет
       if (takenAmount > 0) {
         allAccounting.unshift({
           id: 'acc_' + Date.now() + '_taken',
@@ -2430,10 +2518,7 @@
     function deleteTakenItem(id) {
       if (confirm('Удалить эту строку?')) {
         saveState();
-        
-        // Удаляем связанные записи из учета
         allAccounting = allAccounting.filter(a => a._source !== id);
-        
         allTaken = allTaken.filter(t => t.id !== id);
         saveToStorage();
       }
@@ -2512,8 +2597,14 @@
         });
       });
 
-      // Касса = все оплаты + платежи по installments - себестоимость (только с "Д") - взяли + положили
-      let totalKassa = totalDownPayments + totalInstallments - totalCostPrice - sumTaken + sumPut;
+      // Расход из новой страницы "Доход" вычитается из Кассы
+      let totalIncomeExpenses = 0;
+      allIncomeExpenses.forEach(e => {
+        totalIncomeExpenses += Number(e.amount || 0);
+      });
+
+      // Касса = все оплаты + платежи по installments - себестоимость (только с "Д") - взяли + положили - расходы из "Доход"
+      let totalKassa = totalDownPayments + totalInstallments - totalCostPrice - sumTaken + sumPut - totalIncomeExpenses;
       document.getElementById('kassaTotal').innerText = totalKassa.toLocaleString('ru-RU');
 
       let totalUchetIncome = 0;
@@ -2651,6 +2742,13 @@
       } else if (activeTab === 'taken') {
         const filtered = allTaken.filter(t => (t.takenDesc && t.takenDesc.toLowerCase().includes(q)) || (t.putDesc && t.putDesc.toLowerCase().includes(q)));
         renderTakenFiltered(filtered);
+      } else if (activeTab === 'income') {
+        const filtered = allIncomeExpenses.filter(e => (e.note && e.note.toLowerCase().includes(q)));
+        if (filtered.length === 0 && q.length > 0) {
+          document.getElementById('incomeTableBody').innerHTML = '<tr><td colspan="12" class="text-center text-gray-500 py-4">Нет совпадений по расходам</td></tr>';
+        } else {
+          renderIncomePage();
+        }
       }
     }
 
@@ -2680,6 +2778,7 @@
         contracts: allContracts,
         accounting: allAccounting,
         taken: allTaken,
+        incomeExpenses: allIncomeExpenses,
         accounts: customAccounts
       };
       const blob = new Blob([JSON.stringify(exportObject, null, 2)], { type: "application/json" });
@@ -2706,6 +2805,7 @@
               allContracts = data.contracts || [];
               allAccounting = data.accounting || [];
               allTaken = data.taken || [];
+              allIncomeExpenses = data.incomeExpenses || [];
               customAccounts = data.accounts || customAccounts;
             }
             saveToStorage();
