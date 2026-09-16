@@ -6,18 +6,27 @@
   <title>Система Учета и Договоров</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    /* === Утилиты === */
     .row-error { background-color: #fee2e2 !important; }
     .pay-paid { background-color: #22c55e; color: white; font-weight: bold; cursor: pointer; }
     .btn-history-active { background-color: #f59e0b !important; color: white !important; cursor: pointer !important; }
     .btn-history-active:hover { background-color: #d97706 !important; }
     .input-error { border: 2px solid #ef4444 !important; background-color: #fef2f2 !important; }
-    
+    .cell-over-limit {
+      background-color: #fca5a5 !important;
+      color: #7f1d1d !important;
+      font-weight: bold !important;
+    }
+    .capital-negative { color: #dc2626 !important; font-weight: 800 !important; }
+    .fact-percent-positive { color: #059669; font-weight: 800; }
+    .fact-percent-zero { color: #94a3b8; font-weight: 600; }
+
+    /* === Вкладки === */
     .tab-btn.active {
       background-color: #2563eb;
       color: #ffffff;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
-    
     .tab-btn.today-tab.active { background-color: #22c55e; color: #ffffff; }
     .tab-btn.three-days-tab.active { background-color: #3b82f6; color: #ffffff; }
     .tab-btn.debtors-tab.active { background-color: #ef4444; color: #ffffff; }
@@ -26,50 +35,25 @@
     .tab-btn.income-tab.active { background-color: #0d9488; color: #ffffff; }
     .tab-btn.init-tab.active { background-color: #7c3aed; color: #ffffff; }
 
-    .excel-table td, .excel-table th {
-      border: 1px solid #cbd5e1;
-      padding: 4px 6px;
-    }
-    .bg-excel-header { background-color: #e2e8f0; font-weight: bold; }
-    .bg-excel-yellow { background-color: #fef08a; }
-    .bg-excel-green { background-color: #86efac; }
-    .bg-excel-red { background-color: #fca5a5; color: #7f1d1d; font-weight: bold; }
-    
-    .cell-over-limit {
-      background-color: #fca5a5 !important;
-      color: #7f1d1d !important;
-      font-weight: bold !important;
-    }
-
+    /* === WhatsApp === */
     .whatsapp-btn {
-      background-color: #25D366;
-      color: white;
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-weight: bold;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.3s;
-      cursor: pointer;
-      border: none;
-      font-size: 14px;
+      background-color: #25D366; color: white;
+      padding: 8px 16px; border-radius: 8px; font-weight: bold;
+      display: inline-flex; align-items: center; gap: 8px;
+      transition: all 0.3s; cursor: pointer; border: none; font-size: 14px;
     }
     .whatsapp-btn:hover { background-color: #128C7E; transform: scale(1.02); }
     .whatsapp-btn svg { width: 24px; height: 24px; fill: white; }
 
+    /* === Клиенты === */
     .client-item {
       padding: 12px 16px;
       border-bottom: 1px solid #e5e7eb;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 8px;
+      display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap; gap: 8px;
     }
     .client-item:last-child { border-bottom: none; }
     .client-list { max-height: 500px; overflow-y: auto; }
-    
     .month-status {
       display: inline-block; padding: 2px 8px; border-radius: 4px;
       margin: 2px; font-size: 10px; font-weight: bold;
@@ -77,7 +61,6 @@
     .month-paid { background-color: #22c55e; color: white; }
     .month-overdue { background-color: #ef4444; color: white; }
     .month-future { background-color: #3b82f6; color: white; }
-    
     .client-info { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
     .client-name { font-weight: bold; font-size: 14px; }
     .client-phone { color: #6b7280; font-size: 12px; }
@@ -85,11 +68,7 @@
     .client-overdue { color: #ef4444; font-weight: bold; }
     .client-rest { color: #f59e0b; font-weight: bold; }
 
-    .partner-stat { padding: 8px 12px; border-bottom: 1px solid #e5e7eb; }
-    .partner-stat:last-child { border-bottom: none; }
-    .partner-name { font-weight: bold; font-size: 14px; color: #7c3aed; }
-    .partner-value { font-weight: bold; font-size: 13px; }
-
+    /* === Печать договора === */
     .print-contract {
       font-family: 'Times New Roman', serif;
       font-size: 12px; line-height: 1.4;
@@ -97,28 +76,6 @@
       max-width: 210mm; margin: 0 auto;
     }
     .print-contract h1 { font-size: 16px; font-weight: bold; text-align: center; text-transform: uppercase; margin-bottom: 12px; }
-    .print-contract .contract-num { font-weight: bold; text-align: right; font-size: 13px; }
-    .print-contract .section-title { font-weight: bold; font-size: 14px; margin-top: 12px; margin-bottom: 6px; text-transform: uppercase; text-decoration: underline; }
-    .print-contract .sub-section { font-weight: bold; margin-top: 8px; margin-bottom: 3px; font-size: 12px; }
-    .print-contract .list-item { padding-left: 18px; margin-bottom: 2px; font-size: 11.5px; }
-    .print-contract .signatures { margin-top: 20px; display: flex; justify-content: space-between; }
-    .print-contract .signature-block { text-align: center; min-width: 120px; }
-    .print-contract .signature-line { border-top: 1px solid black; width: 140px; margin: 20px auto 4px; }
-    .print-contract .signature-label { font-size: 10px; }
-    .print-contract .page-break { page-break-after: always; border-bottom: 2px dashed #ccc; margin: 10px 0; }
-
-    .months-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 10px; }
-    .months-table th { background-color: #e2e8f0; font-weight: bold; text-align: center; padding: 4px 8px; border: 1px solid #000; }
-    .months-table td { padding: 4px 8px; text-align: center; border: 1px solid #000; }
-    .month-paid-cell { color: #22c55e; font-weight: bold; }
-    .month-unpaid-cell { color: #ef4444; font-weight: bold; }
-
-    .person-block { border: 1px solid #000; padding: 6px 10px; margin-bottom: 8px; }
-    .person-block .title { font-weight: bold; font-size: 13px; margin-bottom: 3px; }
-    .person-block .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 15px; font-size: 11.5px; }
-    .person-block .grid-full { grid-column: span 2; }
-
-    .seller-block { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 11.5px; }
 
     @media print {
       body * { visibility: hidden; }
@@ -126,12 +83,10 @@
       #printContent { position: absolute; left: 0; top: 0; width: 100%; padding: 0; margin: 0; background: white; }
       .no-print { display: none !important; }
       .print-contract { padding: 12px 20px; font-size: 10px; }
-      .print-contract .page-break { border-bottom: none; page-break-after: always; margin: 0; }
-      .print-contract .signature-line { width: 100px; }
       .print-contract h1 { font-size: 14px; }
-      .print-contract .section-title { font-size: 12px; }
     }
 
+    /* === Уведомление о копировании === */
     .copy-notification {
       position: fixed; top: 20px; right: 20px;
       background: #22c55e; color: white;
@@ -145,6 +100,7 @@
       to { transform: translateX(0); opacity: 1; }
     }
 
+    /* === Предупреждение о дате === */
     .date-warning {
       background-color: #fef3c7; border: 1px solid #f59e0b;
       color: #92400e; padding: 8px 12px; border-radius: 6px;
@@ -152,6 +108,7 @@
     }
     .date-warning.show { display: block; }
 
+    /* === Таблица Дохода === */
     .income-table { width: 100%; border-collapse: collapse; font-size: 12px; }
     .income-table th, .income-table td {
       border: 1px solid #94a3b8; padding: 8px 10px; text-align: center;
@@ -173,7 +130,7 @@
       font-weight: bold; font-size: 12px;
     }
 
-    /* ===== Стили страницы Инициализация ===== */
+    /* === Страница Инициализация === */
     .init-table { width: 100%; border-collapse: collapse; font-size: 11px; }
     .init-table th, .init-table td {
       border: 1px solid #94a3b8; padding: 5px 6px; text-align: center;
@@ -196,7 +153,6 @@
       padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700;
       cursor: pointer; border: none;
     }
-    .init-table .stop-btn.locked { background-color: #16a34a; color: white; }
     .init-table .stop-btn.unlocked { background-color: #f59e0b; color: white; }
     .month-card {
       border: 2px solid #7c3aed; border-radius: 10px; overflow: hidden;
@@ -218,15 +174,12 @@
     .month-card-header .hdr-btn:hover { background: rgba(255,255,255,0.35); }
     .month-card-header .hdr-btn.danger { background: rgba(220,38,38,0.8); }
     .month-card-header .hdr-btn.danger:hover { background: rgba(220,38,38,1); }
-    .capital-negative { color: #dc2626 !important; font-weight: 800 !important; }
-    .fact-percent-positive { color: #059669; font-weight: 800; }
-    .fact-percent-zero { color: #94a3b8; font-weight: 600; }
     .init-error-banner {
       background: #fee2e2; color: #7f1d1d; border: 1px solid #ef4444;
       padding: 10px 14px; border-radius: 8px; font-weight: 700; margin-bottom: 12px;
     }
 
-    /* ===== Экран загрузки ===== */
+    /* === Экран загрузки === */
     #loadingScreen {
       position: fixed; inset: 0; z-index: 99999;
       background: linear-gradient(135deg, #7c3aed, #2563eb);
@@ -244,7 +197,7 @@
     #loadingScreen .label { font-size: 18px; font-weight: 700; letter-spacing: 0.5px; }
     #loadingScreen .sub { font-size: 13px; opacity: 0.8; margin-top: 8px; }
 
-    /* ===== Индикатор синхронизации ===== */
+    /* === Индикатор синхронизации === */
     .sync-indicator {
       display: inline-flex; align-items: center; gap: 6px;
       padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;
@@ -262,7 +215,7 @@
       50% { opacity: 0.3; }
     }
 
-    /* ===== НОВЫЙ СТИЛЬ ЛИСТА «ВЗЯЛИ» ===== */
+    /* === Лист «Взяли» — новый дашборд === */
     .taken-dashboard {
       display: grid;
       grid-template-columns: 1fr;
@@ -345,7 +298,6 @@
       align-items: center;
       gap: 6px;
     }
-    .dash-card-body { padding: 12px 18px; }
 
     .journal-table {
       width: 100%;
@@ -413,7 +365,6 @@
     .stat-list {
       display: flex;
       flex-direction: column;
-      gap: 0;
     }
     .stat-item {
       display: flex;
@@ -441,7 +392,7 @@
     .stat-value.stat-amber { color: #d97706; }
     .stat-value.stat-green { color: #059669; }
 
-    /* ===== НОВЫЙ СТИЛЬ СЧЕТОВ — КУБИКИ ===== */
+    /* === Счета — кубики === */
     .accounts-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -580,7 +531,7 @@
     <div class="sub">Загрузка данных из облака...</div>
   </div>
 
-  <!-- ВЕРХНЯЯ ПАНЕЛЬ ДЕЙСТВИЙ -->
+  <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
   <div class="sticky top-0 z-40 bg-white shadow-md border-b no-print">
     <div class="p-3 max-w-[100vw] flex flex-wrap justify-between items-center gap-4">
       
@@ -698,11 +649,10 @@
       </div>
     </div>
 
-    <!-- ================= Лист 3: Взяли (НОВЫЙ ДИЗАЙН) ================= -->
+    <!-- ================= Лист 3: Взяли ================= -->
     <div id="takenTabContent" class="hidden">
       <div class="taken-dashboard">
 
-        <!-- KPI карточки: Касса → Учёт → Взяли → Положили -->
         <div class="kpi-grid">
           <div class="kpi-card kpi-kassa">
             <div class="kpi-label">💰 Касса</div>
@@ -722,9 +672,7 @@
           </div>
         </div>
 
-        <!-- Основная сетка: слева журнал, справа статистика -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-
           <div class="lg:col-span-2 dash-card">
             <div class="dash-card-header">
               <div class="dash-card-title">📒 Журнал операций</div>
@@ -782,7 +730,6 @@
           </div>
         </div>
 
-        <!-- Счета и карты — кубиками -->
         <div class="dash-card">
           <div class="dash-card-header">
             <div class="dash-card-title">💳 Счета и карты</div>
@@ -997,7 +944,7 @@
 
   </div>
 
-  <!-- НИЖНЯЯ ПАНЕЛЬ ПЕРЕКЛЮЧЕНИЯ ЛИСТОВ -->
+  <!-- НИЖНЯЯ ПАНЕЛЬ ПЕРЕКЛЮЧЕНИЯ -->
   <div class="fixed bottom-0 left-0 right-0 z-40 bg-white shadow-lg border-t px-4 py-2 flex justify-center items-center gap-2 overflow-x-auto no-print">
     <div class="flex items-center gap-2 bg-slate-200 p-1 rounded-xl">
       <button type="button" onclick="switchTab('contracts')" id="tabBtnContracts" class="tab-btn active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2">
@@ -1269,7 +1216,6 @@
     let isCloudLoaded = false;
     let isApplyingRemote = false;
     let syncTimeout = null;
-    let isFirstSync = true;
 
     function setSyncStatus(status, text) {
       const el = document.getElementById('syncIndicator');
@@ -1323,10 +1269,9 @@
       initMonthlyReports = {};
       
       if (rawMonths && typeof rawMonths === 'object' && !Array.isArray(rawMonths)) {
-        let cleaned = 0;
         Object.keys(rawMonths).forEach(key => {
           const rep = rawMonths[key];
-          if (!rep || typeof rep !== 'object') { cleaned++; return; }
+          if (!rep || typeof rep !== 'object') return;
           if (typeof rep.year !== 'number' || typeof rep.month !== 'number') {
             const parts = String(key).split('-');
             if (parts.length === 2) {
@@ -1336,20 +1281,16 @@
                 rep.year = y;
                 rep.month = m;
               } else {
-                cleaned++; return;
+                return;
               }
             } else {
-              cleaned++; return;
+              return;
             }
           }
-          if (!rep.entries || typeof rep.entries !== 'object') {
-            rep.entries = {};
-          }
+          if (!rep.entries || typeof rep.entries !== 'object') rep.entries = {};
           if (typeof rep.stopped !== 'boolean') rep.stopped = false;
           if (typeof rep.overallProfitPercent !== 'number') rep.overallProfitPercent = 0;
-          if (!rep.startingCapital || typeof rep.startingCapital !== 'object') {
-            rep.startingCapital = {};
-          }
+          if (!rep.startingCapital || typeof rep.startingCapital !== 'object') rep.startingCapital = {};
           const normKey = `${rep.year}-${String(rep.month).padStart(2, '0')}`;
           initMonthlyReports[normKey] = rep;
         });
@@ -1363,21 +1304,9 @@
       initMonthlyReports = {};
     }
 
-    (function cleanupOldOwnerField() {
-      let cleaned = 0;
-      Object.keys(initMonthlyReports).forEach(key => {
-        const rep = initMonthlyReports[key];
-        if (rep && rep.owner !== undefined) {
-          delete rep.owner;
-          cleaned++;
-        }
-      });
-    })();
-
     localStorage.setItem('investors_db', JSON.stringify(initInvestors));
     localStorage.setItem('monthly_reports_db', JSON.stringify(initMonthlyReports));
 
-    // Дефолтные счета с русской Н
     if (!customAccounts) {
       const defaultNames = ['Н', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12', 'T13', 'T14', 'T15', 'T16', 'B1', 'B2', 'B3', 'B4'];
       customAccounts = defaultNames.map(name => ({
@@ -1500,7 +1429,6 @@
         }
         
         isCloudLoaded = true;
-        isFirstSync = false;
         setSyncStatus('synced', 'Синхронизировано');
         hideLoadingScreen();
         
@@ -2277,7 +2205,7 @@
           </div>
         </div>
         <div class="overflow-x-auto">
-          <table class="w-full border-collapse excel-table">
+          <table class="w-full border-collapse">
             <thead>
               <tr class="bg-purple-700 text-white font-bold text-xs">
                 <th class="p-3">Партнёр / Магазин</th>
@@ -3183,7 +3111,7 @@
     };
 
     // ================================================================
-    // РЕНДЕР ЛИСТА «ВЗЯЛИ» — KPI + Журнал + Статистика + Кубики счетов
+    // РЕНДЕР ЛИСТА «ВЗЯЛИ»
     // ================================================================
     function renderTakenSheet() {
       const rowsTbody = document.getElementById('takenRowsTable');
@@ -3337,7 +3265,6 @@
       document.getElementById('statFactTodaySum').innerText = factTodaySum.toLocaleString('ru-RU') + ' ₽';
       document.getElementById('statFactTodayCount').innerText = factTodayCount;
 
-      // ============ Счета — кубиками с крупным текстом ============
       const accountsBody = document.getElementById('accountsTableBody');
       accountsBody.innerHTML = '';
 
@@ -3621,7 +3548,7 @@
         tr.innerHTML = `
           <td style="text-align:left;">
             ${inv.isOwner 
-              ? `<span class="font-bold">${inv.name}</span> <span class="owner-badge">Владелец</span>`
+              ? `<span class="font-bold">${inv.name}</span>`
               : `<input type="text" value="${inv.name}" onchange="updateInvestorName(${idx}, this.value)" style="width:100%;">`
             }
           </td>
@@ -4078,7 +4005,7 @@
           
           tableRows += startCapRow + `
             <tr class="${inv.isOwner ? 'owner-row' : 'investor-row'}">
-              <td class="font-bold text-left">${inv.name}${inv.isOwner ? ' <span class="owner-badge">Вы</span>' : ''}</td>
+              <td class="font-bold text-left">${inv.name}${inv.isOwner ? ' (Вы)' : ''}</td>
               <td class="${capitalClass}">${Number(entry.capital || 0).toLocaleString('ru-RU')}</td>
               <td><input type="number" value="${entry.invested || 0}" onchange="updateMonthlyEntry(${year},${month},'${inv.id}','invested',this.value)" min="0"></td>
               <td><input type="number" value="${entry.dividends || 0}" onchange="updateMonthlyEntry(${year},${month},'${inv.id}','dividends',this.value)" min="0"></td>
@@ -4093,7 +4020,7 @@
               </td>
               <td class="${factClass}">${factDisplay}%</td>
               <td>
-                <input type="number" value="${entry.addedPercent || 0}" onchange="applyAddedPercent(${year},${month},'${inv.id}',this.value)" min="0" step="0.1" ${inv.isOwner ? 'disabled title="Только для инвесторов"' : ''}>
+                <input type="number" value="${entry.addedPercent || 0}" onchange="applyAddedPercent(${year},${month},'${inv.id}',this.value)" min="0" step="0.1" ${inv.isOwner ? 'disabled' : ''}>
               </td>
             </tr>
           `;
