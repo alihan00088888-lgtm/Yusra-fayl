@@ -225,9 +225,360 @@
       background: #fee2e2; color: #7f1d1d; border: 1px solid #ef4444;
       padding: 10px 14px; border-radius: 8px; font-weight: 700; margin-bottom: 12px;
     }
+
+    /* ===== Экран загрузки ===== */
+    #loadingScreen {
+      position: fixed; inset: 0; z-index: 99999;
+      background: linear-gradient(135deg, #7c3aed, #2563eb);
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; color: white;
+      font-family: system-ui, sans-serif;
+    }
+    #loadingScreen .spinner {
+      width: 60px; height: 60px; border: 6px solid rgba(255,255,255,0.3);
+      border-top-color: #ffffff; border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 20px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loadingScreen .label { font-size: 18px; font-weight: 700; letter-spacing: 0.5px; }
+    #loadingScreen .sub { font-size: 13px; opacity: 0.8; margin-top: 8px; }
+
+    /* ===== Индикатор синхронизации ===== */
+    .sync-indicator {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;
+      transition: all 0.3s;
+    }
+    .sync-indicator.syncing { background: #fef3c7; color: #92400e; }
+    .sync-indicator.synced { background: #dcfce7; color: #166534; }
+    .sync-indicator.error { background: #fee2e2; color: #991b1b; }
+    .sync-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: currentColor;
+    }
+    .sync-indicator.syncing .sync-dot { animation: pulse 1s infinite; }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* ===== НОВЫЙ СТИЛЬ ЛИСТА «ВЗЯЛИ» ===== */
+    .taken-dashboard {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+    }
+    .kpi-card {
+      background: white;
+      border-radius: 14px;
+      padding: 18px 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      border: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 4px;
+    }
+    .kpi-card.kpi-kassa::before { background: linear-gradient(180deg, #2563eb, #3b82f6); }
+    .kpi-card.kpi-uchet::before { background: linear-gradient(180deg, #8b5cf6, #a78bfa); }
+    .kpi-card.kpi-taken::before { background: linear-gradient(180deg, #f59e0b, #fbbf24); }
+    .kpi-card.kpi-put::before { background: linear-gradient(180deg, #10b981, #34d399); }
+    .kpi-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); transform: translateY(-1px); }
+    .kpi-label {
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .kpi-value {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1.1;
+    }
+    .kpi-kassa .kpi-value { color: #2563eb; }
+    .kpi-uchet .kpi-value { color: #7c3aed; }
+    .kpi-taken .kpi-value { color: #d97706; }
+    .kpi-put .kpi-value { color: #059669; }
+
+    .dash-card {
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+    }
+    .dash-card-header {
+      padding: 12px 18px;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .dash-card-title {
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dash-card-body { padding: 12px 18px; }
+
+    .journal-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 12px;
+    }
+    .journal-table thead th {
+      background: #f8fafc;
+      color: #475569;
+      font-weight: 800;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 10px 12px;
+      text-align: center;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .journal-table tbody td {
+      padding: 10px 12px;
+      text-align: center;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+      color: #334155;
+    }
+    .journal-table tbody tr:hover { background: #f8fafc; }
+    .journal-table tbody tr:last-child td { border-bottom: none; }
+    .journal-taken-amount {
+      color: #d97706;
+      font-weight: 800;
+      font-size: 13px;
+    }
+    .journal-put-amount {
+      color: #059669;
+      font-weight: 800;
+      font-size: 13px;
+    }
+    .journal-desc {
+      text-align: left !important;
+      color: #64748b;
+      font-size: 11px;
+    }
+    .journal-actions {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+    }
+    .journal-action-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: none;
+      font-size: 13px;
+      transition: all 0.15s;
+    }
+    .journal-action-btn.edit { background: #eff6ff; color: #2563eb; }
+    .journal-action-btn.edit:hover { background: #dbeafe; }
+    .journal-action-btn.delete { background: #fef2f2; color: #dc2626; }
+    .journal-action-btn.delete:hover { background: #fee2e2; }
+
+    .stat-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .stat-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 18px;
+      border-bottom: 1px solid #f1f5f9;
+      transition: background 0.15s;
+    }
+    .stat-item:last-child { border-bottom: none; }
+    .stat-item:hover { background: #f8fafc; }
+    .stat-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .stat-value {
+      font-size: 14px;
+      font-weight: 800;
+      color: #1e293b;
+    }
+    .stat-value.stat-blue { color: #2563eb; }
+    .stat-value.stat-amber { color: #d97706; }
+    .stat-value.stat-green { color: #059669; }
+
+    /* ===== НОВЫЙ СТИЛЬ СЧЕТОВ — КУБИКИ ===== */
+    .accounts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 12px;
+      padding: 14px 18px;
+      max-height: 600px;
+      overflow-y: auto;
+    }
+    .account-cube {
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 14px 16px;
+      transition: all 0.15s;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+    }
+    .account-cube:hover {
+      border-color: #cbd5e1;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      transform: translateY(-1px);
+    }
+    .account-cube-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .account-cube-name {
+      font-size: 15px;
+      font-weight: 800;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: -0.2px;
+    }
+    .account-color-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 2px solid #ffffff;
+      box-shadow: 0 0 0 1px #cbd5e1;
+      flex-shrink: 0;
+    }
+    .account-cube-actions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .account-cube-actions input[type="color"] {
+      width: 26px;
+      height: 26px;
+      border-radius: 7px;
+      border: 1px solid #cbd5e1;
+      cursor: pointer;
+      padding: 0;
+    }
+    .account-cube-actions .acc-del {
+      width: 26px;
+      height: 26px;
+      border-radius: 7px;
+      background: #fef2f2;
+      color: #dc2626;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+    }
+    .account-cube-actions .acc-del:hover { background: #fee2e2; }
+    .account-cube-balance {
+      font-size: 24px;
+      font-weight: 800;
+      color: #2563eb;
+      letter-spacing: -0.6px;
+      line-height: 1.1;
+    }
+    .account-cube-balance.negative { color: #dc2626; }
+    .account-cube-month {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 12px;
+      color: #64748b;
+      border-top: 1px dashed #e2e8f0;
+      padding-top: 8px;
+    }
+    .account-cube-month .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .account-cube-month .row .lbl { font-weight: 600; }
+    .account-cube-month .row .val {
+      font-weight: 800;
+      color: #334155;
+      font-size: 13px;
+    }
+    .account-cube-month .row .val.income { color: #059669; }
+    .account-cube-month .row .val.expense { color: #dc2626; }
+    .account-cube-month .row .val.limit {
+      background-color: #fca5a5;
+      color: #7f1d1d;
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+    .accounts-grand-total-badge {
+      display: inline-block;
+      background: #2563eb;
+      color: white;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: 7px;
+    }
+
+    @media (max-width: 768px) {
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .kpi-value { font-size: 18px; }
+      .accounts-grid { grid-template-columns: 1fr; }
+      .account-cube-balance { font-size: 20px; }
+    }
   </style>
 </head>
 <body class="bg-slate-100 text-gray-800 text-xs min-h-screen pb-20">
+
+  <!-- ЭКРАН ЗАГРУЗКИ -->
+  <div id="loadingScreen">
+    <div class="spinner"></div>
+    <div class="label">YUSRA</div>
+    <div class="sub">Загрузка данных из облака...</div>
+  </div>
 
   <!-- ВЕРХНЯЯ ПАНЕЛЬ ДЕЙСТВИЙ -->
   <div class="sticky top-0 z-40 bg-white shadow-md border-b no-print">
@@ -252,6 +603,11 @@
         <button type="button" onclick="document.getElementById('importFile').click()" class="bg-slate-600 hover:bg-slate-700 text-white font-medium px-3 py-1.5 rounded-lg text-xs transition shadow-sm">
           📂 Загрузить базу
         </button>
+
+        <div id="syncIndicator" class="sync-indicator synced" title="Статус синхронизации с облаком">
+          <span class="sync-dot"></span>
+          <span id="syncText">Синхронизировано</span>
+        </div>
 
         <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Поиск..." class="p-1.5 border rounded-lg w-40 focus:ring-2 focus:ring-blue-400 outline-none">
       </div>
@@ -342,92 +698,105 @@
       </div>
     </div>
 
-    <!-- ================= Лист 3: Взяли ================= -->
-    <div id="takenTabContent" class="hidden space-y-4">
-      <div class="bg-white shadow-xl rounded-xl p-4 overflow-x-auto border">
-        <div class="flex flex-wrap lg:flex-nowrap gap-6">
-          
-          <div class="flex-1 min-w-[550px]">
-            <table class="w-full text-left border-collapse excel-table bg-amber-50/20">
-              <thead>
-                <tr class="bg-excel-header text-center font-bold">
-                  <th class="w-24">Касса</th>
-                  <th class="w-28">Взяли</th>
-                  <th>Описание</th>
-                  <th class="w-28">Положили</th>
-                  <th>Описание</th>
-                  <th class="w-16">Действия</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr class="bg-excel-yellow font-bold text-center">
-                  <td id="kassaTotal" class="text-sm">0</td>
-                  <td id="takenTotalSum" class="text-sm">0</td>
-                  <td></td>
-                  <td id="putTotalSum" class="text-sm">0</td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr class="bg-excel-yellow font-bold text-center">
-                  <td>Учет</td>
-                  <td colspan="4"></td>
-                  <td></td>
-                </tr>
-                <tr class="bg-excel-yellow font-bold text-center">
-                  <td id="kassaUchet">0</td>
-                  <td colspan="4"></td>
-                  <td></td>
-                </tr>
-              </tbody>
-              <tbody id="takenRowsTable"></tbody>
-            </table>
-          </div>
+    <!-- ================= Лист 3: Взяли (НОВЫЙ ДИЗАЙН) ================= -->
+    <div id="takenTabContent" class="hidden">
+      <div class="taken-dashboard">
 
-          <div class="w-64 shrink-0">
-            <table class="w-full border-collapse excel-table text-center">
-              <tbody>
-                <tr class="bg-excel-header font-bold"><td class="p-2">Количество договоров</td></tr>
-                <tr><td id="statTotalContracts" class="font-bold text-sm">0</td></tr>
-                <tr class="bg-excel-header font-bold"><td class="p-2">Закрытые договора</td></tr>
-                <tr><td id="statClosedContracts" class="font-bold text-sm">0</td></tr>
-                <tr class="bg-excel-header font-bold"><td class="p-2">Актуальные договора</td></tr>
-                <tr><td id="statActiveContracts" class="font-bold text-sm text-blue-600">0</td></tr>
-                <tr class="bg-excel-header font-bold"><td class="p-2">Оплаты Сегодня (план)</td></tr>
-                <tr><td id="statPlanTodaySum" class="font-bold text-sm text-amber-600">0</td></tr>
-                <tr class="bg-excel-header"><td class="text-[10px] uppercase font-bold">Количество</td></tr>
-                <tr><td id="statPlanTodayCount" class="font-bold">0</td></tr>
-                <tr class="bg-excel-header font-bold"><td class="p-2">Оплаты Сегодня (факт)</td></tr>
-                <tr><td id="statFactTodaySum" class="font-bold text-sm text-emerald-600">0</td></tr>
-                <tr class="bg-excel-header"><td class="text-[10px] uppercase font-bold">Количество</td></tr>
-                <tr><td id="statFactTodayCount" class="font-bold">0</td></tr>
-              </tbody>
-            </table>
+        <!-- KPI карточки: Касса → Учёт → Взяли → Положили -->
+        <div class="kpi-grid">
+          <div class="kpi-card kpi-kassa">
+            <div class="kpi-label">💰 Касса</div>
+            <div class="kpi-value" id="kassaTotal">0</div>
           </div>
+          <div class="kpi-card kpi-uchet">
+            <div class="kpi-label">📊 Учёт</div>
+            <div class="kpi-value" id="kassaUchet">0</div>
+          </div>
+          <div class="kpi-card kpi-taken">
+            <div class="kpi-label">📤 Взяли</div>
+            <div class="kpi-value" id="takenTotalSum">0</div>
+          </div>
+          <div class="kpi-card kpi-put">
+            <div class="kpi-label">📥 Положили</div>
+            <div class="kpi-value" id="putTotalSum">0</div>
+          </div>
+        </div>
 
-          <div class="flex-1 min-w-[500px]">
-            <div class="mb-2 flex justify-between items-center">
-              <span class="font-bold uppercase text-[10px] text-slate-500">Счета и Карты (Цвет и Удаление)</span>
-              <button onclick="addNewAccountPrompt()" class="bg-slate-700 hover:bg-slate-800 text-white font-bold px-2 py-1 rounded text-[10px]">+ Добавить счет</button>
+        <!-- Основная сетка: слева журнал, справа статистика -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+          <div class="lg:col-span-2 dash-card">
+            <div class="dash-card-header">
+              <div class="dash-card-title">📒 Журнал операций</div>
+              <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Взяли / Положили</div>
             </div>
-            <div class="max-h-[70vh] overflow-y-auto">
-              <table class="w-full border-collapse excel-table text-center">
+            <div style="overflow-x:auto;">
+              <table class="journal-table">
                 <thead>
-                  <tr class="bg-excel-header font-bold text-[10px]">
-                    <th>Счет / Карта</th>
-                    <th id="accountsGrandTotal">0</th>
-                    <th>кол-во вход.</th>
-                    <th>приход в месяц</th>
-                    <th>кол-во исх.</th>
-                    <th>расход в месяц</th>
-                    <th>Цвет / Удал.</th>
+                  <tr>
+                    <th style="width: 30%;">Взяли (₽)</th>
+                    <th style="width: 25%;">Описание</th>
+                    <th style="width: 30%;">Положили (₽)</th>
+                    <th style="width: 15%;">Описание / Действия</th>
                   </tr>
                 </thead>
-                <tbody id="accountsTableBody"></tbody>
+                <tbody id="takenRowsTable"></tbody>
               </table>
             </div>
           </div>
 
+          <div class="dash-card">
+            <div class="dash-card-header">
+              <div class="dash-card-title">📊 Статистика</div>
+            </div>
+            <div class="stat-list">
+              <div class="stat-item">
+                <span class="stat-label">Всего договоров</span>
+                <span class="stat-value" id="statTotalContracts">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Закрытые</span>
+                <span class="stat-value stat-green" id="statClosedContracts">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Актуальные</span>
+                <span class="stat-value stat-blue" id="statActiveContracts">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Оплаты сегодня (план)</span>
+                <span class="stat-value stat-amber" id="statPlanTodaySum">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Кол-во (план)</span>
+                <span class="stat-value" id="statPlanTodayCount">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Оплаты сегодня (факт)</span>
+                <span class="stat-value stat-green" id="statFactTodaySum">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Кол-во (факт)</span>
+                <span class="stat-value" id="statFactTodayCount">0</span>
+              </div>
+            </div>
+          </div>
         </div>
+
+        <!-- Счета и карты — кубиками -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <div class="dash-card-title">💳 Счета и карты</div>
+            <div class="flex items-center gap-3">
+              <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Общий баланс:</span>
+              <span class="accounts-grand-total-badge" id="accountsGrandTotal">0</span>
+              <button onclick="addNewAccountPrompt()" class="bg-slate-700 hover:bg-slate-800 text-white font-bold px-3 py-1 rounded-lg text-[10px] transition">
+                + Добавить счёт
+              </button>
+            </div>
+          </div>
+          <div class="accounts-grid" id="accountsTableBody"></div>
+        </div>
+
       </div>
     </div>
 
@@ -571,7 +940,6 @@
     <div id="initTabContent" class="hidden space-y-4">
       <div id="initErrorBanner" class="init-error-banner hidden"></div>
 
-      <!-- Блок настройки инвесторов -->
       <div class="bg-white shadow-xl rounded-xl p-6 border-2 border-purple-300">
         <h2 class="text-xl font-bold text-purple-700 mb-4">🏛️ Настройка инвесторов</h2>
         <div class="overflow-x-auto">
@@ -601,7 +969,6 @@
         </div>
       </div>
 
-      <!-- Панель управления месяцами -->
       <div class="bg-white shadow-xl rounded-xl p-4 border-2 border-purple-200 flex flex-wrap items-center gap-3">
         <span class="font-bold text-purple-700 text-sm">📅 Управление месяцами:</span>
         <select id="newMonthYear" class="p-2 border rounded text-xs font-bold"></select>
@@ -625,7 +992,6 @@
         <span id="initDebug" class="text-[10px] text-gray-400"></span>
       </div>
 
-      <!-- Ежемесячный учет -->
       <div id="initMonthsContainer"></div>
     </div>
 
@@ -647,7 +1013,7 @@
         💵 Доход
       </button>
       <button type="button" onclick="switchTab('init')" id="tabBtnInit" class="tab-btn init-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
-        🏛️ Инициализация
+        🏛️ Инвестиция
       </button>
       <button type="button" onclick="switchTab('today')" id="tabBtnToday" class="tab-btn today-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
         📅 Сегодня
@@ -809,7 +1175,7 @@
         </div>
         <div>
           <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Счет / Источник</label>
-          <input type="text" id="accAccount" placeholder="Например: S1, N, C1..." class="p-2 border rounded-md w-full outline-none">
+          <input type="text" id="accAccount" placeholder="Например: Н, C1, S1..." class="p-2 border rounded-md w-full outline-none">
         </div>
 
         <div class="flex justify-end gap-2 pt-4 border-t">
@@ -854,7 +1220,6 @@
     </div>
   </div>
 
-  <!-- МОДАЛЬНОЕ ОКНО ДЛЯ РАСХОДА В ДОХОДЕ -->
   <div id="incomeExpModal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl border-t-4 border-red-500">
       <h3 id="incomeExpModalTitle" class="font-bold text-base text-slate-800 mb-4 border-b pb-2 uppercase">Добавить расход</h3>
@@ -881,38 +1246,70 @@
     </div>
   </div>
 
-  <script>
+  <script type="module">
     // ================================================================
-    // ВСЕ ПЕРЕМЕННЫЕ И БАЗОВЫЕ ФУНКЦИИ
+    // FIREBASE
     // ================================================================
-    
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDuPqMwudSodv37VjNCNmVg71ES09AmyW0",
+      authDomain: "yusra-fayl.firebaseapp.com",
+      projectId: "yusra-fayl",
+      storageBucket: "yusra-fayl.firebasestorage.app",
+      messagingSenderId: "727049123441",
+      appId: "1:727049123441:web:a930058c08764e35e3cdd0"
+    };
+
+    const fbApp = initializeApp(firebaseConfig);
+    const db = getFirestore(fbApp);
+    const DOC_REF = doc(db, 'yusra_data', 'main');
+
+    let isCloudLoaded = false;
+    let isApplyingRemote = false;
+    let syncTimeout = null;
+    let isFirstSync = true;
+
+    function setSyncStatus(status, text) {
+      const el = document.getElementById('syncIndicator');
+      const txt = document.getElementById('syncText');
+      if (!el || !txt) return;
+      el.className = 'sync-indicator ' + status;
+      txt.textContent = text;
+    }
+
+    function hideLoadingScreen() {
+      const ls = document.getElementById('loadingScreen');
+      if (ls) {
+        ls.style.transition = 'opacity 0.4s';
+        ls.style.opacity = '0';
+        setTimeout(() => ls.remove(), 400);
+      }
+    }
+
+    // ================================================================
+    // ПЕРЕМЕННЫЕ
+    // ================================================================
     let allContracts = JSON.parse(localStorage.getItem('contracts_db') || '[]');
     let allAccounting = JSON.parse(localStorage.getItem('accounting_db') || '[]');
     let allTaken = JSON.parse(localStorage.getItem('taken_db') || '[]');
     let allIncomeExpenses = JSON.parse(localStorage.getItem('income_expenses_db') || '[]');
     let customAccounts = JSON.parse(localStorage.getItem('accounts_db') || 'null');
 
-    // ================================================================
-    // ИНИЦИАЛИЗАЦИЯ ДАННЫХ ИНВЕСТИЦИЙ + МИГРАЦИЯ СТАРЫХ ДАННЫХ
-    // ================================================================
-    
     let initInvestors;
     let initMonthlyReports;
 
     try {
-      // Инвесторы
       const rawInv = JSON.parse(localStorage.getItem('investors_db') || 'null');
       if (Array.isArray(rawInv) && rawInv.length > 0) {
-        // Фильтруем только валидные записи
         initInvestors = rawInv.filter(inv => inv && typeof inv === 'object' && inv.id && inv.name);
       } else {
         initInvestors = [];
       }
-      // Гарантируем владельца
       if (!initInvestors.some(i => i.isOwner)) {
         initInvestors.unshift({ id: 'owner', name: 'Владелец', percent: 100, isOwner: true });
       }
-      // Гарантируем хотя бы одного инвестора
       if (initInvestors.length < 2) {
         initInvestors.push({
           id: 'inv_default_' + Date.now(),
@@ -922,7 +1319,6 @@
         });
       }
       
-      // Месяцы — жёсткая миграция
       let rawMonths = JSON.parse(localStorage.getItem('monthly_reports_db') || 'null');
       initMonthlyReports = {};
       
@@ -930,10 +1326,8 @@
         let cleaned = 0;
         Object.keys(rawMonths).forEach(key => {
           const rep = rawMonths[key];
-          // Валидация: должен быть объект с year/month/entries
           if (!rep || typeof rep !== 'object') { cleaned++; return; }
           if (typeof rep.year !== 'number' || typeof rep.month !== 'number') {
-            // Пробуем вытащить из ключа "YYYY-MM"
             const parts = String(key).split('-');
             if (parts.length === 2) {
               const y = Number(parts[0]);
@@ -948,7 +1342,6 @@
               cleaned++; return;
             }
           }
-          // Гарантируем entries
           if (!rep.entries || typeof rep.entries !== 'object') {
             rep.entries = {};
           }
@@ -957,16 +1350,12 @@
           if (!rep.startingCapital || typeof rep.startingCapital !== 'object') {
             rep.startingCapital = {};
           }
-          // Ключ в нормализованном виде
           const normKey = `${rep.year}-${String(rep.month).padStart(2, '0')}`;
           initMonthlyReports[normKey] = rep;
         });
-        if (cleaned > 0) {
-          console.warn(`[Инициализация] Очищено повреждённых записей месяцев: ${cleaned}`);
-        }
       }
     } catch (e) {
-      console.error('[Инициализация] Ошибка чтения данных, сброс:', e);
+      console.error('[Инициализация] Ошибка:', e);
       initInvestors = [
         { id: 'owner', name: 'Владелец', percent: 100, isOwner: true },
         { id: 'inv_default_' + Date.now(), name: 'Инвестор 1', percent: 50, isOwner: false }
@@ -974,7 +1363,6 @@
       initMonthlyReports = {};
     }
 
-    // Единоразовая очистка: если в старом формате был ключ "owner" внутри отчёта — удаляем
     (function cleanupOldOwnerField() {
       let cleaned = 0;
       Object.keys(initMonthlyReports).forEach(key => {
@@ -984,26 +1372,27 @@
           cleaned++;
         }
       });
-      if (cleaned > 0) {
-        console.warn(`[Инициализация] Удалено поле 'owner' из ${cleaned} месяцев`);
-      }
     })();
 
-    // Сохраняем нормализованные данные обратно
     localStorage.setItem('investors_db', JSON.stringify(initInvestors));
     localStorage.setItem('monthly_reports_db', JSON.stringify(initMonthlyReports));
 
+    // Дефолтные счета с русской Н
     if (!customAccounts) {
-      const defaultNames = ['N', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12', 'T13', 'T14', 'T15', 'T16', 'B1', 'B2', 'B3', 'B4'];
+      const defaultNames = ['Н', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12', 'T13', 'T14', 'T15', 'T16', 'B1', 'B2', 'B3', 'B4'];
       customAccounts = defaultNames.map(name => ({
         name,
         color: name === 'C1' ? '#86efac' : (name === 'T1' ? '#fef08a' : '')
       }));
     } else if (typeof customAccounts[0] === 'string') {
       customAccounts = customAccounts.map(name => ({
-        name,
+        name: name === 'N' ? 'Н' : name,
         color: name === 'C1' ? '#86efac' : (name === 'T1' ? '#fef08a' : '')
       }));
+    } else if (Array.isArray(customAccounts)) {
+      customAccounts.forEach(a => {
+        if (a && a.name === 'N') a.name = 'Н';
+      });
     }
 
     let activeTab = 'contracts';
@@ -1011,10 +1400,131 @@
     let redoStack = [];
 
     // ================================================================
+    // СИНХРОНИЗАЦИЯ
+    // ================================================================
+    function pushToCloud() {
+      if (isApplyingRemote) return;
+      if (!isCloudLoaded) return;
+
+      if (syncTimeout) clearTimeout(syncTimeout);
+      syncTimeout = setTimeout(async () => {
+        try {
+          setSyncStatus('syncing', 'Сохранение...');
+          await setDoc(DOC_REF, {
+            contracts: allContracts,
+            accounting: allAccounting,
+            taken: allTaken,
+            incomeExpenses: allIncomeExpenses,
+            accounts: customAccounts,
+            investors: initInvestors,
+            monthlyReports: initMonthlyReports,
+            updatedAt: Date.now()
+          });
+          setSyncStatus('synced', 'Синхронизировано');
+        } catch (e) {
+          console.error('Ошибка сохранения:', e);
+          setSyncStatus('error', 'Ошибка синхронизации');
+        }
+      }, 800);
+    }
+
+    function applyCloudData(data) {
+      isApplyingRemote = true;
+      allContracts = data.contracts || [];
+      allAccounting = data.accounting || [];
+      allTaken = data.taken || [];
+      allIncomeExpenses = data.incomeExpenses || [];
+      if (data.accounts) customAccounts = data.accounts;
+      if (data.investors) initInvestors = data.investors;
+      if (data.monthlyReports) initMonthlyReports = data.monthlyReports;
+
+      localStorage.setItem('contracts_db', JSON.stringify(allContracts));
+      localStorage.setItem('accounting_db', JSON.stringify(allAccounting));
+      localStorage.setItem('taken_db', JSON.stringify(allTaken));
+      localStorage.setItem('income_expenses_db', JSON.stringify(allIncomeExpenses));
+      localStorage.setItem('accounts_db', JSON.stringify(customAccounts));
+      localStorage.setItem('investors_db', JSON.stringify(initInvestors));
+      localStorage.setItem('monthly_reports_db', JSON.stringify(initMonthlyReports));
+
+      try {
+        renderTable(allContracts);
+        renderAccountingTable(allAccounting);
+        renderTakenSheet();
+        if (activeTab === 'income') renderIncomePage();
+        if (activeTab === 'init') renderInitPage();
+        if (activeTab === 'today') renderTodayClients();
+        if (activeTab === 'threeDays') renderThreeDaysClients();
+        if (activeTab === 'debtors') renderDebtorsClients();
+        if (activeTab === 'partners') renderPartners();
+        if (activeTab === 'print') {
+          updatePrintSelect();
+          loadContractForPrint();
+        }
+        updateHistoryButtons();
+      } catch (e) {
+        console.error('Ошибка перерисовки:', e);
+      }
+
+      setTimeout(() => { isApplyingRemote = false; }, 100);
+    }
+
+    function isCloudEmpty(data) {
+      if (!data) return true;
+      const emptyArr = (arr) => !Array.isArray(arr) || arr.length === 0;
+      const emptyObj = (obj) => !obj || typeof obj !== 'object' || Object.keys(obj).length === 0;
+      return emptyArr(data.contracts) && 
+             emptyArr(data.accounting) && 
+             emptyArr(data.taken) && 
+             emptyArr(data.incomeExpenses) && 
+             emptyObj(data.monthlyReports);
+    }
+
+    async function initSync() {
+      try {
+        setSyncStatus('syncing', 'Загрузка...');
+        const snap = await getDoc(DOC_REF);
+        
+        if (snap.exists() && !isCloudEmpty(snap.data())) {
+          applyCloudData(snap.data());
+        } else {
+          await setDoc(DOC_REF, {
+            contracts: allContracts,
+            accounting: allAccounting,
+            taken: allTaken,
+            incomeExpenses: allIncomeExpenses,
+            accounts: customAccounts,
+            investors: initInvestors,
+            monthlyReports: initMonthlyReports,
+            updatedAt: Date.now()
+          });
+        }
+        
+        isCloudLoaded = true;
+        isFirstSync = false;
+        setSyncStatus('synced', 'Синхронизировано');
+        hideLoadingScreen();
+        
+        onSnapshot(DOC_REF, (docSnap) => {
+          if (!docSnap.exists()) return;
+          if (isApplyingRemote) return;
+          const data = docSnap.data();
+          if (!data) return;
+          applyCloudData(data);
+          setSyncStatus('synced', 'Обновлено из облака');
+        });
+        
+      } catch (e) {
+        console.error('Ошибка синхронизации:', e);
+        setSyncStatus('error', 'Ошибка подключения');
+        isCloudLoaded = false;
+        hideLoadingScreen();
+      }
+    }
+
+    // ================================================================
     // ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
     // ================================================================
-
-    function switchTab(tab) {
+    window.switchTab = function(tab) {
       activeTab = tab;
       const cTab = document.getElementById('contractsTabContent');
       const aTab = document.getElementById('accountingTabContent');
@@ -1114,9 +1624,9 @@
         loadContractForPrint();
       }
       handleSearch();
-    }
+    };
 
-    function saveState() {
+    window.saveState = function() {
       const stateSnapshot = {
         contracts: JSON.parse(JSON.stringify(allContracts)),
         accounting: JSON.parse(JSON.stringify(allAccounting)),
@@ -1130,9 +1640,9 @@
       if (undoStack.length > 50) undoStack.shift();
       redoStack = [];
       updateHistoryButtons();
-    }
+    };
 
-    function undo() {
+    window.undo = function() {
       if (undoStack.length === 0) return;
       const currentState = {
         contracts: JSON.parse(JSON.stringify(allContracts)),
@@ -1154,9 +1664,9 @@
       initInvestors = previousState.investors || initInvestors;
       initMonthlyReports = previousState.monthlyReports || initMonthlyReports;
       finishAction();
-    }
+    };
 
-    function redo() {
+    window.redo = function() {
       if (redoStack.length === 0) return;
       const currentState = {
         contracts: JSON.parse(JSON.stringify(allContracts)),
@@ -1178,7 +1688,7 @@
       initInvestors = nextState.investors || initInvestors;
       initMonthlyReports = nextState.monthlyReports || initMonthlyReports;
       finishAction();
-    }
+    };
 
     function finishAction() {
       localStorage.setItem('contracts_db', JSON.stringify(allContracts));
@@ -1202,6 +1712,7 @@
         loadContractForPrint();
       }
       updateHistoryButtons();
+      pushToCloud();
     }
 
     function updateHistoryButtons() {
@@ -1215,7 +1726,7 @@
       rBtn.className = rBtn.disabled ? "px-3 py-1.5 rounded text-xs font-bold text-gray-400 bg-gray-100 cursor-not-allowed transition" : "px-3 py-1.5 rounded text-xs font-bold btn-history-active transition";
     }
 
-    function saveToStorage() {
+    window.saveToStorage = function() {
       localStorage.setItem('contracts_db', JSON.stringify(allContracts));
       localStorage.setItem('accounting_db', JSON.stringify(allAccounting));
       localStorage.setItem('taken_db', JSON.stringify(allTaken));
@@ -1237,12 +1748,12 @@
         loadContractForPrint();
       }
       updateHistoryButtons();
-    }
+      pushToCloud();
+    };
 
     // ================================================================
-    // ФУНКЦИИ ДЛЯ ДОГОВОРОВ (БЕЗ ИЗМЕНЕНИЙ)
+    // ДОГОВОРЫ
     // ================================================================
-    
     function calculatePaymentDates(contract) {
       const payDateStr = contract.payDate;
       if (!payDateStr) return [];
@@ -1277,7 +1788,6 @@
           amount: Number(contract.monthlyPay) || 0
         });
       }
-      
       return dates;
     }
 
@@ -1337,7 +1847,7 @@
       };
     }
 
-    function checkPaymentDateAdjustment() {
+    window.checkPaymentDateAdjustment = function() {
       const payDateStr = document.getElementById('payDate').value;
       const warningEl = document.getElementById('dateWarning');
       
@@ -1368,7 +1878,7 @@
       } catch (e) {
         warningEl.classList.remove('show');
       }
-    }
+    };
 
     function updatePrintSelect() {
       const select = document.getElementById('printContractSelect');
@@ -1387,7 +1897,7 @@
       }
     }
 
-    function loadContractForPrint() {
+    window.loadContractForPrint = function() {
       const select = document.getElementById('printContractSelect');
       const contractId = select.value;
       const container = document.getElementById('printContent');
@@ -1410,13 +1920,7 @@
       let totalPaidSum = 0;
       
       if (paymentKeys.length === 0) {
-        paymentsHtml = `
-          <tr>
-            <td colspan="3" style="padding: 8px; text-align: center; color: #999; border: 1px solid #000;">
-              Нет внесенных платежей
-            </td>
-          </tr>
-        `;
+        paymentsHtml = `<tr><td colspan="3" style="padding: 8px; text-align: center; color: #999; border: 1px solid #000;">Нет внесенных платежей</td></tr>`;
       } else {
         paymentKeys.forEach((key, index) => {
           const payment = installments[key];
@@ -1446,17 +1950,9 @@
       
       container.innerHTML = `
         <div style="font-family: 'Times New Roman', serif; font-size: 12px; line-height: 1.4; padding: 15px 25px; max-width: 210mm; margin: 0 auto; background: white;">
-          
           <div style="position: relative;">
-            
-            <div style="position: absolute; top: 0; right: 0; font-size: 13px; font-weight: bold;">
-              № ${contract.contractNum}
-            </div>
-            
-            <h1 style="font-size: 16px; font-weight: bold; text-align: center; text-transform: uppercase; margin-bottom: 10px;">
-              ДОГОВОР КУПЛИ-ПРОДАЖИ ТОВАРА В РАССРОЧКУ
-            </h1>
-            
+            <div style="position: absolute; top: 0; right: 0; font-size: 13px; font-weight: bold;">№ ${contract.contractNum}</div>
+            <h1 style="font-size: 16px; font-weight: bold; text-align: center; text-transform: uppercase; margin-bottom: 10px;">ДОГОВОР КУПЛИ-ПРОДАЖИ ТОВАРА В РАССРОЧКУ</h1>
             <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 11.5px;">
               <div>
                 <b>Чеченская Республика</b><br>
@@ -1469,7 +1965,6 @@
                 <b>Юр. адрес:</b> ______
               </div>
             </div>
-            
             <div style="border: 1px solid #000; padding: 6px 10px; margin-bottom: 8px;">
               <div style="font-weight: bold; font-size: 13px; margin-bottom: 3px;">Покупатель</div>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px 15px; font-size: 11.5px;">
@@ -1481,7 +1976,6 @@
                 <div><b>Доп. Телефон:</b> ${contract.extraPhone || '______'}</div>
               </div>
             </div>
-            
             <div style="border: 1px solid #000; padding: 6px 10px; margin-bottom: 10px;">
               <div style="font-weight: bold; font-size: 13px; margin-bottom: 3px;">Поручитель</div>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px 15px; font-size: 11.5px;">
@@ -1493,27 +1987,12 @@
                 <div><b>Доп. Телефон:</b> ______</div>
               </div>
             </div>
-            
-            <p style="text-align: justify; font-size: 11.5px; margin-bottom: 10px;">
-              Совместно именуемые «Стороны», заключили настоящий Договор о нижеследующем:
-            </p>
-            
-            <div style="font-weight: bold; font-size: 14px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">
-              1. ПРЕДМЕТ ДОГОВОРА
-            </div>
-            <p style="text-align: justify; font-size: 11.5px; padding-left: 12px; margin-bottom: 2px;">
-              По настоящему Договору «Продавец» обязуется передать в собственность «Покупателя»:
-            </p>
-            <p style="text-align: justify; font-size: 11.5px; padding-left: 25px; font-weight: bold;">
-              Товар: ${contract.product || '______'}
-            </p>
-            <p style="text-align: justify; font-size: 11.5px; padding-left: 12px;">
-              «Покупатель» обязуется принять и уплатить за него стоимость, указанную в Договоре.
-            </p>
-            
-            <div style="font-weight: bold; font-size: 14px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">
-              2. ЦЕНА ТОВАРА И ПОРЯДОК РАСЧЕТОВ
-            </div>
+            <p style="text-align: justify; font-size: 11.5px; margin-bottom: 10px;">Совместно именуемые «Стороны», заключили настоящий Договор о нижеследующем:</p>
+            <div style="font-weight: bold; font-size: 14px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">1. ПРЕДМЕТ ДОГОВОРА</div>
+            <p style="text-align: justify; font-size: 11.5px; padding-left: 12px; margin-bottom: 2px;">По настоящему Договору «Продавец» обязуется передать в собственность «Покупателя»:</p>
+            <p style="text-align: justify; font-size: 11.5px; padding-left: 25px; font-weight: bold;">Товар: ${contract.product || '______'}</p>
+            <p style="text-align: justify; font-size: 11.5px; padding-left: 12px;">«Покупатель» обязуется принять и уплатить за него стоимость, указанную в Договоре.</p>
+            <div style="font-weight: bold; font-size: 14px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">2. ЦЕНА ТОВАРА И ПОРЯДОК РАСЧЕТОВ</div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px 25px; font-size: 11.5px; padding-left: 12px;">
               <div><b>Цена Товара:</b> ${Number(contract.totalCost).toLocaleString('ru-RU')} руб.</div>
               <div><b>Первый взнос:</b> ${Number(contract.downPayment || 0).toLocaleString('ru-RU')} руб.</div>
@@ -1524,11 +2003,8 @@
               равными частями в размере <b>${Number(contract.monthlyPay).toLocaleString('ru-RU')}</b> руб. 
               не позднее <b>${contract.payDate || '______'}</b> числа каждого месяца.
             </p>
-            
             <div style="margin-top: 10px; border: 1px solid #000; overflow: hidden;">
-              <div style="background-color: #e2e8f0; font-weight: bold; text-align: center; padding: 4px; font-size: 12px; border-bottom: 1px solid #000;">
-                📋 ВНЕСЕННЫЕ ПЛАТЕЖИ
-              </div>
+              <div style="background-color: #e2e8f0; font-weight: bold; text-align: center; padding: 4px; font-size: 12px; border-bottom: 1px solid #000;">📋 ВНЕСЕННЫЕ ПЛАТЕЖИ</div>
               <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
                 <thead>
                   <tr>
@@ -1537,84 +2013,34 @@
                     <th style="padding: 3px 8px; border: 1px solid #000; width: 40%; background: #e2e8f0;">Сумма</th>
                   </tr>
                 </thead>
-                <tbody>
-                  ${paymentsHtml}
-                </tbody>
+                <tbody>${paymentsHtml}</tbody>
               </table>
             </div>
-            
           </div>
-          
           <div style="page-break-after: always; border-bottom: 2px dashed #ccc; margin: 10px 0;"></div>
-          
           <div style="font-size: 11px;">
-            
-            <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-top: 8px; margin-bottom: 5px;">
-              3. ПРАВА И ОБЯЗАННОСТИ СТОРОН
-            </div>
-            
+            <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-top: 8px; margin-bottom: 5px;">3. ПРАВА И ОБЯЗАННОСТИ СТОРОН</div>
             <div style="font-weight: bold; font-size: 11.5px; margin-top: 6px; margin-bottom: 2px;">«Продавец» обязан:</div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 6px;">
-              - Передать «Покупателю» Товар надлежащего качества, в надлежащей упаковке, в порядке и в сроки, установленные настоящим Договором.
-            </div>
-            
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 6px;">- Передать «Покупателю» Товар надлежащего качества, в надлежащей упаковке, в порядке и в сроки, установленные настоящим Договором.</div>
             <div style="font-weight: bold; font-size: 11.5px; margin-top: 6px; margin-bottom: 2px;">«Покупатель» обязан:</div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">
-              - Принять Товар в порядке, предусмотренном настоящим Договором.
-            </div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">
-              - Оплатить Товар в порядке и в сроки, предусмотренные настоящим Договором.
-            </div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 6px;">
-              - Не имеет право менять контактный номер без предупреждения. При наступлении непредвиденных обстоятельств обязан всеми возможными способами оповестить продавца.
-            </div>
-            
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">- Принять Товар в порядке, предусмотренном настоящим Договором.</div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">- Оплатить Товар в порядке и в сроки, предусмотренные настоящим Договором.</div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 6px;">- Не имеет право менять контактный номер без предупреждения. При наступлении непредвиденных обстоятельств обязан всеми возможными способами оповестить продавца.</div>
             <div style="font-weight: bold; font-size: 11.5px; margin-top: 6px; margin-bottom: 2px;">«Поручитель» обязан:</div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 8px;">
-              - При неисполнении или ненадлежащем исполнении «Покупателем» своих обязательств по настоящему договору «Поручитель» отвечает перед «Продавцом» в том же объеме, что и «Покупатель», включая возврат основного долга. При просрочке выплаты «Покупателем» на 7 дней от установленного срока «Поручитель» обязан выплатить просроченный платеж.
-            </div>
-            
-            <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">
-              4. ПЕРЕДАЧА И ПРИНЯТИЕ ТОВАРА
-            </div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">
-              - Товар передается «Покупателю» в месте нахождения продавца в дату подписания настоящего договора.
-            </div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">
-              - «Покупатель» обязан осмотреть товар, проверить соответствие по качеству, количеству и комплектности условиям настоящего договора и принять его.
-            </div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">
-              - Право собственности на товар переходит к «Покупателю» с момента полной оплаты им цены договора. Ответственность за сохранность товара переходит к покупателю с момента подписания настоящего договора.
-            </div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 8px;">
-              - «Продавец» считается исполнившим свою обязанность по передаче товара с даты подписания настоящего договора.
-            </div>
-            
-            <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">
-              5. РАЗРЕШЕНИЕ СПОРОВ
-            </div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">
-              - Все споры и разногласия, которые могут возникнуть между сторонами по вопросам, не нашедшим своего разрешения в тексте настоящего договора, будут разрешаться путем переговоров.
-            </div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 8px;">
-              - В случае неурегулирования спорных вопросов в процессе переговоров такой спор подлежит рассмотрению в суде.
-            </div>
-            
-            <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">
-              6. ЗАКЛЮЧИТЕЛЬНЫЕ ПОЛОЖЕНИЯ
-            </div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">
-              - Настоящий договор вступает в силу с даты его подписания «Сторонами» и действует до полного исполнения ими обязательств по настоящему договору.
-            </div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 12px;">
-              - Любые изменения и дополнения к настоящему договору должны быть составлены в письменной форме и подписаны всеми сторонами.
-            </div>
-            
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 8px;">- При неисполнении или ненадлежащем исполнении «Покупателем» своих обязательств по настоящему договору «Поручитель» отвечает перед «Продавцом» в том же объеме, что и «Покупатель», включая возврат основного долга. При просрочке выплаты «Покупателем» на 7 дней от установленного срока «Поручитель» обязан выплатить просроченный платеж.</div>
+            <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">4. ПЕРЕДАЧА И ПРИНЯТИЕ ТОВАРА</div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">- Товар передается «Покупателю» в месте нахождения продавца в дату подписания настоящего договора.</div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">- «Покупатель» обязан осмотреть товар, проверить соответствие по качеству, количеству и комплектности условиям настоящего договора и принять его.</div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">- Право собственности на товар переходит к «Покупателю» с момента полной оплаты им цены договора. Ответственность за сохранность товара переходит к покупателю с момента подписания настоящего договора.</div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 8px;">- «Продавец» считается исполнившим свою обязанность по передаче товара с даты подписания настоящего договора.</div>
+            <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">5. РАЗРЕШЕНИЕ СПОРОВ</div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">- Все споры и разногласия, которые могут возникнуть между сторонами по вопросам, не нашедшим своего разрешения в тексте настоящего договора, будут разрешаться путем переговоров.</div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 8px;">- В случае неурегулирования спорных вопросов в процессе переговоров такой спор подлежит рассмотрению в суде.</div>
+            <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">6. ЗАКЛЮЧИТЕЛЬНЫЕ ПОЛОЖЕНИЯ</div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">- Настоящий договор вступает в силу с даты его подписания «Сторонами» и действует до полного исполнения ими обязательств по настоящему договору.</div>
+            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 12px;">- Любые изменения и дополнения к настоящему договору должны быть составлены в письменной форме и подписаны всеми сторонами.</div>
             <div style="margin-top: 12px;">
-              <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-bottom: 8px;">
-                ПОДПИСИ СТОРОН
-              </div>
-              
+              <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-bottom: 8px;">ПОДПИСИ СТОРОН</div>
               <table style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: center;">
                 <thead>
                   <tr>
@@ -1640,25 +2066,20 @@
                 </tbody>
               </table>
             </div>
-            
-            <div style="margin-top: 10px; font-size: 9px; text-align: center; color: #999; border-top: 1px solid #ddd; padding-top: 6px;">
-              Дата печати: ${todayStr}
-            </div>
-            
+            <div style="margin-top: 10px; font-size: 9px; text-align: center; color: #999; border-top: 1px solid #ddd; padding-top: 6px;">Дата печати: ${todayStr}</div>
           </div>
-          
         </div>
       `;
-    }
+    };
 
-    function printContract() {
+    window.printContract = function() {
       const select = document.getElementById('printContractSelect');
       if (!select.value) {
         alert('Пожалуйста, выберите договор для печати');
         return;
       }
       window.print();
-    }
+    };
 
     function renderIncomePage() {
       const tbody = document.getElementById('incomeTableBody');
@@ -1732,15 +2153,15 @@
 
     const incomeExpModal = document.getElementById('incomeExpModal');
 
-    function openIncomeExpModal() {
+    window.openIncomeExpModal = function() {
       document.getElementById('incomeExpForm').reset();
       document.getElementById('incomeExpEditId').value = '';
       document.getElementById('incomeExpModalTitle').innerText = 'Добавить расход';
       document.getElementById('incomeExpDate').valueAsDate = new Date();
       incomeExpModal.classList.remove('hidden');
-    }
+    };
 
-    function openEditIncomeExpModal(id) {
+    window.openEditIncomeExpModal = function(id) {
       const item = allIncomeExpenses.find(e => e.id === id);
       if (!item) return;
       document.getElementById('incomeExpEditId').value = item.id;
@@ -1749,19 +2170,19 @@
       document.getElementById('incomeExpDate').value = item.date || '';
       document.getElementById('incomeExpNote').value = item.note || '';
       incomeExpModal.classList.remove('hidden');
-    }
+    };
 
-    function closeIncomeExpModal() {
+    window.closeIncomeExpModal = function() {
       incomeExpModal.classList.add('hidden');
-    }
+    };
 
-    function deleteIncomeExpItem(id) {
+    window.deleteIncomeExpItem = function(id) {
       if (confirm('Удалить этот расход?')) {
         saveState();
         allIncomeExpenses = allIncomeExpenses.filter(e => e.id !== id);
         saveToStorage();
       }
-    }
+    };
 
     document.getElementById('incomeExpForm').addEventListener('submit', (e) => {
       e.preventDefault();
@@ -1791,7 +2212,7 @@
       closeIncomeExpModal();
     });
 
-    function renderPartners() {
+    window.renderPartners = function() {
       const container = document.getElementById('partnersList');
       
       const dateFrom = document.getElementById('partnerDateFrom').value;
@@ -1885,16 +2306,11 @@
         `;
       });
       
-      html += `
-            </tbody>
-          </table>
-        </div>
-      `;
-      
+      html += `</tbody></table></div>`;
       container.innerHTML = html;
-    }
+    };
 
-    function showPartnerDetails(partnerName) {
+    window.showPartnerDetails = function(partnerName) {
       const dateFrom = document.getElementById('partnerDateFrom').value;
       const dateTo = document.getElementById('partnerDateTo').value;
       
@@ -1931,13 +2347,13 @@
         </head><body>${message.replace(/\n/g, '<br>')}</body></html>
       `);
       detailsWindow.document.close();
-    }
+    };
 
-    function clearPartnerDates() {
+    window.clearPartnerDates = function() {
       document.getElementById('partnerDateFrom').value = '';
       document.getElementById('partnerDateTo').value = '';
       renderPartners();
-    }
+    };
 
     function getMonthStatus(contract) {
       const paymentDates = calculatePaymentDates(contract);
@@ -2059,15 +2475,9 @@
             <div class="flex flex-wrap items-center gap-2">
               <span class="client-overdue">Просрочка: ${clientOverdue.toLocaleString('ru-RU')} ₽</span>
               <span class="client-rest">Остаток: ${rest.toLocaleString('ru-RU')} ₽</span>
-              <a href="https://wa.me/7${client.phone.replace(/[^0-9]/g, '')}?text=Здравствуйте! Напоминаем о платеже." 
-                 target="_blank" 
-                 class="text-green-600 hover:text-green-800 font-bold text-sm">
-                💬
-              </a>
+              <a href="https://wa.me/7${client.phone.replace(/[^0-9]/g, '')}?text=Здравствуйте! Напоминаем о платеже." target="_blank" class="text-green-600 hover:text-green-800 font-bold text-sm">💬</a>
             </div>
-            <div class="w-full mt-1 flex flex-wrap gap-1">
-              ${monthsHtml}
-            </div>
+            <div class="w-full mt-1 flex flex-wrap gap-1">${monthsHtml}</div>
           </div>
         `;
       });
@@ -2130,7 +2540,7 @@
       }, 3000);
     }
 
-    function sendWhatsAppToday() {
+    window.sendWhatsAppToday = function() {
       const today = new Date();
       const todayStr = today.toISOString().slice(0, 10);
       const clients = getClientsForDate(todayStr);
@@ -2169,14 +2579,13 @@
       navigator.clipboard.writeText(phoneList).then(() => {
         showCopyNotification(`✅ Скопировано ${phoneNumbers.length} номеров для рассылки!`);
       }).catch(() => {
-        showCopyNotification(`⚠️ Найдено ${phoneNumbers.length} клиентов. Скопируйте номера вручную.`);
+        showCopyNotification(`⚠️ Найдено ${phoneNumbers.length} клиентов.`);
       });
       
-      const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-      window.open(url, '_blank');
-    }
+      window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+    };
 
-    function sendWhatsAppThreeDays() {
+    window.sendWhatsAppThreeDays = function() {
       const today = new Date();
       const threeDaysLater = new Date(today);
       threeDaysLater.setDate(today.getDate() + 3);
@@ -2215,16 +2624,15 @@
       
       const phoneList = phoneNumbers.map(p => `7${p}`).join(', ');
       navigator.clipboard.writeText(phoneList).then(() => {
-        showCopyNotification(`✅ Скопировано ${phoneNumbers.length} номеров для рассылки!`);
+        showCopyNotification(`✅ Скопировано ${phoneNumbers.length} номеров!`);
       }).catch(() => {
-        showCopyNotification(`⚠️ Найдено ${phoneNumbers.length} клиентов. Скопируйте номера вручную.`);
+        showCopyNotification(`⚠️ Найдено ${phoneNumbers.length} клиентов.`);
       });
       
-      const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-      window.open(url, '_blank');
-    }
+      window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+    };
 
-    function sendWhatsAppDebtors() {
+    window.sendWhatsAppDebtors = function() {
       const clients = getDebtors();
       
       if (clients.length === 0) {
@@ -2260,16 +2668,15 @@
       
       const phoneList = phoneNumbers.map(p => `7${p}`).join(', ');
       navigator.clipboard.writeText(phoneList).then(() => {
-        showCopyNotification(`✅ Скопировано ${phoneNumbers.length} номеров для рассылки!`);
+        showCopyNotification(`✅ Скопировано ${phoneNumbers.length} номеров!`);
       }).catch(() => {
-        showCopyNotification(`⚠️ Найдено ${phoneNumbers.length} должников. Скопируйте номера вручную.`);
+        showCopyNotification(`⚠️ Найдено ${phoneNumbers.length} должников.`);
       });
       
-      const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-      window.open(url, '_blank');
-    }
+      window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+    };
 
-    function validateFinance() {
+    window.validateFinance = function() {
       const months = Number(document.getElementById('monthsCount').value) || 0;
       const monthly = Number(document.getElementById('monthlyPay').value) || 0;
       const total = Number(document.getElementById('totalCost').value) || 0;
@@ -2303,10 +2710,10 @@
       saveBtn.classList.toggle('cursor-not-allowed', hasError);
 
       return !hasError;
-    }
+    };
 
     const modal = document.getElementById('modal');
-    function openCreateModal() {
+    window.openCreateModal = function() {
       document.getElementById('contractForm').reset();
       document.getElementById('editDocId').value = '';
       document.getElementById('modalTitle').innerText = 'Оформление нового договора';
@@ -2314,17 +2721,17 @@
       document.getElementById('dateWarning').classList.remove('show');
       validateFinance();
       modal.classList.remove('hidden');
-    }
-    function closeModal() { modal.classList.add('hidden'); }
-    function closePayModal() { document.getElementById('payModal').classList.add('hidden'); }
+    };
+    window.closeModal = function() { modal.classList.add('hidden'); };
+    window.closePayModal = function() { document.getElementById('payModal').classList.add('hidden'); };
 
-    function openPayModal(id) {
+    window.openPayModal = function(id) {
       document.getElementById('payContractId').value = id;
       document.getElementById('payDateVal').valueAsDate = new Date();
       document.getElementById('payModal').classList.remove('hidden');
-    }
+    };
 
-    function openEditModal(id) {
+    window.openEditModal = function(id) {
       const contract = allContracts.find(c => c.id === id);
       if(!contract) return;
       document.getElementById('editDocId').value = id;
@@ -2351,7 +2758,7 @@
       checkPaymentDateAdjustment();
       validateFinance();
       modal.classList.remove('hidden');
-    }
+    };
 
     document.getElementById('contractForm').addEventListener('submit', (e) => {
       e.preventDefault();
@@ -2423,7 +2830,7 @@
       const isDifferentMonth = (inputDate.getFullYear() !== today.getFullYear()) || (inputDate.getMonth() !== today.getMonth());
 
       if (isDifferentMonth) {
-        const confirmed = confirm(`Внимание! Дата платежа (${inputDateVal}) относится НЕ к текущему месяцу.\n\nВы уверены, что хотите сохранить эту дату?`);
+        const confirmed = confirm(`Внимание! Дата платежа (${inputDateVal}) относится НЕ к текущему месяцу.\n\nВы уверены?`);
         if (!confirmed) return;
       }
 
@@ -2445,7 +2852,7 @@
       document.getElementById('payForm').reset();
     });
 
-    function deleteInstallment() {
+    window.deleteInstallment = function() {
       const id = document.getElementById('payContractId').value;
       const idx = document.getElementById('payIndex').value;
       const contract = allContracts.find(c => c.id === id);
@@ -2462,9 +2869,9 @@
       } else {
         alert("Этот взнос еще не был внесен.");
       }
-    }
+    };
 
-    function deleteContract(id) {
+    window.deleteContract = function(id) {
       const contract = allContracts.find(c => c.id === id);
       if (confirm(`Удалить договор №${contract.contractNum}?`)) {
         if (prompt('Введите "УДАЛИТЬ" для подтверждения:') === "УДАЛИТЬ") {
@@ -2473,7 +2880,7 @@
           saveToStorage();
         }
       }
-    }
+    };
 
     function copyToClip(text, btn) {
       navigator.clipboard.writeText(text).then(() => {
@@ -2484,19 +2891,19 @@
       });
     }
 
-    function copyHistory(id, btn) {
+    window.copyHistory = function(id, btn) {
       const c = allContracts.find(i => i.id === id);
       let log = `Договор №${c.contractNum}\nФИО: ${c.fio}\n\nОплаты:\n`;
       Object.keys(c.installments || {}).sort((a,b)=>Number(a)-Number(b)).forEach(k => {
         log += `${k}-й: ${c.installments[k].amount}₽ (${c.installments[k].date})\n`;
       });
       copyToClip(log, btn);
-    }
+    };
 
-    function copyGuarantor(id, btn) {
+    window.copyGuarantor = function(id, btn) {
       const c = allContracts.find(i => i.id === id);
       copyToClip(`Договор №${c.contractNum}\nКлиент: ${c.fio}\nПоручитель: ${c.guarantorFio || '—'} (${c.guarantorPhone || '—'})`, btn);
-    }
+    };
 
     function renderTable(contracts) {
       const tbody = document.getElementById('contractsTable');
@@ -2544,17 +2951,17 @@
 
     const accModal = document.getElementById('accModal');
     
-    function openAccModal() {
+    window.openAccModal = function() {
       document.getElementById('accForm').reset();
       document.getElementById('accEditId').value = '';
       document.getElementById('accModalTitle').innerText = 'Новая запись учета';
       document.getElementById('accDate').valueAsDate = new Date();
       accModal.classList.remove('hidden');
-    }
+    };
 
-    function closeAccModal() { accModal.classList.add('hidden'); }
+    window.closeAccModal = function() { accModal.classList.add('hidden'); };
 
-    function openEditAccModal(id) {
+    window.openEditAccModal = function(id) {
       const item = allAccounting.find(a => a.id === id);
       if (!item) return;
       document.getElementById('accEditId').value = item.id;
@@ -2565,7 +2972,7 @@
       document.getElementById('accNote').value = item.note || '';
       document.getElementById('accAccount').value = item.account || '';
       accModal.classList.remove('hidden');
-    }
+    };
 
     document.getElementById('accForm').addEventListener('submit', (e) => {
       e.preventDefault();
@@ -2595,13 +3002,13 @@
       closeAccModal();
     });
 
-    function deleteAccItem(id) {
+    window.deleteAccItem = function(id) {
       if (confirm('Удалить эту запись из учета?')) {
         saveState();
         allAccounting = allAccounting.filter(a => a.id !== id);
         saveToStorage();
       }
-    }
+    };
 
     function renderAccountingTable(items) {
       const tbody = document.getElementById('accountingTable');
@@ -2637,16 +3044,16 @@
 
     const takenModal = document.getElementById('takenModal');
 
-    function openTakenModal() {
+    window.openTakenModal = function() {
       document.getElementById('takenForm').reset();
       document.getElementById('takenEditId').value = '';
       document.getElementById('takenModalTitle').innerText = 'Новая запись Взяли / Положили';
       takenModal.classList.remove('hidden');
-    }
+    };
 
-    function closeTakenModal() { takenModal.classList.add('hidden'); }
+    window.closeTakenModal = function() { takenModal.classList.add('hidden'); };
 
-    function openEditTakenModal(id) {
+    window.openEditTakenModal = function(id) {
       const item = allTaken.find(t => t.id === id);
       if(!item) return;
       document.getElementById('takenEditId').value = item.id;
@@ -2656,7 +3063,7 @@
       document.getElementById('putAmount').value = item.putAmount || 0;
       document.getElementById('putDesc').value = item.putDesc || '';
       takenModal.classList.remove('hidden');
-    }
+    };
 
     document.getElementById('takenForm').addEventListener('submit', (e) => {
       e.preventDefault();
@@ -2713,7 +3120,7 @@
           income: 0,
           expense: takenAmount,
           note: `Взяли: ${takenDesc || 'без описания'}`,
-          account: 'N',
+          account: 'Н',
           _source: editId || allTaken[allTaken.length - 1]?.id || 'taken_' + Date.now(),
           type: 'taken',
           createdAt: Date.now()
@@ -2727,7 +3134,7 @@
           income: putAmount,
           expense: 0,
           note: `Положили: ${putDesc || 'без описания'}`,
-          account: 'N',
+          account: 'Н',
           _source: editId || allTaken[allTaken.length - 1]?.id || 'taken_' + Date.now(),
           type: 'put',
           createdAt: Date.now()
@@ -2738,16 +3145,16 @@
       closeTakenModal();
     });
 
-    function deleteTakenItem(id) {
+    window.deleteTakenItem = function(id) {
       if (confirm('Удалить эту строку?')) {
         saveState();
         allAccounting = allAccounting.filter(a => a._source !== id);
         allTaken = allTaken.filter(t => t.id !== id);
         saveToStorage();
       }
-    }
+    };
 
-    function addNewAccountPrompt() {
+    window.addNewAccountPrompt = function() {
       const accName = prompt('Введите название нового счета/карты (например: S3, A1):');
       if (accName && accName.trim()) {
         const cleanName = accName.trim();
@@ -2759,22 +3166,25 @@
           alert('Такой счет уже существует!');
         }
       }
-    }
+    };
 
-    function deleteAccount(index) {
+    window.deleteAccount = function(index) {
       if (confirm(`Удалить счет "${customAccounts[index].name}"?`)) {
         saveState();
         customAccounts.splice(index, 1);
         saveToStorage();
       }
-    }
+    };
 
-    function changeAccountColor(index, color) {
+    window.changeAccountColor = function(index, color) {
       saveState();
       customAccounts[index].color = color;
       saveToStorage();
-    }
+    };
 
+    // ================================================================
+    // РЕНДЕР ЛИСТА «ВЗЯЛИ» — KPI + Журнал + Статистика + Кубики счетов
+    // ================================================================
     function renderTakenSheet() {
       const rowsTbody = document.getElementById('takenRowsTable');
       rowsTbody.innerHTML = '';
@@ -2787,23 +3197,36 @@
         sumPut += Number(item.putAmount || 0);
 
         const tr = document.createElement('tr');
-        tr.className = "text-center";
         tr.innerHTML = `
-          <td></td>
-          <td class="font-bold text-amber-700">${item.takenAmount || ''}</td>
-          <td class="text-left">${item.takenDesc || ''}</td>
-          <td class="font-bold text-emerald-600">${item.putAmount || ''}</td>
-          <td class="text-left">${item.putDesc || ''}</td>
-          <td class="space-x-1">
-            <button onclick="openEditTakenModal('${item.id}')" class="text-blue-600 font-bold">✏️</button>
-            <button onclick="deleteTakenItem('${item.id}')" class="text-red-600 font-bold">🗑️</button>
+          <td>
+            ${item.takenAmount ? `<span class="journal-taken-amount">− ${Number(item.takenAmount).toLocaleString('ru-RU')} ₽</span>` : '<span style="color:#cbd5e1;">—</span>'}
+          </td>
+          <td class="journal-desc">${item.takenDesc || ''}</td>
+          <td>
+            ${item.putAmount ? `<span class="journal-put-amount">+ ${Number(item.putAmount).toLocaleString('ru-RU')} ₽</span>` : '<span style="color:#cbd5e1;">—</span>'}
+          </td>
+          <td>
+            <div class="journal-actions">
+              <button class="journal-action-btn edit" onclick="openEditTakenModal('${item.id}')" title="Редактировать">✏️</button>
+              <button class="journal-action-btn delete" onclick="deleteTakenItem('${item.id}')" title="Удалить">🗑️</button>
+            </div>
           </td>
         `;
         rowsTbody.appendChild(tr);
       });
 
-      document.getElementById('takenTotalSum').innerText = sumTaken.toLocaleString('ru-RU');
-      document.getElementById('putTotalSum').innerText = sumPut.toLocaleString('ru-RU');
+      if (allTaken.length === 0) {
+        rowsTbody.innerHTML = `
+          <tr>
+            <td colspan="4" style="text-align:center; color:#94a3b8; padding: 30px 12px; font-size: 12px;">
+              📭 Нет записей. Нажмите «+ Запись Взяли / Положили» чтобы добавить.
+            </td>
+          </tr>
+        `;
+      }
+
+      document.getElementById('takenTotalSum').innerText = sumTaken.toLocaleString('ru-RU') + ' ₽';
+      document.getElementById('putTotalSum').innerText = sumPut.toLocaleString('ru-RU') + ' ₽';
 
       let totalDownPayments = 0;
       let totalInstallments = 0;
@@ -2825,8 +3248,34 @@
         totalIncomeExpenses += Number(e.amount || 0);
       });
 
-      let totalKassa = totalDownPayments + totalInstallments - totalCostPrice - sumTaken + sumPut - totalIncomeExpenses;
-      document.getElementById('kassaTotal').innerText = totalKassa.toLocaleString('ru-RU');
+      let totalInvested = 0;
+      let totalDividends = 0;
+      let totalWithdrawn = 0;
+      let totalStartingCapital = 0;
+      
+      const sortedMonthKeys = Object.keys(initMonthlyReports).sort();
+      sortedMonthKeys.forEach((key, idx) => {
+        const rep = initMonthlyReports[key];
+        if (rep && rep.entries) {
+          initInvestors.forEach(inv => {
+            const e = rep.entries[inv.id];
+            if (e) {
+              totalInvested += Number(e.invested || 0);
+              totalDividends += Number(e.dividends || 0);
+              totalWithdrawn += Number(e.withdrawn || 0);
+            }
+          });
+        }
+        if (idx === 0 && rep && rep.startingCapital) {
+          initInvestors.forEach(inv => {
+            totalStartingCapital += Number(rep.startingCapital[inv.id] || 0);
+          });
+        }
+      });
+      const investImpact = totalInvested - totalDividends - totalWithdrawn + totalStartingCapital;
+
+      let totalKassa = totalDownPayments + totalInstallments - totalCostPrice - sumTaken + sumPut - totalIncomeExpenses + investImpact;
+      document.getElementById('kassaTotal').innerText = totalKassa.toLocaleString('ru-RU') + ' ₽';
 
       let totalUchetIncome = 0;
       let totalUchetExpense = 0;
@@ -2835,7 +3284,7 @@
         totalUchetExpense += Number(a.expense || 0);
       });
       let uchetBalance = totalUchetIncome - totalUchetExpense;
-      document.getElementById('kassaUchet').innerText = uchetBalance.toLocaleString('ru-RU');
+      document.getElementById('kassaUchet').innerText = uchetBalance.toLocaleString('ru-RU') + ' ₽';
 
       const now = new Date();
       const todayStr = now.toISOString().slice(0, 10);
@@ -2888,6 +3337,7 @@
       document.getElementById('statFactTodaySum').innerText = factTodaySum.toLocaleString('ru-RU') + ' ₽';
       document.getElementById('statFactTodayCount').innerText = factTodayCount;
 
+      // ============ Счета — кубиками с крупным текстом ============
       const accountsBody = document.getElementById('accountsTableBody');
       accountsBody.innerHTML = '';
 
@@ -2931,30 +3381,50 @@
 
         const isIncOverLimit = incSumMonth >= 400000;
         const isExpOverLimit = expSumMonth >= 400000;
-        
-        let rowStyle = accObj.color ? `background-color: ${accObj.color};` : '';
 
-        const tr = document.createElement('tr');
-        tr.style = rowStyle;
-        tr.innerHTML = `
-          <td class="font-bold">${accObj.name}</td>
-          <td class="font-bold">${accBalance.toLocaleString('ru-RU')}</td>
-          <td>${incCountMonth}</td>
-          <td class="${isIncOverLimit ? 'cell-over-limit' : ''}">${incSumMonth.toLocaleString('ru-RU')}</td>
-          <td>${expCountMonth}</td>
-          <td class="${isExpOverLimit ? 'cell-over-limit' : ''}">${expSumMonth.toLocaleString('ru-RU')}</td>
-          <td class="space-x-1">
-            <input type="color" value="${accObj.color || '#ffffff'}" onchange="changeAccountColor(${idx}, this.value)" title="Изменить цвет" class="w-5 h-5 cursor-pointer align-middle border rounded">
-            <button onclick="deleteAccount(${idx})" class="text-red-700 font-bold px-1 text-[11px]" title="Удалить счет">🗑️</button>
-          </td>
+        const cube = document.createElement('div');
+        cube.className = 'account-cube';
+        if (accObj.color) cube.style.background = accObj.color;
+        
+        cube.innerHTML = `
+          <div class="account-cube-header">
+            <div class="account-cube-name">
+              <span class="account-color-dot" style="background: ${accObj.color || '#e2e8f0'};"></span>
+              ${accObj.name}
+            </div>
+            <div class="account-cube-actions">
+              <input type="color" value="${accObj.color || '#ffffff'}" onchange="changeAccountColor(${idx}, this.value)" title="Изменить цвет">
+              <button class="acc-del" onclick="deleteAccount(${idx})" title="Удалить счёт">🗑️</button>
+            </div>
+          </div>
+          <div class="account-cube-balance ${accBalance < 0 ? 'negative' : ''}">
+            ${accBalance.toLocaleString('ru-RU')} ₽
+          </div>
+          <div class="account-cube-month">
+            <div class="row">
+              <span class="lbl">📥 Приход</span>
+              <span class="val income ${isIncOverLimit ? 'limit' : ''}">${incSumMonth.toLocaleString('ru-RU')} ₽</span>
+            </div>
+            <div class="row">
+              <span class="lbl">📤 Расход</span>
+              <span class="val expense ${isExpOverLimit ? 'limit' : ''}">${expSumMonth.toLocaleString('ru-RU')} ₽</span>
+            </div>
+            <div class="row" style="font-size: 10px; color: #94a3b8;">
+              <span>Вход: ${incCountMonth} / Исх: ${expCountMonth}</span>
+            </div>
+          </div>
         `;
-        accountsBody.appendChild(tr);
+        accountsBody.appendChild(cube);
       });
 
-      document.getElementById('accountsGrandTotal').innerText = accountsGrandTotalSum.toLocaleString('ru-RU');
+      if (customAccounts.length === 0) {
+        accountsBody.innerHTML = '<div style="text-align:center; color:#94a3b8; padding: 20px; font-size: 12px; grid-column: 1/-1;">💳 Нет счетов. Добавьте первый счёт.</div>';
+      }
+
+      document.getElementById('accountsGrandTotal').innerText = accountsGrandTotalSum.toLocaleString('ru-RU') + ' ₽';
     }
 
-    function handleSearch() {
+    window.handleSearch = function() {
       const q = document.getElementById('searchInput').value.toLowerCase();
       if (activeTab === 'contracts') {
         renderTable(allContracts.filter(c => c.fio.toLowerCase().includes(q) || String(c.contractNum).includes(q)));
@@ -2971,30 +3441,33 @@
           renderIncomePage();
         }
       }
-    }
+    };
 
     function renderTakenFiltered(items) {
       const rowsTbody = document.getElementById('takenRowsTable');
       rowsTbody.innerHTML = '';
+      if (items.length === 0) {
+        rowsTbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#94a3b8; padding: 30px 12px; font-size: 12px;">🔍 Нет совпадений</td></tr>`;
+        return;
+      }
       items.forEach(item => {
         const tr = document.createElement('tr');
-        tr.className = "text-center";
         tr.innerHTML = `
-          <td></td>
-          <td class="font-bold text-amber-700">${item.takenAmount || ''}</td>
-          <td class="text-left">${item.takenDesc || ''}</td>
-          <td class="font-bold text-emerald-600">${item.putAmount || ''}</td>
-          <td class="text-left">${item.putDesc || ''}</td>
-          <td class="space-x-1">
-            <button onclick="openEditTakenModal('${item.id}')" class="text-blue-600 font-bold">✏️</button>
-            <button onclick="deleteTakenItem('${item.id}')" class="text-red-600 font-bold">🗑️</button>
+          <td>${item.takenAmount ? `<span class="journal-taken-amount">− ${Number(item.takenAmount).toLocaleString('ru-RU')} ₽</span>` : '—'}</td>
+          <td class="journal-desc">${item.takenDesc || ''}</td>
+          <td>${item.putAmount ? `<span class="journal-put-amount">+ ${Number(item.putAmount).toLocaleString('ru-RU')} ₽</span>` : '—'}</td>
+          <td>
+            <div class="journal-actions">
+              <button class="journal-action-btn edit" onclick="openEditTakenModal('${item.id}')">✏️</button>
+              <button class="journal-action-btn delete" onclick="deleteTakenItem('${item.id}')">🗑️</button>
+            </div>
           </td>
         `;
         rowsTbody.appendChild(tr);
       });
     }
 
-    function exportData() {
+    window.exportData = function() {
       const exportObject = {
         contracts: allContracts,
         accounting: allAccounting,
@@ -3011,9 +3484,9 @@
       a.download = `BAZA_FULL_${new Date().toISOString().slice(0,10)}.json`;
       a.click();
       URL.revokeObjectURL(url);
-    }
+    };
 
-    function importData(e) {
+    window.importData = function(e) {
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
@@ -3038,7 +3511,7 @@
         } catch (err) { alert("Ошибка при чтении файла: " + err.message); }
       };
       reader.readAsText(file);
-    }
+    };
 
     document.addEventListener('keydown', (e) => {
       if (e.ctrlKey && (e.key === 'z' || e.key === 'я')) { e.preventDefault(); undo(); }
@@ -3046,16 +3519,14 @@
     });
 
     // ================================================================
-    // СТРАНИЦА «ИНИЦИАЛИЗАЦИЯ» — ПОЛНАЯ ЛОГИКА
+    // ИНВЕСТИЦИИ
     // ================================================================
-
     function saveInitData() {
       localStorage.setItem('investors_db', JSON.stringify(initInvestors));
       localStorage.setItem('monthly_reports_db', JSON.stringify(initMonthlyReports));
     }
 
-    // ---- Настройка инвесторов ----
-    function addInvestorSetup() {
+    window.addInvestorSetup = function() {
       saveState();
       initInvestors.push({
         id: 'inv_' + Date.now(),
@@ -3065,25 +3536,28 @@
       });
       saveInitData();
       renderInitPage();
-    }
+      pushToCloud();
+    };
 
-    function updateInvestorName(idx, value) {
+    window.updateInvestorName = function(idx, value) {
       if (initInvestors[idx].isOwner) return;
       initInvestors[idx].name = value;
       saveInitData();
       renderInitPage();
-    }
+      pushToCloud();
+    };
 
-    function updateInvestorPercent(idx, value) {
+    window.updateInvestorPercent = function(idx, value) {
       if (initInvestors[idx].isOwner) return;
       initInvestors[idx].percent = Math.min(100, Math.max(0, Number(value) || 0));
       saveInitData();
       recalculateInit();
       saveInitData();
       renderInitPage();
-    }
+      pushToCloud();
+    };
 
-    function deleteInvestorSetup(idx) {
+    window.deleteInvestorSetup = function(idx) {
       if (initInvestors[idx].isOwner) {
         alert('Нельзя удалить владельца');
         return;
@@ -3099,9 +3573,9 @@
         }
       });
       saveToStorage();
-    }
+    };
 
-    function resetInitPage() {
+    window.resetInitPage = function() {
       if (!confirm('Удалить ВСЕ данные страницы Инициализация? (инвесторы и все месяцы)')) return;
       if (prompt('Введите "СБРОС" для подтверждения:') !== 'СБРОС') return;
       saveState();
@@ -3114,7 +3588,7 @@
       saveInitData();
       saveToStorage();
       renderInitPage();
-    }
+    };
 
     function renderInvestorSetup() {
       const tbody = document.getElementById('investorSetupBody');
@@ -3173,7 +3647,6 @@
       });
     }
 
-    // ---- Месяцы ----
     function getMonthlyReport(year, month) {
       const key = `${year}-${String(month).padStart(2, '0')}`;
       if (!initMonthlyReports[key] || typeof initMonthlyReports[key] !== 'object') {
@@ -3203,7 +3676,20 @@
       return rep;
     }
 
-    function createMonthFromSelects() {
+    function ensureNextMonthExists() {
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const currentMonth = now.getMonth() + 1;
+      
+      getMonthlyReport(currentYear, currentMonth);
+      
+      let nextMonth = currentMonth + 1;
+      let nextYear = currentYear;
+      if (nextMonth > 12) { nextMonth = 1; nextYear++; }
+      getMonthlyReport(nextYear, nextMonth);
+    }
+
+    window.createMonthFromSelects = function() {
       const yearEl = document.getElementById('newMonthYear');
       const monthEl = document.getElementById('newMonthMonth');
       if (!yearEl || !monthEl) return;
@@ -3225,9 +3711,10 @@
       recalculateInit();
       saveInitData();
       renderInitPage();
-    }
+      pushToCloud();
+    };
 
-    function deleteMonth(year, month) {
+    window.deleteMonth = function(year, month) {
       const key = `${year}-${String(month).padStart(2, '0')}`;
       if (!confirm(`Удалить месяц ${month}/${year}? Связанные записи учёта будут удалены.`)) return;
       saveState();
@@ -3236,9 +3723,9 @@
       recalculateInit();
       saveInitData();
       renderInitPage();
-    }
+      pushToCloud();
+    };
 
-    // ---- Прибыль по месяцам ----
     function getProfitByMonth(year, month) {
       let totalProfit = 0;
       allContracts.forEach(c => {
@@ -3263,10 +3750,37 @@
       return totalProfit;
     }
 
-    // ---- Пересчёт ----
     function recalculateInit() {
       const keys = Object.keys(initMonthlyReports).sort();
+      
+      keys.forEach((key) => {
+        const report = initMonthlyReports[key];
+        if (!report || typeof report !== 'object') return;
+        if (!report.entries || typeof report.entries !== 'object') report.entries = {};
+        initInvestors.forEach(inv => {
+          if (!report.entries[inv.id] || typeof report.entries[inv.id] !== 'object') {
+            report.entries[inv.id] = {
+              invested: 0, dividends: 0, withdrawn: 0,
+              profitActual: 0, factPercent: 0, stopValue: null,
+              addedPercent: 0, capital: 0, capitalStart: 0
+            };
+          }
+          const entry = report.entries[inv.id];
+          entry.profitActual = 0;
+          entry.factPercent = 0;
+          entry.capital = 0;
+          entry.capitalStart = 0;
+          entry._baseProfit = 0;
+        });
+      });
+      
       let previousCapitais = {};
+      let pendingProfit = {};
+      
+      initInvestors.forEach(inv => {
+        previousCapitais[inv.id] = 0;
+        pendingProfit[inv.id] = 0;
+      });
       
       keys.forEach((key) => {
         const report = initMonthlyReports[key];
@@ -3276,32 +3790,19 @@
         const year = report.year;
         const month = report.month;
         
-        if (!report.entries || typeof report.entries !== 'object') report.entries = {};
-        
-        initInvestors.forEach(inv => {
-          if (!report.entries[inv.id] || typeof report.entries[inv.id] !== 'object') {
-            report.entries[inv.id] = {
-              invested: 0, dividends: 0, withdrawn: 0,
-              profitActual: 0, factPercent: 0, stopValue: null,
-              addedPercent: 0, capital: 0, capitalStart: 0
-            };
-          }
-        });
-        
-        // 1. Капитал на начало
         initInvestors.forEach(inv => {
           const entry = report.entries[inv.id];
           const manualStart = report.startingCapital && report.startingCapital[inv.id] !== undefined 
             ? Number(report.startingCapital[inv.id]) || 0 
             : null;
-          if (manualStart !== null && Object.keys(previousCapitais).length === 0) {
+          
+          if (manualStart !== null && Object.keys(previousCapitais).every(k => previousCapitais[k] === 0)) {
             entry.capitalStart = manualStart;
           } else {
-            entry.capitalStart = previousCapitais[inv.id] || 0;
+            entry.capitalStart = (previousCapitais[inv.id] || 0) + (pendingProfit[inv.id] || 0);
           }
         });
         
-        // 2. Прибыль месяца
         const totalProfitMonth = getProfitByMonth(year, month);
         
         let totalCapitalForProfit = 0;
@@ -3341,10 +3842,14 @@
             entry.profitActual = entry._baseProfit || 0;
             const cfs = Math.max(1, (entry.capitalStart || 0) + Number(entry.invested || 0) - Number(entry.withdrawn || 0));
             entry.factPercent = (entry.profitActual / cfs) * 100;
+          } else {
+            entry.factPercent = (entry.stopValue !== null && entry.stopValue !== undefined) 
+              ? Number(entry.stopValue) 
+              : 0;
+            entry.profitActual = entry._baseProfit || 0;
           }
         });
         
-        // 3. addedPercent
         if (ownerId && report.entries[ownerId]) {
           const ownerEntry = report.entries[ownerId];
           initInvestors.forEach(inv => {
@@ -3361,20 +3866,20 @@
           });
         }
         
-        // 4. Капитал на конец
         initInvestors.forEach(inv => {
           const entry = report.entries[inv.id];
           const cs = entry.capitalStart || 0;
           const invested = Number(entry.invested || 0);
           const dividends = Number(entry.dividends || 0);
           const withdrawn = Number(entry.withdrawn || 0);
-          const unpaidDividends = Math.max(0, (entry.profitActual || 0) - dividends);
-          entry.capital = cs + invested + unpaidDividends - withdrawn;
+          entry.capital = cs + invested - dividends - withdrawn;
         });
         
         previousCapitais = {};
+        pendingProfit = {};
         initInvestors.forEach(inv => {
           previousCapitais[inv.id] = report.entries[inv.id].capital || 0;
+          pendingProfit[inv.id] = report.entries[inv.id].profitActual || 0;
         });
         
         let totalCapitalEnd = 0, totalProfitEnd = 0;
@@ -3388,8 +3893,7 @@
       saveInitData();
     }
 
-    // ---- Обновление полей ----
-    function updateMonthlyEntry(year, month, investorId, field, value) {
+    window.updateMonthlyEntry = function(year, month, investorId, field, value) {
       const report = getMonthlyReport(year, month);
       if (!report.entries[investorId]) {
         report.entries[investorId] = { invested: 0, dividends: 0, withdrawn: 0, profitActual: 0, factPercent: 0, stopValue: null, addedPercent: 0, capital: 0, capitalStart: 0 };
@@ -3402,18 +3906,19 @@
       recalculateInit();
       saveInitData();
       renderInitPage();
-    }
+      pushToCloud();
+    };
 
-    function updateStartingCapital(year, month, investorId, value) {
+    window.updateStartingCapital = function(year, month, investorId, value) {
       const report = getMonthlyReport(year, month);
       if (!report.startingCapital) report.startingCapital = {};
       report.startingCapital[investorId] = Number(value) || 0;
       recalculateInit();
       saveInitData();
       renderInitPage();
-    }
+      pushToCloud();
+    };
 
-    // ---- Синхронизация с учётом ----
     function syncInvestorOperationsWithAccounting(year, month, investorId, field, value) {
       const dateStr = `${year}-${String(month).padStart(2, '0')}-01`;
       const investMonth = `${year}-${String(month).padStart(2, '0')}`;
@@ -3436,13 +3941,15 @@
         withdraw_invest: `Снятие вклада: ${investor.name} (${month}/${year})`
       };
       
+      const isIncome = (type === 'invest');
+      
       allAccounting.unshift({
         id: 'acc_' + type + '_' + Date.now() + '_' + investorId,
         date: dateStr,
-        income: 0,
-        expense: value,
+        income: isIncome ? value : 0,
+        expense: isIncome ? 0 : value,
         note: noteMap[type],
-        account: 'N',
+        account: 'Н',
         _investorId: investorId,
         _investMonth: investMonth,
         type: type,
@@ -3450,8 +3957,7 @@
       });
     }
 
-    // ---- Стоп / Разблокировка ----
-    function stopMonth(year, month) {
+    window.stopMonth = function(year, month) {
       const report = getMonthlyReport(year, month);
       saveState();
       report.stopped = true;
@@ -3461,9 +3967,10 @@
       });
       saveInitData();
       renderInitPage();
-    }
+      pushToCloud();
+    };
 
-    function unstopMonth(year, month) {
+    window.unstopMonth = function(year, month) {
       const report = getMonthlyReport(year, month);
       saveState();
       report.stopped = false;
@@ -3474,20 +3981,20 @@
       recalculateInit();
       saveInitData();
       renderInitPage();
-    }
+      pushToCloud();
+    };
 
-    // ---- Добавить % ----
-    function applyAddedPercent(year, month, investorId, value) {
+    window.applyAddedPercent = function(year, month, investorId, value) {
       const report = getMonthlyReport(year, month);
       if (!report.entries[investorId]) return;
       report.entries[investorId].addedPercent = Number(value) || 0;
       recalculateInit();
       saveInitData();
       renderInitPage();
-    }
+      pushToCloud();
+    };
 
-    // ---- Копировать отчёт ----
-    function copyMonthReport(year, month) {
+    window.copyMonthReport = function(year, month) {
       const report = getMonthlyReport(year, month);
       const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
       let txt = `📅 ${monthNames[month-1]} ${year}\n`;
@@ -3506,15 +4013,14 @@
       navigator.clipboard.writeText(txt).then(() => {
         showCopyNotification('✅ Отчёт скопирован в буфер');
       }).catch(() => alert('Не удалось скопировать'));
-    }
+    };
 
-    // ---- Рендер месяцев ----
     function renderMonthlyReports() {
       const container = document.getElementById('initMonthsContainer');
       if (!container) return;
       container.innerHTML = '';
       
-      const keys = Object.keys(initMonthlyReports).sort();
+      const keys = Object.keys(initMonthlyReports).sort().reverse();
       const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
       
       if (keys.length === 0) {
@@ -3522,12 +4028,14 @@
         return;
       }
       
-      keys.forEach((key, keyIdx) => {
+      const oldestKey = Object.keys(initMonthlyReports).sort()[0];
+      
+      keys.forEach((key) => {
         const report = initMonthlyReports[key];
         if (!report) return;
         const year = report.year, month = report.month;
         if (!year || !month) return;
-        const isFirstMonth = keyIdx === 0;
+        const isFirstMonth = (key === oldestKey);
         
         const card = document.createElement('div');
         card.className = 'month-card';
@@ -3577,14 +4085,13 @@
               <td><input type="number" value="${entry.withdrawn || 0}" onchange="updateMonthlyEntry(${year},${month},'${inv.id}','withdrawn',this.value)" min="0"></td>
               <td class="font-bold text-blue-700">${shareOfCapital.toFixed(2)}%</td>
               <td class="profit-cell">${Number(entry.profitActual || 0).toLocaleString('ru-RU')}</td>
-              <td>${inv.isOwner ? '—' : shareOfProfit.toFixed(2) + '%'}</td>
-              <td class="${factClass}">${factDisplay}%</td>
               <td>
                 ${report.stopped 
                   ? `<span class="text-green-700 font-bold" title="Зафиксировано">✅</span>`
                   : `<button class="stop-btn unlocked" onclick="stopMonth(${year},${month})">Стоп</button>`
                 }
               </td>
+              <td class="${factClass}">${factDisplay}%</td>
               <td>
                 <input type="number" value="${entry.addedPercent || 0}" onchange="applyAddedPercent(${year},${month},'${inv.id}',this.value)" min="0" step="0.1" ${inv.isOwner ? 'disabled title="Только для инвесторов"' : ''}>
               </td>
@@ -3627,8 +4134,8 @@
                   <th>Снял с вклада</th>
                   <th>Доля в капитале</th>
                   <th>Прибыль факт</th>
-                  <th>Факт %</th>
                   <th>Стоп</th>
+                  <th>Факт %</th>
                   <th>Добавить %</th>
                 </tr>
               </thead>
@@ -3643,9 +4150,9 @@
       });
     }
 
-    // ---- Главная функция страницы ----
     function renderInitPage() {
       try {
+        ensureNextMonthExists();
         recalculateInit();
         
         const yearSelect = document.getElementById('newMonthYear');
@@ -3693,7 +4200,7 @@
     }
 
     // ================================================================
-    // ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ
+    // СТАРТ
     // ================================================================
     try {
       renderTable(allContracts);
@@ -3703,6 +4210,8 @@
     } catch (e) {
       console.error('Ошибка начальной инициализации:', e);
     }
+
+    initSync();
   </script>
 </body>
   </html>
