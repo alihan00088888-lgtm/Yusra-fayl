@@ -520,9 +520,83 @@
       .accounts-grid { grid-template-columns: 1fr; }
       .account-cube-balance { font-size: 20px; }
     }
+  
+    /* === Новая боковая навигация и адаптивность === */
+    body { overflow-x: hidden; }
+    .app-sidebar {
+      position: fixed; inset: 0 auto 0 0; width: 286px; max-width: 86vw;
+      background: #fff; border-right: 1px solid #e2e8f0; box-shadow: 8px 0 30px rgba(15,23,42,.12);
+      z-index: 60; transform: translateX(-105%); transition: transform .22s ease;
+      overflow-y: auto; padding: 76px 12px 20px;
+    }
+    .app-sidebar.open { transform: translateX(0); }
+    .sidebar-overlay {
+      position: fixed; inset: 0; background: rgba(15,23,42,.45); z-index: 55;
+      opacity: 0; pointer-events: none; transition: opacity .2s ease;
+    }
+    .sidebar-overlay.open { opacity: 1; pointer-events: auto; }
+    .menu-toggle {
+      width: 42px; height: 42px; flex: 0 0 42px; border-radius: 10px; border: 1px solid #e2e8f0;
+      background: #fff; color: #0f172a; font-size: 22px; line-height: 1; display: inline-flex;
+      align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 1px 3px rgba(15,23,42,.08);
+    }
+    .menu-toggle:hover { background: #f8fafc; }
+    .sidebar-section { padding: 0 4px 12px; margin-bottom: 10px; border-bottom: 1px solid #e2e8f0; }
+    .sidebar-section:last-child { border-bottom: 0; }
+    .sidebar-title { padding: 7px 10px 6px; font-size: 10px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; color: #94a3b8; }
+    .app-sidebar .tab-btn {
+      width: 100%; min-height: 42px; justify-content: flex-start; padding: 9px 12px !important;
+      margin: 2px 0; border-radius: 9px; border: 1px solid transparent; color: #475569;
+      background: transparent; cursor: pointer;
+    }
+    .app-sidebar .tab-btn:hover { background: #f1f5f9; color: #0f172a; }
+    .app-sidebar .tab-btn.active {
+      background: #dbeafe !important; color: #1d4ed8 !important; border-color: #bfdbfe !important;
+      box-shadow: inset 3px 0 0 #2563eb; font-weight: 900;
+    }
+    .sidebar-close { position: absolute; right: 12px; top: 12px; width: 38px; height: 38px; border: 0; background: #f1f5f9; border-radius: 9px; font-size: 20px; cursor: pointer; }
+    .client-card { border: 1px solid #e2e8f0; border-radius: 14px; background: #fff; padding: 14px; transition: box-shadow .15s, border-color .15s; }
+    .client-card:hover { border-color: #bfdbfe; box-shadow: 0 5px 18px rgba(15,23,42,.07); }
+    .client-status { display:inline-flex; align-items:center; gap:5px; border-radius:999px; padding:3px 8px; font-size:10px; font-weight:800; }
+    .client-status.active { background:#dcfce7; color:#166534; }
+    .client-status.closed { background:#f1f5f9; color:#64748b; }
+    .client-modal-grid { display:grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap:12px; }
+    .client-contract-card { border:1px solid #e2e8f0; border-radius:12px; overflow:hidden; }
+    .client-contract-head { padding:10px 12px; background:#f8fafc; display:flex; justify-content:space-between; gap:8px; align-items:center; flex-wrap:wrap; }
+    .client-history-table-wrap { overflow-x:auto; max-width:100%; }
+    .partners-mobile-cards { display:none; }
+    .client-history-table { width:100%; min-width:620px; border-collapse:collapse; font-size:11px; }
+    .client-history-table th,.client-history-table td { padding:7px 8px; border-bottom:1px solid #f1f5f9; text-align:left; white-space:nowrap; }
+    .client-history-table th { background:#f8fafc; font-size:9px; text-transform:uppercase; color:#64748b; }
+    .paid-mark { color:#16a34a; font-weight:900; }
+    .unpaid-mark { color:#dc2626; font-weight:900; }
+    .copy-option-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    @media (max-width: 768px) {
+      .app-sidebar { width: 290px; }
+      .menu-toggle { width:44px; height:44px; }
+      body { padding-bottom: 0 !important; }
+      .sticky.top-0 .p-3 { padding: 8px !important; }
+      .sticky.top-0 .p-3 > div { max-width: 100%; }
+      #searchInput { width: min(42vw, 180px) !important; min-height: 40px; }
+      #addContractBtn,#addAccBtn,#addTakenBtn,#addIncomeExpBtn { min-height: 40px; }
+      .client-modal-grid { grid-template-columns:1fr; }
+      .copy-option-grid { grid-template-columns:1fr; }
+      #clientDetailModal > div { padding: 14px !important; max-height: 92vh; }
+      .overflow-x-auto { max-width: 100%; }
+      .partners-table { display: none; }
+      .partners-mobile-cards { display: grid !important; }
+      .kpi-grid { gap:8px; }
+      .kpi-card { padding:12px; }
+      .dash-card-header { padding:10px 12px; }
+      .p-4 { padding: .75rem !important; }
+    }
+    @media (min-width: 769px) {
+      .app-sidebar.open + .sidebar-overlay { opacity: 1; pointer-events:auto; }
+    }
+
   </style>
 </head>
-<body class="bg-slate-100 text-gray-800 text-xs min-h-screen pb-20">
+<body class="bg-slate-100 text-gray-800 text-xs min-h-screen">
 
   <!-- ЭКРАН ЗАГРУЗКИ -->
   <div id="loadingScreen">
@@ -536,6 +610,7 @@
     <div class="p-3 max-w-[100vw] flex flex-wrap justify-between items-center gap-4">
       
       <div class="flex items-center gap-2 flex-wrap">
+        <button type="button" id="menuToggle" class="menu-toggle no-print" onclick="toggleSidebar()" aria-label="Открыть меню" aria-expanded="false">☰</button>
         <div class="flex bg-slate-200 rounded-lg p-1 gap-1">
           <button type="button" id="undoBtn" onclick="undo()" disabled title="Шаг назад (Ctrl+Z)" 
             class="px-3 py-1.5 rounded text-xs font-bold text-gray-400 bg-gray-100 cursor-not-allowed transition">
@@ -589,6 +664,7 @@
         <table class="min-w-full text-left border-collapse">
           <thead class="bg-slate-800 text-white uppercase font-bold text-[10px] sticky top-0 z-20">
             <tr>
+              <th class="p-3 border-r border-slate-700 w-12 text-center">№</th>
               <th class="p-3 border-r border-slate-700 min-w-[150px]">ФИО Покупателя</th>
               <th class="p-3 border-r border-slate-700">Телефон</th>
               <th class="p-3 border-r border-slate-700">Даты (Покупка / График)</th>
@@ -789,6 +865,22 @@
       </div>
     </div>
 
+    <!-- ================= Лист: Клиенты ================= -->
+    <div id="clientsTabContent" class="hidden space-y-4">
+      <div class="bg-white shadow-xl rounded-xl p-4 md:p-6 border rounded-xl">
+        <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+          <div>
+            <h2 class="text-xl font-bold text-blue-600">👥 Клиенты</h2>
+            <p class="text-slate-500 text-xs mt-1">Все клиенты из существующих договоров</p>
+          </div>
+          <div class="flex items-center gap-2 w-full md:w-auto">
+            <input id="clientsSearchInput" type="search" oninput="renderClients()" placeholder="Поиск по ФИО, телефону или № договора..." class="p-2.5 border rounded-lg outline-none focus:ring-2 focus:ring-blue-400 w-full md:w-80">
+          </div>
+        </div>
+        <div id="clientsList" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+      </div>
+    </div>
+
     <!-- ================= Лист 7: Партнёры ================= -->
     <div id="partnersTabContent" class="hidden space-y-4">
       <div class="bg-white shadow-xl rounded-xl p-6 border">
@@ -944,39 +1036,75 @@
 
   </div>
 
-  <!-- НИЖНЯЯ ПАНЕЛЬ ПЕРЕКЛЮЧЕНИЯ -->
-  <div class="fixed bottom-0 left-0 right-0 z-40 bg-white shadow-lg border-t px-4 py-2 flex justify-center items-center gap-2 overflow-x-auto no-print">
-    <div class="flex items-center gap-2 bg-slate-200 p-1 rounded-xl">
-      <button type="button" onclick="switchTab('contracts')" id="tabBtnContracts" class="tab-btn active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2">
-        📋 Договоры
-      </button>
-      <button type="button" onclick="switchTab('accounting')" id="tabBtnAccounting" class="tab-btn px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
-        📊 Учет
-      </button>
-      <button type="button" onclick="switchTab('taken')" id="tabBtnTaken" class="tab-btn px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
-        📙 Взяли
-      </button>
-      <button type="button" onclick="switchTab('income')" id="tabBtnIncome" class="tab-btn income-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
-        💵 Доход
-      </button>
-      <button type="button" onclick="switchTab('init')" id="tabBtnInit" class="tab-btn init-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
-        🏛️ Инвестиция
-      </button>
-      <button type="button" onclick="switchTab('today')" id="tabBtnToday" class="tab-btn today-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
-        📅 Сегодня
-      </button>
-      <button type="button" onclick="switchTab('threeDays')" id="tabBtnThreeDays" class="tab-btn three-days-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
-        ⏰ 3 дня
-      </button>
-      <button type="button" onclick="switchTab('debtors')" id="tabBtnDebtors" class="tab-btn debtors-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
-        🚫 Неплательщики
-      </button>
-      <button type="button" onclick="switchTab('partners')" id="tabBtnPartners" class="tab-btn partners-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
-        🤝 Партнёры
-      </button>
-      <button type="button" onclick="switchTab('print')" id="tabBtnPrint" class="tab-btn print-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
-        🖨️ Распечатка
-      </button>
+  <!-- БОКОВАЯ НАВИГАЦИЯ -->
+  <aside id="appSidebar" class="app-sidebar no-print" aria-label="Навигация">
+    <button type="button" class="sidebar-close" onclick="closeSidebar()" aria-label="Закрыть меню">×</button>
+    <div class="sidebar-section">
+      <div class="sidebar-title">Основное</div>
+      <button type="button" onclick="switchTab('contracts')" id="tabBtnContracts" class="tab-btn active flex items-center gap-2">📋 Договоры</button>
+      <button type="button" onclick="switchTab('today')" id="tabBtnToday" class="tab-btn flex items-center gap-2">📅 Сегодня</button>
+      <button type="button" onclick="switchTab('threeDays')" id="tabBtnThreeDays" class="tab-btn flex items-center gap-2">⏰ Через 3 дня</button>
+      <button type="button" onclick="switchTab('debtors')" id="tabBtnDebtors" class="tab-btn flex items-center gap-2">🚫 Неплательщики</button>
+      <button type="button" onclick="switchTab('clients')" id="tabBtnClients" class="tab-btn flex items-center gap-2">👥 Клиенты</button>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">Учёт</div>
+      <button type="button" onclick="switchTab('accounting')" id="tabBtnAccounting" class="tab-btn flex items-center gap-2">📊 Учет</button>
+      <button type="button" onclick="switchTab('taken')" id="tabBtnTaken" class="tab-btn flex items-center gap-2">📙 Взяли</button>
+      <button type="button" onclick="switchTab('income')" id="tabBtnIncome" class="tab-btn income-tab flex items-center gap-2">💵 Доход</button>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">Партнёры</div>
+      <button type="button" onclick="switchTab('partners')" id="tabBtnPartners" class="tab-btn partners-tab flex items-center gap-2">🤝 Партнёры</button>
+      <button type="button" onclick="switchTab('init')" id="tabBtnInit" class="tab-btn init-tab flex items-center gap-2">🏛️ Инвестиции</button>
+      <button type="button" onclick="switchTab('print')" id="tabBtnPrint" class="tab-btn print-tab flex items-center gap-2">🖨️ Распечатка</button>
+    </div>
+  </aside>
+  <div id="sidebarOverlay" class="sidebar-overlay no-print" onclick="closeSidebar()"></div>
+
+  <!-- КАРТОЧКА КЛИЕНТА -->
+  <div id="clientDetailModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-3 z-[70]">
+    <div class="bg-white rounded-2xl p-5 md:p-6 max-w-5xl w-full max-h-[94vh] overflow-y-auto shadow-2xl">
+      <div class="flex justify-between items-start gap-3 border-b pb-3 mb-4">
+        <div>
+          <div id="clientDetailName" class="text-xl font-black text-slate-900"></div>
+          <div id="clientDetailContacts" class="text-xs text-slate-500 mt-1"></div>
+        </div>
+        <button type="button" onclick="closeClientDetail()" class="w-9 h-9 rounded-lg bg-slate-100 text-xl">×</button>
+      </div>
+      <div id="clientDetailBody"></div>
+    </div>
+  </div>
+
+  <!-- КОПИРОВАНИЕ ИНВЕСТИЦИЙ -->
+  <div id="investmentCopyModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-3 z-[70]">
+    <div class="bg-white rounded-2xl p-5 max-w-lg w-full shadow-2xl">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-black text-purple-700">📋 Копировать данные инвестиций</h3>
+        <button type="button" onclick="closeInvestmentCopyModal()" class="w-9 h-9 rounded-lg bg-slate-100 text-xl">×</button>
+      </div>
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Месяц</label>
+          <select id="investmentCopyMonth" class="w-full p-2.5 border rounded-lg"></select>
+        </div>
+        <label class="flex items-center gap-2 p-3 border rounded-lg cursor-pointer">
+          <input type="radio" name="investmentCopyMode" value="all" checked onchange="toggleInvestmentCopyInvestor()">
+          <span class="font-bold">Все инвесторы за выбранный месяц</span>
+        </label>
+        <label class="flex items-center gap-2 p-3 border rounded-lg cursor-pointer">
+          <input type="radio" name="investmentCopyMode" value="one" onchange="toggleInvestmentCopyInvestor()">
+          <span class="font-bold">Конкретный инвестор за выбранный месяц</span>
+        </label>
+        <div id="investmentCopyInvestorWrap" class="hidden">
+          <label class="block text-xs font-bold text-slate-500 mb-1">Инвестор</label>
+          <select id="investmentCopyInvestor" class="w-full p-2.5 border rounded-lg"></select>
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeInvestmentCopyModal()" class="px-4 py-2 text-slate-500 font-bold">Отмена</button>
+          <button type="button" onclick="performInvestmentCopy()" class="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-bold">📋 Копировать</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1304,8 +1432,8 @@
       initMonthlyReports = {};
     }
 
-    localStorage.setItem('investors_db', JSON.stringify(initInvestors));
-    localStorage.setItem('monthly_reports_db', JSON.stringify(initMonthlyReports));
+    // Не перезаписываем локальные данные до получения облачного состояния.
+    // Нормализованные данные сохраняются через saveToStorage/applyCloudData.
 
     if (!customAccounts) {
       const defaultNames = ['Н', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12', 'T13', 'T14', 'T15', 'T16', 'B1', 'B2', 'B3', 'B4'];
@@ -1384,6 +1512,7 @@
         if (activeTab === 'today') renderTodayClients();
         if (activeTab === 'threeDays') renderThreeDaysClients();
         if (activeTab === 'debtors') renderDebtorsClients();
+        if (activeTab === 'clients') renderClients();
         if (activeTab === 'partners') renderPartners();
         if (activeTab === 'print') {
           updatePrintSelect();
@@ -1405,7 +1534,9 @@
              emptyArr(data.accounting) && 
              emptyArr(data.taken) && 
              emptyArr(data.incomeExpenses) && 
-             emptyObj(data.monthlyReports);
+             emptyArr(data.investors) && 
+             emptyObj(data.monthlyReports) && 
+             emptyArr(data.accounts);
     }
 
     async function initSync() {
@@ -1450,10 +1581,51 @@
     }
 
     // ================================================================
+    // БОКОВАЯ НАВИГАЦИЯ
+    // ================================================================
+    window.toggleSidebar = function() {
+      const sidebar = document.getElementById('appSidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      const toggle = document.getElementById('menuToggle');
+      if (!sidebar || !overlay) return;
+      const open = sidebar.classList.toggle('open');
+      overlay.classList.toggle('open', open);
+      if (toggle) {
+        toggle.setAttribute('aria-expanded', String(open));
+        toggle.textContent = open ? '×' : '☰';
+      }
+      document.body.classList.toggle('overflow-hidden', open && window.innerWidth <= 768);
+    };
+    window.closeSidebar = function() {
+      const sidebar = document.getElementById('appSidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      const toggle = document.getElementById('menuToggle');
+      if (sidebar) sidebar.classList.remove('open');
+      if (overlay) overlay.classList.remove('open');
+      if (toggle) {
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.textContent = '☰';
+      }
+      document.body.classList.remove('overflow-hidden');
+    };
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        closeSidebar();
+        closeClientDetail();
+        closeInvestmentCopyModal();
+      }
+    });
+
+    // ================================================================
     // ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
     // ================================================================
     window.switchTab = function(tab) {
       activeTab = tab;
+      // Всегда снимаем active со всех пунктов и назначаем его только текущему.
+      document.querySelectorAll('#appSidebar .tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+        btn.removeAttribute('aria-current');
+      });
       const cTab = document.getElementById('contractsTabContent');
       const aTab = document.getElementById('accountingTabContent');
       const tTab = document.getElementById('takenTabContent');
@@ -1461,6 +1633,7 @@
       const todayTab = document.getElementById('todayTabContent');
       const threeDaysTab = document.getElementById('threeDaysTabContent');
       const debtorsTab = document.getElementById('debtorsTabContent');
+      const clientsTab = document.getElementById('clientsTabContent');
       const partnersTab = document.getElementById('partnersTabContent');
       const printTab = document.getElementById('printTabContent');
       const initTab = document.getElementById('initTabContent');
@@ -1473,6 +1646,7 @@
       const todayBtn = document.getElementById('tabBtnToday');
       const threeDaysBtn = document.getElementById('tabBtnThreeDays');
       const debtorsBtn = document.getElementById('tabBtnDebtors');
+      const clientsBtn = document.getElementById('tabBtnClients');
       const partnersBtn = document.getElementById('tabBtnPartners');
       const printBtn = document.getElementById('tabBtnPrint');
 
@@ -1488,6 +1662,7 @@
       todayTab.classList.add('hidden');
       threeDaysTab.classList.add('hidden');
       debtorsTab.classList.add('hidden');
+      clientsTab.classList.add('hidden');
       partnersTab.classList.add('hidden');
       printTab.classList.add('hidden');
       initTab.classList.add('hidden');
@@ -1504,6 +1679,7 @@
       todayBtn.className = "tab-btn today-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       threeDaysBtn.className = "tab-btn three-days-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       debtorsBtn.className = "tab-btn debtors-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
+      clientsBtn.className = "tab-btn clients-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       partnersBtn.className = "tab-btn partners-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       printBtn.className = "tab-btn print-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
 
@@ -1541,6 +1717,11 @@
         debtorsTab.classList.remove('hidden');
         debtorsBtn.className = "tab-btn debtors-tab active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
         renderDebtorsClients();
+      } else if (tab === 'clients') {
+        clientsTab.classList.remove('hidden');
+        clientsBtn.className = "tab-btn clients-tab active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
+        clientsBtn.setAttribute('aria-current', 'page');
+        renderClients();
       } else if (tab === 'partners') {
         partnersTab.classList.remove('hidden');
         partnersBtn.className = "tab-btn partners-tab active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
@@ -1551,6 +1732,16 @@
         updatePrintSelect();
         loadContractForPrint();
       }
+      const activeButton = document.getElementById({
+        contracts:'tabBtnContracts', accounting:'tabBtnAccounting', taken:'tabBtnTaken',
+        income:'tabBtnIncome', init:'tabBtnInit', today:'tabBtnToday', threeDays:'tabBtnThreeDays',
+        debtors:'tabBtnDebtors', clients:'tabBtnClients', partners:'tabBtnPartners', print:'tabBtnPrint'
+      }[tab]);
+      if (activeButton) {
+        activeButton.classList.add('active');
+        activeButton.setAttribute('aria-current', 'page');
+      }
+      if (window.innerWidth <= 768) closeSidebar();
       handleSearch();
     };
 
@@ -1634,6 +1825,7 @@
       if (activeTab === 'today') renderTodayClients();
       if (activeTab === 'threeDays') renderThreeDaysClients();
       if (activeTab === 'debtors') renderDebtorsClients();
+      if (activeTab === 'clients') renderClients();
       if (activeTab === 'partners') renderPartners();
       if (activeTab === 'print') {
         updatePrintSelect();
@@ -1676,6 +1868,9 @@
         loadContractForPrint();
       }
       updateHistoryButtons();
+      // Повторно применяем текущий поиск после перерисовки, чтобы добавление/редактирование
+      // не сбрасывало найденный результат.
+      handleSearch();
       pushToCloud();
     };
 
@@ -2204,7 +2399,7 @@
             <div class="text-2xl font-bold text-red-700">${partners.reduce((sum, p) => sum + p.debtContracts, 0)}</div>
           </div>
         </div>
-        <div class="overflow-x-auto">
+        <div class="partners-table overflow-x-auto">
           <table class="w-full border-collapse">
             <thead>
               <tr class="bg-purple-700 text-white font-bold text-xs">
@@ -2235,6 +2430,20 @@
       });
       
       html += `</tbody></table></div>`;
+      html += `<div class="partners-mobile-cards grid grid-cols-1 gap-3">`;
+      partners.forEach(partner => {
+        html += `<div class="bg-white border border-purple-200 rounded-xl p-4 shadow-sm">
+          <div class="font-black text-purple-700 text-sm mb-3">${partner.name}</div>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div class="bg-red-50 rounded-lg p-2"><div class="text-[9px] text-red-600 font-bold">В долг</div><b>${partner.debtContracts}</b></div>
+            <div class="bg-red-50 rounded-lg p-2"><div class="text-[9px] text-red-600 font-bold">Сумма долга</div><b>${partner.debtSum.toLocaleString('ru-RU')} ₽</b></div>
+            <div class="bg-purple-50 rounded-lg p-2"><div class="text-[9px] text-purple-600 font-bold">Договоров</div><b>${partner.totalContracts}</b></div>
+            <div class="bg-blue-50 rounded-lg p-2"><div class="text-[9px] text-blue-600 font-bold">Общая сумма</div><b>${partner.totalSum.toLocaleString('ru-RU')} ₽</b></div>
+          </div>
+          <button onclick="showPartnerDetails(${JSON.stringify(partner.name)})" class="w-full mt-3 bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg text-xs font-bold">📋 Детали</button>
+        </div>`;
+      });
+      html += `</div>`;
       container.innerHTML = html;
     };
 
@@ -2412,6 +2621,221 @@
       html += '</div>';
       container.innerHTML = html;
     }
+
+    // ================================================================
+    // КЛИЕНТЫ
+    // ================================================================
+    function escapeClientHtml(value) {
+      return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function clientJsArg(value) {
+      return JSON.stringify(String(value ?? '')).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;');
+    }
+
+    function getClientGroups() {
+      const map = new Map();
+      allContracts.forEach(contract => {
+        const fio = String(contract.fio || '').trim();
+        if (!fio) return;
+        const key = fio.toLocaleLowerCase('ru-RU');
+        if (!map.has(key)) {
+          map.set(key, { fio, phone: contract.phone || '', extraPhone: contract.extraPhone || '', contracts: [] });
+        }
+        const client = map.get(key);
+        if (!client.phone && contract.phone) client.phone = contract.phone;
+        if (!client.extraPhone && contract.extraPhone) client.extraPhone = contract.extraPhone;
+        client.contracts.push(contract);
+      });
+      return Array.from(map.values()).sort((a,b) => a.fio.localeCompare(b.fio, 'ru'));
+    }
+
+    function clientContractStatus(contract) {
+      const metrics = calculateContractMetrics(contract);
+      return metrics.isClosed ? 'closed' : 'active';
+    }
+
+    window.renderClients = function(query) {
+      const container = document.getElementById('clientsList');
+      if (!container) return;
+      const input = document.getElementById('clientsSearchInput');
+      const q = String(query !== undefined ? query : (input ? input.value : '')).trim().toLocaleLowerCase('ru-RU');
+      const clients = getClientGroups().filter(client => {
+        if (!q) return true;
+        return client.fio.toLocaleLowerCase('ru-RU').includes(q) ||
+          String(client.phone || '').toLowerCase().includes(q) ||
+          String(client.extraPhone || '').toLowerCase().includes(q) ||
+          client.contracts.some(c => String(c.contractNum || '').toLowerCase().includes(q));
+      });
+
+      if (!clients.length) {
+        container.innerHTML = '<div class="col-span-full text-center text-slate-500 py-10">🔍 Клиенты не найдены</div>';
+        return;
+      }
+
+      container.innerHTML = clients.map((client, index) => {
+        const active = client.contracts.filter(c => clientContractStatus(c) === 'active').length;
+        const closed = client.contracts.length - active;
+        const rest = client.contracts.reduce((sum,c) => sum + Number(calculateContractMetrics(c).rest || 0), 0);
+        const phoneText = client.phone ? `📞 ${client.phone}` : '📞 Телефон не указан';
+        return `<button type="button" class="client-card text-left w-full" onclick="openClientDetail(${clientJsArg(client.fio)})">
+          <div class="flex justify-between items-start gap-2">
+            <div class="font-black text-slate-900 text-sm">${index + 1}. ${escapeClientHtml(client.fio)}</div>
+            <span class="client-status ${active ? 'active' : 'closed'}">${active ? '● Активный' : '● Нет активных'}</span>
+          </div>
+          <div class="text-xs text-slate-500 mt-2">${phoneText}${client.extraPhone ? ` · ${escapeClientHtml(client.extraPhone)}` : ''}</div>
+          <div class="flex flex-wrap gap-2 mt-3 text-[10px] font-bold">
+            <span class="bg-blue-50 text-blue-700 px-2 py-1 rounded-full">Договоров: ${client.contracts.length}</span>
+            <span class="bg-green-50 text-green-700 px-2 py-1 rounded-full">Активных: ${active}</span>
+            <span class="bg-slate-100 text-slate-600 px-2 py-1 rounded-full">Закрытых: ${closed}</span>
+            <span class="bg-orange-50 text-orange-700 px-2 py-1 rounded-full">Остаток: ${rest.toLocaleString('ru-RU')} ₽</span>
+          </div>
+        </button>`;
+      }).join('');
+    };
+
+    function formatClientDate(dateStr) {
+      if (!dateStr) return '—';
+      const d = new Date(dateStr);
+      return isNaN(d.getTime()) ? String(dateStr) : d.toLocaleDateString('ru-RU');
+    }
+
+    function buildContractWhatsAppText(contract) {
+      const metrics = calculateContractMetrics(contract);
+      const status = metrics.isClosed ? 'ЗАКРЫТ' : 'АКТИВЕН';
+      const info = getMonthStatus(contract);
+      let text = `📄 *Договор №${contract.contractNum || '—'} — ${status}*\n`;
+      text += `Клиент: ${contract.fio || '—'}\n`;
+      text += `Товар: ${contract.product || '—'}\n`;
+      text += `Дата покупки: ${formatClientDate(contract.buyDate)}\n`;
+      text += `График платежа: ${formatClientDate(contract.payDate)}\n`;
+      text += `Общая сумма: ${Number(contract.totalCost || 0).toLocaleString('ru-RU')} ₽\n`;
+      text += `Первоначальный взнос: ${Number(contract.downPayment || 0).toLocaleString('ru-RU')} ₽\n`;
+      text += `Ежемесячный платеж: ${Number(contract.monthlyPay || 0).toLocaleString('ru-RU')} ₽\n`;
+      text += `Остаток: ${Number(metrics.rest || 0).toLocaleString('ru-RU')} ₽\n`;
+      text += `Просрочка: ${Number(metrics.overdueSum || info.overdueSum || 0).toLocaleString('ru-RU')} ₽\n\n`;
+      text += `📅 *График платежей:*\n`;
+      info.months.forEach(m => {
+        const mark = m.isPaid ? '✅' : (m.status === 'overdue' ? '⚠️' : '⏳');
+        text += `${mark} ${m.month}-й: ${formatClientDate(m.date)} — ${Number(m.amount || 0).toLocaleString('ru-RU')} ₽${m.isPaid ? ' — оплачено' : (m.status === 'overdue' ? ' — просрочен' : ' — ожидает')}\n`;
+      });
+      return text;
+    }
+
+    function openWhatsAppForClient(phone, text) {
+      const digits = String(phone || '').replace(/\D/g, '');
+      if (!digits) {
+        alert('У клиента не указан номер телефона.');
+        return;
+      }
+      let normalized = digits;
+      if (normalized.startsWith('8') && normalized.length === 11) normalized = '7' + normalized.slice(1);
+      if (normalized.length === 10 && normalized.startsWith('9')) normalized = '7' + normalized;
+      window.open(`https://wa.me/${normalized}?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
+    }
+
+    window.openClientWhatsApp = function(fio, mode) {
+      const client = getClientGroups().find(c => String(c.fio) === String(fio));
+      if (!client) return;
+      let contracts = client.contracts;
+      if (mode === 'active') contracts = contracts.filter(c => clientContractStatus(c) === 'active');
+      if (mode === 'one') {
+        const select = document.getElementById('clientWhatsAppContract');
+        const selected = select ? select.value : '';
+        contracts = contracts.filter(c => String(c.id) === selected);
+      }
+      if (!contracts.length) {
+        alert('Нет договоров для отправки.');
+        return;
+      }
+      const text = contracts.length === 1
+        ? buildContractWhatsAppText(contracts[0])
+        : `👤 *Клиент: ${client.fio}*\n\n${contracts.map(buildContractWhatsAppText).join('\n━━━━━━━━━━━━━━━━━━━━\n\n')}`;
+      openWhatsAppForClient(client.phone || client.extraPhone, text);
+    };
+
+    window.openClientDetail = function(fio) {
+      const client = getClientGroups().find(c => String(c.fio) === String(fio));
+      if (!client) return;
+      document.getElementById('clientDetailName').textContent = client.fio;
+      document.getElementById('clientDetailContacts').textContent =
+        [client.phone && `📞 ${client.phone}`, client.extraPhone && `Доп.: ${client.extraPhone}`].filter(Boolean).join(' · ') || 'Контактные данные не указаны';
+
+      const activeCount = client.contracts.filter(c => clientContractStatus(c) === 'active').length;
+      const closedCount = client.contracts.length - activeCount;
+      let body = `<div class="flex flex-wrap gap-2 mb-4">
+        <span class="client-status active">Активных договоров: ${activeCount}</span>
+        <span class="client-status closed">Закрытых договоров: ${closedCount}</span>
+        <button type="button" onclick="toggleClientWhatsAppOptions()" class="ml-auto bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg font-bold">💬 WhatsApp</button>
+      </div>`;
+      body += `<div class="grid grid-cols-1 xl:grid-cols-2 gap-4">`;
+
+      client.contracts.slice().sort((a,b) => Number(a.contractNum || 0) - Number(b.contractNum || 0)).forEach(contract => {
+        const metrics = calculateContractMetrics(contract);
+        const info = getMonthStatus(contract);
+        const status = clientContractStatus(contract);
+        const overdue = Number(metrics.overdueSum || info.overdueSum || 0);
+        const paid = info.months.filter(m => m.isPaid).reduce((s,m) => s + Number(m.amount || 0), 0);
+        body += `<section class="client-contract-card">
+          <div class="client-contract-head">
+            <div><b>Договор №${contract.contractNum || '—'}</b><div class="text-[10px] text-slate-500">${contract.product || 'Товар не указан'}</div></div>
+            <span class="client-status ${status}">${status === 'active' ? '● Активный' : '● Закрытый'}</span>
+          </div>
+          <div class="p-3 space-y-2">
+            <div class="grid grid-cols-2 gap-2 text-[11px]">
+              <div>Покупка: <b>${formatClientDate(contract.buyDate)}</b></div>
+              <div>График: <b>${formatClientDate(contract.payDate)}</b></div>
+              <div>Сумма: <b>${Number(contract.totalCost || 0).toLocaleString('ru-RU')} ₽</b></div>
+              <div>Мес. платеж: <b>${Number(contract.monthlyPay || 0).toLocaleString('ru-RU')} ₽</b></div>
+              <div>Оплачено: <b class="text-green-700">${paid.toLocaleString('ru-RU')} ₽</b></div>
+              <div>Остаток: <b>${Number(metrics.rest || 0).toLocaleString('ru-RU')} ₽</b></div>
+              <div>Просрочка: <b class="${overdue ? 'text-red-600' : 'text-green-700'}">${overdue.toLocaleString('ru-RU')} ₽</b></div>
+              <div>Магазин: <b>${contract.store || '—'}</b></div>
+            </div>
+            <div class="client-history-table-wrap mt-2"><table class="client-history-table">
+              <thead><tr><th>Месяц</th><th>Дата</th><th>Сумма</th><th>Статус</th></tr></thead><tbody>
+                ${info.months.map(m => `<tr><td>${m.month}-й</td><td>${formatClientDate(m.date)}</td><td>${Number(m.amount || 0).toLocaleString('ru-RU')} ₽</td><td>${m.isPaid ? '<span class="paid-mark">✓ Оплачено</span>' : (m.status === 'overdue' ? '<span class="unpaid-mark">⚠ Просрочка</span>' : '<span class="text-slate-500">⏳ Ожидает</span>')}</td></tr>`).join('')}
+              </tbody></table></div>
+            <button type="button" onclick="selectClientWhatsAppContract(${clientJsArg(client.fio)}, ${clientJsArg(contract.id)})" class="w-full mt-2 bg-green-50 hover:bg-green-100 text-green-700 px-3 py-2 rounded-lg font-bold">💬 Отправить этот договор</button>
+          </div>
+        </section>`;
+      });
+      body += `</div>
+        <div id="clientWhatsAppOptions" class="hidden mt-5 border-t pt-4">
+          <h3 class="font-black text-sm mb-3">WhatsApp — выберите вариант</h3>
+          <div class="copy-option-grid">
+            <button type="button" onclick="openClientWhatsApp(${clientJsArg(client.fio)}, 'one')" class="p-3 rounded-lg border border-green-200 bg-green-50 text-green-700 font-bold">1. Конкретный договор</button>
+            <button type="button" onclick="openClientWhatsApp(${clientJsArg(client.fio)}, 'active')" class="p-3 rounded-lg border border-green-200 bg-green-50 text-green-700 font-bold">2. Все активные</button>
+            <button type="button" onclick="openClientWhatsApp(${clientJsArg(client.fio)}, 'all')" class="p-3 rounded-lg border border-green-200 bg-green-50 text-green-700 font-bold">3. Все договоры</button>
+            <select id="clientWhatsAppContract" class="p-3 border rounded-lg" aria-label="Конкретный договор">
+              ${client.contracts.map(c => `<option value="${escapeClientHtml(c.id)}">Договор №${escapeClientHtml(c.contractNum || '—')} — ${clientContractStatus(c) === 'active' ? 'активный' : 'закрытый'}</option>`).join('')}
+            </select>
+          </div>
+        </div>`;
+      document.getElementById('clientDetailBody').innerHTML = body;
+      const modal = document.getElementById('clientDetailModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    };
+
+    window.toggleClientWhatsAppOptions = function() {
+      const box = document.getElementById('clientWhatsAppOptions');
+      if (box) {
+        box.classList.toggle('hidden');
+        if (!box.classList.contains('hidden')) box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    };
+
+    window.selectClientWhatsAppContract = function(fio, contractId) {
+      const select = document.getElementById('clientWhatsAppContract');
+      if (select) select.value = contractId;
+      openClientWhatsApp(fio, 'one');
+    };
+
+    window.closeClientDetail = function() {
+      const modal = document.getElementById('clientDetailModal');
+      if (modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); }
+    };
 
     function renderTodayClients() {
       const today = new Date();
@@ -2810,12 +3234,38 @@
       }
     };
 
+    async function copyTextSafe(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        try { await navigator.clipboard.writeText(text); return true; } catch (e) {}
+      }
+      const area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      area.style.pointerEvents = 'none';
+      document.body.appendChild(area);
+      area.focus();
+      area.select();
+      let ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+      area.remove();
+      return ok;
+    }
+
     function copyToClip(text, btn) {
-      navigator.clipboard.writeText(text).then(() => {
-        const oldText = btn.innerText;
-        btn.innerText = "✓ Готово";
-        btn.classList.add("bg-green-700");
-        setTimeout(() => { btn.innerText = oldText; btn.classList.remove("bg-green-700"); }, 1000);
+      copyTextSafe(text).then(ok => {
+        if (ok && btn) {
+          const oldText = btn.innerText;
+          btn.innerText = "✓ Готово";
+          btn.classList.add("bg-green-700");
+          setTimeout(() => {
+            btn.innerText = oldText;
+            btn.classList.remove("bg-green-700");
+          }, 1500);
+        } else if (!ok) {
+          alert("Не удалось скопировать текст.");
+        }
       });
     }
 
@@ -2837,7 +3287,7 @@
       const tbody = document.getElementById('contractsTable');
       tbody.innerHTML = '';
       
-      contracts.forEach(item => {
+      contracts.forEach((item, index) => {
         const metrics = calculateContractMetrics(item);
         const rest = metrics.rest;
         const overdueSum = metrics.overdueSum;
@@ -2853,6 +3303,7 @@
         }
 
         tr.innerHTML = `
+          <td class="p-2 border-r text-center font-black text-slate-500">${index + 1}</td>
           <td class="p-2 border-r font-bold">${item.fio}</td>
           <td class="p-2 border-r text-[10px]">${item.phone}</td>
           <td class="p-2 border-r text-[10px]">${item.buyDate}<br><b class="text-blue-600">${item.payDate}</b></td>
@@ -3354,12 +3805,14 @@
     window.handleSearch = function() {
       const q = document.getElementById('searchInput').value.toLowerCase();
       if (activeTab === 'contracts') {
-        renderTable(allContracts.filter(c => c.fio.toLowerCase().includes(q) || String(c.contractNum).includes(q)));
+        renderTable(allContracts.filter(c => String(c.fio || '').toLowerCase().includes(q) || String(c.contractNum || '').includes(q)));
       } else if (activeTab === 'accounting') {
         renderAccountingTable(allAccounting.filter(a => a.note.toLowerCase().includes(q) || a.account.toLowerCase().includes(q) || a.date.includes(q)));
       } else if (activeTab === 'taken') {
         const filtered = allTaken.filter(t => (t.takenDesc && t.takenDesc.toLowerCase().includes(q)) || (t.putDesc && t.putDesc.toLowerCase().includes(q)));
         renderTakenFiltered(filtered);
+      } else if (activeTab === 'clients') {
+        renderClients(q);
       } else if (activeTab === 'income') {
         const filtered = allIncomeExpenses.filter(e => (e.note && e.note.toLowerCase().includes(q)));
         if (filtered.length === 0 && q.length > 0) {
@@ -3921,25 +4374,86 @@
       pushToCloud();
     };
 
-    window.copyMonthReport = function(year, month) {
-      const report = getMonthlyReport(year, month);
-      const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
-      let txt = `📅 ${monthNames[month-1]} ${year}\n`;
+    window.openInvestmentCopyModal = function(year, month) {
+      const modal = document.getElementById('investmentCopyModal');
+      const monthSelect = document.getElementById('investmentCopyMonth');
+      const investorSelect = document.getElementById('investmentCopyInvestor');
+      if (!modal || !monthSelect || !investorSelect) return;
+
+      const keys = Object.keys(initMonthlyReports).sort().reverse();
+      monthSelect.innerHTML = keys.map(key => {
+        const rep = initMonthlyReports[key];
+        const names = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+        return `<option value="${key}">${names[(rep.month || 1)-1]} ${rep.year}</option>`;
+      }).join('');
+      const requestedKey = `${year}-${String(month).padStart(2,'0')}`;
+      if (keys.includes(requestedKey)) monthSelect.value = requestedKey;
+
+      investorSelect.innerHTML = initInvestors.map(inv =>
+        `<option value="${inv.id}">${inv.name}${inv.isOwner ? ' (Вы)' : ''}</option>`
+      ).join('');
+      toggleInvestmentCopyInvestor();
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    };
+
+    window.toggleInvestmentCopyInvestor = function() {
+      const wrap = document.getElementById('investmentCopyInvestorWrap');
+      const mode = document.querySelector('input[name="investmentCopyMode"]:checked');
+      if (wrap) wrap.classList.toggle('hidden', !mode || mode.value !== 'one');
+    };
+
+    function buildInvestmentReportText(year, month, investorId) {
+      const report = initMonthlyReports[`${year}-${String(month).padStart(2,'0')}`] || getMonthlyReport(year, month);
+      const names = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+      const selected = investorId ? initInvestors.filter(inv => inv.id === investorId) : initInvestors;
+      let txt = `📅 ${names[month-1]} ${year}\n`;
       txt += `━━━━━━━━━━━━━━━━━━━━━━\n`;
-      txt += `Общий % прибыли: ${(report.overallProfitPercent || 0).toFixed(2)}%\n\n`;
-      initInvestors.forEach(inv => {
-        const e = report.entries[inv.id] || {};
+      txt += `Общий % прибыли: ${Number(report.overallProfitPercent || 0).toFixed(2)}%\n\n`;
+      selected.forEach(inv => {
+        const e = report.entries && report.entries[inv.id] || {};
         txt += `${inv.name}${inv.isOwner ? ' (Вы)' : ''}:\n`;
         txt += `  Капитал: ${Number(e.capital || 0).toLocaleString('ru-RU')} ₽\n`;
         txt += `  Вложил: ${Number(e.invested || 0).toLocaleString('ru-RU')} ₽\n`;
         txt += `  Дивиденды: ${Number(e.dividends || 0).toLocaleString('ru-RU')} ₽\n`;
         txt += `  Снял: ${Number(e.withdrawn || 0).toLocaleString('ru-RU')} ₽\n`;
         txt += `  Прибыль: ${Number(e.profitActual || 0).toLocaleString('ru-RU')} ₽\n`;
-        txt += `  Факт %: ${Number(e.factPercent || 0).toFixed(2)}%\n\n`;
+        txt += `  Факт %: ${Number(e.factPercent || 0).toFixed(2)}%\n`;
+        if (e.addedPercent !== undefined) txt += `  Добавлено %: ${Number(e.addedPercent || 0).toFixed(2)}%\n`;
+        txt += '\n';
       });
-      navigator.clipboard.writeText(txt).then(() => {
-        showCopyNotification('✅ Отчёт скопирован в буфер');
-      }).catch(() => alert('Не удалось скопировать'));
+      return txt.trim();
+    }
+
+    window.performInvestmentCopy = function() {
+      const key = document.getElementById('investmentCopyMonth').value;
+      const mode = document.querySelector('input[name="investmentCopyMode"]:checked');
+      if (!key || !mode) return;
+      const parts = key.split('-');
+      const year = Number(parts[0]), month = Number(parts[1]);
+      const investorId = mode.value === 'one' ? document.getElementById('investmentCopyInvestor').value : null;
+      const text = buildInvestmentReportText(year, month, investorId);
+      copyTextSafe(text).then(ok => {
+        if (ok) {
+          showCopyNotification('✅ Данные инвестиций скопированы');
+          closeInvestmentCopyModal();
+        } else {
+          alert('Не удалось скопировать данные.');
+        }
+      });
+    };
+
+    window.closeInvestmentCopyModal = function() {
+      const modal = document.getElementById('investmentCopyModal');
+      if (modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); }
+    };
+
+    window.copyMonthReport = function(year, month) {
+      const text = buildInvestmentReportText(year, month, null);
+      copyTextSafe(text).then(ok => {
+        if (ok) showCopyNotification('✅ Отчёт скопирован в буфер');
+        else alert('Не удалось скопировать');
+      });
     };
 
     function renderMonthlyReports() {
@@ -4042,7 +4556,7 @@
             <span>📅 ${monthNames[month-1]} ${year}</span>
             <div class="flex items-center gap-2 flex-wrap">
               <span class="overall-pct">Общий % прибыли: ${overallPct}%</span>
-              <button class="hdr-btn" onclick="copyMonthReport(${year},${month})">📋 Скопировать</button>
+              <button class="hdr-btn" onclick="openInvestmentCopyModal(${year},${month})">📋 Скопировать</button>
               ${report.stopped 
                 ? `<button class="hdr-btn" onclick="unstopMonth(${year},${month})">🔓 Разблокировать</button>`
                 : ''
