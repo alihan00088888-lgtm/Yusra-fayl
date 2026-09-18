@@ -30,6 +30,7 @@
     .tab-btn.today-tab.active { background-color: #22c55e; color: #ffffff; }
     .tab-btn.three-days-tab.active { background-color: #3b82f6; color: #ffffff; }
     .tab-btn.debtors-tab.active { background-color: #ef4444; color: #ffffff; }
+    .tab-btn.fieldwork-tab.active { background-color: #991b1b; color: #ffffff; }
     .tab-btn.partners-tab.active { background-color: #8b5cf6; color: #ffffff; }
     .tab-btn.print-tab.active { background-color: #f59e0b; color: #ffffff; }
     .tab-btn.income-tab.active { background-color: #0d9488; color: #ffffff; }
@@ -594,6 +595,142 @@
       .app-sidebar.open + .sidebar-overlay { opacity: 1; pointer-events:auto; }
     }
 
+    /* === Выезд === */
+    .fieldwork-shell { display:flex; flex-direction:column; gap:16px; }
+    .fieldwork-hero { background:linear-gradient(135deg,#111827,#7f1d1d); color:#fff; border-radius:20px; padding:18px 20px; box-shadow:0 14px 32px rgba(127,29,29,.16); }
+    .fieldwork-hero-inner { display:flex; justify-content:space-between; align-items:flex-start; gap:14px; flex-wrap:wrap; }
+    .fieldwork-title { font-size:25px; font-weight:900; letter-spacing:-.5px; }
+    .fieldwork-subtitle { margin-top:5px; font-size:11px; opacity:.78; }
+    .fieldwork-link-btn { border:1px solid rgba(255,255,255,.22); background:rgba(255,255,255,.12); color:#fff; padding:9px 12px; border-radius:10px; font-size:11px; font-weight:900; cursor:pointer; }
+    .fieldwork-stats { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
+    .fieldwork-stat { background:#fff; border:1px solid #e2e8f0; border-radius:15px; padding:14px; box-shadow:0 5px 18px rgba(15,23,42,.05); }
+    .fieldwork-stat-label { font-size:9px; font-weight:900; color:#64748b; text-transform:uppercase; letter-spacing:.05em; }
+    .fieldwork-stat-value { margin-top:5px; font-size:21px; font-weight:900; color:#0f172a; }
+    .fieldwork-stat-value.red { color:#dc2626; }
+    .fieldwork-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .fieldwork-card { background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:15px; box-shadow:0 5px 18px rgba(15,23,42,.05); }
+    .fieldwork-card-head { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+    .fieldwork-client-name { font-size:15px; font-weight:900; color:#0f172a; }
+    .fieldwork-client-meta { margin-top:3px; color:#64748b; font-size:10px; }
+    .fieldwork-status { display:inline-flex; align-items:center; border-radius:999px; padding:5px 9px; font-size:9px; font-weight:900; white-space:nowrap; }
+    .fieldwork-status.s0 { background:#fee2e2; color:#991b1b; }
+    .fieldwork-status.s1 { background:#fef3c7; color:#92400e; }
+    .fieldwork-status.s2 { background:#ffedd5; color:#9a3412; }
+    .fieldwork-status.s3 { background:#dbeafe; color:#1d4ed8; }
+    .fieldwork-status.s4 { background:#ede9fe; color:#6d28d9; }
+    .fieldwork-status.s5 { background:#dcfce7; color:#166534; }
+    .fieldwork-status.s6 { background:#f1f5f9; color:#475569; }
+    .fieldwork-info-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; margin-top:12px; }
+    .fieldwork-info { background:#f8fafc; border-radius:10px; padding:8px 9px; }
+    .fieldwork-info-label { font-size:8px; color:#94a3b8; font-weight:900; text-transform:uppercase; }
+    .fieldwork-info-value { margin-top:2px; font-size:11px; font-weight:900; color:#334155; }
+    .fieldwork-actions { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:7px; margin-top:11px; }
+    .fieldwork-action { border:1px solid #e2e8f0; background:#fff; border-radius:9px; padding:9px 6px; font-size:10px; font-weight:900; color:#334155; cursor:pointer; }
+    .fieldwork-action:hover { background:#f8fafc; }
+    .fieldwork-action.whatsapp { color:#15803d; background:#f0fdf4; border-color:#bbf7d0; }
+    .fieldwork-action.map { color:#1d4ed8; background:#eff6ff; border-color:#bfdbfe; }
+    .fieldwork-action.status { color:#991b1b; background:#fff1f2; border-color:#fecdd3; }
+    .fieldwork-modal-history { max-height:250px; overflow:auto; border:1px solid #e2e8f0; border-radius:12px; }
+    .fieldwork-history-row { padding:9px 11px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; gap:10px; align-items:center; font-size:10px; }
+    .fieldwork-history-row:last-child { border-bottom:0; }
+    .fieldwork-mode-banner { display:none; }
+    body.fieldworker-mode { background:#f1f5f9; }
+    body.fieldworker-mode > .sticky.top-0, body.fieldworker-mode #appSidebar, body.fieldworker-mode #sidebarOverlay { display:none !important; }
+    body.fieldworker-mode #homeTabContent, body.fieldworker-mode #contractsTabContent, body.fieldworker-mode #accountingTabContent, body.fieldworker-mode #takenTabContent, body.fieldworker-mode #incomeTabContent, body.fieldworker-mode #todayTabContent, body.fieldworker-mode #threeDaysTabContent, body.fieldworker-mode #debtorsTabContent, body.fieldworker-mode #clientsTabContent, body.fieldworker-mode #partnersTabContent, body.fieldworker-mode #printTabContent, body.fieldworker-mode #initTabContent { display:none !important; }
+    body.fieldworker-mode #fieldworkTabContent { display:block !important; max-width:1100px; margin:0 auto; }
+    body.fieldworker-mode .fieldwork-mode-banner { display:block; }
+    body.fieldworker-mode .fieldwork-link-btn { display:none; }
+    @media (max-width: 900px) { .fieldwork-stats { grid-template-columns:repeat(2,minmax(0,1fr)); } .fieldwork-list { grid-template-columns:1fr; } }
+    @media (max-width: 640px) { .fieldwork-hero { padding:16px; border-radius:16px; } .fieldwork-title { font-size:21px; } .fieldwork-stats { gap:8px; } .fieldwork-stat { padding:11px; } .fieldwork-stat-value { font-size:17px; } .fieldwork-actions { grid-template-columns:repeat(2,minmax(0,1fr)); } .fieldwork-info-grid { grid-template-columns:1fr 1fr; } }
+
+    /* === Главная: финансовый дашборд === */
+    .dashboard-shell { display:flex; flex-direction:column; gap:18px; }
+    .dashboard-hero {
+      position:relative; overflow:hidden; border-radius:20px; padding:20px 22px;
+      background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 55%,#2563eb 100%);
+      color:#fff; box-shadow:0 14px 35px rgba(15,23,42,.18);
+    }
+    .dashboard-hero:after { content:''; position:absolute; width:220px; height:220px; right:-70px; top:-95px; border-radius:50%; background:rgba(255,255,255,.08); }
+    .dashboard-hero-inner { position:relative; z-index:1; display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; }
+    .dashboard-kicker { font-size:10px; font-weight:900; letter-spacing:.16em; text-transform:uppercase; opacity:.7; }
+    .dashboard-title { font-size:26px; line-height:1.1; font-weight:900; margin-top:5px; letter-spacing:-.5px; }
+    .dashboard-subtitle { font-size:11px; opacity:.78; margin-top:6px; }
+    .dashboard-period-box { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .dashboard-period-select,.dashboard-date-input { border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.12); color:#fff; border-radius:10px; padding:9px 11px; font-size:11px; font-weight:800; outline:none; }
+    .dashboard-period-select option { color:#0f172a; background:#fff; }
+    .dashboard-date-input::-webkit-calendar-picker-indicator { filter:invert(1); }
+    .dashboard-custom-range { display:none; gap:8px; align-items:center; flex-wrap:wrap; }
+    .dashboard-custom-range.show { display:flex; }
+    .dashboard-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+    .dashboard-card { background:#fff; border:1px solid #e2e8f0; border-radius:16px; box-shadow:0 5px 18px rgba(15,23,42,.06); overflow:hidden; }
+    .dashboard-metric { padding:16px; min-height:112px; display:flex; flex-direction:column; justify-content:space-between; }
+    .dashboard-metric-top { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+    .dashboard-metric-label { font-size:10px; font-weight:900; color:#64748b; text-transform:uppercase; letter-spacing:.055em; }
+    .dashboard-metric-icon { width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; background:#f1f5f9; }
+    .dashboard-metric-value { margin-top:8px; font-size:21px; line-height:1.05; font-weight:900; letter-spacing:-.45px; color:#0f172a; word-break:break-word; }
+    .dashboard-metric-note { margin-top:5px; font-size:9px; color:#94a3b8; font-weight:700; }
+    .dashboard-metric.green .dashboard-metric-value { color:#059669; }
+    .dashboard-metric.red .dashboard-metric-value { color:#dc2626; }
+    .dashboard-metric.blue .dashboard-metric-value { color:#2563eb; }
+    .dashboard-metric.amber .dashboard-metric-value { color:#d97706; }
+    .dashboard-section { padding:0; }
+    .dashboard-section-head { padding:14px 16px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
+    .dashboard-section-title { font-size:12px; font-weight:900; color:#0f172a; display:flex; align-items:center; gap:7px; }
+    .dashboard-section-sub { font-size:9px; color:#94a3b8; font-weight:700; }
+    .dashboard-two-col { display:grid; grid-template-columns:1.35fr 1fr; gap:14px; }
+    .dashboard-three-col { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
+    .dashboard-list { padding:4px 0; }
+    .dashboard-row { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 16px; border-bottom:1px solid #f1f5f9; }
+    .dashboard-row:last-child { border-bottom:0; }
+    .dashboard-row-label { font-size:10px; color:#64748b; font-weight:800; }
+    .dashboard-row-value { font-size:12px; color:#0f172a; font-weight:900; text-align:right; }
+    .dashboard-row-value.green { color:#059669; }
+    .dashboard-row-value.red { color:#dc2626; }
+    .dashboard-row-value.blue { color:#2563eb; }
+    .dashboard-row-value.amber { color:#d97706; }
+    .dashboard-installment { padding:18px; }
+    .dashboard-installment-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+    .dashboard-big-box { border:1px solid #e2e8f0; border-radius:14px; padding:14px; background:#f8fafc; }
+    .dashboard-big-label { font-size:9px; font-weight:900; color:#64748b; text-transform:uppercase; letter-spacing:.05em; }
+    .dashboard-big-value { margin-top:5px; font-size:22px; font-weight:900; color:#0f172a; }
+    .dashboard-big-value.blue { color:#2563eb; }
+    .dashboard-big-value.green { color:#059669; }
+    .dashboard-profit-strip { margin-top:10px; padding:10px 12px; border-radius:10px; background:#ecfdf5; color:#047857; display:flex; justify-content:space-between; gap:8px; font-size:10px; font-weight:900; }
+    .dashboard-chart-wrap { padding:12px 16px 16px; }
+    .dashboard-chart { height:190px; display:flex; align-items:flex-end; gap:7px; border-bottom:1px solid #e2e8f0; padding:8px 4px 0; overflow-x:auto; }
+    .dashboard-chart-month { min-width:46px; height:100%; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; gap:4px; }
+    .dashboard-chart-bars { width:100%; height:145px; display:flex; align-items:flex-end; justify-content:center; gap:3px; }
+    .dashboard-chart-bar { width:10px; min-height:2px; border-radius:4px 4px 0 0; background:#2563eb; }
+    .dashboard-chart-bar.expense { background:#ef4444; }
+    .dashboard-chart-label { font-size:8px; color:#94a3b8; font-weight:800; white-space:nowrap; }
+    .dashboard-chart-value { font-size:7px; color:#64748b; font-weight:800; white-space:nowrap; }
+    .dashboard-quick-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; padding:14px 16px 16px; }
+    .dashboard-quick-btn { border:1px solid #e2e8f0; background:#fff; border-radius:12px; padding:11px 10px; cursor:pointer; font-size:10px; font-weight:900; color:#334155; transition:all .15s; }
+    .dashboard-quick-btn:hover { background:#f8fafc; border-color:#bfdbfe; transform:translateY(-1px); }
+    .dashboard-footnote { font-size:9px; color:#94a3b8; padding:0 16px 14px; line-height:1.45; }
+    @media (max-width: 1000px) {
+      .dashboard-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .dashboard-two-col { grid-template-columns:1fr; }
+      .dashboard-three-col { grid-template-columns:1fr 1fr; }
+      .dashboard-quick-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    }
+    @media (max-width: 640px) {
+      .dashboard-hero { padding:16px; border-radius:16px; }
+      .dashboard-title { font-size:22px; }
+      .dashboard-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+      .dashboard-metric { padding:12px; min-height:102px; }
+      .dashboard-metric-value { font-size:16px; }
+      .dashboard-metric-icon { width:30px; height:30px; font-size:15px; }
+      .dashboard-three-col { grid-template-columns:1fr; }
+      .dashboard-installment-grid { grid-template-columns:1fr; }
+      .dashboard-big-value { font-size:19px; }
+      .dashboard-quick-grid { grid-template-columns:1fr 1fr; padding:12px; }
+      .dashboard-period-box { width:100%; }
+      .dashboard-period-select { width:100%; }
+      .dashboard-custom-range { width:100%; }
+      .dashboard-date-input { flex:1; min-width:0; width:100%; }
+    }
+
   </style>
 </head>
 <body class="bg-slate-100 text-gray-800 text-xs min-h-screen">
@@ -657,6 +794,157 @@
   </div>
 
   <div class="p-4 max-w-[100vw]">
+
+    <!-- ================= Главная ================= -->
+    <div id="homeTabContent" class="dashboard-shell">
+      <section class="dashboard-hero">
+        <div class="dashboard-hero-inner">
+          <div>
+            <div class="dashboard-kicker">YUSRA · Финансовый центр</div>
+            <div class="dashboard-title">Главная</div>
+            <div id="dashboardPeriodCaption" class="dashboard-subtitle">Показатели за всё время</div>
+          </div>
+          <div class="dashboard-period-box">
+            <select id="dashboardPeriod" class="dashboard-period-select" onchange="changeDashboardPeriod(this.value)">
+              <option value="all">Все время</option>
+              <option value="month">Этот месяц</option>
+              <option value="prevMonth">Прошлый месяц</option>
+              <option value="year">Этот год</option>
+              <option value="custom">Свой период</option>
+            </select>
+            <div id="dashboardCustomRange" class="dashboard-custom-range">
+              <input type="date" id="dashboardDateFrom" class="dashboard-date-input" onchange="renderDashboard()" aria-label="Дата начала">
+              <span class="text-[10px] font-bold opacity-70">—</span>
+              <input type="date" id="dashboardDateTo" class="dashboard-date-input" onchange="renderDashboard()" aria-label="Дата окончания">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="dashboard-grid">
+        <div class="dashboard-card dashboard-metric blue">
+          <div class="dashboard-metric-top"><span class="dashboard-metric-label">Общий доход</span><span class="dashboard-metric-icon">📈</span></div>
+          <div id="dashTotalProfit" class="dashboard-metric-value">0 ₽</div>
+          <div class="dashboard-metric-note">без вычета расходов</div>
+        </div>
+        <div class="dashboard-card dashboard-metric red">
+          <div class="dashboard-metric-top"><span class="dashboard-metric-label">Общие расходы</span><span class="dashboard-metric-icon">📉</span></div>
+          <div id="dashGeneralExpense" class="dashboard-metric-value">0 ₽</div>
+          <div class="dashboard-metric-note">дивиденды здесь не учитываются</div>
+        </div>
+        <div class="dashboard-card dashboard-metric green">
+          <div class="dashboard-metric-top"><span class="dashboard-metric-label">Доход с расходами</span><span class="dashboard-metric-icon">💰</span></div>
+          <div id="dashProfitAfterExpenses" class="dashboard-metric-value">0 ₽</div>
+          <div class="dashboard-metric-note">после общих расходов и дивидендов</div>
+        </div>
+        <div class="dashboard-card dashboard-metric amber">
+          <div class="dashboard-metric-top"><span class="dashboard-metric-label">Ожидаемый доход</span><span class="dashboard-metric-icon">⏳</span></div>
+          <div id="dashExpectedProfit" class="dashboard-metric-value">0 ₽</div>
+          <div class="dashboard-metric-note">прибыль, которая ещё ожидается</div>
+        </div>
+        <div class="dashboard-card dashboard-metric green">
+          <div class="dashboard-metric-top"><span class="dashboard-metric-label">Оплаченный доход</span><span class="dashboard-metric-icon">✅</span></div>
+          <div id="dashPaidProfit" class="dashboard-metric-value">0 ₽</div>
+          <div class="dashboard-metric-note">прибыль по фактически внесённым деньгам</div>
+        </div>
+        <div class="dashboard-card dashboard-metric blue">
+          <div class="dashboard-metric-top"><span class="dashboard-metric-label">Общие платежи</span><span class="dashboard-metric-icon">💳</span></div>
+          <div id="dashPayments" class="dashboard-metric-value">0 ₽</div>
+          <div class="dashboard-metric-note">предоплаты + внесённые платежи</div>
+        </div>
+        <div class="dashboard-card dashboard-metric red">
+          <div class="dashboard-metric-top"><span class="dashboard-metric-label">Просрочка</span><span class="dashboard-metric-icon">⚠️</span></div>
+          <div id="dashOverdue" class="dashboard-metric-value">0 ₽</div>
+          <div class="dashboard-metric-note">текущая просроченная сумма</div>
+        </div>
+        <div class="dashboard-card dashboard-metric amber">
+          <div class="dashboard-metric-top"><span class="dashboard-metric-label">Неплательщики</span><span class="dashboard-metric-icon">👥</span></div>
+          <div id="dashDebtors" class="dashboard-metric-value">0</div>
+          <div class="dashboard-metric-note">можно открыть из меню</div>
+        </div>
+      </section>
+
+      <section class="dashboard-two-col">
+        <div class="dashboard-card dashboard-section">
+          <div class="dashboard-section-head">
+            <div><div class="dashboard-section-title">📊 Рассрочка</div><div id="dashInstallmentCaption" class="dashboard-section-sub">Текущий месяц</div></div>
+          </div>
+          <div class="dashboard-installment">
+            <div class="dashboard-installment-grid">
+              <div class="dashboard-big-box">
+                <div class="dashboard-big-label">Себестоимость рассрочки</div>
+                <div id="dashInstallmentCost" class="dashboard-big-value">0 ₽</div>
+              </div>
+              <div class="dashboard-big-box">
+                <div class="dashboard-big-label">Итоговая сумма рассрочки</div>
+                <div id="dashInstallmentTotal" class="dashboard-big-value blue">0 ₽</div>
+              </div>
+            </div>
+            <div class="dashboard-profit-strip"><span>Доход от рассрочки</span><span id="dashInstallmentProfit">0 ₽</span></div>
+          </div>
+        </div>
+
+        <div class="dashboard-card dashboard-section">
+          <div class="dashboard-section-head"><div class="dashboard-section-title">📋 Договоры</div><div class="dashboard-section-sub">За выбранный период</div></div>
+          <div class="dashboard-list">
+            <div class="dashboard-row"><span class="dashboard-row-label">Всего договоров</span><span id="dashContracts" class="dashboard-row-value">0</span></div>
+            <div class="dashboard-row"><span class="dashboard-row-label">Действующие</span><span id="dashActiveContracts" class="dashboard-row-value blue">0</span></div>
+            <div class="dashboard-row"><span class="dashboard-row-label">Закрытые</span><span id="dashClosedContracts" class="dashboard-row-value green">0</span></div>
+            <div class="dashboard-row"><span class="dashboard-row-label">Средний срок</span><span id="dashAverageMonths" class="dashboard-row-value">0 мес.</span></div>
+            <div class="dashboard-row"><span class="dashboard-row-label">Средний процент прибыли</span><span id="dashAveragePercent" class="dashboard-row-value blue">0%</span></div>
+            <div class="dashboard-row"><span class="dashboard-row-label">Остаток по договорам</span><span id="dashOutstanding" class="dashboard-row-value amber">0 ₽</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="dashboard-three-col">
+        <div class="dashboard-card dashboard-section">
+          <div class="dashboard-section-head"><div class="dashboard-section-title">💸 Расходы</div><div class="dashboard-section-sub">Раздельно</div></div>
+          <div class="dashboard-list">
+            <div class="dashboard-row"><span class="dashboard-row-label">Общие расходы</span><span id="dashExpenseDetail" class="dashboard-row-value red">0 ₽</span></div>
+            <div class="dashboard-row"><span class="dashboard-row-label">Дивиденды инвесторам</span><span id="dashDividends" class="dashboard-row-value red">0 ₽</span></div>
+            <div class="dashboard-row"><span class="dashboard-row-label">Всего с дивидендами</span><span id="dashExpensesWithDividends" class="dashboard-row-value">0 ₽</span></div>
+          </div>
+        </div>
+        <div class="dashboard-card dashboard-section">
+          <div class="dashboard-section-head"><div class="dashboard-section-title">🤝 Инвестиции</div><div class="dashboard-section-sub">Текущая картина</div></div>
+          <div class="dashboard-list">
+            <div class="dashboard-row"><span class="dashboard-row-label">Вложено инвесторами</span><span id="dashInvestorInvested" class="dashboard-row-value blue">0 ₽</span></div>
+            <div class="dashboard-row"><span class="dashboard-row-label">Вложено нами</span><span id="dashOwnerInvested" class="dashboard-row-value blue">0 ₽</span></div>
+            <div class="dashboard-row"><span class="dashboard-row-label">Вложено всего</span><span id="dashTotalInvested" class="dashboard-row-value">0 ₽</span></div>
+            <div class="dashboard-row"><span class="dashboard-row-label">Капитал сейчас</span><span id="dashCurrentCapital" class="dashboard-row-value green">0 ₽</span></div>
+          </div>
+        </div>
+        <div class="dashboard-card dashboard-section">
+          <div class="dashboard-section-head"><div class="dashboard-section-title">🏦 Касса и контроль</div><div class="dashboard-section-sub">Текущее состояние</div></div>
+          <div class="dashboard-list">
+            <div class="dashboard-row"><span class="dashboard-row-label">Касса</span><span id="dashCash" class="dashboard-row-value green">0 ₽</span></div>
+            <div class="dashboard-row"><span class="dashboard-row-label">Взяли</span><span id="dashTaken" class="dashboard-row-value red">0 ₽</span></div>
+            <div class="dashboard-row"><span class="dashboard-row-label">Положили</span><span id="dashPut" class="dashboard-row-value green">0 ₽</span></div>
+            <div class="dashboard-row"><span class="dashboard-row-label">Общий средний %</span><span id="dashOverallPercent" class="dashboard-row-value blue">0%</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="dashboard-card dashboard-section">
+        <div class="dashboard-section-head">
+          <div><div class="dashboard-section-title">📈 Динамика</div><div class="dashboard-section-sub">Доход без расходов и общие расходы по месяцам</div></div>
+          <div class="flex items-center gap-3 text-[9px] font-bold text-slate-500"><span>■ Доход</span><span class="text-red-500">■ Расход</span></div>
+        </div>
+        <div id="dashboardChart" class="dashboard-chart-wrap"></div>
+      </section>
+
+      <section class="dashboard-card dashboard-section">
+        <div class="dashboard-section-head"><div class="dashboard-section-title">⚡ Быстрые действия</div><div class="dashboard-section-sub">Частые операции</div></div>
+        <div class="dashboard-quick-grid">
+          <button class="dashboard-quick-btn" onclick="openCreateModal()">＋ Новый договор</button>
+          <button class="dashboard-quick-btn" onclick="switchTab('clients')">👥 Клиенты</button>
+          <button class="dashboard-quick-btn" onclick="openAccModal()">＋ Запись учёта</button>
+          <button class="dashboard-quick-btn" onclick="openIncomeExpModal()">＋ Добавить расход</button>
+        </div>
+        <div class="dashboard-footnote">Главная показывает финансовую картину, а подробная работа с договорами, клиентами, платежами и инвестициями остаётся на существующих страницах.</div>
+      </section>
+    </div>
     
     <!-- ================= Лист 1: Договоры ================= -->
     <div id="contractsTabContent" class="space-y-4">
@@ -865,6 +1153,42 @@
       </div>
     </div>
 
+    <!-- ================= Лист: Выезд ================= -->
+    <div id="fieldworkTabContent" class="hidden fieldwork-shell">
+      <section class="fieldwork-hero">
+        <div class="fieldwork-hero-inner">
+          <div>
+            <div class="dashboard-kicker">YUSRA · Работа с просрочкой</div>
+            <div class="fieldwork-title">🚗 Выезд</div>
+            <div id="fieldworkCaption" class="fieldwork-subtitle">Клиенты с двумя и более просроченными месячными платежами</div>
+          </div>
+          <button type="button" onclick="copyFieldWorkerLink()" class="fieldwork-link-btn">🔗 Ссылка для выездника</button>
+        </div>
+      </section>
+
+      <div class="fieldwork-mode-banner bg-white border rounded-xl p-4 shadow-sm mb-3">
+        <div class="font-black text-slate-900">👤 Кабинет выездника</div>
+        <div class="text-xs text-slate-500 mt-1">Только работа со списком выезда: звонок, WhatsApp, карта и статус. Данные клиента редактировать нельзя.</div>
+      </div>
+
+      <section class="fieldwork-stats">
+        <div class="fieldwork-stat"><div class="fieldwork-stat-label">Клиентов для выезда</div><div id="fieldworkCount" class="fieldwork-stat-value red">0</div></div>
+        <div class="fieldwork-stat"><div class="fieldwork-stat-label">Общая просрочка</div><div id="fieldworkOverdue" class="fieldwork-stat-value red">0 ₽</div></div>
+        <div class="fieldwork-stat"><div class="fieldwork-stat-label">Просрочено месяцев</div><div id="fieldworkMonths" class="fieldwork-stat-value">0</div></div>
+        <div class="fieldwork-stat"><div class="fieldwork-stat-label">Более 3 месяцев</div><div id="fieldworkCritical" class="fieldwork-stat-value red">0</div></div>
+      </section>
+
+      <section class="bg-white border rounded-2xl shadow-sm overflow-hidden">
+        <div class="p-4 border-b flex flex-wrap justify-between items-center gap-3">
+          <div><div class="font-black text-slate-900">Список на выезд</div><div class="text-[10px] text-slate-400 mt-1">Автоматически формируется по просроченным месячным платежам</div></div>
+          <select id="fieldworkFilter" onchange="renderFieldwork()" class="p-2 border rounded-lg text-xs font-bold">
+            <option value="all">Все</option><option value="new">Не связывались</option><option value="work">В работе</option><option value="planned">Выезд запланирован</option><option value="done">Выезд выполнен</option><option value="resolved">Решено</option>
+          </select>
+        </div>
+        <div id="fieldworkList" class="p-3 fieldwork-list"></div>
+      </section>
+    </div>
+
     <!-- ================= Лист: Клиенты ================= -->
     <div id="clientsTabContent" class="hidden space-y-4">
       <div class="bg-white shadow-xl rounded-xl p-4 md:p-6 border rounded-xl">
@@ -1041,10 +1365,12 @@
     <button type="button" class="sidebar-close" onclick="closeSidebar()" aria-label="Закрыть меню">×</button>
     <div class="sidebar-section">
       <div class="sidebar-title">Основное</div>
-      <button type="button" onclick="switchTab('contracts')" id="tabBtnContracts" class="tab-btn active flex items-center gap-2">📋 Договоры</button>
+      <button type="button" onclick="switchTab('home')" id="tabBtnHome" class="tab-btn active flex items-center gap-2">🏠 Главная</button>
+      <button type="button" onclick="switchTab('contracts')" id="tabBtnContracts" class="tab-btn flex items-center gap-2">📋 Договоры</button>
       <button type="button" onclick="switchTab('today')" id="tabBtnToday" class="tab-btn flex items-center gap-2">📅 Сегодня</button>
       <button type="button" onclick="switchTab('threeDays')" id="tabBtnThreeDays" class="tab-btn flex items-center gap-2">⏰ Через 3 дня</button>
       <button type="button" onclick="switchTab('debtors')" id="tabBtnDebtors" class="tab-btn flex items-center gap-2">🚫 Неплательщики</button>
+      <button type="button" onclick="switchTab('fieldwork')" id="tabBtnFieldwork" class="tab-btn fieldwork-tab flex items-center gap-2">🚗 Выезд</button>
       <button type="button" onclick="switchTab('clients')" id="tabBtnClients" class="tab-btn flex items-center gap-2">👥 Клиенты</button>
     </div>
     <div class="sidebar-section">
@@ -1061,6 +1387,14 @@
     </div>
   </aside>
   <div id="sidebarOverlay" class="sidebar-overlay no-print" onclick="closeSidebar()"></div>
+
+  <!-- КАРТОЧКА ВЫЕЗДА -->
+  <div id="fieldworkDetailModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-3 z-[75]">
+    <div class="bg-white rounded-2xl p-5 max-w-2xl w-full max-h-[92vh] overflow-y-auto shadow-2xl">
+      <div class="flex justify-between items-center mb-4"><h3 id="fieldworkDetailTitle" class="text-lg font-black text-red-700">Выезд</h3><button type="button" onclick="closeFieldworkDetail()" class="w-9 h-9 rounded-lg bg-slate-100 text-xl">×</button></div>
+      <div id="fieldworkDetailBody"></div>
+    </div>
+  </div>
 
   <!-- КАРТОЧКА КЛИЕНТА -->
   <div id="clientDetailModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-3 z-[70]">
@@ -1326,7 +1660,7 @@
     // FIREBASE
     // ================================================================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDuPqMwudSodv37VjNCNmVg71ES09AmyW0",
@@ -1369,6 +1703,10 @@
     let allAccounting = JSON.parse(localStorage.getItem('accounting_db') || '[]');
     let allTaken = JSON.parse(localStorage.getItem('taken_db') || '[]');
     let allIncomeExpenses = JSON.parse(localStorage.getItem('income_expenses_db') || '[]');
+    let fieldVisitRecords = JSON.parse(localStorage.getItem('field_visit_records_db') || '{}');
+    if (!fieldVisitRecords || typeof fieldVisitRecords !== 'object' || Array.isArray(fieldVisitRecords)) fieldVisitRecords = {};
+    const IS_FIELDWORKER_MODE = new URLSearchParams(window.location.search).get('role') === 'fieldworker';
+    if (IS_FIELDWORKER_MODE) document.body.classList.add('fieldworker-mode');
     let customAccounts = JSON.parse(localStorage.getItem('accounts_db') || 'null');
 
     let initInvestors;
@@ -1452,7 +1790,7 @@
       });
     }
 
-    let activeTab = 'contracts';
+    let activeTab = 'home';
     let undoStack = [];
     let redoStack = [];
 
@@ -1475,6 +1813,7 @@
             accounts: customAccounts,
             investors: initInvestors,
             monthlyReports: initMonthlyReports,
+            fieldVisitRecords: fieldVisitRecords,
             updatedAt: Date.now()
           });
           setSyncStatus('synced', 'Синхронизировано');
@@ -1494,6 +1833,7 @@
       if (data.accounts) customAccounts = data.accounts;
       if (data.investors) initInvestors = data.investors;
       if (data.monthlyReports) initMonthlyReports = data.monthlyReports;
+      if (data.fieldVisitRecords && typeof data.fieldVisitRecords === 'object') fieldVisitRecords = data.fieldVisitRecords;
 
       localStorage.setItem('contracts_db', JSON.stringify(allContracts));
       localStorage.setItem('accounting_db', JSON.stringify(allAccounting));
@@ -1502,16 +1842,19 @@
       localStorage.setItem('accounts_db', JSON.stringify(customAccounts));
       localStorage.setItem('investors_db', JSON.stringify(initInvestors));
       localStorage.setItem('monthly_reports_db', JSON.stringify(initMonthlyReports));
+      localStorage.setItem('field_visit_records_db', JSON.stringify(fieldVisitRecords));
 
       try {
         renderTable(allContracts);
         renderAccountingTable(allAccounting);
         renderTakenSheet();
+        if (activeTab === 'home') renderDashboard();
         if (activeTab === 'income') renderIncomePage();
         if (activeTab === 'init') renderInitPage();
         if (activeTab === 'today') renderTodayClients();
         if (activeTab === 'threeDays') renderThreeDaysClients();
         if (activeTab === 'debtors') renderDebtorsClients();
+        if (activeTab === 'fieldwork') renderFieldwork();
         if (activeTab === 'clients') renderClients();
         if (activeTab === 'partners') renderPartners();
         if (activeTab === 'print') {
@@ -1536,7 +1879,8 @@
              emptyArr(data.incomeExpenses) && 
              emptyArr(data.investors) && 
              emptyObj(data.monthlyReports) && 
-             emptyArr(data.accounts);
+             emptyArr(data.accounts) &&
+             emptyObj(data.fieldVisitRecords);
     }
 
     async function initSync() {
@@ -1555,6 +1899,7 @@
             accounts: customAccounts,
             investors: initInvestors,
             monthlyReports: initMonthlyReports,
+            fieldVisitRecords: fieldVisitRecords,
             updatedAt: Date.now()
           });
         }
@@ -1562,6 +1907,7 @@
         isCloudLoaded = true;
         setSyncStatus('synced', 'Синхронизировано');
         hideLoadingScreen();
+        if (IS_FIELDWORKER_MODE) switchTab('fieldwork');
         
         onSnapshot(DOC_REF, (docSnap) => {
           if (!docSnap.exists()) return;
@@ -1613,6 +1959,7 @@
         closeSidebar();
         closeClientDetail();
         closeInvestmentCopyModal();
+        closeFieldworkDetail();
       }
     });
 
@@ -1626,6 +1973,7 @@
         btn.classList.remove('active');
         btn.removeAttribute('aria-current');
       });
+      const homeTab = document.getElementById('homeTabContent');
       const cTab = document.getElementById('contractsTabContent');
       const aTab = document.getElementById('accountingTabContent');
       const tTab = document.getElementById('takenTabContent');
@@ -1633,11 +1981,13 @@
       const todayTab = document.getElementById('todayTabContent');
       const threeDaysTab = document.getElementById('threeDaysTabContent');
       const debtorsTab = document.getElementById('debtorsTabContent');
+      const fieldworkTab = document.getElementById('fieldworkTabContent');
       const clientsTab = document.getElementById('clientsTabContent');
       const partnersTab = document.getElementById('partnersTabContent');
       const printTab = document.getElementById('printTabContent');
       const initTab = document.getElementById('initTabContent');
 
+      const homeBtn = document.getElementById('tabBtnHome');
       const cBtn = document.getElementById('tabBtnContracts');
       const aBtn = document.getElementById('tabBtnAccounting');
       const tBtn = document.getElementById('tabBtnTaken');
@@ -1646,6 +1996,7 @@
       const todayBtn = document.getElementById('tabBtnToday');
       const threeDaysBtn = document.getElementById('tabBtnThreeDays');
       const debtorsBtn = document.getElementById('tabBtnDebtors');
+      const fieldworkBtn = document.getElementById('tabBtnFieldwork');
       const clientsBtn = document.getElementById('tabBtnClients');
       const partnersBtn = document.getElementById('tabBtnPartners');
       const printBtn = document.getElementById('tabBtnPrint');
@@ -1655,6 +2006,7 @@
       const addT = document.getElementById('addTakenBtn');
       const addI = document.getElementById('addIncomeExpBtn');
 
+      homeTab.classList.add('hidden');
       cTab.classList.add('hidden');
       aTab.classList.add('hidden');
       tTab.classList.add('hidden');
@@ -1662,6 +2014,7 @@
       todayTab.classList.add('hidden');
       threeDaysTab.classList.add('hidden');
       debtorsTab.classList.add('hidden');
+      fieldworkTab.classList.add('hidden');
       clientsTab.classList.add('hidden');
       partnersTab.classList.add('hidden');
       printTab.classList.add('hidden');
@@ -1671,6 +2024,7 @@
       addT.classList.add('hidden');
       addI.classList.add('hidden');
 
+      homeBtn.className = "tab-btn px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       cBtn.className = "tab-btn px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       aBtn.className = "tab-btn px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       tBtn.className = "tab-btn px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
@@ -1683,7 +2037,11 @@
       partnersBtn.className = "tab-btn partners-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
       printBtn.className = "tab-btn print-tab px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
 
-      if (tab === 'contracts') {
+      if (tab === 'home') {
+        homeTab.classList.remove('hidden');
+        homeBtn.className = "tab-btn active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
+        renderDashboard();
+      } else if (tab === 'contracts') {
         cTab.classList.remove('hidden');
         cBtn.className = "tab-btn active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
         addC.classList.remove('hidden');
@@ -1717,6 +2075,10 @@
         debtorsTab.classList.remove('hidden');
         debtorsBtn.className = "tab-btn debtors-tab active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
         renderDebtorsClients();
+      } else if (tab === 'fieldwork') {
+        fieldworkTab.classList.remove('hidden');
+        fieldworkBtn.className = "tab-btn fieldwork-tab active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
+        renderFieldwork();
       } else if (tab === 'clients') {
         clientsTab.classList.remove('hidden');
         clientsBtn.className = "tab-btn clients-tab active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
@@ -1733,9 +2095,9 @@
         loadContractForPrint();
       }
       const activeButton = document.getElementById({
-        contracts:'tabBtnContracts', accounting:'tabBtnAccounting', taken:'tabBtnTaken',
+        home:'tabBtnHome', contracts:'tabBtnContracts', accounting:'tabBtnAccounting', taken:'tabBtnTaken',
         income:'tabBtnIncome', init:'tabBtnInit', today:'tabBtnToday', threeDays:'tabBtnThreeDays',
-        debtors:'tabBtnDebtors', clients:'tabBtnClients', partners:'tabBtnPartners', print:'tabBtnPrint'
+        debtors:'tabBtnDebtors', fieldwork:'tabBtnFieldwork', clients:'tabBtnClients', partners:'tabBtnPartners', print:'tabBtnPrint'
       }[tab]);
       if (activeButton) {
         activeButton.classList.add('active');
@@ -1753,7 +2115,8 @@
         incomeExpenses: JSON.parse(JSON.stringify(allIncomeExpenses)),
         accounts: JSON.parse(JSON.stringify(customAccounts)),
         investors: JSON.parse(JSON.stringify(initInvestors)),
-        monthlyReports: JSON.parse(JSON.stringify(initMonthlyReports))
+        monthlyReports: JSON.parse(JSON.stringify(initMonthlyReports)),
+        fieldVisitRecords: JSON.parse(JSON.stringify(fieldVisitRecords))
       };
       undoStack.push(JSON.stringify(stateSnapshot));
       if (undoStack.length > 50) undoStack.shift();
@@ -1770,7 +2133,8 @@
         incomeExpenses: JSON.parse(JSON.stringify(allIncomeExpenses)),
         accounts: JSON.parse(JSON.stringify(customAccounts)),
         investors: JSON.parse(JSON.stringify(initInvestors)),
-        monthlyReports: JSON.parse(JSON.stringify(initMonthlyReports))
+        monthlyReports: JSON.parse(JSON.stringify(initMonthlyReports)),
+        fieldVisitRecords: JSON.parse(JSON.stringify(fieldVisitRecords))
       };
       redoStack.push(JSON.stringify(currentState));
       
@@ -1782,6 +2146,7 @@
       customAccounts = previousState.accounts || customAccounts;
       initInvestors = previousState.investors || initInvestors;
       initMonthlyReports = previousState.monthlyReports || initMonthlyReports;
+      fieldVisitRecords = previousState.fieldVisitRecords || fieldVisitRecords;
       finishAction();
     };
 
@@ -1794,7 +2159,8 @@
         incomeExpenses: JSON.parse(JSON.stringify(allIncomeExpenses)),
         accounts: JSON.parse(JSON.stringify(customAccounts)),
         investors: JSON.parse(JSON.stringify(initInvestors)),
-        monthlyReports: JSON.parse(JSON.stringify(initMonthlyReports))
+        monthlyReports: JSON.parse(JSON.stringify(initMonthlyReports)),
+        fieldVisitRecords: JSON.parse(JSON.stringify(fieldVisitRecords))
       };
       undoStack.push(JSON.stringify(currentState));
       
@@ -1806,6 +2172,7 @@
       customAccounts = nextState.accounts || customAccounts;
       initInvestors = nextState.investors || initInvestors;
       initMonthlyReports = nextState.monthlyReports || initMonthlyReports;
+      fieldVisitRecords = nextState.fieldVisitRecords || fieldVisitRecords;
       finishAction();
     };
 
@@ -1817,14 +2184,17 @@
       localStorage.setItem('accounts_db', JSON.stringify(customAccounts));
       localStorage.setItem('investors_db', JSON.stringify(initInvestors));
       localStorage.setItem('monthly_reports_db', JSON.stringify(initMonthlyReports));
+      localStorage.setItem('field_visit_records_db', JSON.stringify(fieldVisitRecords));
       renderTable(allContracts);
       renderAccountingTable(allAccounting);
       renderTakenSheet();
+      if (activeTab === 'home') renderDashboard();
       if (activeTab === 'income') renderIncomePage();
       if (activeTab === 'init') renderInitPage();
       if (activeTab === 'today') renderTodayClients();
       if (activeTab === 'threeDays') renderThreeDaysClients();
       if (activeTab === 'debtors') renderDebtorsClients();
+      if (activeTab === 'fieldwork') renderFieldwork();
       if (activeTab === 'clients') renderClients();
       if (activeTab === 'partners') renderPartners();
       if (activeTab === 'print') {
@@ -1854,9 +2224,11 @@
       localStorage.setItem('accounts_db', JSON.stringify(customAccounts));
       localStorage.setItem('investors_db', JSON.stringify(initInvestors));
       localStorage.setItem('monthly_reports_db', JSON.stringify(initMonthlyReports));
+      localStorage.setItem('field_visit_records_db', JSON.stringify(fieldVisitRecords));
       renderTable(allContracts);
       renderAccountingTable(allAccounting);
       renderTakenSheet();
+      if (activeTab === 'home') renderDashboard();
       if (activeTab === 'income') renderIncomePage();
       if (activeTab === 'init') renderInitPage();
       if (activeTab === 'today') renderTodayClients();
@@ -1873,6 +2245,339 @@
       handleSearch();
       pushToCloud();
     };
+
+    // ================================================================
+    // ГЛАВНАЯ — ФИНАНСОВЫЙ ДАШБОРД
+    // ================================================================
+    let dashboardPeriodMode = 'all';
+
+    function dashDateString(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function dashParseDate(value) {
+      if (!value) return null;
+      const parts = String(value).split('-').map(Number);
+      if (parts.length !== 3 || parts.some(n => !Number.isFinite(n))) return null;
+      const d = new Date(parts[0], parts[1] - 1, parts[2]);
+      d.setHours(0, 0, 0, 0);
+      return isNaN(d.getTime()) ? null : d;
+    }
+
+    function dashFormatMoney(value) {
+      return `${Math.round(Number(value) || 0).toLocaleString('ru-RU')} ₽`;
+    }
+
+    function dashInRange(dateValue, range) {
+      if (!range) return true;
+      const d = dashParseDate(dateValue);
+      if (!d) return false;
+      if (range.from && d < range.from) return false;
+      if (range.to && d > range.to) return false;
+      return true;
+    }
+
+    function getDashboardRange() {
+      const now = new Date();
+      now.setHours(0,0,0,0);
+      if (dashboardPeriodMode === 'all') return null;
+      if (dashboardPeriodMode === 'month') {
+        return { from: new Date(now.getFullYear(), now.getMonth(), 1), to: new Date(now.getFullYear(), now.getMonth() + 1, 0) };
+      }
+      if (dashboardPeriodMode === 'prevMonth') {
+        return { from: new Date(now.getFullYear(), now.getMonth() - 1, 1), to: new Date(now.getFullYear(), now.getMonth(), 0) };
+      }
+      if (dashboardPeriodMode === 'year') {
+        return { from: new Date(now.getFullYear(), 0, 1), to: new Date(now.getFullYear(), 11, 31) };
+      }
+      const from = dashParseDate(document.getElementById('dashboardDateFrom')?.value);
+      const to = dashParseDate(document.getElementById('dashboardDateTo')?.value);
+      return { from, to };
+    }
+
+    function dashboardRangeCaption(range) {
+      const names = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+      if (!range) return 'Показатели за всё время';
+      if (range.from && range.to && range.from.getFullYear() === range.to.getFullYear() && range.from.getMonth() === range.to.getMonth()) {
+        return `Показатели за ${names[range.from.getMonth()]} ${range.from.getFullYear()}`;
+      }
+      const fromText = range.from ? dashDateString(range.from) : 'начала';
+      const toText = range.to ? dashDateString(range.to) : 'сегодня';
+      return `Показатели: ${fromText} — ${toText}`;
+    }
+
+    function getDashboardContractMetrics(contracts) {
+      let totalProfit = 0;
+      let expectedProfit = 0;
+      let paidProfit = 0;
+      let payments = 0;
+      let outstanding = 0;
+      let overdue = 0;
+      let totalMonths = 0;
+      let totalMarginBase = 0;
+      let active = 0;
+      let closed = 0;
+
+      contracts.forEach(c => {
+        const total = Number(c.totalCost) || 0;
+        const cost = Number(c.costPrice) || 0;
+        const down = Number(c.downPayment) || 0;
+        const contractProfit = total - cost;
+        const metrics = calculateContractMetrics(c);
+        totalProfit += contractProfit;
+        outstanding += metrics.rest;
+        totalMonths += Number(c.monthsCount) || 0;
+        totalMarginBase += cost;
+        if (metrics.isClosed) closed++; else active++;
+
+        const margin = total > 0 ? contractProfit / total : 0;
+        const paidDown = Math.max(0, down);
+        payments += paidDown;
+        paidProfit += paidDown * margin;
+
+        Object.values(c.installments || {}).forEach(p => {
+          const amount = Number(p?.amount) || 0;
+          if (amount <= 0) return;
+          payments += amount;
+          paidProfit += amount * margin;
+        });
+
+        expectedProfit += Math.max(0, metrics.rest) * margin;
+        overdue += metrics.overdueSum;
+      });
+
+      const averageMonths = contracts.length ? totalMonths / contracts.length : 0;
+      const averagePercent = totalMarginBase > 0 ? (totalProfit / totalMarginBase) * 100 : 0;
+      return { totalProfit, expectedProfit, paidProfit, payments, outstanding, overdue, averageMonths, averagePercent, active, closed };
+    }
+
+    function getDashboardExpenses(range) {
+      return allIncomeExpenses.reduce((sum, e) => sum + (dashInRange(e.date, range) ? (Number(e.amount) || 0) : 0), 0);
+    }
+
+    function getDashboardDividends(range) {
+      let sum = 0;
+      Object.keys(initMonthlyReports).forEach(key => {
+        const rep = initMonthlyReports[key];
+        if (!rep || !rep.entries) return;
+        const monthDate = `${rep.year}-${String(rep.month).padStart(2,'0')}-01`;
+        if (!dashInRange(monthDate, range)) return;
+        initInvestors.forEach(inv => {
+          const e = rep.entries[inv.id];
+          if (e) sum += Number(e.dividends || 0);
+        });
+      });
+      return sum;
+    }
+
+    function getDashboardInvestments(range) {
+      let investorInvested = 0, ownerInvested = 0, totalInvested = 0;
+      Object.keys(initMonthlyReports).forEach(key => {
+        const rep = initMonthlyReports[key];
+        if (!rep || !rep.entries) return;
+        const monthDate = `${rep.year}-${String(rep.month).padStart(2,'0')}-01`;
+        if (!dashInRange(monthDate, range)) return;
+        initInvestors.forEach(inv => {
+          const e = rep.entries[inv.id];
+          const monthlyInvested = Number(e?.invested || 0);
+          // Начальный капитал является частью реально вложенного капитала.
+          const startingCapital = Number(rep.startingCapital?.[inv.id] || 0);
+          const value = monthlyInvested + startingCapital;
+          totalInvested += value;
+          if (inv.isOwner) ownerInvested += value;
+          else investorInvested += value;
+        });
+      });
+      return { investorInvested, ownerInvested, totalInvested };
+    }
+
+    function getDashboardCurrentCapital() {
+      const keys = Object.keys(initMonthlyReports).sort();
+      if (!keys.length) return 0;
+      const latest = initMonthlyReports[keys[keys.length - 1]];
+      let total = 0;
+      initInvestors.forEach(inv => total += Number(latest?.entries?.[inv.id]?.capital || 0));
+      return total;
+    }
+
+    function getDashboardCash() {
+      let sumTaken = 0, sumPut = 0, totalDownPayments = 0, totalInstallments = 0, totalCostPrice = 0, totalIncomeExpenses = 0;
+      allTaken.forEach(item => {
+        sumTaken += Number(item.takenAmount || 0);
+        sumPut += Number(item.putAmount || 0);
+      });
+      allContracts.forEach(c => {
+        if (c.shopPaid) {
+          totalDownPayments += Number(c.downPayment || 0);
+          totalCostPrice += Number(c.costPrice || 0);
+        }
+        Object.values(c.installments || {}).forEach(p => totalInstallments += Number(p?.amount || 0));
+      });
+      allIncomeExpenses.forEach(e => totalIncomeExpenses += Number(e.amount || 0));
+
+      let totalInvested = 0, totalDividends = 0, totalWithdrawn = 0, totalStartingCapital = 0;
+      const keys = Object.keys(initMonthlyReports).sort();
+      keys.forEach((key, idx) => {
+        const rep = initMonthlyReports[key];
+        if (!rep?.entries) return;
+        initInvestors.forEach(inv => {
+          const e = rep.entries[inv.id];
+          if (e) {
+            totalInvested += Number(e.invested || 0);
+            totalDividends += Number(e.dividends || 0);
+            totalWithdrawn += Number(e.withdrawn || 0);
+          }
+        });
+        if (idx === 0 && rep.startingCapital) {
+          initInvestors.forEach(inv => totalStartingCapital += Number(rep.startingCapital[inv.id] || 0));
+        }
+      });
+      const investImpact = totalInvested - totalDividends - totalWithdrawn + totalStartingCapital;
+      return totalDownPayments + totalInstallments - totalCostPrice - sumTaken + sumPut - totalIncomeExpenses + investImpact;
+    }
+
+    function getDashboardInstallmentScope(range) {
+      // Показатели рассрочки используют тот же период, который выбран на Главной.
+      // В режиме «Все время» range равен null, поэтому берём все договоры.
+      return range;
+    }
+
+    function getDashboardChartMonths(range) {
+      const now = new Date();
+      let end = range?.to ? new Date(range.to) : new Date(now.getFullYear(), now.getMonth(), 1);
+      end.setDate(1);
+      let start = range?.from ? new Date(range.from) : new Date(end.getFullYear(), end.getMonth() - 11, 1);
+      start.setDate(1);
+      if (!range && start < new Date(now.getFullYear(), now.getMonth() - 11, 1)) start = new Date(now.getFullYear(), now.getMonth() - 11, 1);
+      const months = [];
+      const cursor = new Date(start);
+      const limit = new Date(end);
+      while (cursor <= limit && months.length < 24) {
+        months.push({ year: cursor.getFullYear(), month: cursor.getMonth() + 1 });
+        cursor.setMonth(cursor.getMonth() + 1);
+      }
+      return months;
+    }
+
+    function getDashboardMonthData(year, month) {
+      let profit = 0, expense = 0;
+      allContracts.forEach(c => {
+        const d = dashParseDate(c.buyDate);
+        if (d && d.getFullYear() === year && d.getMonth() + 1 === month) {
+          profit += (Number(c.totalCost) || 0) - (Number(c.costPrice) || 0);
+        }
+      });
+      allIncomeExpenses.forEach(e => {
+        const d = dashParseDate(e.date);
+        if (d && d.getFullYear() === year && d.getMonth() + 1 === month) expense += Number(e.amount) || 0;
+      });
+      return { profit, expense };
+    }
+
+    function renderDashboardChart(range) {
+      const container = document.getElementById('dashboardChart');
+      if (!container) return;
+      const months = getDashboardChartMonths(range);
+      const data = months.map(m => ({ ...m, ...getDashboardMonthData(m.year, m.month) }));
+      const maxValue = Math.max(1, ...data.flatMap(x => [x.profit, x.expense]));
+      const monthNames = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
+      container.innerHTML = `<div class="dashboard-chart">${data.map(item => {
+        const hProfit = Math.max(2, Math.round((item.profit / maxValue) * 130));
+        const hExpense = Math.max(2, Math.round((item.expense / maxValue) * 130));
+        return `<div class="dashboard-chart-month">
+          <div class="dashboard-chart-bars" title="${monthNames[item.month-1]} ${item.year}: доход ${dashFormatMoney(item.profit)}, расход ${dashFormatMoney(item.expense)}">
+            <div class="dashboard-chart-bar" style="height:${hProfit}px"></div>
+            <div class="dashboard-chart-bar expense" style="height:${hExpense}px"></div>
+          </div>
+          <div class="dashboard-chart-value">${item.profit > 999999 ? Math.round(item.profit/1000000)+'м' : item.profit > 999 ? Math.round(item.profit/1000)+'к' : Math.round(item.profit)}</div>
+          <div class="dashboard-chart-label">${monthNames[item.month-1]}</div>
+        </div>`;
+      }).join('')}</div>`;
+    }
+
+    window.changeDashboardPeriod = function(mode) {
+      dashboardPeriodMode = mode || 'all';
+      const custom = document.getElementById('dashboardCustomRange');
+      if (custom) custom.classList.toggle('show', dashboardPeriodMode === 'custom');
+      const from = document.getElementById('dashboardDateFrom');
+      const to = document.getElementById('dashboardDateTo');
+      if (dashboardPeriodMode === 'custom') {
+        const now = new Date();
+        if (from && !from.value) from.value = `${now.getFullYear()}-01-01`;
+        if (to && !to.value) to.value = dashDateString(now);
+      }
+      renderDashboard();
+    };
+
+    function renderDashboard() {
+      const range = getDashboardRange();
+      const contracts = allContracts.filter(c => !range || dashInRange(c.buyDate, range));
+      const metrics = getDashboardContractMetrics(contracts);
+      const generalExpense = getDashboardExpenses(range);
+      const dividends = getDashboardDividends(range);
+      const totalExpensesWithDividends = generalExpense + dividends;
+      const profitAfterExpenses = metrics.totalProfit - totalExpensesWithDividends;
+      const investments = getDashboardInvestments(range);
+      const currentCapital = getDashboardCurrentCapital();
+      const cash = getDashboardCash();
+      const debtors = getDebtors();
+      const installRange = getDashboardInstallmentScope(range);
+      const installmentContracts = allContracts.filter(c => !installRange || dashInRange(c.buyDate, installRange));
+      // Себестоимость — деньги, которые фактически ушли магазину за товар.
+      // Флаг «Оплачено Д» означает, что расчёт с магазином завершён.
+      const installmentCost = installmentContracts.reduce((sum,c) => {
+        return sum + (c.shopPaid ? (Number(c.costPrice) || 0) : 0);
+      }, 0);
+      // Итоговая сумма рассрочки — полная сумма, указанная в договоре.
+      const installmentTotal = installmentContracts.reduce((sum,c) => sum + (Number(c.totalCost)||0), 0);
+      const installmentProfit = installmentTotal - installmentCost;
+
+      const set = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
+      set('dashboardPeriodCaption', dashboardRangeCaption(range));
+      set('dashTotalProfit', dashFormatMoney(metrics.totalProfit));
+      set('dashGeneralExpense', dashFormatMoney(generalExpense));
+      set('dashProfitAfterExpenses', dashFormatMoney(profitAfterExpenses));
+      set('dashExpectedProfit', dashFormatMoney(metrics.expectedProfit));
+      set('dashPaidProfit', dashFormatMoney(metrics.paidProfit));
+      set('dashPayments', dashFormatMoney(metrics.payments));
+      set('dashOverdue', dashFormatMoney(metrics.overdue));
+      set('dashDebtors', String(debtors.length));
+      set('dashContracts', String(contracts.length));
+      set('dashActiveContracts', String(metrics.active));
+      set('dashClosedContracts', String(metrics.closed));
+      set('dashAverageMonths', `${metrics.averageMonths.toFixed(2)} мес.`);
+      set('dashAveragePercent', `${metrics.averagePercent.toFixed(2)}%`);
+      set('dashOutstanding', dashFormatMoney(metrics.outstanding));
+      set('dashInstallmentCost', dashFormatMoney(installmentCost));
+      set('dashInstallmentTotal', dashFormatMoney(installmentTotal));
+      set('dashInstallmentProfit', dashFormatMoney(installmentProfit));
+      set('dashExpenseDetail', dashFormatMoney(generalExpense));
+      set('dashDividends', dashFormatMoney(dividends));
+      set('dashExpensesWithDividends', dashFormatMoney(totalExpensesWithDividends));
+      set('dashInvestorInvested', dashFormatMoney(investments.investorInvested));
+      set('dashOwnerInvested', dashFormatMoney(investments.ownerInvested));
+      set('dashTotalInvested', dashFormatMoney(investments.totalInvested));
+      set('dashCurrentCapital', dashFormatMoney(currentCapital));
+      set('dashCash', dashFormatMoney(cash));
+      set('dashTaken', dashFormatMoney(allTaken.reduce((s,x)=>s+(Number(x.takenAmount)||0),0)));
+      set('dashPut', dashFormatMoney(allTaken.reduce((s,x)=>s+(Number(x.putAmount)||0),0)));
+      set('dashOverallPercent', `${metrics.averagePercent.toFixed(2)}%`);
+
+      const caption = document.getElementById('dashInstallmentCaption');
+      if (caption) {
+        if (!installRange) {
+          caption.textContent = 'За всё время';
+        } else if (installRange.from && installRange.to && installRange.from.getMonth() === installRange.to.getMonth() && installRange.from.getFullYear() === installRange.to.getFullYear()) {
+          caption.textContent = `За ${['январь','февраль','март','апрель','май','июнь','июль','август','сентябрь','октябрь','ноябрь','декабрь'][installRange.from.getMonth()]} ${installRange.from.getFullYear()}`;
+        } else {
+          caption.textContent = 'За выбранный период';
+        }
+      }
+      renderDashboardChart(range);
+    }
 
     // ================================================================
     // ДОГОВОРЫ
@@ -2621,6 +3326,168 @@
       html += '</div>';
       container.innerHTML = html;
     }
+
+    // ================================================================
+    // ВЫЕЗД
+    // ================================================================
+    const FIELDWORK_STATUSES = [
+      { key:'new', label:'Не связывались', cls:'s0' },
+      { key:'contacted', label:'Связались', cls:'s1' },
+      { key:'agreed', label:'Договорились', cls:'s2' },
+      { key:'planned', label:'Выезд запланирован', cls:'s3' },
+      { key:'visited', label:'Выезд выполнен', cls:'s4' },
+      { key:'resolved', label:'Решено', cls:'s5' },
+      { key:'other', label:'Отказ / другое', cls:'s6' }
+    ];
+
+    function fieldworkClientKey(client) {
+      return [String(client.fio || '').trim().toLocaleLowerCase('ru-RU'), String(client.phone || '').replace(/\D/g,''), String(client.extraPhone || '').replace(/\D/g,'')].join('|');
+    }
+
+    function getFieldworkRecord(client) {
+      const key = fieldworkClientKey(client);
+      const rec = fieldVisitRecords[key];
+      if (!rec || typeof rec !== 'object') return { status:'new', history:[] };
+      return { status: rec.status || 'new', history: Array.isArray(rec.history) ? rec.history : [], updatedAt: rec.updatedAt || null };
+    }
+
+    function getFieldworkClients() {
+      const result = [];
+      getClientGroups().forEach(client => {
+        let overdueMonths = 0;
+        let overdueSum = 0;
+        let oldestOverdueDate = null;
+        const overdueContracts = [];
+        client.contracts.forEach(contract => {
+          const metrics = calculateContractMetrics(contract);
+          if (metrics.isClosed) return;
+          const info = getMonthStatus(contract);
+          const overdue = info.months.filter(m => m.status === 'overdue' && !m.isPaid);
+          if (!overdue.length) return;
+          overdueMonths += overdue.length;
+          overdueSum += overdue.reduce((sum,m) => sum + Number(m.amount || 0), 0);
+          overdue.forEach(m => { if (!oldestOverdueDate || m.date < oldestOverdueDate) oldestOverdueDate = m.date; });
+          overdueContracts.push({ contract, overdueCount: overdue.length, overdueSum: overdue.reduce((sum,m) => sum + Number(m.amount || 0), 0) });
+        });
+        if (overdueMonths < 2) return;
+        const record = getFieldworkRecord(client);
+        result.push({ ...client, key: fieldworkClientKey(client), overdueMonths, overdueSum, oldestOverdueDate, overdueContracts, record });
+      });
+      result.sort((a,b) => b.overdueMonths - a.overdueMonths || b.overdueSum - a.overdueSum || a.fio.localeCompare(b.fio,'ru'));
+      return result;
+    }
+
+    function fieldworkStatusInfo(key) { return FIELDWORK_STATUSES.find(s => s.key === key) || FIELDWORK_STATUSES[0]; }
+    function fieldworkMoney(v) { return `${Math.round(Number(v)||0).toLocaleString('ru-RU')} ₽`; }
+    function fieldworkPhone(phone) { return String(phone || '').replace(/\D/g,''); }
+    function fieldworkMapUrl(address) { return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(String(address || ''))}`; }
+
+    window.copyFieldWorkerLink = async function() {
+      const u = new URL(window.location.href);
+      u.search = '';
+      u.hash = '';
+      u.searchParams.set('role','fieldworker');
+      const link = u.toString();
+      try {
+        await navigator.clipboard.writeText(link);
+        showCopyNotification('🔗 Ссылка для выездника скопирована');
+      } catch (e) {
+        prompt('Скопируйте ссылку для выездника:', link);
+      }
+    };
+
+    window.setFieldworkStatus = async function(key, status) {
+      const clients = getFieldworkClients();
+      const client = clients.find(c => c.key === key);
+      if (!client) return;
+      const prev = getFieldworkRecord(client);
+      if (prev.status === status) return;
+      const now = Date.now();
+      fieldVisitRecords[key] = {
+        status,
+        history: [...prev.history, { status, at: now }].slice(-50),
+        updatedAt: now
+      };
+      localStorage.setItem('field_visit_records_db', JSON.stringify(fieldVisitRecords));
+      renderFieldwork();
+      if (IS_FIELDWORKER_MODE) {
+        try {
+          if (isCloudLoaded) await updateDoc(DOC_REF, { fieldVisitRecords: fieldVisitRecords, updatedAt: now });
+        } catch (e) {
+          console.error('Ошибка сохранения статуса выезда:', e);
+          alert('Не удалось сохранить статус. Проверьте интернет-соединение.');
+        }
+      } else {
+        saveState();
+        saveToStorage();
+      }
+    };
+
+    window.openFieldworkCard = function(key) {
+      const client = getFieldworkClients().find(c => c.key === key);
+      if (!client) return;
+      const rec = getFieldworkRecord(client);
+      const status = fieldworkStatusInfo(rec.status);
+      const history = rec.history.slice().reverse().map(h => {
+        const st = fieldworkStatusInfo(h.status);
+        return `<div class="fieldwork-history-row"><span class="fieldwork-status ${st.cls}">${st.label}</span><span class="text-slate-400">${new Date(h.at).toLocaleString('ru-RU')}</span></div>`;
+      }).join('') || '<div class="p-4 text-center text-slate-400">Истории пока нет</div>';
+      const modal = document.getElementById('fieldworkDetailModal');
+      document.getElementById('fieldworkDetailTitle').textContent = client.fio;
+      document.getElementById('fieldworkDetailBody').innerHTML = `
+        <div class="space-y-3">
+          <div class="flex flex-wrap gap-2"><span class="fieldwork-status ${status.cls}">${status.label}</span><span class="bg-red-50 text-red-700 rounded-full px-3 py-1 text-[10px] font-black">Просрочка: ${fieldworkMoney(client.overdueSum)}</span><span class="bg-orange-50 text-orange-700 rounded-full px-3 py-1 text-[10px] font-black">${client.overdueMonths} мес.</span></div>
+          <div class="grid grid-cols-2 gap-2 text-[11px]"><div class="bg-slate-50 p-3 rounded-xl"><b>Телефон</b><div class="mt-1">${escapeClientHtml(client.phone || '—')}</div></div><div class="bg-slate-50 p-3 rounded-xl"><b>Адрес</b><div class="mt-1">${escapeClientHtml(client.contracts[0]?.address || '—')}</div></div></div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <button class="fieldwork-action" onclick="fieldworkCall(${clientJsArg(client.phone)})">📞 Позвонить</button>
+            <button class="fieldwork-action whatsapp" onclick="fieldworkWhatsApp(${clientJsArg(client.phone)}, ${clientJsArg(client.fio)})">💬 WhatsApp</button>
+            <button class="fieldwork-action map" onclick="fieldworkOpenMap(${clientJsArg(client.contracts[0]?.address || '')})">📍 Карта</button>
+            <button class="fieldwork-action" onclick="closeFieldworkDetail()">Закрыть</button>
+          </div>
+          <div><div class="font-black text-sm mb-2">Изменить статус</div><div class="grid grid-cols-2 gap-2">${FIELDWORK_STATUSES.map(st => `<button type="button" onclick="setFieldworkStatus(${clientJsArg(client.key)},${clientJsArg(st.key)}); openFieldworkCard(${clientJsArg(client.key)})" class="p-2.5 rounded-lg border text-[10px] font-black ${st.key===rec.status?'bg-slate-900 text-white':'bg-white text-slate-700 hover:bg-slate-50'}">${st.label}</button>`).join('')}</div></div>
+          <div><div class="font-black text-sm mb-2">История</div><div class="fieldwork-modal-history">${history}</div></div>
+          <div><div class="font-black text-sm mb-2">Договоры с просрочкой</div><div class="space-y-2">${client.overdueContracts.map(x => `<div class="p-3 bg-red-50 rounded-xl text-[10px] flex justify-between gap-2"><span><b>№${escapeClientHtml(x.contract.contractNum || '—')}</b> · ${escapeClientHtml(x.contract.product || 'Товар')}</span><span class="font-black text-red-700">${x.overdueCount} мес. · ${fieldworkMoney(x.overdueSum)}</span></div>`).join('')}</div></div>
+        </div>`;
+      modal.classList.remove('hidden'); modal.classList.add('flex');
+    };
+
+    window.closeFieldworkDetail = function() { const m=document.getElementById('fieldworkDetailModal'); if(m){m.classList.add('hidden');m.classList.remove('flex');} };
+    window.fieldworkCall = function(phone) { const p=fieldworkPhone(phone); if(p) window.location.href=`tel:${p}`; else alert('Телефон не указан.'); };
+    window.fieldworkWhatsApp = function(phone, fio) { const p=fieldworkPhone(phone); if(!p){alert('Телефон не указан.');return;} const text=`Здравствуйте, ${fio || ''}. Пишем по поводу вашей задолженности по договору. Пожалуйста, свяжитесь с нами.`; window.open(`https://wa.me/${p}?text=${encodeURIComponent(text)}`,'_blank','noopener'); };
+    window.fieldworkOpenMap = function(address) { if(!address){alert('Адрес клиента не указан.');return;} window.open(fieldworkMapUrl(address),'_blank','noopener'); };
+
+    window.renderFieldwork = function() {
+      const list = document.getElementById('fieldworkList'); if (!list) return;
+      const clients = getFieldworkClients();
+      const filter = document.getElementById('fieldworkFilter')?.value || 'all';
+      const filtered = clients.filter(c => {
+        const s=c.record.status;
+        if(filter==='all') return true;
+        if(filter==='new') return s==='new';
+        if(filter==='work') return ['contacted','agreed','other'].includes(s);
+        if(filter==='planned') return s==='planned';
+        if(filter==='done') return s==='visited';
+        if(filter==='resolved') return s==='resolved';
+        return true;
+      });
+      const totalOverdue=clients.reduce((sum,c)=>sum+c.overdueSum,0);
+      const totalMonths=clients.reduce((sum,c)=>sum+c.overdueMonths,0);
+      const critical=clients.filter(c=>c.overdueMonths>3).length;
+      const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+      set('fieldworkCount',clients.length); set('fieldworkOverdue',fieldworkMoney(totalOverdue)); set('fieldworkMonths',totalMonths); set('fieldworkCritical',critical);
+      if(!filtered.length){list.innerHTML='<div class="col-span-full text-center text-slate-400 py-12">🚗 Нет клиентов в выбранном статусе</div>';return;}
+      list.innerHTML=filtered.map((client,index)=>{
+        const st=fieldworkStatusInfo(client.record.status);
+        const address=client.contracts[0]?.address || '';
+        const last=client.record.history?.length ? client.record.history[client.record.history.length-1] : null;
+        return `<article class="fieldwork-card">
+          <div class="fieldwork-card-head"><div><div class="fieldwork-client-name">${index+1}. ${escapeClientHtml(client.fio)}</div><div class="fieldwork-client-meta">${client.phone ? '📞 '+escapeClientHtml(client.phone) : '📞 Телефон не указан'}${address ? ' · 📍 '+escapeClientHtml(address) : ''}</div></div><span class="fieldwork-status ${st.cls}">${st.label}</span></div>
+          <div class="fieldwork-info-grid"><div class="fieldwork-info"><div class="fieldwork-info-label">Просрочка</div><div class="fieldwork-info-value text-red-600">${fieldworkMoney(client.overdueSum)}</div></div><div class="fieldwork-info"><div class="fieldwork-info-label">Просрочено месяцев</div><div class="fieldwork-info-value">${client.overdueMonths}</div></div><div class="fieldwork-info"><div class="fieldwork-info-label">Самая ранняя просрочка</div><div class="fieldwork-info-value">${formatClientDate(client.oldestOverdueDate)}</div></div><div class="fieldwork-info"><div class="fieldwork-info-label">Договоров с просрочкой</div><div class="fieldwork-info-value">${client.overdueContracts.length}</div></div></div>
+          <div class="fieldwork-actions"><button class="fieldwork-action" onclick="fieldworkCall(${clientJsArg(client.phone)})">📞 Звонок</button><button class="fieldwork-action whatsapp" onclick="fieldworkWhatsApp(${clientJsArg(client.phone)},${clientJsArg(client.fio)})">💬 WhatsApp</button><button class="fieldwork-action map" onclick="fieldworkOpenMap(${clientJsArg(address)})">📍 Карта</button><button class="fieldwork-action status" onclick="openFieldworkCard(${clientJsArg(client.key)})">📋 Карточка</button></div>
+          ${last ? `<div class="text-[9px] text-slate-400 mt-2">Последняя отметка: <b>${fieldworkStatusInfo(last.status).label}</b> · ${new Date(last.at).toLocaleString('ru-RU')}</div>` : ''}
+        </article>`;
+      }).join('');
+    };
 
     // ================================================================
     // КЛИЕНТЫ
@@ -4644,10 +5511,12 @@
     // СТАРТ
     // ================================================================
     try {
+      renderDashboard();
       renderTable(allContracts);
       renderAccountingTable(allAccounting);
       renderTakenSheet();
       updateHistoryButtons();
+      switchTab(IS_FIELDWORKER_MODE ? 'fieldwork' : 'home');
     } catch (e) {
       console.error('Ошибка начальной инициализации:', e);
     }
