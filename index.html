@@ -135,22 +135,125 @@
     .schedule-client-list .month-today { background:#3b82f6; color:#fff; }
     .schedule-client-list .month-three-days { background:#facc15; color:#713f12; }
 
-    /* === Печать договора === */
+    /* === Печать договора / A4 === */
     .print-contract {
-      font-family: 'Times New Roman', serif;
-      font-size: 12px; line-height: 1.4;
-      padding: 20px 30px; background: white;
-      max-width: 210mm; margin: 0 auto;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #eef2f7;
+      max-width: 210mm;
+      margin: 0 auto;
+      padding: 12px;
+      color: #172033;
     }
-    .print-contract h1 { font-size: 16px; font-weight: bold; text-align: center; text-transform: uppercase; margin-bottom: 12px; }
+    .print-page {
+      width: 194mm;
+      min-height: 281mm;
+      box-sizing: border-box;
+      margin: 0 auto 12px;
+      padding: 8mm 9mm 7mm;
+      background: #fff;
+      border: 1px solid #dbe3ee;
+      position: relative;
+      overflow: hidden;
+    }
+    .print-page:last-child { margin-bottom: 0; }
+    .print-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #172033;
+    }
+    .print-brand { font-size: 23px; font-weight: 900; letter-spacing: 2px; color: #172033; }
+    .print-header-meta { display:flex; gap:18px; text-align:right; }
+    .print-header-meta div { display:flex; flex-direction:column; gap:1px; }
+    .print-header-meta span { font-size:8px; color:#64748b; text-transform:uppercase; letter-spacing:.6px; }
+    .print-header-meta b { font-size:11px; }
+    .print-title-wrap { text-align:center; margin:10px 0 11px; }
+    .print-title-wrap h1 { font-size:15px; line-height:1.2; margin:0; font-weight:900; letter-spacing:.25px; }
+    .print-location { margin-top:4px; font-size:9px; color:#64748b; }
+    .party-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .party-card { border:1px solid #d5dee9; border-radius:7px; padding:7px 8px; }
+    .party-card-title { font-size:10px; font-weight:900; letter-spacing:.7px; margin-bottom:5px; color:#172033; }
+    .party-row { display:grid; grid-template-columns:84px 1fr; gap:6px; font-size:8.7px; line-height:1.25; padding:1.5px 0; }
+    .party-row span { color:#64748b; }
+    .party-row b { font-weight:700; overflow-wrap:anywhere; }
+    .party-row.full { grid-template-columns:84px 1fr; }
+    .seller-strip { display:flex; justify-content:space-between; gap:12px; margin-top:7px; padding:6px 8px; background:#f4f7fb; border-radius:6px; font-size:8.8px; }
+    .print-section { margin-top:8px; }
+    .section-heading { display:flex; align-items:center; gap:6px; font-size:10px; font-weight:900; letter-spacing:.25px; padding-bottom:4px; border-bottom:1px solid #d8e0ea; }
+    .section-heading > span { width:17px; height:17px; border-radius:50%; background:#172033; color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:8px; flex:0 0 auto; }
+    .print-section p, .legal-section p { font-size:8.8px; line-height:1.38; margin:5px 0 0; text-align:justify; }
+    .product-line { display:flex; gap:8px; align-items:center; margin-top:5px; padding:6px 8px; background:#f8fafc; border:1px solid #e1e7ef; border-radius:5px; font-size:9px; }
+    .product-line span { color:#64748b; min-width:45px; }
+    .finance-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:5px; margin-top:6px; }
+    .finance-grid > div { border:1px solid #e1e7ef; border-radius:5px; padding:5px 6px; background:#fafbfd; }
+    .finance-grid span { display:block; font-size:7.5px; color:#64748b; margin-bottom:2px; }
+    .finance-grid b { font-size:9.5px; }
+    .payment-rule { margin-top:6px !important; }
+    .schedule-box { margin-top:8px; border:1px solid #cfd9e6; border-radius:7px; overflow:hidden; }
+    .schedule-head { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:6px 8px; background:#f4f7fb; border-bottom:1px solid #dbe3ed; }
+    .schedule-head strong { display:block; font-size:9.5px; letter-spacing:.4px; }
+    .schedule-head > div:first-child span { display:block; margin-top:2px; font-size:7.5px; color:#64748b; }
+    .schedule-summary { text-align:right; white-space:nowrap; }
+    .schedule-summary b { font-size:10px; }
+    .schedule-summary span { display:block; font-size:7px; color:#64748b; }
+    .schedule-table { width:100%; border-collapse:collapse; font-size:8px; }
+    .schedule-table th { background:#172033; color:#fff; padding:4px 5px; font-size:7.5px; text-transform:uppercase; letter-spacing:.25px; }
+    .schedule-table td { padding:3.5px 5px; border-top:1px solid #e5eaf0; vertical-align:middle; }
+    .schedule-num { width:9%; text-align:center; font-weight:800; }
+    .schedule-date { width:32%; }
+    .schedule-date .actual-date { display:block; color:#64748b; font-size:6.8px; margin-top:1px; }
+    .schedule-amount { width:20%; text-align:right; font-weight:700; }
+    .schedule-status { width:25%; font-weight:700; white-space:nowrap; }
+    .schedule-status.paid { color:#15803d; }
+    .schedule-status.overdue { color:#b91c1c; }
+    .schedule-status.pending { color:#64748b; }
+    .schedule-signature { width:14%; min-width:52px; text-align:center; }
+    .schedule-signature span { display:block; width:78%; height:12px; margin:0 auto; border-bottom:1px solid #64748b; }
+    .accounting-filter-grid { display:grid; grid-template-columns:repeat(8,minmax(0,1fr)); gap:6px; align-items:center; }
+    .acc-filter { min-width:0; width:100%; height:30px; padding:4px 7px; border:1px solid #dbe3ec; border-radius:7px; background:#f8fafc; color:#334155; font-size:10px; outline:none; }
+    .acc-filter:focus { border-color:#60a5fa; box-shadow:0 0 0 2px rgba(96,165,250,.12); }
+    .acc-filter-reset { height:30px; padding:0 9px; border:1px solid #cbd5e1; border-radius:7px; background:#f1f5f9; color:#475569; font-size:10px; font-weight:800; white-space:nowrap; cursor:pointer; }
+    @media (max-width:900px) { .accounting-filter-grid { grid-template-columns:repeat(4,minmax(0,1fr)); } }
+    @media (max-width:560px) { .accounting-filter-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .acc-filter-reset { width:100%; } }
+    .paid-check { display:inline-flex; width:13px; height:13px; border-radius:50%; align-items:center; justify-content:center; margin-right:4px; background:#22c55e; color:#fff; font-size:9px; font-weight:900; vertical-align:middle; }
+    .schedule-row.paid { background:#f0fdf4; }
+    .schedule-row.overdue { background:#fff7f7; }
+    .schedule-table tfoot td { padding:5px; border-top:1px solid #cfd9e6; background:#f4f7fb; font-weight:900; }
+    .schedule-table tfoot td:nth-child(3) { text-align:right; }
+    .rest-cell { color:#334155; text-align:right; }
+    .empty-schedule { text-align:center; color:#64748b; padding:10px !important; }
+    .schedule-note { padding:5px 7px; font-size:7.2px; color:#64748b; border-top:1px solid #e5eaf0; }
+    .legend-check { display:inline-flex; width:11px; height:11px; border-radius:50%; align-items:center; justify-content:center; background:#22c55e; color:#fff; font-size:7px; font-weight:900; margin-right:3px; }
+    .print-page-footer { position:absolute; left:9mm; right:9mm; bottom:4mm; padding-top:4px; border-top:1px solid #e5e7eb; font-size:6.8px; color:#94a3b8; text-align:center; }
+    .compact-header { margin-bottom:8px; }
+    .legal-intro { font-size:8.8px; line-height:1.4; margin-bottom:7px; }
+    .legal-section { margin-top:7px; }
+    .legal-section h3 { font-size:8.8px; margin:5px 0 0; font-weight:900; }
+    .signatures-section { margin-top:9px; }
+    .signatures-table { width:100%; border-collapse:collapse; table-layout:fixed; margin-top:6px; font-size:8px; text-align:center; }
+    .signatures-table th { background:#f4f7fb; padding:5px; border:1px solid #cfd9e6; font-size:8px; }
+    .signatures-table td { border:1px solid #cfd9e6; height:38px; vertical-align:bottom; padding:5px; }
+    .signature-line { width:65%; margin:0 auto 3px; border-top:1px solid #172033; height:1px; }
+    .signatures-table small { font-size:7px; color:#64748b; }
+    .print-contact { margin-top:7px; padding:6px 8px; background:#f8fafc; border:1px solid #e1e7ef; border-radius:5px; text-align:center; font-size:7.5px; line-height:1.45; }
+
+    @media (max-width: 640px) {
+      .print-contract { padding:6px; overflow-x:auto; }
+      .print-page { width:194mm; margin-left:0; }
+    }
 
     @media print {
+      @page { size: A4 portrait; margin: 8mm; }
+      html, body { width:210mm; min-height:297mm; margin:0 !important; padding:0 !important; background:#fff !important; }
       body * { visibility: hidden; }
       #printContent, #printContent * { visibility: visible; }
-      #printContent { position: absolute; left: 0; top: 0; width: 100%; padding: 0; margin: 0; background: white; }
-      .no-print { display: none !important; }
-      .print-contract { padding: 12px 20px; font-size: 10px; }
-      .print-contract h1 { font-size: 14px; }
+      #printContent { position:absolute; left:0; top:0; width:194mm; padding:0; margin:0; background:#fff; }
+      .no-print { display:none !important; }
+      .print-contract { width:194mm; max-width:none; padding:0; margin:0; background:#fff; }
+      .print-page { width:194mm; min-height:281mm; height:281mm; margin:0; padding:8mm 9mm 7mm; border:0; border-radius:0; page-break-after:always; break-after:page; overflow:hidden; }
+      .print-page:last-child { page-break-after:auto; break-after:auto; }
     }
 
     /* === Уведомление о копировании === */
@@ -666,7 +769,7 @@
       .sticky.top-0 .p-3 { padding: 8px !important; }
       .sticky.top-0 .p-3 > div { max-width: 100%; }
       #searchInput { width: min(42vw, 180px) !important; min-height: 40px; }
-      #addContractBtn,#addAccBtn,#addTakenBtn,#addIncomeExpBtn { min-height: 40px; }
+      #addContractBtn,#addAccIncomeBtn,#addAccExpenseBtn,#addTakenBtn,#addIncomeExpBtn { min-height: 40px; }
       .client-modal-grid { grid-template-columns:1fr; }
       .copy-option-grid { grid-template-columns:1fr; }
       #clientDetailModal > div { padding: 14px !important; max-height: 92vh; }
@@ -973,8 +1076,11 @@
         <button type="button" id="addContractBtn" onclick="openCreateModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1.5 rounded-lg shadow transition">
           + Новый Договор
         </button>
-        <button type="button" id="addAccBtn" onclick="openAccModal()" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-lg shadow transition">
-          + Новая Запись Учета
+        <button type="button" id="addAccIncomeBtn" onclick="openAccModal('income')" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-lg shadow transition">
+          ＋ Поступление
+        </button>
+        <button type="button" id="addAccExpenseBtn" onclick="openAccModal('expense')" class="hidden bg-red-600 hover:bg-red-700 text-white font-bold px-3 py-1.5 rounded-lg shadow transition">
+          − Расход
         </button>
         <button type="button" id="addTakenBtn" onclick="openTakenModal()" class="hidden bg-amber-600 hover:bg-amber-700 text-white font-bold px-3 py-1.5 rounded-lg shadow transition">
           + Запись Взяли / Положили
@@ -1151,7 +1257,7 @@
           <div class="contracts-stats" id="contractsStats"></div>
         </div>
         <div class="contracts-controls">
-          <div class="contracts-search">🔍 <input id="contractsLocalSearch" type="search" placeholder="Поиск по ФИО, телефону, № договора, товару..." oninput="renderContractsView()"></div>
+          <div class="contracts-search">🔎 <input id="contractsNumberSearch" type="search" inputmode="numeric" placeholder="№ договора" oninput="renderContractsView()"></div>
           <select id="contractsStatusFilter" class="contracts-select" onchange="renderContractsView()">
             <option value="all">Все договоры</option>
             <option value="active">Активные</option>
@@ -1197,21 +1303,41 @@
     </div>
 
     <!-- ================= Лист 2: Учет ================= -->
-    <div id="accountingTabContent" class="hidden space-y-4">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="bg-white p-4 rounded-xl border-l-4 border-emerald-500 shadow-md flex justify-between items-center">
-          <div>
-            <p class="text-[10px] uppercase font-bold text-gray-400">Общий доход</p>
-            <h3 id="totalIncome" class="text-xl font-black text-emerald-600">0 ₽</h3>
-          </div>
-          <span class="text-2xl">📈</span>
+    <div id="accountingTabContent" class="hidden space-y-3">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div class="bg-white p-3 rounded-xl border-l-4 border-emerald-500 shadow-sm flex justify-between items-center">
+          <div><p class="text-[10px] uppercase font-bold text-gray-400">Поступило</p><h3 id="totalIncome" class="text-xl font-black text-emerald-600">0 ₽</h3></div>
+          <span class="text-xl">📈</span>
         </div>
-        <div class="bg-white p-4 rounded-xl border-l-4 border-red-500 shadow-md flex justify-between items-center">
-          <div>
-            <p class="text-[10px] uppercase font-bold text-gray-400">Общий расход</p>
-            <h3 id="totalExpense" class="text-xl font-black text-red-600">0 ₽</h3>
-          </div>
-          <span class="text-2xl">📉</span>
+        <div class="bg-white p-3 rounded-xl border-l-4 border-red-500 shadow-sm flex justify-between items-center">
+          <div><p class="text-[10px] uppercase font-bold text-gray-400">Расход</p><h3 id="totalExpense" class="text-xl font-black text-red-600">0 ₽</h3></div>
+          <span class="text-xl">📉</span>
+        </div>
+      </div>
+
+      <div class="accounting-filter-panel bg-white border rounded-xl shadow-sm p-2.5">
+        <div class="accounting-filter-grid">
+          <input type="date" id="accDateFrom" class="acc-filter" title="Дата от" onchange="applyAccountingFilters()">
+          <input type="date" id="accDateTo" class="acc-filter" title="Дата до" onchange="applyAccountingFilters()">
+          <select id="accIncomeFilter" class="acc-filter" title="Поступление" onchange="applyAccountingFilters()">
+            <option value="all">Поступление: все</option>
+            <option value="yes">Только есть</option>
+            <option value="no">Только нет</option>
+          </select>
+          <select id="accExpenseFilter" class="acc-filter" title="Расход" onchange="applyAccountingFilters()">
+            <option value="all">Расход: все</option>
+            <option value="yes">Только есть</option>
+            <option value="no">Только нет</option>
+          </select>
+          <input type="search" id="accNoteFilter" class="acc-filter" placeholder="Отметка" oninput="applyAccountingFilters()">
+          <select id="accAccountFilter" class="acc-filter" title="Счёт" onchange="applyAccountingFilters()">
+            <option value="all">Счёт: все</option>
+          </select>
+          <select id="accSortFilter" class="acc-filter" title="Сортировка" onchange="applyAccountingFilters()">
+            <option value="newest">Новые сначала</option>
+            <option value="oldest">Старые сначала</option>
+          </select>
+          <button type="button" class="acc-filter-reset" onclick="resetAccountingFilters()">Сбросить</button>
         </div>
       </div>
 
@@ -1455,6 +1581,7 @@
         <div class="flex justify-between items-center mb-4 no-print">
           <h2 class="text-xl font-bold text-amber-600">🖨️ Распечатка договора</h2>
           <div class="flex gap-2 flex-wrap">
+            <input id="printContractNumberSearch" type="search" inputmode="numeric" placeholder="№ договора" class="p-2 border rounded text-sm w-32" oninput="filterPrintContractsByNumber()">
             <select id="printContractSelect" class="p-2 border rounded text-sm font-bold" onchange="loadContractForPrint()">
               <option value="">-- Выберите договор --</option>
             </select>
@@ -1805,9 +1932,10 @@
 
   <div id="accModal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl border-t-4 border-emerald-500">
-      <h3 id="accModalTitle" class="font-bold text-base text-slate-800 mb-4 border-b pb-2 uppercase">Запись учета</h3>
+      <h3 id="accModalTitle" class="font-bold text-base text-slate-800 mb-4 border-b pb-2 uppercase">Поступление</h3>
       <form id="accForm" class="space-y-3">
         <input type="hidden" id="accEditId">
+        <input type="hidden" id="accQuickType" value="income">
         <div>
           <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Дата</label>
           <input type="date" id="accDate" required class="p-2 border rounded-md w-full outline-none">
@@ -2090,7 +2218,8 @@
 
       try {
         renderTable(allContracts);
-        renderAccountingTable(allAccounting);
+        populateAccountingAccountFilter();
+        applyAccountingFilters();
         renderTakenSheet();
         if (activeTab === 'home') renderDashboard();
         if (activeTab === 'income') renderIncomePage();
@@ -2247,7 +2376,8 @@
       const printBtn = document.getElementById('tabBtnPrint');
 
       const addC = document.getElementById('addContractBtn');
-      const addA = document.getElementById('addAccBtn');
+      const addAIncome = document.getElementById('addAccIncomeBtn');
+      const addAExpense = document.getElementById('addAccExpenseBtn');
       const addT = document.getElementById('addTakenBtn');
       const addI = document.getElementById('addIncomeExpBtn');
 
@@ -2265,7 +2395,8 @@
       printTab.classList.add('hidden');
       initTab.classList.add('hidden');
       addC.classList.add('hidden');
-      addA.classList.add('hidden');
+      addAIncome.classList.add('hidden');
+      addAExpense.classList.add('hidden');
       addT.classList.add('hidden');
       addI.classList.add('hidden');
 
@@ -2294,7 +2425,10 @@
       } else if (tab === 'accounting') {
         aTab.classList.remove('hidden');
         aBtn.className = "tab-btn active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
-        addA.classList.remove('hidden');
+        addAIncome.classList.remove('hidden');
+        addAExpense.classList.remove('hidden');
+        populateAccountingAccountFilter();
+        applyAccountingFilters();
       } else if (tab === 'taken') {
         tTab.classList.remove('hidden');
         tBtn.className = "tab-btn active px-5 py-2 rounded-lg font-bold text-xs transition flex items-center gap-2";
@@ -2432,7 +2566,8 @@
       localStorage.setItem('monthly_reports_db', JSON.stringify(initMonthlyReports));
       localStorage.setItem('field_visit_records_db', JSON.stringify(fieldVisitRecords));
       renderTable(allContracts);
-      renderAccountingTable(allAccounting);
+      if (activeTab === 'accounting') { populateAccountingAccountFilter(); applyAccountingFilters(); }
+      else renderAccountingTable(allAccounting);
       renderTakenSheet();
       if (activeTab === 'home') renderDashboard();
       if (activeTab === 'income') renderIncomePage();
@@ -2472,7 +2607,8 @@
       localStorage.setItem('monthly_reports_db', JSON.stringify(initMonthlyReports));
       localStorage.setItem('field_visit_records_db', JSON.stringify(fieldVisitRecords));
       renderTable(allContracts);
-      renderAccountingTable(allAccounting);
+      if (activeTab === 'accounting') { populateAccountingAccountFilter(); applyAccountingFilters(); }
+      else renderAccountingTable(allAccounting);
       renderTakenSheet();
       if (activeTab === 'home') renderDashboard();
       if (activeTab === 'income') renderIncomePage();
@@ -2955,193 +3091,223 @@
     };
 
     function updatePrintSelect() {
+      const currentValue = document.getElementById('printContractSelect')?.value || '';
+      filterPrintContractsByNumber(currentValue);
+    }
+
+    window.filterPrintContractsByNumber = function(preferredId = '') {
       const select = document.getElementById('printContractSelect');
-      const currentValue = select.value;
+      const search = String(document.getElementById('printContractNumberSearch')?.value || '').trim().toLowerCase();
+      if (!select) return;
+      const currentValue = preferredId || select.value || '';
       select.innerHTML = '<option value="">-- Выберите договор --</option>';
-      
+
       allContracts.forEach(contract => {
+        const number = String(contract.contractNum || '').toLowerCase();
+        if (search && !number.includes(search)) return;
         const option = document.createElement('option');
         option.value = contract.id;
         option.textContent = `№${contract.contractNum} - ${contract.fio} (${contract.phone})`;
         select.appendChild(option);
       });
-      
+
       if (currentValue && [...select.options].some(o => o.value === currentValue)) {
         select.value = currentValue;
       }
-    }
+    };
 
     window.loadContractForPrint = function() {
       const select = document.getElementById('printContractSelect');
       const contractId = select.value;
       const container = document.getElementById('printContent');
-      
+
       if (!contractId) {
         container.innerHTML = `<div class="text-center text-gray-400 py-20 text-lg">Выберите договор для распечатки</div>`;
         return;
       }
-      
+
       const contract = allContracts.find(c => c.id === contractId);
       if (!contract) {
         container.innerHTML = `<div class="text-center text-red-500 py-20 text-lg">Договор не найден</div>`;
         return;
       }
-      
+
       const installments = contract.installments || {};
-      const paymentKeys = Object.keys(installments).sort((a, b) => Number(a) - Number(b));
-      
-      let paymentsHtml = '';
-      let totalPaidSum = 0;
-      
-      if (paymentKeys.length === 0) {
-        paymentsHtml = `<tr><td colspan="3" style="padding: 8px; text-align: center; color: #999; border: 1px solid #000;">Нет внесенных платежей</td></tr>`;
-      } else {
-        paymentKeys.forEach((key, index) => {
-          const payment = installments[key];
-          const amount = Number(payment.amount) || 0;
-          const date = payment.date || '—';
-          totalPaidSum += amount;
-          
-          paymentsHtml += `
-            <tr>
-              <td style="padding: 3px 8px; text-align: center; font-weight: bold; border: 1px solid #000;">${index + 1}</td>
-              <td style="padding: 3px 8px; text-align: center; border: 1px solid #000;">${date}</td>
-              <td style="padding: 3px 8px; text-align: center; font-weight: bold; color: #22c55e; border: 1px solid #000;">${amount.toLocaleString('ru-RU')} ₽</td>
-            </tr>
-          `;
-        });
-        
-        paymentsHtml += `
-          <tr style="background-color: #e2e8f0; font-weight: bold;">
-            <td style="padding: 3px 8px; text-align: center; border: 1px solid #000;" colspan="2">ИТОГО ВНЕСЕНО:</td>
-            <td style="padding: 3px 8px; text-align: center; border: 1px solid #000; color: #22c55e;">${totalPaidSum.toLocaleString('ru-RU')} ₽</td>
-          </tr>
-        `;
-      }
-      
+      const paymentDates = calculatePaymentDates(contract);
       const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      let totalPaidSum = 0;
+      let paidCount = 0;
+
+      // График строится автоматически из существующих данных договора:
+      // количество месяцев + день платежа + ежемесячный платеж.
+      // Сохранённые оплаты привязываются к соответствующему номеру платежа.
+      const scheduleRows = paymentDates.length
+        ? paymentDates.map(pd => {
+            const payment = installments[pd.index];
+            const isPaid = !!payment && Number(payment.amount) > 0;
+            const paidAmount = isPaid ? Number(payment.amount) : 0;
+            if (isPaid) {
+              totalPaidSum += paidAmount;
+              paidCount++;
+            }
+
+            const plannedDate = formatContractDate(pd.date);
+            const actualDate = isPaid && payment.date ? payment.date : '';
+            const displayAmount = isPaid ? paidAmount : Number(pd.amount || contract.monthlyPay || 0);
+            const statusClass = isPaid ? 'paid' : (pd.date < today ? 'overdue' : 'pending');
+            const statusText = isPaid ? '✓ Оплачено' : (pd.date < today ? 'Просрочено' : 'Ожидается');
+
+            return `
+              <tr class="schedule-row ${statusClass}">
+                <td class="schedule-num">${pd.index}</td>
+                <td class="schedule-date"><b>${plannedDate}</b>${actualDate ? `<span class="actual-date">оплата: ${escapeHtml(actualDate)}</span>` : ''}</td>
+                <td class="schedule-amount">${displayAmount.toLocaleString('ru-RU')} ₽</td>
+                <td class="schedule-status ${statusClass}">${isPaid ? '<span class="paid-check">✓</span>' : ''}<span>${statusText}</span></td>
+                <td class="schedule-signature"><span></span></td>
+              </tr>`;
+          }).join('')
+        : `<tr><td colspan="5" class="empty-schedule">График платежей не задан</td></tr>`;
+
+      const totalPayable = Math.max(0, (Number(contract.totalCost) || 0) - (Number(contract.downPayment) || 0));
+      const rest = Math.max(0, totalPayable - totalPaidSum);
       const todayStr = today.toLocaleDateString('ru-RU');
-      
+      const monthlyPay = Number(contract.monthlyPay) || 0;
+      const monthsCount = Number(contract.monthsCount) || paymentDates.length || 0;
+      const payDay = contract.payDate ? formatContractDate(new Date(contract.payDate)) : '—';
+
       container.innerHTML = `
-        <div style="font-family: 'Times New Roman', serif; font-size: 12px; line-height: 1.4; padding: 15px 25px; max-width: 210mm; margin: 0 auto; background: white;">
-          <div style="position: relative;">
-            <div style="position: absolute; top: 0; right: 0; font-size: 13px; font-weight: bold;">№ ${contract.contractNum}</div>
-            <h1 style="font-size: 16px; font-weight: bold; text-align: center; text-transform: uppercase; margin-bottom: 10px;">ДОГОВОР КУПЛИ-ПРОДАЖИ ТОВАРА В РАССРОЧКУ</h1>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 11.5px;">
-              <div>
-                <b>Чеченская Республика</b><br>
-                Дата: ${contract.buyDate || '______'}<br>
-                Продавец: Компания "YUSRA"<br>
-                рабочий номер: ${contract.phone || '______'}
-              </div>
-              <div style="text-align: right;">
-                <b>ИНН/ОГРН:</b> ______<br>
-                <b>Юр. адрес:</b> ______
-              </div>
+        <div class="print-page print-page-1">
+          <header class="print-header">
+            <div class="print-brand">YUSRA</div>
+            <div class="print-header-meta">
+              <div><span>Договор</span><b>№ ${escapeHtml(contract.contractNum || '—')}</b></div>
+              <div><span>Дата</span><b>${escapeHtml(contract.buyDate || '—')}</b></div>
             </div>
-            <div style="border: 1px solid #000; padding: 6px 10px; margin-bottom: 8px;">
-              <div style="font-weight: bold; font-size: 13px; margin-bottom: 3px;">Покупатель</div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px 15px; font-size: 11.5px;">
-                <div><b>ФИО:</b> ${contract.fio || '______'}</div>
-                <div><b>Паспорт серия:</b> ${contract.passport || '______'}</div>
-                <div><b>Дата рождения:</b> ${contract.birthDate || '______'}</div>
-                <div><b>Телефон:</b> ${contract.phone || '______'}</div>
-                <div style="grid-column: span 2;"><b>Адрес:</b> ${contract.address || '______'}</div>
-                <div><b>Доп. Телефон:</b> ${contract.extraPhone || '______'}</div>
-              </div>
-            </div>
-            <div style="border: 1px solid #000; padding: 6px 10px; margin-bottom: 10px;">
-              <div style="font-weight: bold; font-size: 13px; margin-bottom: 3px;">Поручитель</div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px 15px; font-size: 11.5px;">
-                <div><b>ФИО:</b> ${contract.guarantorFio || '______'}</div>
-                <div><b>Паспорт серия:</b> ${contract.guarantorPassport || '______'}</div>
-                <div><b>Дата рождения:</b> ${contract.guarantorBirthDate || '______'}</div>
-                <div><b>Телефон:</b> ${contract.guarantorPhone || '______'}</div>
-                <div style="grid-column: span 2;"><b>Адрес:</b> ${contract.guarantorAddress || '______'}</div>
-                <div><b>Доп. Телефон:</b> ${contract.guarantorExtraPhone || '______'}</div>
-              </div>
-            </div>
-            <p style="text-align: justify; font-size: 11.5px; margin-bottom: 10px;">Совместно именуемые «Стороны», заключили настоящий Договор о нижеследующем:</p>
-            <div style="font-weight: bold; font-size: 14px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">1. ПРЕДМЕТ ДОГОВОРА</div>
-            <p style="text-align: justify; font-size: 11.5px; padding-left: 12px; margin-bottom: 2px;">По настоящему Договору «Продавец» обязуется передать в собственность «Покупателя»:</p>
-            <p style="text-align: justify; font-size: 11.5px; padding-left: 25px; font-weight: bold;">Товар: ${contract.product || '______'}</p>
-            <p style="text-align: justify; font-size: 11.5px; padding-left: 12px;">«Покупатель» обязуется принять и уплатить за него стоимость, указанную в Договоре.</p>
-            <div style="font-weight: bold; font-size: 14px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">2. ЦЕНА ТОВАРА И ПОРЯДОК РАСЧЕТОВ</div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px 25px; font-size: 11.5px; padding-left: 12px;">
-              <div><b>Цена Товара:</b> ${Number(contract.totalCost).toLocaleString('ru-RU')} руб.</div>
-              <div><b>Первый взнос:</b> ${Number(contract.downPayment || 0).toLocaleString('ru-RU')} руб.</div>
-              <div style="grid-column: span 2; text-align: right; font-size: 10px; color: #666;">подпись: ______</div>
-            </div>
-            <p style="text-align: justify; font-size: 11.5px; padding-left: 12px; margin-top: 3px;">
-              Оставшуюся сумму Покупатель выплачивает в течение <b>${contract.monthsCount}</b> месяцев, 
-              равными частями в размере <b>${Number(contract.monthlyPay).toLocaleString('ru-RU')}</b> руб. 
-              не позднее <b>${contract.payDate || '______'}</b> числа каждого месяца.
-            </p>
-            <div style="margin-top: 10px; border: 1px solid #000; overflow: hidden;">
-              <div style="background-color: #e2e8f0; font-weight: bold; text-align: center; padding: 4px; font-size: 12px; border-bottom: 1px solid #000;">📋 ВНЕСЕННЫЕ ПЛАТЕЖИ</div>
-              <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
-                <thead>
-                  <tr>
-                    <th style="padding: 3px 8px; border: 1px solid #000; width: 15%; background: #e2e8f0;">№</th>
-                    <th style="padding: 3px 8px; border: 1px solid #000; width: 45%; background: #e2e8f0;">Дата оплаты</th>
-                    <th style="padding: 3px 8px; border: 1px solid #000; width: 40%; background: #e2e8f0;">Сумма</th>
-                  </tr>
-                </thead>
-                <tbody>${paymentsHtml}</tbody>
-              </table>
-            </div>
+          </header>
+
+          <div class="print-title-wrap">
+            <h1>ДОГОВОР КУПЛИ-ПРОДАЖИ ТОВАРА В РАССРОЧКУ</h1>
+            <div class="print-location">Чеченская Республика</div>
           </div>
-          <div style="page-break-after: always; border-bottom: 2px dashed #ccc; margin: 10px 0;"></div>
-          <div style="font-size: 11px;">
-            <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-top: 8px; margin-bottom: 5px;">3. ПРАВА И ОБЯЗАННОСТИ СТОРОН</div>
-            <div style="font-weight: bold; font-size: 11.5px; margin-top: 6px; margin-bottom: 2px;">«Продавец» обязан:</div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 6px;">- Передать «Покупателю» Товар надлежащего качества, в надлежащей упаковке, в порядке и в сроки, установленные настоящим Договором.</div>
-            <div style="font-weight: bold; font-size: 11.5px; margin-top: 6px; margin-bottom: 2px;">«Покупатель» обязан:</div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">- Принять Товар в порядке, предусмотренном настоящим Договором.</div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">- Оплатить Товар в порядке и в сроки, предусмотренные настоящим Договором.</div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 6px;">- Не имеет право менять контактный номер без предупреждения. При наступлении непредвиденных обстоятельств обязан всеми возможными способами оповестить продавца.</div>
-            <div style="font-weight: bold; font-size: 11.5px; margin-top: 6px; margin-bottom: 2px;">«Поручитель» обязан:</div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 8px;">- При неисполнении или ненадлежащем исполнении «Покупателем» своих обязательств по настоящему договору «Поручитель» отвечает перед «Продавцом» в том же объеме, что и «Покупатель», включая возврат основного долга. При просрочке выплаты «Покупателем» на 7 дней от установленного срока «Поручитель» обязан выплатить просроченный платеж.</div>
-            <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">4. ПЕРЕДАЧА И ПРИНЯТИЕ ТОВАРА</div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">- Товар передается «Покупателю» в месте нахождения продавца в дату подписания настоящего договора.</div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">- «Покупатель» обязан осмотреть товар, проверить соответствие по качеству, количеству и комплектности условиям настоящего договора и принять его.</div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">- Право собственности на товар переходит к «Покупателю» с момента полной оплаты им цены договора. Ответственность за сохранность товара переходит к покупателю с момента подписания настоящего договора.</div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 8px;">- «Продавец» считается исполнившим свою обязанность по передаче товара с даты подписания настоящего договора.</div>
-            <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">5. РАЗРЕШЕНИЕ СПОРОВ</div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">- Все споры и разногласия, которые могут возникнуть между сторонами по вопросам, не нашедшим своего разрешения в тексте настоящего договора, будут разрешаться путем переговоров.</div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 8px;">- В случае неурегулирования спорных вопросов в процессе переговоров такой спор подлежит рассмотрению в суде.</div>
-            <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-top: 10px; margin-bottom: 5px;">6. ЗАКЛЮЧИТЕЛЬНЫЕ ПОЛОЖЕНИЯ</div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 2px;">- Настоящий договор вступает в силу с даты его подписания «Сторонами» и действует до полного исполнения ими обязательств по настоящему договору.</div>
-            <div style="padding-left: 16px; font-size: 10.5px; margin-bottom: 12px;">- Любые изменения и дополнения к настоящему договору должны быть составлены в письменной форме и подписаны всеми сторонами.</div>
-            <div style="margin-top: 12px;">
-              <div style="font-weight: bold; font-size: 13px; text-transform: uppercase; text-decoration: underline; margin-bottom: 8px;">ПОДПИСИ СТОРОН</div>
-              <table style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: center;">
-                <thead>
-                  <tr>
-                    <th style="padding: 5px; border: 1px solid #000; width: 33%;">«Продавец»</th>
-                    <th style="padding: 5px; border: 1px solid #000; width: 33%;">«Покупатель»</th>
-                    <th style="padding: 5px; border: 1px solid #000; width: 34%;">«Поручитель»</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td style="padding: 18px 5px; border: 1px solid #000; vertical-align: bottom;">
-                      <div style="border-top: 1px solid #000; width: 60%; margin: 0 auto; padding-top: 3px;">______</div>
-                    </td>
-                    <td style="padding: 18px 5px; border: 1px solid #000; vertical-align: bottom;">
-                      <div style="border-top: 1px solid #000; width: 60%; margin: 0 auto; padding-top: 3px;">______</div>
-                      <div style="font-size: 9px; margin-top: 2px; color: #555;">${contract.fio || ''}</div>
-                    </td>
-                    <td style="padding: 18px 5px; border: 1px solid #000; vertical-align: bottom;">
-                      <div style="border-top: 1px solid #000; width: 60%; margin: 0 auto; padding-top: 3px;">______</div>
-                      <div style="font-size: 9px; margin-top: 2px; color: #555;">${contract.guarantorFio || ''}</div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div style="margin-top: 10px; font-size: 9px; text-align: center; color: #999; border-top: 1px solid #ddd; padding-top: 6px;">Дата печати: ${todayStr}</div>
+
+          <div class="party-grid">
+            <section class="party-card">
+              <div class="party-card-title">ПОКУПАТЕЛЬ</div>
+              <div class="party-row"><span>ФИО</span><b>${escapeHtml(contract.fio || '—')}</b></div>
+              <div class="party-row"><span>Паспорт</span><b>${escapeHtml(contract.passport || '—')}</b></div>
+              <div class="party-row"><span>Дата рождения</span><b>${escapeHtml(contract.birthDate || '—')}</b></div>
+              <div class="party-row"><span>Телефон</span><b>${escapeHtml(contract.phone || '—')}</b></div>
+              <div class="party-row full"><span>Адрес</span><b>${escapeHtml(contract.address || '—')}</b></div>
+              ${contract.extraPhone ? `<div class="party-row"><span>Доп. телефон</span><b>${escapeHtml(contract.extraPhone)}</b></div>` : ''}
+            </section>
+            <section class="party-card">
+              <div class="party-card-title">ПОРУЧИТЕЛЬ</div>
+              <div class="party-row"><span>ФИО</span><b>${escapeHtml(contract.guarantorFio || '—')}</b></div>
+              <div class="party-row"><span>Паспорт</span><b>${escapeHtml(contract.guarantorPassport || '—')}</b></div>
+              <div class="party-row"><span>Дата рождения</span><b>${escapeHtml(contract.guarantorBirthDate || '—')}</b></div>
+              <div class="party-row"><span>Телефон</span><b>${escapeHtml(contract.guarantorPhone || '—')}</b></div>
+              <div class="party-row full"><span>Адрес</span><b>${escapeHtml(contract.guarantorAddress || '—')}</b></div>
+              ${contract.guarantorExtraPhone ? `<div class="party-row"><span>Доп. телефон</span><b>${escapeHtml(contract.guarantorExtraPhone)}</b></div>` : ''}
+            </section>
           </div>
+
+          <div class="seller-strip">
+            <span><b>Продавец:</b> Компания «YUSRA»</span>
+            <span><b>Рабочий номер:</b> ${escapeHtml(contract.phone || '—')}</span>
+          </div>
+
+          <section class="print-section compact-section">
+            <div class="section-heading"><span>1</span> ПРЕДМЕТ ДОГОВОРА</div>
+            <p>По настоящему Договору «Продавец» обязуется передать в собственность «Покупателя» товар, а «Покупатель» обязуется принять и уплатить за него стоимость, указанную в Договоре.</p>
+            <div class="product-line"><span>Товар</span><b>${escapeHtml(contract.product || '—')}</b></div>
+          </section>
+
+          <section class="print-section compact-section">
+            <div class="section-heading"><span>2</span> ЦЕНА ТОВАРА И ПОРЯДОК РАСЧЁТОВ</div>
+            <div class="finance-grid">
+              <div><span>Цена товара</span><b>${(Number(contract.totalCost) || 0).toLocaleString('ru-RU')} ₽</b></div>
+              <div><span>Первый взнос</span><b>${(Number(contract.downPayment) || 0).toLocaleString('ru-RU')} ₽</b></div>
+              <div><span>Остаток к рассрочке</span><b>${totalPayable.toLocaleString('ru-RU')} ₽</b></div>
+              <div><span>Ежемесячный платёж</span><b>${monthlyPay.toLocaleString('ru-RU')} ₽</b></div>
+              <div><span>Срок</span><b>${monthsCount} мес.</b></div>
+              <div><span>День оплаты</span><b>${escapeHtml(contract.payDate || '—')} числа</b></div>
+            </div>
+            <p class="payment-rule">Оставшуюся сумму Покупатель выплачивает в течение <b>${monthsCount}</b> месяцев равными частями в размере <b>${monthlyPay.toLocaleString('ru-RU')} ₽</b> не позднее <b>${escapeHtml(contract.payDate || '—')}</b> числа каждого месяца.</p>
+          </section>
+
+          <section class="schedule-box">
+            <div class="schedule-head">
+              <div><strong>ГРАФИК ПЛАТЕЖЕЙ</strong><span>Даты рассчитываются автоматически по условиям договора</span></div>
+              <div class="schedule-summary"><b>${paidCount} / ${paymentDates.length}</b><span>оплачено</span></div>
+            </div>
+            <table class="schedule-table">
+              <thead><tr><th>№</th><th>Дата платежа</th><th>Сумма</th><th>Статус</th><th>Подпись</th></tr></thead>
+              <tbody>${scheduleRows}</tbody>
+              <tfoot>
+                <tr><td colspan="2">ВНЕСЕНО</td><td>${totalPaidSum.toLocaleString('ru-RU')} ₽</td><td class="rest-cell">Остаток: ${rest.toLocaleString('ru-RU')} ₽</td><td></td></tr>
+              </tfoot>
+            </table>
+            <div class="schedule-note"><span class="legend-check">✓</span> Зелёная отметка означает, что соответствующий взнос уже внесён в YUSRA.</div>
+          </section>
+
+          <div class="print-page-footer">YUSRA • Договор № ${escapeHtml(contract.contractNum || '—')}</div>
+        </div>
+
+        <div class="print-page print-page-2">
+          <header class="print-header compact-header">
+            <div class="print-brand">YUSRA</div>
+            <div class="print-header-meta"><div><span>Договор</span><b>№ ${escapeHtml(contract.contractNum || '—')}</b></div><div><span>Покупатель</span><b>${escapeHtml(contract.fio || '—')}</b></div></div>
+          </header>
+
+          <div class="legal-intro">Совместно именуемые «Стороны», заключили настоящий Договор о нижеследующем.</div>
+
+          <section class="legal-section">
+            <div class="section-heading"><span>3</span> ПРАВА И ОБЯЗАННОСТИ СТОРОН</div>
+            <h3>«Продавец» обязан:</h3>
+            <p>Передать «Покупателю» Товар надлежащего качества, в надлежащей упаковке, в порядке и в сроки, установленные настоящим Договором.</p>
+            <h3>«Покупатель» обязан:</h3>
+            <p>Принять Товар в порядке, предусмотренном настоящим Договором.</p>
+            <p>Оплатить Товар в порядке и в сроки, предусмотренные настоящим Договором.</p>
+            <p>Не имеет право менять контактный номер без предупреждения. При наступлении непредвиденных обстоятельств обязан всеми возможными способами оповестить продавца.</p>
+            <h3>«Поручитель» обязан:</h3>
+            <p>При неисполнении или ненадлежащем исполнении «Покупателем» своих обязательств по настоящему договору «Поручитель» отвечает перед «Продавцом» в том же объёме, что и «Покупатель», включая возврат основного долга. При просрочке выплаты «Покупателем» на 7 дней от установленного срока «Поручитель» обязан выплатить просроченный платеж.</p>
+          </section>
+
+          <section class="legal-section">
+            <div class="section-heading"><span>4</span> ПЕРЕДАЧА И ПРИНЯТИЕ ТОВАРА</div>
+            <p>Товар передается «Покупателю» в месте нахождения продавца в дату подписания настоящего договора.</p>
+            <p>«Покупатель» обязан осмотреть товар, проверить соответствие по качеству, количеству и комплектности условиям настоящего договора и принять его.</p>
+            <p>Право собственности на товар переходит к «Покупателю» с момента полной оплаты им цены договора. Ответственность за сохранность товара переходит к покупателю с момента подписания настоящего договора.</p>
+            <p>«Продавец» считается исполнившим свою обязанность по передаче товара с даты подписания настоящего договора.</p>
+          </section>
+
+          <section class="legal-section">
+            <div class="section-heading"><span>5</span> РАЗРЕШЕНИЕ СПОРОВ</div>
+            <p>Все споры и разногласия, которые могут возникнуть между сторонами по вопросам, не нашедшим своего разрешения в тексте настоящего договора, будут разрешаться путем переговоров.</p>
+            <p>В случае неурегулирования спорных вопросов в процессе переговоров такой спор подлежит рассмотрению в суде.</p>
+          </section>
+
+          <section class="legal-section">
+            <div class="section-heading"><span>6</span> ЗАКЛЮЧИТЕЛЬНЫЕ ПОЛОЖЕНИЯ</div>
+            <p>Настоящий договор вступает в силу с даты его подписания «Сторонами» и действует до полного исполнения ими обязательств по настоящему договору.</p>
+            <p>Любые изменения и дополнения к настоящему договору должны быть составлены в письменной форме и подписаны всеми сторонами.</p>
+          </section>
+
+          <section class="signatures-section">
+            <div class="section-heading"><span>✓</span> ПОДПИСИ СТОРОН</div>
+            <table class="signatures-table">
+              <thead><tr><th>«Продавец»</th><th>«Покупатель»</th><th>«Поручитель»</th></tr></thead>
+              <tbody><tr>
+                <td><div class="signature-line"></div><small>Компания «YUSRA»</small></td>
+                <td><div class="signature-line"></div><small>${escapeHtml(contract.fio || '')}</small></td>
+                <td><div class="signature-line"></div><small>${escapeHtml(contract.guarantorFio || '')}</small></td>
+              </tr></tbody>
+            </table>
+          </section>
+
+          <div class="print-contact">Контактные номера для связи: <b>${escapeHtml(contract.phone || '—')}</b><br>Реквизиты для оплаты обязательно уточняйте по рабочему номеру.</div>
+          <div class="print-page-footer">YUSRA • Договор № ${escapeHtml(contract.contractNum || '—')} • Дата печати: ${todayStr}</div>
         </div>
       `;
     };
@@ -4580,11 +4746,11 @@
     }
 
     window.renderContractsView = function() {
-      const q = String(document.getElementById('contractsLocalSearch')?.value || '').trim().toLowerCase();
+      const q = String(document.getElementById('contractsNumberSearch')?.value || '').trim().toLowerCase();
       const statusFilter = document.getElementById('contractsStatusFilter')?.value || 'all';
       const sortKey = document.getElementById('contractsSort')?.value || 'newest';
       let list = allContracts.filter(c => {
-        if (q && !getContractSearchText(c).includes(q)) return false;
+        if (q && !String(c.contractNum || '').toLowerCase().includes(q)) return false;
         if (statusFilter !== 'all' && getContractStatusInfo(c).key !== statusFilter) return false;
         return true;
       });
@@ -4597,7 +4763,7 @@
     };
 
     window.resetContractsFilters = function() {
-      const s = document.getElementById('contractsLocalSearch');
+      const s = document.getElementById('contractsNumberSearch');
       const f = document.getElementById('contractsStatusFilter');
       const sort = document.getElementById('contractsSort');
       if (s) s.value = '';
@@ -4654,12 +4820,16 @@
 
     const accModal = document.getElementById('accModal');
     
-    window.openAccModal = function() {
+    window.openAccModal = function(type = 'income') {
       document.getElementById('accForm').reset();
       document.getElementById('accEditId').value = '';
-      document.getElementById('accModalTitle').innerText = 'Новая запись учета';
+      document.getElementById('accQuickType').value = type;
+      document.getElementById('accModalTitle').innerText = type === 'expense' ? 'Новый расход' : 'Новое поступление';
       document.getElementById('accDate').valueAsDate = new Date();
+      document.getElementById('accIncome').value = type === 'expense' ? 0 : '';
+      document.getElementById('accExpense').value = type === 'expense' ? '' : 0;
       accModal.classList.remove('hidden');
+      setTimeout(() => document.getElementById(type === 'expense' ? 'accExpense' : 'accIncome')?.focus(), 0);
     };
 
     window.closeAccModal = function() { accModal.classList.add('hidden'); };
@@ -4669,6 +4839,7 @@
       if (!item) return;
       document.getElementById('accEditId').value = item.id;
       document.getElementById('accModalTitle').innerText = 'Редактирование записи';
+      document.getElementById('accQuickType').value = Number(item.expense || 0) > 0 ? 'expense' : 'income';
       document.getElementById('accDate').value = item.date;
       document.getElementById('accIncome').value = item.income || 0;
       document.getElementById('accExpense').value = item.expense || 0;
@@ -4702,6 +4873,8 @@
       }
 
       saveToStorage();
+      populateAccountingAccountFilter();
+      applyAccountingFilters();
       closeAccModal();
     });
 
@@ -4713,6 +4886,67 @@
       }
     };
 
+    function getAccountingFilterAccounts() {
+      const names = new Set();
+      allAccounting.forEach(a => { if (a && a.account) names.add(String(a.account)); });
+      (customAccounts || []).forEach(a => { if (a && a.name) names.add(String(a.name)); });
+      return [...names].sort((a,b) => a.localeCompare(b, 'ru'));
+    }
+
+    window.populateAccountingAccountFilter = function() {
+      const select = document.getElementById('accAccountFilter');
+      if (!select) return;
+      const current = select.value || 'all';
+      select.innerHTML = '<option value="all">Счёт: все</option>';
+      getAccountingFilterAccounts().forEach(name => {
+        const opt = document.createElement('option');
+        opt.value = name; opt.textContent = name;
+        select.appendChild(opt);
+      });
+      if ([...select.options].some(o => o.value === current)) select.value = current;
+    };
+
+    window.applyAccountingFilters = function() {
+      const from = document.getElementById('accDateFrom')?.value || '';
+      const to = document.getElementById('accDateTo')?.value || '';
+      const income = document.getElementById('accIncomeFilter')?.value || 'all';
+      const expense = document.getElementById('accExpenseFilter')?.value || 'all';
+      const note = String(document.getElementById('accNoteFilter')?.value || '').trim().toLowerCase();
+      const account = document.getElementById('accAccountFilter')?.value || 'all';
+      const sort = document.getElementById('accSortFilter')?.value || 'newest';
+
+      let items = allAccounting.filter(a => {
+        const date = String(a.date || '');
+        if (from && date < from) return false;
+        if (to && date > to) return false;
+        const hasIncome = Number(a.income || 0) > 0;
+        const hasExpense = Number(a.expense || 0) > 0;
+        if (income === 'yes' && !hasIncome) return false;
+        if (income === 'no' && hasIncome) return false;
+        if (expense === 'yes' && !hasExpense) return false;
+        if (expense === 'no' && hasExpense) return false;
+        if (note && !String(a.note || '').toLowerCase().includes(note)) return false;
+        if (account !== 'all' && String(a.account || '') !== account) return false;
+        return true;
+      });
+
+      items.sort((a,b) => {
+        const ad = String(a.date || ''), bd = String(b.date || '');
+        if (ad !== bd) return sort === 'oldest' ? ad.localeCompare(bd) : bd.localeCompare(ad);
+        return sort === 'oldest' ? (a.createdAt || 0) - (b.createdAt || 0) : (b.createdAt || 0) - (a.createdAt || 0);
+      });
+      renderAccountingTable(items);
+    };
+
+    window.resetAccountingFilters = function() {
+      ['accDateFrom','accDateTo','accNoteFilter'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+      const income=document.getElementById('accIncomeFilter'); if(income) income.value='all';
+      const expense=document.getElementById('accExpenseFilter'); if(expense) expense.value='all';
+      const account=document.getElementById('accAccountFilter'); if(account) account.value='all';
+      const sort=document.getElementById('accSortFilter'); if(sort) sort.value='newest';
+      applyAccountingFilters();
+    };
+
     function renderAccountingTable(items) {
       const tbody = document.getElementById('accountingTable');
       tbody.innerHTML = '';
@@ -4720,7 +4954,7 @@
       let incomeSum = 0;
       let expenseSum = 0;
 
-      const sorted = [...items].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+      const sorted = [...items];
 
       sorted.forEach(item => {
         incomeSum += Number(item.income || 0);
@@ -4743,6 +4977,7 @@
 
       document.getElementById('totalIncome').innerText = incomeSum.toLocaleString('ru-RU') + ' ₽';
       document.getElementById('totalExpense').innerText = expenseSum.toLocaleString('ru-RU') + ' ₽';
+      populateAccountingAccountFilter();
     }
 
     const takenModal = document.getElementById('takenModal');
@@ -5129,11 +5364,13 @@
     window.handleSearch = function() {
       const q = document.getElementById('searchInput').value.toLowerCase();
       if (activeTab === 'contracts') {
-        const local = document.getElementById('contractsLocalSearch');
+        const local = document.getElementById('contractsNumberSearch');
         if (local && local.value !== q) local.value = q;
         renderContractsView();
       } else if (activeTab === 'accounting') {
-        renderAccountingTable(allAccounting.filter(a => a.note.toLowerCase().includes(q) || a.account.toLowerCase().includes(q) || a.date.includes(q)));
+        const note = document.getElementById('accNoteFilter');
+        if (note && note.value !== q) note.value = q;
+        applyAccountingFilters();
       } else if (activeTab === 'taken') {
         const filtered = allTaken.filter(t => (t.takenDesc && t.takenDesc.toLowerCase().includes(q)) || (t.putDesc && t.putDesc.toLowerCase().includes(q)));
         renderTakenFiltered(filtered);
@@ -5972,7 +6209,8 @@
     try {
       renderDashboard();
       renderTable(allContracts);
-      renderAccountingTable(allAccounting);
+      populateAccountingAccountFilter();
+      applyAccountingFilters();
       renderTakenSheet();
       updateHistoryButtons();
       switchTab(IS_FIELDWORKER_MODE ? 'fieldwork' : 'home');
