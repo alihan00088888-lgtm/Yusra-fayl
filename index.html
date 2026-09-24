@@ -2887,6 +2887,10 @@
         const monthDate = `${rep.year}-${String(rep.month).padStart(2,'0')}-01`;
         if (!dashInRange(monthDate, range)) return;
         initInvestors.forEach(inv => {
+          // Дивиденды владельца уже входят в общие расходы на Главной.
+          // Поэтому здесь учитываем только дивиденды внешних инвесторов,
+          // чтобы дивиденды владельца не вычитались повторно.
+          if (inv.isOwner) return;
           const e = rep.entries[inv.id];
           if (e) sum += Number(e.dividends || 0);
         });
