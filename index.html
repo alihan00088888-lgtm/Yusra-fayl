@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+  <!-- YUSRA: Excel expenses + owner dividend cash logic fix 2026-09-23 -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Система Учета и Договоров</title>
@@ -132,6 +133,76 @@
     .schedule-client-list .client-rest { font-size: 10px; }
     .schedule-client-list .client-item a { font-size: 10px; }
     .schedule-client-list .month-future { background:#e5e7eb; color:#64748b; }
+
+    /* Единый компактный стиль для «Сегодня», «Через 3 дня» и «Неплательщики» —
+       визуально в одной системе с таблицей «Договоры». */
+    .schedule-contract-list {
+      background:#fff;
+      border:1px solid #e2e8f0;
+      border-radius:16px;
+      overflow:hidden;
+      box-shadow:0 6px 20px rgba(15,23,42,.05);
+    }
+    .schedule-contract-row {
+      display:grid;
+      grid-template-columns:92px minmax(170px,1.45fr) minmax(125px,1fr) minmax(150px,1.1fr) minmax(125px,1fr) minmax(105px,.8fr) 92px;
+      align-items:stretch;
+      min-height:56px;
+      border-bottom:1px solid #eef2f7;
+      transition:background .15s;
+    }
+    .schedule-contract-row:last-child { border-bottom:0; }
+    .schedule-contract-row:hover { background:#f8fafc; }
+    .schedule-contract-segment {
+      min-width:0;
+      padding:8px 10px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      border-right:1px solid #eef2f7;
+      font-size:10px;
+    }
+    .schedule-contract-segment:last-child { border-right:0; }
+    .schedule-contract-label {
+      color:#94a3b8;
+      font-size:8px;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+      margin-bottom:2px;
+    }
+    .schedule-contract-value { color:#0f172a; font-weight:800; line-height:1.2; overflow:hidden; text-overflow:ellipsis; }
+    .schedule-contract-number { color:#0f172a; font-size:11px; font-weight:900; }
+    .schedule-contract-name { color:#0f172a; font-size:11px; font-weight:900; }
+    .schedule-contract-muted { color:#64748b; font-size:9px; margin-top:2px; overflow:hidden; text-overflow:ellipsis; }
+    .schedule-contract-danger { color:#dc2626; font-weight:900; }
+    .schedule-contract-warn { color:#ea580c; font-weight:900; }
+    .schedule-contract-action {
+      display:inline-flex; align-items:center; justify-content:center; gap:4px;
+      min-height:30px; padding:5px 7px; border-radius:7px;
+      font-size:9px; font-weight:900; border:1px solid #dcfce7;
+      background:#f0fdf4; color:#15803d; text-decoration:none;
+    }
+    .schedule-contract-action:hover { background:#dcfce7; }
+    .schedule-contract-header {
+      display:grid;
+      grid-template-columns:92px minmax(170px,1.45fr) minmax(125px,1fr) minmax(150px,1.1fr) minmax(125px,1fr) minmax(105px,.8fr) 92px;
+      background:#0f172a; color:#fff;
+    }
+    .schedule-contract-header > div { padding:8px 10px; border-right:1px solid #334155; font-size:8px; font-weight:900; text-transform:uppercase; letter-spacing:.04em; }
+    .schedule-contract-header > div:last-child { border-right:0; }
+    @media (max-width:900px) {
+      .schedule-contract-list { overflow-x:auto; }
+      .schedule-contract-header, .schedule-contract-row { min-width:860px; }
+    }
+    @media (max-width:640px) {
+      .schedule-contract-list { border-radius:12px; }
+      .schedule-contract-header { display:none; }
+      .schedule-contract-row { display:grid; grid-template-columns:82px minmax(145px,1fr) 110px 105px; min-width:0; }
+      .schedule-contract-segment:nth-child(3), .schedule-contract-segment:nth-child(4) { display:none; }
+      .schedule-contract-segment { padding:8px 9px; }
+      .schedule-contract-segment:nth-child(5) { border-right:1px solid #eef2f7; }
+    }
     .schedule-client-list .month-today { background:#3b82f6; color:#fff; }
     .schedule-client-list .month-three-days { background:#facc15; color:#713f12; }
 
@@ -976,6 +1047,15 @@
     .dashboard-section-sub { font-size:9px; color:#94a3b8; font-weight:700; }
     .dashboard-two-col { display:grid; grid-template-columns:1.35fr 1fr; gap:14px; }
     .dashboard-three-col { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
+    .dashboard-a-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:10px; }
+    .dashboard-a-card { background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:12px 13px; box-shadow:0 4px 14px rgba(15,23,42,.04); }
+    .dashboard-a-label { font-size:9px; font-weight:900; color:#64748b; text-transform:uppercase; letter-spacing:.045em; }
+    .dashboard-a-value { margin-top:6px; font-size:16px; line-height:1.1; font-weight:900; color:#0f172a; word-break:break-word; }
+    .dashboard-a-value.green { color:#059669; }
+    .dashboard-a-value.blue { color:#2563eb; }
+    .dashboard-a-value.red { color:#dc2626; }
+    .dashboard-a-value.amber { color:#d97706; }
+    .dashboard-a-note { margin-top:4px; font-size:8px; color:#94a3b8; font-weight:700; }
     .dashboard-list { padding:4px 0; }
     .dashboard-row { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 16px; border-bottom:1px solid #f1f5f9; }
     .dashboard-row:last-child { border-bottom:0; }
@@ -993,12 +1073,16 @@
     .dashboard-big-value.blue { color:#2563eb; }
     .dashboard-big-value.green { color:#059669; }
     .dashboard-profit-strip { margin-top:10px; padding:10px 12px; border-radius:10px; background:#ecfdf5; color:#047857; display:flex; justify-content:space-between; gap:8px; font-size:10px; font-weight:900; }
+    .dashboard-installment-moved { margin-top:10px; }
+
     .dashboard-chart-wrap { padding:12px 16px 16px; }
     .dashboard-chart { height:190px; display:flex; align-items:flex-end; gap:7px; border-bottom:1px solid #e2e8f0; padding:8px 4px 0; overflow-x:auto; }
     .dashboard-chart-month { min-width:46px; height:100%; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; gap:4px; }
-    .dashboard-chart-bars { width:100%; height:145px; display:flex; align-items:flex-end; justify-content:center; gap:3px; }
-    .dashboard-chart-bar { width:10px; min-height:2px; border-radius:4px 4px 0 0; background:#2563eb; }
+    .dashboard-chart-bars { width:100%; height:145px; display:flex; align-items:flex-end; justify-content:center; gap:3px; cursor:pointer; }
+    .dashboard-chart-bar { width:10px; min-height:2px; border-radius:4px 4px 0 0; background:#2563eb; cursor:pointer; transition:opacity .15s, transform .15s; }
+    .dashboard-chart-bar:hover { opacity:.78; transform:scaleY(1.03); transform-origin:bottom; }
     .dashboard-chart-bar.expense { background:#ef4444; }
+    .dashboard-chart-bar.real-income { background:#22c55e; }
     .dashboard-chart-label { font-size:8px; color:#94a3b8; font-weight:800; white-space:nowrap; }
     .dashboard-chart-value { font-size:7px; color:#64748b; font-weight:800; white-space:nowrap; }
     .dashboard-quick-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; padding:14px 16px 16px; }
@@ -1009,6 +1093,7 @@
       .dashboard-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
       .dashboard-two-col { grid-template-columns:1fr; }
       .dashboard-three-col { grid-template-columns:1fr 1fr; }
+      .dashboard-a-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
       .dashboard-quick-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
     }
     @media (max-width: 640px) {
@@ -1019,6 +1104,9 @@
       .dashboard-metric-value { font-size:16px; }
       .dashboard-metric-icon { width:30px; height:30px; font-size:15px; }
       .dashboard-three-col { grid-template-columns:1fr; }
+      .dashboard-a-grid { grid-template-columns:1fr 1fr; gap:8px; }
+      .dashboard-a-card { padding:10px; }
+      .dashboard-a-value { font-size:14px; }
       .dashboard-installment-grid { grid-template-columns:1fr; }
       .dashboard-big-value { font-size:19px; }
       .dashboard-quick-grid { grid-template-columns:1fr 1fr; padding:12px; }
@@ -1122,11 +1210,6 @@
       </section>
 
       <section class="dashboard-grid">
-        <div class="dashboard-card dashboard-metric blue">
-          <div class="dashboard-metric-top"><span class="dashboard-metric-label">Общий доход</span><span class="dashboard-metric-icon">📈</span></div>
-          <div id="dashTotalProfit" class="dashboard-metric-value">0 ₽</div>
-          <div class="dashboard-metric-note">без вычета расходов</div>
-        </div>
         <div class="dashboard-card dashboard-metric red">
           <div class="dashboard-metric-top"><span class="dashboard-metric-label">Общие расходы</span><span class="dashboard-metric-icon">📉</span></div>
           <div id="dashGeneralExpense" class="dashboard-metric-value">0 ₽</div>
@@ -1147,11 +1230,6 @@
           <div id="dashPaidProfit" class="dashboard-metric-value">0 ₽</div>
           <div class="dashboard-metric-note">прибыль по фактически внесённым деньгам</div>
         </div>
-        <div class="dashboard-card dashboard-metric blue">
-          <div class="dashboard-metric-top"><span class="dashboard-metric-label">Общие платежи</span><span class="dashboard-metric-icon">💳</span></div>
-          <div id="dashPayments" class="dashboard-metric-value">0 ₽</div>
-          <div class="dashboard-metric-note">предоплаты + внесённые платежи</div>
-        </div>
         <div class="dashboard-card dashboard-metric red">
           <div class="dashboard-metric-top"><span class="dashboard-metric-label">Просрочка</span><span class="dashboard-metric-icon">⚠️</span></div>
           <div id="dashOverdue" class="dashboard-metric-value">0 ₽</div>
@@ -1162,7 +1240,8 @@
           <div id="dashDebtors" class="dashboard-metric-value">0</div>
           <div class="dashboard-metric-note">можно открыть из меню</div>
         </div>
-      </section>
+
+        </section>
 
       <section class="dashboard-two-col">
         <div class="dashboard-card dashboard-section">
@@ -1180,7 +1259,16 @@
                 <div id="dashInstallmentTotal" class="dashboard-big-value blue">0 ₽</div>
               </div>
             </div>
-            <div class="dashboard-profit-strip"><span>Доход от рассрочки</span><span id="dashInstallmentProfit">0 ₽</span></div>
+            <div class="dashboard-installment-grid dashboard-installment-moved">
+              <div class="dashboard-big-box">
+                <div class="dashboard-big-label">Общий доход</div>
+                <div id="dashTotalProfitMoved" class="dashboard-big-value">0 ₽</div>
+              </div>
+              <div class="dashboard-big-box">
+                <div class="dashboard-big-label">Общие платежи</div>
+                <div id="dashPaymentsMoved" class="dashboard-big-value blue">0 ₽</div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1229,7 +1317,7 @@
       <section class="dashboard-card dashboard-section">
         <div class="dashboard-section-head">
           <div><div class="dashboard-section-title">📈 Динамика</div><div class="dashboard-section-sub">Доход без расходов и общие расходы по месяцам</div></div>
-          <div class="flex items-center gap-3 text-[9px] font-bold text-slate-500"><span>■ Доход</span><span class="text-red-500">■ Расход</span></div>
+          <div class="flex items-center gap-3 text-[9px] font-bold text-slate-500"><span>■ Доход</span><span class="text-red-500">■ Расход</span><span class="text-green-500">■ Мой реальный доход</span></div>
         </div>
         <div id="dashboardChart" class="dashboard-chart-wrap"></div>
       </section>
@@ -1264,6 +1352,7 @@
             <option value="today">Сегодня платёж</option>
             <option value="soon">Скоро платёж</option>
             <option value="overdue">Просроченные</option>
+            <option value="unpaidStore">Не оплачено магазину (без Д)</option>
             <option value="closed">Закрытые</option>
           </select>
           <select id="contractsSort" class="contracts-select" onchange="renderContractsView()">
@@ -1491,7 +1580,6 @@
             <div id="debtorsSummary" class="text-xs text-slate-500 font-semibold mt-1"></div>
           </div>
         </div>
-        </div>
         <div id="debtorsClientsList" class="client-list"></div>
       </div>
     </div>
@@ -1555,23 +1643,30 @@
     </div>
 
     <!-- ================= Лист 7: Партнёры ================= -->
-    <div id="partnersTabContent" class="hidden space-y-4">
-      <div class="bg-white shadow-xl rounded-xl p-6 border">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold text-purple-600">🤝 Партнёры / Магазины</h2>
-          <div class="flex items-center gap-4">
-            <div class="flex items-center gap-2">
-              <label class="text-xs font-bold">С:</label>
-              <input type="date" id="partnerDateFrom" class="p-1 border rounded text-xs" onchange="renderPartners()">
-            </div>
-            <div class="flex items-center gap-2">
-              <label class="text-xs font-bold">По:</label>
-              <input type="date" id="partnerDateTo" class="p-1 border rounded text-xs" onchange="renderPartners()">
-            </div>
-            <button onclick="clearPartnerDates()" class="bg-gray-500 hover:bg-gray-600 text-white px-2 py-1 rounded text-xs">Сбросить</button>
+    <div id="partnersTabContent" class="hidden space-y-3">
+      <div class="bg-white shadow-xl rounded-xl p-3 md:p-4 border">
+        <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
+          <h2 class="text-lg font-bold text-purple-600">🤝 Партнёры</h2>
+          <div class="flex flex-wrap items-center gap-1.5">
+            <button onclick="setPartnersView('official')" id="partnersViewOfficial" class="bg-purple-600 text-white px-2.5 py-1.5 rounded text-xs font-bold">Мои партнёры</button>
+            <button onclick="setPartnersView('other')" id="partnersViewOther" class="bg-gray-100 text-gray-700 px-2.5 py-1.5 rounded text-xs font-bold">Другие</button>
+            <button onclick="togglePartnerAdd()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1.5 rounded text-xs font-bold">＋ Добавить</button>
           </div>
         </div>
-        <div id="partnersList" class="divide-y"></div>
+        <div id="partnerAddPanel" class="hidden mb-3 p-2.5 rounded-lg bg-purple-50 border border-purple-200">
+          <div class="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-2">
+            <input id="partnerNameInput" class="p-2 border rounded text-sm" placeholder="Название партнёра / магазина">
+            <input id="partnerPhoneInput" class="p-2 border rounded text-sm" placeholder="Телефон / WhatsApp">
+            <button onclick="addPartner()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded text-xs font-bold">Сохранить</button>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 mb-3">
+          <input type="date" id="partnerDateFrom" class="p-1.5 border rounded text-xs" onchange="renderPartners()">
+          <span class="text-xs font-bold text-gray-400">—</span>
+          <input type="date" id="partnerDateTo" class="p-1.5 border rounded text-xs" onchange="renderPartners()">
+          <button onclick="clearPartnerDates()" class="bg-gray-500 hover:bg-gray-600 text-white px-2 py-1.5 rounded text-xs">Сбросить</button>
+        </div>
+        <div id="partnersList"></div>
       </div>
     </div>
 
@@ -1655,11 +1750,13 @@
 
       <div class="bg-white shadow-xl rounded-xl p-6 border-2 border-purple-300">
         <h2 class="text-xl font-bold text-purple-700 mb-4">🏛️ Настройка инвесторов</h2>
+        <div class="text-xs text-gray-500 mb-3">Начальный капитал задаётся здесь один раз и не относится к отдельному месяцу.</div>
         <div class="overflow-x-auto">
           <table class="init-table" style="max-width: 1000px;">
             <thead>
               <tr>
                 <th>Имя инвестора</th>
+                <th>Начальный капитал</th>
                 <th>% прибыли инвестору</th>
                 <th>% владельцу (авто)</th>
                 <th>Вложено всего</th>
@@ -1787,6 +1884,33 @@
         <div class="flex justify-end gap-2 pt-2">
           <button type="button" onclick="closeInvestmentCopyModal()" class="px-4 py-2 text-slate-500 font-bold">Отмена</button>
           <button type="button" onclick="performInvestmentCopy()" class="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-bold">📋 Копировать</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ПОДРОБНОСТИ ДИНАМИКИ ЗА МЕСЯЦ -->
+  <div id="dashboardMonthDetailModal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-[80]" onclick="if(event.target===this) closeDashboardMonthDetail()">
+    <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+      <div class="flex items-start justify-between gap-4 p-5 border-b border-slate-200">
+        <div>
+          <div class="text-[9px] uppercase font-black tracking-widest text-slate-400">Динамика за месяц</div>
+          <h2 id="dashboardMonthDetailTitle" class="text-xl font-black text-slate-900 mt-1"></h2>
+        </div>
+        <button type="button" onclick="closeDashboardMonthDetail()" class="text-2xl leading-none text-slate-400 hover:text-slate-700">×</button>
+      </div>
+      <div class="p-5 space-y-3">
+        <div class="flex items-center justify-between gap-4 p-4 rounded-xl bg-blue-50 border border-blue-100">
+          <span class="font-bold text-slate-600">Доход</span>
+          <strong id="dashboardMonthDetailProfit" class="text-blue-600 text-lg"></strong>
+        </div>
+        <div class="flex items-center justify-between gap-4 p-4 rounded-xl bg-red-50 border border-red-100">
+          <span class="font-bold text-slate-600">Расход</span>
+          <strong id="dashboardMonthDetailExpense" class="text-red-600 text-lg"></strong>
+        </div>
+        <div class="flex items-center justify-between gap-4 p-4 rounded-xl bg-green-50 border border-green-100">
+          <span class="font-bold text-slate-600">Мой реальный доход</span>
+          <strong id="dashboardMonthDetailRealIncome" class="text-green-600 text-lg"></strong>
         </div>
       </div>
     </div>
@@ -2072,6 +2196,8 @@
     // ПЕРЕМЕННЫЕ
     // ================================================================
     let allContracts = JSON.parse(localStorage.getItem('contracts_db') || '[]');
+    let allPartners = JSON.parse(localStorage.getItem('partners_db') || '[]');
+    if (!Array.isArray(allPartners)) allPartners = [];
     let allAccounting = JSON.parse(localStorage.getItem('accounting_db') || '[]');
     let allTaken = JSON.parse(localStorage.getItem('taken_db') || '[]');
     let allIncomeExpenses = JSON.parse(localStorage.getItem('income_expenses_db') || '[]');
@@ -2186,6 +2312,7 @@
             investors: initInvestors,
             monthlyReports: initMonthlyReports,
             fieldVisitRecords: fieldVisitRecords,
+            partners: allPartners,
             updatedAt: Date.now()
           });
           setSyncStatus('synced', 'Синхронизировано');
@@ -2206,6 +2333,7 @@
       if (data.investors) initInvestors = data.investors;
       if (data.monthlyReports) initMonthlyReports = data.monthlyReports;
       if (data.fieldVisitRecords && typeof data.fieldVisitRecords === 'object') fieldVisitRecords = data.fieldVisitRecords;
+      if (Array.isArray(data.partners)) allPartners = data.partners;
 
       localStorage.setItem('contracts_db', JSON.stringify(allContracts));
       localStorage.setItem('accounting_db', JSON.stringify(allAccounting));
@@ -2215,6 +2343,7 @@
       localStorage.setItem('investors_db', JSON.stringify(initInvestors));
       localStorage.setItem('monthly_reports_db', JSON.stringify(initMonthlyReports));
       localStorage.setItem('field_visit_records_db', JSON.stringify(fieldVisitRecords));
+      localStorage.setItem('partners_db', JSON.stringify(allPartners));
 
       try {
         renderTable(allContracts);
@@ -2565,6 +2694,7 @@
       localStorage.setItem('investors_db', JSON.stringify(initInvestors));
       localStorage.setItem('monthly_reports_db', JSON.stringify(initMonthlyReports));
       localStorage.setItem('field_visit_records_db', JSON.stringify(fieldVisitRecords));
+      localStorage.setItem('partners_db', JSON.stringify(allPartners));
       renderTable(allContracts);
       if (activeTab === 'accounting') { populateAccountingAccountFilter(); applyAccountingFilters(); }
       else renderAccountingTable(allAccounting);
@@ -2692,6 +2822,8 @@
     }
 
     function getDashboardContractMetrics(contracts) {
+      let contractRevenue = 0;
+      let totalCost = 0;
       let totalProfit = 0;
       let expectedProfit = 0;
       let paidProfit = 0;
@@ -2707,18 +2839,22 @@
         const total = Number(c.totalCost) || 0;
         const cost = Number(c.costPrice) || 0;
         const down = Number(c.downPayment) || 0;
-        const contractProfit = total - cost;
+        const contractProfit = Math.max(0, total - cost);
         const metrics = calculateContractMetrics(c);
+
+        contractRevenue += total;
+        totalCost += cost;
         totalProfit += contractProfit;
-        outstanding += metrics.rest;
+        outstanding += Math.max(0, metrics.rest);
         totalMonths += Number(c.monthsCount) || 0;
         totalMarginBase += cost;
         if (metrics.isClosed) closed++; else active++;
 
         const margin = total > 0 ? contractProfit / total : 0;
-        const paidDown = Math.max(0, down);
-        payments += paidDown;
-        paidProfit += paidDown * margin;
+
+        // Предоплата относится к фактическим платежам.
+        payments += Math.max(0, down);
+        paidProfit += Math.max(0, down) * margin;
 
         Object.values(c.installments || {}).forEach(p => {
           const amount = Number(p?.amount) || 0;
@@ -2733,7 +2869,10 @@
 
       const averageMonths = contracts.length ? totalMonths / contracts.length : 0;
       const averagePercent = totalMarginBase > 0 ? (totalProfit / totalMarginBase) * 100 : 0;
-      return { totalProfit, expectedProfit, paidProfit, payments, outstanding, overdue, averageMonths, averagePercent, active, closed };
+      return {
+        contractRevenue, totalCost, totalProfit, expectedProfit, paidProfit,
+        payments, outstanding, overdue, averageMonths, averagePercent, active, closed
+      };
     }
 
     function getDashboardExpenses(range) {
@@ -2757,16 +2896,19 @@
 
     function getDashboardInvestments(range) {
       let investorInvested = 0, ownerInvested = 0, totalInvested = 0;
-      Object.keys(initMonthlyReports).forEach(key => {
+      const keys = Object.keys(initMonthlyReports).sort();
+      const firstKey = keys[0];
+      keys.forEach(key => {
         const rep = initMonthlyReports[key];
         if (!rep || !rep.entries) return;
         const monthDate = `${rep.year}-${String(rep.month).padStart(2,'0')}-01`;
         if (!dashInRange(monthDate, range)) return;
+        const isFirstReport = key === firstKey;
         initInvestors.forEach(inv => {
           const e = rep.entries[inv.id];
           const monthlyInvested = Number(e?.invested || 0);
-          // Начальный капитал является частью реально вложенного капитала.
-          const startingCapital = Number(rep.startingCapital?.[inv.id] || 0);
+          // Начальный капитал — это разовое первоначальное вложение, а не ежемесячное.
+          const startingCapital = isFirstReport ? Number(inv.initialCapital || 0) : 0;
           const value = monthlyInvested + startingCapital;
           totalInvested += value;
           if (inv.isOwner) ownerInvested += value;
@@ -2776,10 +2918,18 @@
       return { investorInvested, ownerInvested, totalInvested };
     }
 
-    function getDashboardCurrentCapital() {
+    function getDashboardCurrentCapital(range) {
       const keys = Object.keys(initMonthlyReports).sort();
       if (!keys.length) return 0;
-      const latest = initMonthlyReports[keys[keys.length - 1]];
+      let candidateKey = null;
+      keys.forEach(key => {
+        const rep = initMonthlyReports[key];
+        if (!rep) return;
+        const monthDate = `${rep.year}-${String(rep.month).padStart(2,'0')}-01`;
+        if (!range || !range.to || dashParseDate(monthDate) <= dashParseDate(range.to)) candidateKey = key;
+      });
+      if (!candidateKey) return 0;
+      const latest = initMonthlyReports[candidateKey];
       let total = 0;
       initInvestors.forEach(inv => total += Number(latest?.entries?.[inv.id]?.capital || 0));
       return total;
@@ -2792,15 +2942,15 @@
         sumPut += Number(item.putAmount || 0);
       });
       allContracts.forEach(c => {
-        if (c.shopPaid) {
-          totalDownPayments += Number(c.downPayment || 0);
-          totalCostPrice += Number(c.costPrice || 0);
-        }
+        // Платёж клиента поступает в кассу независимо от того, рассчитались ли мы с магазином.
+        // Предоплата учитывается в кассе только после отметки «Д».
+        if (isStorePaid(c)) totalDownPayments += Number(c.downPayment || 0);
+        if (isStorePaid(c)) totalCostPrice += Number(c.costPrice || 0);
         Object.values(c.installments || {}).forEach(p => totalInstallments += Number(p?.amount || 0));
       });
       allIncomeExpenses.forEach(e => totalIncomeExpenses += Number(e.amount || 0));
 
-      let totalInvested = 0, totalDividends = 0, totalWithdrawn = 0, totalStartingCapital = 0;
+      let totalInvested = 0, totalExternalDividends = 0, totalWithdrawn = 0, totalStartingCapital = 0;
       const keys = Object.keys(initMonthlyReports).sort();
       keys.forEach((key, idx) => {
         const rep = initMonthlyReports[key];
@@ -2809,15 +2959,17 @@
           const e = rep.entries[inv.id];
           if (e) {
             totalInvested += Number(e.invested || 0);
-            totalDividends += Number(e.dividends || 0);
+            // Дивиденды владельца — это распределение уже учтённых расходов.
+            // Они не должны повторно уменьшать кассу.
+            if (!inv.isOwner) totalExternalDividends += Number(e.dividends || 0);
             totalWithdrawn += Number(e.withdrawn || 0);
           }
         });
         if (idx === 0 && rep.startingCapital) {
-          initInvestors.forEach(inv => totalStartingCapital += Number(rep.startingCapital[inv.id] || 0));
+          initInvestors.forEach(inv => totalStartingCapital += Number(inv.initialCapital || 0));
         }
       });
-      const investImpact = totalInvested - totalDividends - totalWithdrawn + totalStartingCapital;
+      const investImpact = totalInvested - totalExternalDividends - totalWithdrawn + totalStartingCapital;
       return totalDownPayments + totalInstallments - totalCostPrice - sumTaken + sumPut - totalIncomeExpenses + investImpact;
     }
 
@@ -2844,19 +2996,35 @@
       return months;
     }
 
+    function getDashboardOwnerRealIncomeByMonth(year, month) {
+      const owner = initInvestors.find(inv => inv && inv.isOwner);
+      if (!owner) return 0;
+
+      const key = `${year}-${String(month).padStart(2, '0')}`;
+      const report = initMonthlyReports[key];
+      const entry = report?.entries?.[owner.id];
+      if (!entry) return 0;
+
+      // Зелёная динамика показывает именно доход владельца из раздела
+      // «Инвестиции» — прибыль, которая относится к капиталу владельца.
+      // Общий доход по договорам здесь не используется. Расходы, дивиденды
+      // и снятия не вычитаются из этого показателя: они отображаются отдельно
+      // и не должны менять сам показатель заработанного дохода владельца.
+      const ownerProfit = Number(entry.profitActual) || 0;
+      return ownerProfit;
+    }
+
     function getDashboardMonthData(year, month) {
-      let profit = 0, expense = 0;
-      allContracts.forEach(c => {
-        const d = dashParseDate(c.buyDate);
-        if (d && d.getFullYear() === year && d.getMonth() + 1 === month) {
-          profit += (Number(c.totalCost) || 0) - (Number(c.costPrice) || 0);
-        }
-      });
+      // На графике показываем фактически заработанную прибыль по полученным
+      // платежам — тот же принцип, который используется в инвестициях.
+      const profit = getProfitByMonth(year, month);
+      let expense = 0;
       allIncomeExpenses.forEach(e => {
         const d = dashParseDate(e.date);
         if (d && d.getFullYear() === year && d.getMonth() + 1 === month) expense += Number(e.amount) || 0;
       });
-      return { profit, expense };
+      const realIncome = getDashboardOwnerRealIncomeByMonth(year, month);
+      return { profit, expense, realIncome };
     }
 
     function renderDashboardChart(range) {
@@ -2864,21 +3032,53 @@
       if (!container) return;
       const months = getDashboardChartMonths(range);
       const data = months.map(m => ({ ...m, ...getDashboardMonthData(m.year, m.month) }));
-      const maxValue = Math.max(1, ...data.flatMap(x => [x.profit, x.expense]));
+      // Высота всех трёх столбцов считается от одной шкалы. Поэтому зелёный
+      // столбец действительно показывает реальный размер дохода относительно
+      // красного расхода: при равных суммах они одинаковой высоты.
+      const maxValue = Math.max(1, ...data.flatMap(x => [Math.max(0, x.profit), Math.max(0, x.expense), Math.max(0, x.realIncome)]));
       const monthNames = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
       container.innerHTML = `<div class="dashboard-chart">${data.map(item => {
-        const hProfit = Math.max(2, Math.round((item.profit / maxValue) * 130));
-        const hExpense = Math.max(2, Math.round((item.expense / maxValue) * 130));
+        const hProfit = Math.max(2, Math.round((Math.max(0, item.profit) / maxValue) * 130));
+        const hExpense = Math.max(2, Math.round((Math.max(0, item.expense) / maxValue) * 130));
+        const hRealIncome = Math.max(2, Math.round((Math.max(0, item.realIncome) / maxValue) * 130));
+        const monthTitle = `${monthNames[item.month-1]} ${item.year}`;
+        const detailCall = `openDashboardMonthDetail(${item.year},${item.month})`;
         return `<div class="dashboard-chart-month">
-          <div class="dashboard-chart-bars" title="${monthNames[item.month-1]} ${item.year}: доход ${dashFormatMoney(item.profit)}, расход ${dashFormatMoney(item.expense)}">
-            <div class="dashboard-chart-bar" style="height:${hProfit}px"></div>
-            <div class="dashboard-chart-bar expense" style="height:${hExpense}px"></div>
+          <div class="dashboard-chart-bars" title="${monthTitle}: доход ${dashFormatMoney(item.profit)}, расход ${dashFormatMoney(item.expense)}, мой реальный доход ${dashFormatMoney(item.realIncome)}" onclick="${detailCall}">
+            <div class="dashboard-chart-bar" style="height:${hProfit}px" onclick="event.stopPropagation();${detailCall}"></div>
+            <div class="dashboard-chart-bar expense" style="height:${hExpense}px" onclick="event.stopPropagation();${detailCall}"></div>
+            <div class="dashboard-chart-bar real-income" style="height:${hRealIncome}px" onclick="event.stopPropagation();${detailCall}"></div>
           </div>
           <div class="dashboard-chart-value">${item.profit > 999999 ? Math.round(item.profit/1000000)+'м' : item.profit > 999 ? Math.round(item.profit/1000)+'к' : Math.round(item.profit)}</div>
           <div class="dashboard-chart-label">${monthNames[item.month-1]}</div>
         </div>`;
       }).join('')}</div>`;
     }
+
+    window.openDashboardMonthDetail = function(year, month) {
+      const data = getDashboardMonthData(year, month);
+      const names = ['январь','февраль','март','апрель','май','июнь','июль','август','сентябрь','октябрь','ноябрь','декабрь'];
+      const modal = document.getElementById('dashboardMonthDetailModal');
+      if (!modal) return;
+      const title = document.getElementById('dashboardMonthDetailTitle');
+      const profit = document.getElementById('dashboardMonthDetailProfit');
+      const expense = document.getElementById('dashboardMonthDetailExpense');
+      const realIncome = document.getElementById('dashboardMonthDetailRealIncome');
+      if (title) title.textContent = `${names[month - 1]} ${year}`;
+      if (profit) profit.textContent = dashFormatMoney(data.profit);
+      if (expense) expense.textContent = dashFormatMoney(data.expense);
+      if (realIncome) realIncome.textContent = dashFormatMoney(data.realIncome);
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    };
+
+    window.closeDashboardMonthDetail = function() {
+      const modal = document.getElementById('dashboardMonthDetailModal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    };
 
     window.changeDashboardPeriod = function(mode) {
       dashboardPeriodMode = mode || 'all';
@@ -2894,6 +3094,38 @@
       renderDashboard();
     };
 
+    function getDashboardInvestorMetrics(range) {
+      let investorIncome = 0;
+      let investorExpense = 0;
+      let dividends = 0;
+      let withdrawn = 0;
+      let invested = 0;
+
+      const reportKeys = Object.keys(initMonthlyReports).sort();
+      const firstReportKey = reportKeys[0];
+      reportKeys.forEach(key => {
+        const rep = initMonthlyReports[key];
+        if (!rep || !rep.entries) return;
+        const monthDate = `${rep.year}-${String(rep.month).padStart(2,'0')}-01`;
+        if (!dashInRange(monthDate, range)) return;
+
+        initInvestors.forEach(inv => {
+          const e = rep.entries[inv.id];
+          if (!e) return;
+          if (!inv.isOwner) investorIncome += Number(e.profitActual || 0);
+          dividends += Number(e.dividends || 0);
+          withdrawn += Number(e.withdrawn || 0);
+          invested += Number(e.invested || 0);
+          if (key === firstReportKey) {
+            invested += Number(inv.initialCapital || 0);
+          }
+        });
+      });
+
+      investorExpense = dividends + withdrawn;
+      return { investorIncome, investorExpense, dividends, withdrawn, invested };
+    }
+
     function renderDashboard() {
       const range = getDashboardRange();
       const contracts = allContracts.filter(c => !range || dashInRange(c.buyDate, range));
@@ -2903,15 +3135,17 @@
       const totalExpensesWithDividends = generalExpense + dividends;
       const profitAfterExpenses = metrics.totalProfit - totalExpensesWithDividends;
       const investments = getDashboardInvestments(range);
-      const currentCapital = getDashboardCurrentCapital();
+      const investorMetrics = getDashboardInvestorMetrics(range);
+      const currentCapital = getDashboardCurrentCapital(range);
       const cash = getDashboardCash();
       const debtors = getDebtors();
       const installRange = getDashboardInstallmentScope(range);
       const installmentContracts = allContracts.filter(c => !installRange || dashInRange(c.buyDate, installRange));
-      // Себестоимость — деньги, которые фактически ушли магазину за товар.
-      // Флаг «Оплачено Д» означает, что расчёт с магазином завершён.
+      // Себестоимость рассрочки — себестоимость всех договоров за выбранный период.
+      // Она не зависит от отметки «Д»: даже если договор ещё не оплачен магазину,
+      // его себестоимость уже должна входить в общую себестоимость рассрочки.
       const installmentCost = installmentContracts.reduce((sum,c) => {
-        return sum + (c.shopPaid ? (Number(c.costPrice) || 0) : 0);
+        return sum + (Number(c.costPrice) || 0);
       }, 0);
       // Итоговая сумма рассрочки — полная сумма, указанная в договоре.
       const installmentTotal = installmentContracts.reduce((sum,c) => sum + (Number(c.totalCost)||0), 0);
@@ -2920,6 +3154,16 @@
       const set = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
       set('dashboardPeriodCaption', dashboardRangeCaption(range));
       set('dashTotalProfit', dashFormatMoney(metrics.totalProfit));
+      set('dashAContractRevenue', dashFormatMoney(metrics.contractRevenue));
+      set('dashAMonthlyPayments', dashFormatMoney(metrics.payments));
+      set('dashACost', dashFormatMoney(metrics.totalCost));
+      set('dashATotalProfit', dashFormatMoney(metrics.totalProfit));
+      set('dashAInvestorIncome', dashFormatMoney(investorMetrics.investorIncome));
+      set('dashAInvestorExpense', dashFormatMoney(investorMetrics.investorExpense));
+      set('dashAInvested', dashFormatMoney(investorMetrics.invested));
+      set('dashAWithdrawn', dashFormatMoney(investorMetrics.withdrawn));
+      set('dashADividends', dashFormatMoney(investorMetrics.dividends));
+      set('dashACapital', dashFormatMoney(currentCapital));
       set('dashGeneralExpense', dashFormatMoney(generalExpense));
       set('dashProfitAfterExpenses', dashFormatMoney(profitAfterExpenses));
       set('dashExpectedProfit', dashFormatMoney(metrics.expectedProfit));
@@ -2935,7 +3179,8 @@
       set('dashOutstanding', dashFormatMoney(metrics.outstanding));
       set('dashInstallmentCost', dashFormatMoney(installmentCost));
       set('dashInstallmentTotal', dashFormatMoney(installmentTotal));
-      set('dashInstallmentProfit', dashFormatMoney(installmentProfit));
+      set('dashTotalProfitMoved', dashFormatMoney(metrics.totalProfit));
+      set('dashPaymentsMoved', dashFormatMoney(metrics.payments));
       set('dashExpenseDetail', dashFormatMoney(generalExpense));
       set('dashDividends', dashFormatMoney(dividends));
       set('dashExpensesWithDividends', dashFormatMoney(totalExpensesWithDividends));
@@ -2974,9 +3219,11 @@
       const payDay = payDateObj.getDate();
       const monthsCount = Number(contract.monthsCount) || 0;
       
-      let startDate = new Date(contract.buyDate || payDateStr);
+      // Дата «График платежа» является опорной датой графика.
+      // Дата покупки не должна сдвигать день ежемесячного платежа.
+      let startDate = new Date(payDateStr);
       if (isNaN(startDate.getTime())) {
-        startDate = new Date(payDateStr);
+        return [];
       }
       startDate.setHours(0, 0, 0, 0);
       
@@ -3039,9 +3286,10 @@
         const paymentDates = calculatePaymentDates(contract);
         for (const pd of paymentDates) {
           const payment = installments[pd.index];
-          const isPaid = !!payment && Number(payment.amount) > 0;
-          if (!isPaid && pd.date < today) {
-            overdueSum += monthlyPay;
+          const paidAmount = Math.max(0, Number(payment?.amount) || 0);
+          const dueAmount = Math.max(0, monthlyPay - paidAmount);
+          if (dueAmount > 0 && pd.date < today) {
+            overdueSum += dueAmount;
           }
         }
       }
@@ -3355,21 +3603,24 @@
       });
 
       let totalExpense = 0;
-      const rightRows = allIncomeExpenses.map(e => {
-        const amount = Number(e.amount) || 0;
-        totalExpense += amount;
-        return `
-          <tr class="right-section">
-            <td>${amount.toLocaleString('ru-RU')}</td>
-            <td>${e.date || '—'}</td>
-            <td>${e.note || '—'}</td>
-            <td>
-              <button onclick="openEditIncomeExpModal('${e.id}')" class="text-blue-700 font-bold px-1">✏️</button>
-              <button onclick="deleteIncomeExpItem('${e.id}')" class="text-red-700 font-bold px-1">🗑️</button>
-            </td>
-          </tr>
-        `;
-      });
+      const rightRows = [...allIncomeExpenses]
+        .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')))
+        .map(e => {
+          const amount = Number(e.amount) || 0;
+          totalExpense += amount;
+          const note = e.note || (e.account ? `Счёт: ${e.account}` : '—');
+          return `
+            <tr class="right-section">
+              <td>${amount.toLocaleString('ru-RU')}</td>
+              <td>${e.date || '—'}</td>
+              <td>${escapeHtml(note)}</td>
+              <td>
+                <button onclick="openEditIncomeExpModal('${e.id}')" class="text-blue-700 font-bold px-1">✏️</button>
+                <button onclick="deleteIncomeExpItem('${e.id}')" class="text-red-700 font-bold px-1">🗑️</button>
+              </td>
+            </tr>
+          `;
+        });
 
       const maxLen = Math.max(rowsLeft.length, rightRows.length);
       let html = '';
@@ -3452,162 +3703,258 @@
       closeIncomeExpModal();
     });
 
-    window.renderPartners = function() {
-      const container = document.getElementById('partnersList');
-      
-      const dateFrom = document.getElementById('partnerDateFrom').value;
-      const dateTo = document.getElementById('partnerDateTo').value;
-      
-      const partnersMap = new Map();
-      
-      allContracts.forEach(contract => {
-        const store = contract.store || '';
-        if (!store.trim()) return;
-        
-        if (dateFrom || dateTo) {
-          const buyDate = contract.buyDate || '';
-          if (buyDate) {
-            if (dateFrom && buyDate < dateFrom) return;
-            if (dateTo && buyDate > dateTo) return;
-          }
-        }
-        
-        if (!partnersMap.has(store)) {
-          partnersMap.set(store, {
-            name: store,
-            debtContracts: 0,
-            debtSum: 0,
-            totalContracts: 0,
-            totalSum: 0,
-            contracts: []
-          });
-        }
-        
-        const partner = partnersMap.get(store);
-        partner.totalContracts++;
-        partner.totalSum += Number(contract.totalCost || 0);
-        partner.contracts.push(contract);
-        
-        if (!contract.shopPaid) {
-          partner.debtContracts++;
-          partner.debtSum += Number(contract.totalCost || 0);
-        }
+    // ================================================================
+    // ПАРТНЁРЫ
+    // ================================================================
+    let partnersView = 'official';
+
+    function partnerEscape(value) {
+      return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    // Безопасный аргумент для inline onclick: сам HTML-атрибут заключаем в одинарные кавычки.
+    function partnerJsArg(value) {
+      return JSON.stringify(String(value ?? '')).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    }
+
+    function isStorePaid(contract) {
+      return contract?.shopPaid === true || contract?.shopPaid === 'true' || contract?.shopPaid === 'Д' || contract?.shopPaid === 'д';
+    }
+
+    function getPartnerFilteredContracts(storeName) {
+      const dateFrom = document.getElementById('partnerDateFrom')?.value || '';
+      const dateTo = document.getElementById('partnerDateTo')?.value || '';
+      const needle = String(storeName || '').trim().toLocaleLowerCase('ru-RU');
+      return allContracts.filter(c => {
+        if (String(c?.store || '').trim().toLocaleLowerCase('ru-RU') !== needle) return false;
+        const buyDate = c.buyDate || '';
+        if (dateFrom && buyDate && buyDate < dateFrom) return false;
+        if (dateTo && buyDate && buyDate > dateTo) return false;
+        return true;
       });
-      
-      const partners = Array.from(partnersMap.values()).sort((a, b) => a.name.localeCompare(b.name));
-      
-      if (partners.length === 0) {
-        container.innerHTML = '<div class="text-center text-gray-500 py-8 text-sm">🤝 Нет партнеров/магазинов</div>';
+    }
+
+    function getPartnerPayable(contract) {
+      const cost = Math.max(0, Number(contract?.costPrice) || 0);
+      const down = Math.max(0, Number(contract?.downPayment) || 0);
+      return Math.max(0, cost - down);
+    }
+
+    function getPartnerNameMatch(name) {
+      const needle = String(name || '').trim().toLocaleLowerCase('ru-RU');
+      return allPartners.find(p => String(p?.name || '').trim().toLocaleLowerCase('ru-RU') === needle) || null;
+    }
+
+    function getPartnerOtherNames() {
+      const official = new Set(allPartners.map(p => String(p?.name || '').trim().toLocaleLowerCase('ru-RU')).filter(Boolean));
+      const names = new Map();
+      allContracts.forEach(c => {
+        const name = String(c?.store || '').trim();
+        if (!name) return;
+        const key = name.toLocaleLowerCase('ru-RU');
+        if (!official.has(key) && !names.has(key)) names.set(key, name);
+      });
+      return Array.from(names.values()).sort((a,b) => a.localeCompare(b, 'ru'));
+    }
+
+    function updatePartnerNamesDatalist() {
+      const list = document.getElementById('partnerNamesList');
+      if (!list) return;
+      list.innerHTML = allPartners.map(p => `<option value="${partnerEscape(p.name)}"></option>`).join('');
+    }
+
+    window.setPartnersView = function(view) {
+      partnersView = view === 'other' ? 'other' : 'official';
+      renderPartners();
+    };
+
+    window.togglePartnerAdd = function() {
+      const panel = document.getElementById('partnerAddPanel');
+      if (!panel) return;
+      panel.classList.toggle('hidden');
+      if (!panel.classList.contains('hidden')) document.getElementById('partnerNameInput')?.focus();
+    };
+
+    window.addPartner = function() {
+      const nameEl = document.getElementById('partnerNameInput');
+      const phoneEl = document.getElementById('partnerPhoneInput');
+      const name = String(nameEl?.value || '').trim();
+      const phone = String(phoneEl?.value || '').trim();
+      if (!name) { alert('Введите название партнёра.'); return; }
+      const existing = getPartnerNameMatch(name);
+      if (existing) {
+        existing.phone = phone || existing.phone || '';
+      } else {
+        allPartners.push({ id: 'partner_' + Date.now(), name, phone, createdAt: Date.now() });
+      }
+      localStorage.setItem('partners_db', JSON.stringify(allPartners));
+      if (nameEl) nameEl.value = '';
+      if (phoneEl) phoneEl.value = '';
+      document.getElementById('partnerAddPanel')?.classList.add('hidden');
+      partnersView = 'official';
+      renderPartners();
+      pushToCloud();
+    };
+
+    window.deletePartner = function(id) {
+      const partner = allPartners.find(p => p.id === id);
+      if (!partner) return;
+      if (!confirm(`Удалить партнёра «${partner.name}» из списка партнёров? Договоры не будут удалены.`)) return;
+      allPartners = allPartners.filter(p => p.id !== id);
+      localStorage.setItem('partners_db', JSON.stringify(allPartners));
+      renderPartners();
+      pushToCloud();
+    };
+
+    function buildPartnerMessage(partnerName, onlyDebts) {
+      const contracts = getPartnerFilteredContracts(partnerName);
+      const filtered = onlyDebts ? contracts.filter(c => !isStorePaid(c)) : contracts;
+      const dateFrom = document.getElementById('partnerDateFrom')?.value || '';
+      const dateTo = document.getElementById('partnerDateTo')?.value || '';
+      let total = 0;
+      let message = `${onlyDebts ? '💳 Долги' : '📋 Все договоры'} — ${partnerName}\n`;
+      if (dateFrom || dateTo) message += `Период: ${dateFrom || 'с начала'} — ${dateTo || 'по сегодня'}\n`;
+      message += '━━━━━━━━━━━━━━━━━━\n';
+      if (!filtered.length) return message + 'Нет договоров за выбранный период.';
+      filtered.forEach((c, i) => {
+        const payable = getPartnerPayable(c);
+        total += payable;
+        const paidMark = isStorePaid(c) ? 'Д — оплачено' : 'без Д — долг';
+        message += `${i + 1}. №${c.contractNum ?? '—'} | Себестоимость товара: ${Number(c.costPrice || 0).toLocaleString('ru-RU')} ₽ | Первый взнос: ${Number(c.downPayment || 0).toLocaleString('ru-RU')} ₽ | К оплате магазину: ${payable.toLocaleString('ru-RU')} ₽ | ${paidMark}\n`;
+      });
+      message += `━━━━━━━━━━━━━━━━━━\nИтого: ${total.toLocaleString('ru-RU')} ₽`;
+      return message;
+    }
+
+    window.copyPartnerMessage = function(partnerName, onlyDebts, btn) {
+      copyToClip(buildPartnerMessage(partnerName, onlyDebts), btn);
+    };
+
+    window.sendPartnerWhatsApp = function(partnerName, onlyDebts) {
+      const partner = getPartnerNameMatch(partnerName);
+      if (!partner || !partner.phone) {
+        alert('У этого партнёра не указан номер WhatsApp. Добавьте или измените номер партнёра.');
         return;
       }
-      
-      let html = `
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-          <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
-            <div class="text-xs text-purple-600 font-bold">Всего партнеров</div>
-            <div class="text-2xl font-bold text-purple-700">${partners.length}</div>
-          </div>
-          <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
-            <div class="text-xs text-blue-600 font-bold">Всего договоров</div>
-            <div class="text-2xl font-bold text-blue-700">${partners.reduce((sum, p) => sum + p.totalContracts, 0)}</div>
-          </div>
-          <div class="bg-red-50 p-4 rounded-lg border border-red-200">
-            <div class="text-xs text-red-600 font-bold">Договоров в долг (без "Д")</div>
-            <div class="text-2xl font-bold text-red-700">${partners.reduce((sum, p) => sum + p.debtContracts, 0)}</div>
-          </div>
-        </div>
-        <div class="partners-table overflow-x-auto">
-          <table class="w-full border-collapse">
-            <thead>
-              <tr class="bg-purple-700 text-white font-bold text-xs">
-                <th class="p-3">Партнёр / Магазин</th>
-                <th class="p-3">Договоров в долг</th>
-                <th class="p-3">Сумма долга</th>
-                <th class="p-3">Всего договоров</th>
-                <th class="p-3">Общая сумма</th>
-                <th class="p-3">Детали</th>
-              </tr>
-            </thead>
-            <tbody>
-      `;
-      
-      partners.forEach(partner => {
-        html += `
-          <tr class="hover:bg-purple-50">
-            <td class="p-3 font-bold text-purple-700">${partner.name}</td>
-            <td class="p-3 text-center font-bold ${partner.debtContracts > 0 ? 'text-red-600' : 'text-green-600'}">${partner.debtContracts}</td>
-            <td class="p-3 text-center font-bold ${partner.debtSum > 0 ? 'text-red-600' : 'text-green-600'}">${partner.debtSum.toLocaleString('ru-RU')} ₽</td>
-            <td class="p-3 text-center font-bold">${partner.totalContracts}</td>
-            <td class="p-3 text-center font-bold">${partner.totalSum.toLocaleString('ru-RU')} ₽</td>
-            <td class="p-3 text-center">
-              <button onclick="showPartnerDetails('${partner.name}')" class="bg-purple-500 hover:bg-purple-600 text-white px-2 py-1 rounded text-xs">📋 Детали</button>
-            </td>
-          </tr>
-        `;
-      });
-      
-      html += `</tbody></table></div>`;
-      html += `<div class="partners-mobile-cards grid grid-cols-1 gap-3">`;
-      partners.forEach(partner => {
-        html += `<div class="bg-white border border-purple-200 rounded-xl p-4 shadow-sm">
-          <div class="font-black text-purple-700 text-sm mb-3">${partner.name}</div>
-          <div class="grid grid-cols-2 gap-2 text-xs">
-            <div class="bg-red-50 rounded-lg p-2"><div class="text-[9px] text-red-600 font-bold">В долг</div><b>${partner.debtContracts}</b></div>
-            <div class="bg-red-50 rounded-lg p-2"><div class="text-[9px] text-red-600 font-bold">Сумма долга</div><b>${partner.debtSum.toLocaleString('ru-RU')} ₽</b></div>
-            <div class="bg-purple-50 rounded-lg p-2"><div class="text-[9px] text-purple-600 font-bold">Договоров</div><b>${partner.totalContracts}</b></div>
-            <div class="bg-blue-50 rounded-lg p-2"><div class="text-[9px] text-blue-600 font-bold">Общая сумма</div><b>${partner.totalSum.toLocaleString('ru-RU')} ₽</b></div>
-          </div>
-          <button onclick="showPartnerDetails(${JSON.stringify(partner.name)})" class="w-full mt-3 bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg text-xs font-bold">📋 Детали</button>
-        </div>`;
-      });
-      html += `</div>`;
-      container.innerHTML = html;
+      const phone = normalizeWhatsAppPhone(partner.phone);
+      if (!phone) { alert('Не удалось распознать номер WhatsApp.'); return; }
+      const message = buildPartnerMessage(partnerName, onlyDebts);
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
     };
 
     window.showPartnerDetails = function(partnerName) {
-      const dateFrom = document.getElementById('partnerDateFrom').value;
-      const dateTo = document.getElementById('partnerDateTo').value;
-      
-      const contracts = allContracts.filter(c => {
-        if (c.store !== partnerName) return false;
-        if (dateFrom && c.buyDate && c.buyDate < dateFrom) return false;
-        if (dateTo && c.buyDate && c.buyDate > dateTo) return false;
-        return true;
-      });
-      
-      if (contracts.length === 0) {
-        alert(`Нет договоров с партнером "${partnerName}" за выбранный период`);
+      const existing = document.getElementById('partnerDetailsPanel');
+      if (existing) existing.remove();
+      const partner = getPartnerNameMatch(partnerName);
+      const contracts = getPartnerFilteredContracts(partnerName);
+      if (!contracts.length) { alert(`Нет договоров с партнёром «${partnerName}» за выбранный период.`); return; }
+      const debts = contracts.filter(c => !isStorePaid(c));
+      const debtTotal = debts.reduce((s,c) => s + getPartnerPayable(c), 0);
+      const allTotal = contracts.reduce((s,c) => s + getPartnerPayable(c), 0);
+      const panel = document.createElement('div');
+      panel.id = 'partnerDetailsPanel';
+      panel.className = 'mt-3 p-3 rounded-xl border border-purple-200 bg-purple-50';
+      const arg = partnerJsArg(partnerName);
+      panel.innerHTML = `
+        <div class="flex flex-wrap justify-between items-center gap-2 mb-2">
+          <div><b class="text-purple-700">${partnerEscape(partnerName)}</b><span class="text-xs text-gray-500 ml-2">${contracts.length} договоров</span></div>
+          <button type="button" onclick="document.getElementById('partnerDetailsPanel')?.remove()" class="text-gray-500 hover:text-gray-800 text-xs">✕ Закрыть</button>
+        </div>
+        <div class="flex flex-wrap gap-1.5 mb-3">
+          <button type="button" onclick='sendPartnerWhatsApp(${arg}, true)' class="whatsapp-btn !text-xs !px-2.5 !py-1.5">💬 Долги в WhatsApp</button>
+          <button type="button" onclick='copyPartnerMessage(${arg}, true, this)' class="bg-gray-700 hover:bg-gray-800 text-white px-2.5 py-1.5 rounded text-xs font-bold">📋 Скопировать долги</button>
+          <button type="button" onclick='sendPartnerWhatsApp(${arg}, false)' class="whatsapp-btn !text-xs !px-2.5 !py-1.5 rounded text-xs font-bold">💬 Все договоры в WhatsApp</button>
+          <button type="button" onclick='copyPartnerMessage(${arg}, false, this)' class="bg-gray-700 hover:bg-gray-800 text-white px-2.5 py-1.5 rounded text-xs font-bold">📋 Скопировать все</button>
+        </div>
+        <div class="text-xs text-gray-600">Долг: <b class="text-red-600">${debtTotal.toLocaleString('ru-RU')} ₽</b> · Все договоры по себестоимости: <b>${allTotal.toLocaleString('ru-RU')} ₽</b>${partner?.phone ? ` · WhatsApp: ${partnerEscape(partner.phone)}` : ''}</div>
+      `;
+      document.getElementById('partnersList').appendChild(panel);
+    };
+
+    window.renderPartners = function() {
+      const container = document.getElementById('partnersList');
+      if (!container) return;
+      updatePartnerNamesDatalist();
+      const officialBtn = document.getElementById('partnersViewOfficial');
+      const otherBtn = document.getElementById('partnersViewOther');
+      if (officialBtn && otherBtn) {
+        officialBtn.className = partnersView === 'official' ? 'bg-purple-600 text-white px-2.5 py-1.5 rounded text-xs font-bold' : 'bg-gray-100 text-gray-700 px-2.5 py-1.5 rounded text-xs font-bold';
+        otherBtn.className = partnersView === 'other' ? 'bg-purple-600 text-white px-2.5 py-1.5 rounded text-xs font-bold' : 'bg-gray-100 text-gray-700 px-2.5 py-1.5 rounded text-xs font-bold';
+      }
+      const names = partnersView === 'official' ? allPartners.map(p => String(p.name || '').trim()).filter(Boolean) : getPartnerOtherNames();
+      const items = names.map(name => {
+        const contracts = getPartnerFilteredContracts(name);
+        const debts = contracts.filter(c => !isStorePaid(c));
+        const debtSum = debts.reduce((s,c) => s + getPartnerPayable(c), 0);
+        const partner = getPartnerNameMatch(name);
+        return { name, contracts, debts, debtSum, partner };
+      }).sort((a,b) => a.name.localeCompare(b.name, 'ru'));
+
+      if (!items.length) {
+        container.innerHTML = `<div class="text-center text-gray-500 py-6 text-sm">${partnersView === 'official' ? '🤝 Нет добавленных партнёров. Нажмите «＋ Добавить».' : 'Других магазинов/названий пока нет.'}</div>`;
         return;
       }
-      
-      let message = `📋 Детали по партнеру: ${partnerName}\n`;
-      message += `━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-      message += `📅 Период: ${dateFrom || 'с начала'} - ${dateTo || 'по сегодня'}\n`;
-      message += `📊 Всего договоров: ${contracts.length}\n`;
-      message += `━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
-      
-      contracts.forEach((c, i) => {
-        const status = c.shopPaid ? '✅ Оплачен' : '❌ В долгу';
-        const rest = c.totalCost - (c.downPayment || 0) - Object.values(c.installments || {}).reduce((sum, p) => sum + Number(p.amount || 0), 0);
-        message += `${i+1}. ${c.fio} - ${c.totalCost} ₽ (${status})\n`;
-        message += `   📅 ${c.buyDate} | Остаток: ${rest} ₽\n`;
-        message += `   📞 ${c.phone}\n\n`;
+
+      let html = '<div class="space-y-1.5">';
+      items.forEach(item => {
+        const arg = partnerJsArg(item.name);
+        const actions = partnersView === 'official' ? `<span class="text-[10px] text-gray-500">${item.partner?.phone ? partnerEscape(item.partner.phone) : 'телефон не указан'}</span>
+          <button type="button" data-partner-details="${partnerEscape(item.name)}" class="partner-details-btn bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded text-[11px] font-bold">📋 Детали</button>
+          <button type="button" data-partner-delete="${partnerEscape(item.partner?.id || '')}" class="partner-delete-btn bg-gray-100 hover:bg-red-100 text-gray-600 hover:text-red-600 px-2 py-1 rounded text-[11px]">🗑</button>` : `<button type="button" data-partner-details="${partnerEscape(item.name)}" class="partner-details-btn bg-gray-700 hover:bg-gray-800 text-white px-2 py-1 rounded text-[11px] font-bold">📋 Детали</button>`;
+        html += `<div class="flex flex-wrap items-center justify-between gap-2 px-2.5 py-2 rounded-lg border bg-white hover:bg-purple-50">
+          <div class="min-w-0"><b class="text-sm text-purple-700">${partnerEscape(item.name)}</b><div class="text-[10px] text-gray-500">Договоров: ${item.contracts.length} · <span class="${item.debtSum ? 'text-red-600 font-bold' : 'text-green-600 font-bold'}">Долг: ${item.debtSum.toLocaleString('ru-RU')} ₽</span></div></div>
+          <div class="flex items-center gap-1.5">${actions}</div>
+        </div>`;
       });
-      
-      const detailsWindow = window.open('', '_blank', 'width=600,height=400');
-      detailsWindow.document.write(`
-        <html><head><title>Детали: ${partnerName}</title>
-        <style>body { font-family: Arial; padding: 20px; white-space: pre-wrap; }</style>
-        </head><body>${message.replace(/\n/g, '<br>')}</body></html>
-      `);
-      detailsWindow.document.close();
+      html += '</div>';
+      container.innerHTML = html;
     };
+
+    // Надёжные обработчики кнопок страницы «Партнёры».
+    // Используем делегирование событий, чтобы кнопки продолжали работать
+    // после каждого повторного renderPartners().
+    if (!window.__partnersButtonsBound) {
+      document.addEventListener('click', function(e) {
+        const detailsBtn = e.target.closest('.partner-details-btn');
+        if (detailsBtn) {
+          e.preventDefault();
+          e.stopPropagation();
+          window.showPartnerDetails(detailsBtn.dataset.partnerDetails || '');
+          return;
+        }
+        const deleteBtn = e.target.closest('.partner-delete-btn');
+        if (deleteBtn) {
+          e.preventDefault();
+          e.stopPropagation();
+          window.deletePartner(deleteBtn.dataset.partnerDelete || '');
+        }
+      });
+      window.__partnersButtonsBound = true;
+    }
 
     window.clearPartnerDates = function() {
       document.getElementById('partnerDateFrom').value = '';
       document.getElementById('partnerDateTo').value = '';
       renderPartners();
     };
+
+    // Сумма оплат распределяется последовательно по месяцам.
+    // Поэтому переплата/аванс прошлого месяца покрывает следующий платеж.
+    function getMonthlyPaidAllocation(contract) {
+      const dates = calculatePaymentDates(contract);
+      const monthlyPay = Number(contract.monthlyPay) || 0;
+      const installments = contract.installments || {};
+      const payments = Object.keys(installments)
+        .map(k => Math.max(0, Number(installments[k]?.amount) || 0))
+        .filter(v => v > 0);
+      let pool = payments.reduce((sum, v) => sum + v, 0);
+      return dates.map(pd => {
+        const paidAmount = monthlyPay > 0 ? Math.min(monthlyPay, pool) : 0;
+        pool = Math.max(0, pool - paidAmount);
+        const dueAmount = Math.max(0, monthlyPay - paidAmount);
+        return { ...pd, paidAmount, dueAmount, isPaid: monthlyPay > 0 && dueAmount <= 0 };
+      });
+    }
 
     function getMonthStatus(contract) {
       const paymentDates = calculatePaymentDates(contract);
@@ -3619,24 +3966,27 @@
       const result = [];
       let overdueSum = 0;
       
-      for (const pd of paymentDates) {
-        const payment = installments[pd.index];
-        const isPaid = !!payment && Number(payment.amount) > 0;
-        const paidAmount = isPaid ? Number(payment.amount) : 0;
+      const allocated = getMonthlyPaidAllocation(contract);
+      for (const pd of allocated) {
+        const paidAmount = pd.paidAmount;
+        const dueAmount = pd.dueAmount;
+        const isPaid = pd.isPaid;
         
         let status = 'future';
         if (isPaid) {
           status = 'paid';
-        } else if (pd.date < today) {
+        } else if (pd.date < today && dueAmount > 0) {
           status = 'overdue';
-          overdueSum += monthlyPay;
+          overdueSum += dueAmount;
         }
         
         result.push({
           month: pd.index,
           date: pd.dateStr,
           status: status,
-          amount: isPaid ? paidAmount : monthlyPay,
+          amount: dueAmount > 0 ? dueAmount : monthlyPay,
+          paidAmount,
+          dueAmount,
           isPaid: isPaid,
           payDateObj: pd.date
         });
@@ -3655,18 +4005,16 @@
         const metrics = calculateContractMetrics(contract);
         if (metrics.isClosed) return;
         
-        const paymentDates = calculatePaymentDates(contract);
-        const installments = contract.installments || {};
+        const allocated = getMonthlyPaidAllocation(contract);
         
         let hasUnpaidMonth = false;
         let unpaidMonthAmount = 0;
         
-        for (const pd of paymentDates) {
-          const payment = installments[pd.index];
-          const isPaid = !!payment && Number(payment.amount) > 0;
-          if (!isPaid && pd.date.getTime() === target.getTime()) {
+        for (const pd of allocated) {
+          const dueAmount = pd.dueAmount;
+          if (dueAmount > 0 && pd.date.getTime() === target.getTime()) {
             hasUnpaidMonth = true;
-            unpaidMonthAmount = pd.amount;
+            unpaidMonthAmount = dueAmount;
             break;
           }
         }
@@ -3686,10 +4034,19 @@
       return result;
     }
 
+    function normalizeWhatsAppPhone(phone) {
+      let d = String(phone || '').replace(/\D/g, '');
+      if (!d) return '';
+      if (d.startsWith('00')) d = d.slice(2);
+      if (d.startsWith('8') && d.length === 11) d = '7' + d.slice(1);
+      if (d.startsWith('7') && d.length === 10) d = '7' + d;
+      return d;
+    }
+
     function buildClientWhatsAppMessage(client, dateStr) {
       const monthInfo = client.monthInfo || getMonthStatus(client);
       const todayPayment = Number(client.unpaidMonthAmount || client.monthlyPay || 0);
-      const overdueSum = monthInfo.months.reduce((sum, m) => sum + (m.status === 'overdue' && !m.isPaid ? Number(m.amount || 0) : 0), 0);
+      const overdueSum = monthInfo.months.reduce((sum, m) => sum + (m.status === 'overdue' && !m.isPaid ? Number(m.dueAmount || m.amount || 0) : 0), 0);
       const rest = Number(client.rest || 0);
       const name = String(client.fio || '').trim();
       let message = `السلام عليكم ورحمة الله\nМир вам\n\n`;
@@ -3721,72 +4078,101 @@
 
     function renderClientList(containerId, clients, title, dateStr, scheduleMode = 'today') {
       const container = document.getElementById(containerId);
+      if (!container) return;
       if (clients.length === 0) {
-        container.innerHTML = `<div class="text-center text-gray-500 py-8 text-sm">📭 ${title}</div>`;
+        container.innerHTML = `<div class="schedule-contract-list"><div class="text-center text-gray-500 py-8 text-sm">📭 ${title}</div></div>`;
         return;
       }
 
       const targetDate = dateStr ? String(dateStr).slice(0, 10) : '';
-      let html = '<div class="divide-y">';
+      const isDebtors = scheduleMode === 'debtors';
+      const dateLabel = scheduleMode === 'today' ? 'Сегодня' : scheduleMode === 'threeDays' ? 'Через 3 дня' : 'Просрочка';
+      let html = `
+        <div class="schedule-contract-list">
+          <div class="schedule-contract-header">
+            <div>Договор</div>
+            <div>Клиент</div>
+            <div>Телефон</div>
+            <div>${isDebtors ? 'Просрочка' : 'Платёж'}</div>
+            <div>${isDebtors ? 'Остаток' : 'Дата платежа'}</div>
+            <div>Статус</div>
+            <div>Связь</div>
+          </div>`;
+
       clients.forEach((client) => {
         const monthInfo = client.monthInfo || getMonthStatus(client);
-        let monthsHtml = '';
-        let overdueSum = 0;
+        let overdueSum = Number(client.overdueSum || 0);
+        let targetPayment = Number(client.unpaidMonthAmount || client.monthlyPay || 0);
+        let targetDateText = dateStr || '';
 
         monthInfo.months.forEach(m => {
+          if (m.status === 'overdue' && !m.isPaid) overdueSum += Number(m.dueAmount || m.amount || 0);
           const monthDate = String(m.date || '').slice(0, 10);
-          let statusClass = 'month-future';
-          let statusText = `📅 ${Number(m.amount || 0).toLocaleString('ru-RU')} ₽`;
-
-          if (m.status === 'paid' || m.isPaid) {
-            statusClass = 'month-paid';
-            statusText = `✓ ${Number(m.amount || 0).toLocaleString('ru-RU')} ₽`;
-          } else if (m.status === 'overdue') {
-            statusClass = 'month-overdue';
-            statusText = `❌ ${Number(m.amount || 0).toLocaleString('ru-RU')} ₽`;
-            overdueSum += Number(m.amount || 0);
-          } else if (scheduleMode === 'threeDays' && monthDate === targetDate) {
-            statusClass = 'month-three-days';
-            statusText = `⏰ ${Number(m.amount || 0).toLocaleString('ru-RU')} ₽`;
-          } else if (scheduleMode === 'today' && monthDate === targetDate) {
-            statusClass = 'month-today';
-            statusText = `${Number(m.amount || 0).toLocaleString('ru-RU')} ₽`;
+          if (monthDate === targetDate && !m.isPaid) {
+            targetPayment = Number(m.dueAmount || m.amount || targetPayment);
+            targetDateText = m.date || targetDateText;
           }
-
-          monthsHtml += `<span class="month-status ${statusClass}" title="${m.date}">${m.month}-й: ${statusText}</span>`;
         });
 
-        const clientOverdue = overdueSum || monthInfo.overdueSum || 0;
-        const rest = client.rest || calculateContractMetrics(client).rest;
-        const phoneDigits = String(client.phone || '').replace(/[^0-9]/g, '');
-        const waHref = phoneDigits
-          ? `https://wa.me/7${phoneDigits}?text=${encodeURIComponent(scheduleMode === 'debtors' ? buildDebtorWhatsAppMessage(client) : buildClientWhatsAppMessage(client, dateStr))}`
-          : '#';
+        // getDebtors() уже считает общую просрочку; не удваиваем её при рендере.
+        if (isDebtors) overdueSum = Number(client.overdueSum || monthInfo.overdueSum || overdueSum || 0);
+        const rest = Number(client.rest || calculateContractMetrics(client).rest || 0);
+        const phoneDigits = normalizeWhatsAppPhone(client.phone);
+        const message = isDebtors ? buildDebtorWhatsAppMessage(client) : buildClientWhatsAppMessage(client, dateStr);
+        const waHref = phoneDigits ? `https://wa.me/${phoneDigits}?text=${encodeURIComponent(message)}` : '#';
         const waAttrs = phoneDigits
           ? 'target="_blank" rel="noopener noreferrer"'
           : 'onclick="alert(\'Телефон не указан.\'); return false;"';
 
+        let statusText = dateLabel;
+        let statusClass = '';
+        if (isDebtors) {
+          statusText = '🔴 Просрочено';
+          statusClass = 'schedule-contract-danger';
+        } else if (scheduleMode === 'today') {
+          statusText = '🔵 Сегодня';
+        } else {
+          statusText = '🟡 Через 3 дня';
+        }
+
         html += `
-          <div class="client-item">
-            <div class="client-info">
-              <span class="client-name">${client.fio}</span>
-              <span class="client-phone">📞 ${client.phone || 'Телефон не указан'}</span>
-              <span class="client-detail">💰 Мес. платеж: ${Number(client.monthlyPay || 0).toLocaleString('ru-RU')} ₽</span>
-              ${dateStr ? `<span class="client-detail">📅 ${scheduleMode === 'threeDays' ? 'Через 3 дня: ' : ''}${dateStr}</span>` : ''}
+          <div class="schedule-contract-row">
+            <div class="schedule-contract-segment">
+              <span class="schedule-contract-label">№ договора</span>
+              <span class="schedule-contract-number">№${escapeHtml(client.contractNum || '—')}</span>
+              <span class="schedule-contract-muted">${escapeHtml(client.buyDate || '—')}</span>
             </div>
-            <div class="flex flex-wrap items-center gap-2">
-              <span class="client-overdue">Просрочка: ${Number(clientOverdue || 0).toLocaleString('ru-RU')} ₽</span>
-              <span class="client-rest">Остаток: ${Number(rest || 0).toLocaleString('ru-RU')} ₽</span>
-              <a href="${waHref}" ${waAttrs} class="text-green-600 hover:text-green-800 font-bold text-sm" title="Открыть WhatsApp с готовым сообщением">💬 WhatsApp</a>
+            <div class="schedule-contract-segment">
+              <span class="schedule-contract-label">Клиент</span>
+              <span class="schedule-contract-name">${escapeHtml(client.fio || 'Без ФИО')}</span>
+              <span class="schedule-contract-muted">${escapeHtml(client.product || '—')}</span>
             </div>
-            <div class="w-full mt-1 flex flex-wrap gap-1">${monthsHtml}</div>
-          </div>
-        `;
+            <div class="schedule-contract-segment">
+              <span class="schedule-contract-label">Телефон</span>
+              <span class="schedule-contract-value">📞 ${escapeHtml(client.phone || 'Не указан')}</span>
+            </div>
+            <div class="schedule-contract-segment">
+              <span class="schedule-contract-label">${isDebtors ? 'Сумма просрочки' : 'Сумма платежа'}</span>
+              <span class="schedule-contract-value ${isDebtors ? 'schedule-contract-danger' : ''}">${Number(isDebtors ? overdueSum : targetPayment).toLocaleString('ru-RU')} ₽</span>
+            </div>
+            <div class="schedule-contract-segment">
+              <span class="schedule-contract-label">${isDebtors ? 'Остаток' : 'Дата'}</span>
+              <span class="schedule-contract-value">${isDebtors ? `${rest.toLocaleString('ru-RU')} ₽` : escapeHtml(targetDateText || '—')}</span>
+              ${!isDebtors && Number(overdueSum) > 0 ? `<span class="schedule-contract-muted schedule-contract-danger">Просрочка: ${Number(overdueSum).toLocaleString('ru-RU')} ₽</span>` : ''}
+            </div>
+            <div class="schedule-contract-segment">
+              <span class="schedule-contract-label">Статус</span>
+              <span class="schedule-contract-value ${statusClass}">${statusText}</span>
+              ${isDebtors ? `<span class="schedule-contract-muted">Мес. платёж: ${Number(client.monthlyPay || 0).toLocaleString('ru-RU')} ₽</span>` : ''}
+            </div>
+            <div class="schedule-contract-segment">
+              <a href="${waHref}" ${waAttrs} class="schedule-contract-action" title="Открыть WhatsApp">💬 WhatsApp</a>
+            </div>
+          </div>`;
       });
       html += '</div>';
       container.innerHTML = html;
     }
-
     // ================================================================
     // ВЫЕЗД
     // ================================================================
@@ -3801,7 +4187,7 @@
     ];
 
     function fieldworkClientKey(client) {
-      return [String(client.fio || '').trim().toLocaleLowerCase('ru-RU'), String(client.phone || '').replace(/\D/g,''), String(client.extraPhone || '').replace(/\D/g,'')].join('|');
+      return [String(client.fio || '').trim().toLocaleLowerCase('ru-RU'), String(client.birthDate || '').trim()].join('|');
     }
 
     function getFieldworkRecord(client) {
@@ -4005,9 +4391,10 @@
       allContracts.forEach(contract => {
         const fio = String(contract.fio || '').trim();
         if (!fio) return;
-        const key = fio.toLocaleLowerCase('ru-RU');
+        const birthDate = String(contract.birthDate || '').trim();
+        const key = `${fio.toLocaleLowerCase('ru-RU')}|${birthDate}`;
         if (!map.has(key)) {
-          map.set(key, { fio, phone: contract.phone || '', extraPhone: contract.extraPhone || '', contracts: [] });
+          map.set(key, { fio, birthDate, phone: contract.phone || '', extraPhone: contract.extraPhone || '', contracts: [] });
         }
         const client = map.get(key);
         if (!client.phone && contract.phone) client.phone = contract.phone;
@@ -4242,7 +4629,7 @@
     function buildThreeDaysWhatsAppMessage(client, dateStr) {
       const monthInfo = client.monthInfo || getMonthStatus(client);
       const payment = Number(client.unpaidMonthAmount || client.monthlyPay || 0);
-      const overdueSum = monthInfo.months.reduce((sum, m) => sum + (m.status === 'overdue' && !m.isPaid ? Number(m.amount || 0) : 0), 0);
+      const overdueSum = monthInfo.months.reduce((sum, m) => sum + (m.status === 'overdue' && !m.isPaid ? Number(m.dueAmount || m.amount || 0) : 0), 0);
       const rest = Number(client.rest || 0);
       const name = String(client.fio || '').trim();
       let message = `السلام عليكم ورحمة الله\nМир вам\n\n`;
@@ -4273,7 +4660,7 @@
       const clients = getDebtors();
       const totalOverdue = clients.reduce((sum, client) => {
         const info = client.monthInfo || getMonthStatus(client);
-        return sum + info.months.reduce((inner, m) => inner + (m.status === 'overdue' && !m.isPaid ? Number(m.amount || 0) : 0), 0);
+        return sum + info.months.reduce((inner, m) => inner + (m.status === 'overdue' && !m.isPaid ? Number(m.dueAmount || m.amount || 0) : 0), 0);
       }, 0);
       const summary = document.getElementById('debtorsSummary');
       if (summary) summary.textContent = `${clients.length} клиентов · ${totalOverdue.toLocaleString('ru-RU')} ₽ просрочено`;
@@ -4282,21 +4669,31 @@
 
     function getDebtors() {
       const result = [];
+      const MIN_OVERDUE_FOR_DEBTOR = 1000; // Та же граница, что и в Excel (Договоры!T2).
       
       allContracts.forEach(contract => {
         const metrics = calculateContractMetrics(contract);
         if (metrics.isClosed) return;
         
         const monthInfo = getMonthStatus(contract);
-        const hasOverdue = monthInfo.months.some(m => m.status === 'overdue' && !m.isPaid);
-        
-        if (hasOverdue) {
+        const overdueSum = monthInfo.months.reduce((sum, m) => {
+          if (m.status === 'overdue' && !m.isPaid) {
+            return sum + Number(m.dueAmount || m.amount || 0);
+          }
+          return sum;
+        }, 0);
+
+        // В Excel договор получает статус «НД» только если общая просрочка
+        // по нему >= 1000 ₽. Не меняем расчёт платежей — меняем только отбор
+        // в список «Неплательщики».
+        if (overdueSum >= MIN_OVERDUE_FOR_DEBTOR) {
           result.push({
             ...contract,
             rest: metrics.rest,
             phone: contract.phone || '',
             fio: contract.fio || '',
-            monthInfo: monthInfo
+            monthInfo: monthInfo,
+            overdueSum: overdueSum
           });
         }
       });
@@ -4439,11 +4836,6 @@
       const installments = editId ? (allContracts.find(c => c.id === editId)?.installments || {}) : {};
       let totalPaid = 0;
       Object.values(installments).forEach(p => totalPaid += Number(p.amount));
-      const rest = totalCost - downPayment - totalPaid;
-      if (rest <= 0) {
-        formData.shopPaid = true;
-      }
-
       if (editId) {
         const index = allContracts.findIndex(c => c.id === editId);
         if (index !== -1) {
@@ -4488,11 +4880,8 @@
         date: inputDateVal 
       };
       
-      const metrics = calculateContractMetrics(contract);
-      if (metrics.isClosed) {
-        contract.shopPaid = true;
-      }
-      
+      // Оплата клиентом договора не означает автоматическую оплату магазину.
+      // «Оплачено Д» меняется только вручную по факту расчёта с магазином.
       saveToStorage();
       closePayModal();
       document.getElementById('payForm').reset();
@@ -4507,7 +4896,7 @@
         if (confirm(`Удалить ${idx}-й взнос на сумму ${contract.installments[idx].amount} ₽?`)) {
           saveState();
           delete contract.installments[idx];
-          contract.shopPaid = false;
+          // Удаление клиентского платежа не меняет факт оплаты магазину.
           saveToStorage();
           closePayModal();
           document.getElementById('payForm').reset();
@@ -4591,13 +4980,11 @@
       const metrics = calculateContractMetrics(contract);
       if (metrics.isClosed) return { key:'closed', label:'Закрыт', icon:'⚫', next:null };
       const today = new Date(); today.setHours(0,0,0,0);
-      const dates = calculatePaymentDates(contract);
-      const installments = contract.installments || {};
+      const dates = getMonthlyPaidAllocation(contract);
       let next = null;
       let overdueCount = 0;
       for (const pd of dates) {
-        const paid = installments[pd.index] && Number(installments[pd.index].amount) > 0;
-        if (!paid) {
+        if (!pd.isPaid) {
           if (pd.date < today) overdueCount++;
           if (!next || pd.date < next.date) next = pd;
         }
@@ -4751,7 +5138,11 @@
       const sortKey = document.getElementById('contractsSort')?.value || 'newest';
       let list = allContracts.filter(c => {
         if (q && !String(c.contractNum || '').toLowerCase().includes(q)) return false;
-        if (statusFilter !== 'all' && getContractStatusInfo(c).key !== statusFilter) return false;
+        if (statusFilter === 'unpaidStore') {
+          if (isStorePaid(c)) return false;
+        } else if (statusFilter !== 'all' && getContractStatusInfo(c).key !== statusFilter) {
+          return false;
+        }
         return true;
       });
       list.sort((a,b) => {
@@ -4800,12 +5191,9 @@
       body.innerHTML = `
         <div class="contract-detail-grid">
           <div class="contract-detail-card wide"><h3>👤 Клиент</h3><div class="contract-detail-value">${escapeHtml(c.fio || '—')}</div><div class="contract-detail-value mt-1">📞 ${escapeHtml(c.phone || '—')}</div><div class="contract-detail-value mt-1">Доп. телефон: ${escapeHtml(c.extraPhone || '—')}</div><div class="contract-detail-value mt-1">Дата рождения: ${escapeHtml(c.birthDate || '—')}</div><div class="contract-detail-value mt-1">Паспорт: ${escapeHtml(c.passport || '—')}</div><div class="contract-detail-value mt-1">Адрес: ${escapeHtml(c.address || '—')}</div></div>
-          <div class="contract-detail-card"><h3>📋 Договор</h3><div class="contract-detail-value">№${escapeHtml(c.contractNum)}</div><div class="contract-detail-value mt-1">Дата покупки: ${escapeHtml(c.buyDate || '—')}</div><div class="contract-detail-value mt-1">График: ${escapeHtml(c.payDate || '—')}</div></div>
-          <div class="contract-detail-card"><h3>💰 Финансы</h3><div class="contract-detail-value">Рассрочка: ${Number(c.totalCost||0).toLocaleString('ru-RU')} ₽</div><div class="contract-detail-value mt-1">Себестоимость: ${Number(c.costPrice||0).toLocaleString('ru-RU')} ₽</div><div class="contract-detail-value mt-1">Месячный: ${Number(c.monthlyPay||0).toLocaleString('ru-RU')} ₽</div></div>
-          <div class="contract-detail-card"><h3>💳 Состояние</h3><div class="contract-detail-value">Оплачено: ${Number(metrics.totalPaid + Number(c.downPayment||0)).toLocaleString('ru-RU')} ₽</div><div class="contract-detail-value mt-1">Остаток: ${Number(metrics.rest).toLocaleString('ru-RU')} ₽</div><div class="contract-detail-value mt-1">Просрочка: ${Number(metrics.overdueSum).toLocaleString('ru-RU')} ₽</div></div>
-          <div class="contract-detail-card wide"><h3>🏠 Личные данные</h3><div class="contract-detail-value">Паспорт: ${escapeHtml(c.passport || '—')}</div><div class="contract-detail-value mt-1">Дата рождения: ${escapeHtml(c.birthDate || '—')}</div><div class="contract-detail-value mt-1">Адрес: ${escapeHtml(c.address || '—')}</div></div>
-          <div class="contract-detail-card"><h3>📦 Товар</h3><div class="contract-detail-value">${escapeHtml(c.product || '—')}</div><div class="contract-detail-value mt-1">Магазин: ${escapeHtml(c.store || '—')}</div><div class="contract-detail-value mt-1">«Д»: ${c.shopPaid ? '✅ Оплачено' : '—'}</div></div>
-          <div class="contract-detail-card"><h3>👥 Поручитель</h3><div class="contract-detail-value">${escapeHtml(c.guarantorFio || '—')}</div><div class="contract-detail-value mt-1">📞 ${escapeHtml(c.guarantorPhone || '—')}</div><div class="contract-detail-value mt-1">Доп. телефон: ${escapeHtml(c.guarantorExtraPhone || '—')}</div><div class="contract-detail-value mt-1">Паспорт: ${escapeHtml(c.guarantorPassport || '—')}</div><div class="contract-detail-value mt-1">Дата рождения: ${escapeHtml(c.guarantorBirthDate || '—')}</div><div class="contract-detail-value mt-1">Адрес: ${escapeHtml(c.guarantorAddress || '—')}</div></div>
+          <div class="contract-detail-card wide"><h3>👥 Поручитель</h3><div class="contract-detail-value">${escapeHtml(c.guarantorFio || '—')}</div><div class="contract-detail-value mt-1">📞 ${escapeHtml(c.guarantorPhone || '—')}</div><div class="contract-detail-value mt-1">Доп. телефон: ${escapeHtml(c.guarantorExtraPhone || '—')}</div><div class="contract-detail-value mt-1">Паспорт: ${escapeHtml(c.guarantorPassport || '—')}</div><div class="contract-detail-value mt-1">Дата рождения: ${escapeHtml(c.guarantorBirthDate || '—')}</div><div class="contract-detail-value mt-1">Адрес: ${escapeHtml(c.guarantorAddress || '—')}</div></div>
+          <div class="contract-detail-card wide"><h3>📋 Договор и 📦 Товар</h3><div class="contract-detail-value">№${escapeHtml(c.contractNum)}</div><div class="contract-detail-value mt-1">Дата покупки: ${escapeHtml(c.buyDate || '—')}</div><div class="contract-detail-value mt-1">График: ${escapeHtml(c.payDate || '—')}</div><div class="contract-detail-value mt-1">Товар: ${escapeHtml(c.product || '—')}</div><div class="contract-detail-value mt-1">Магазин: ${escapeHtml(c.store || '—')}</div><div class="contract-detail-value mt-1">«Д»: ${c.shopPaid ? '✅ Оплачено' : '—'}</div></div>
+          <div class="contract-detail-card wide"><h3>💰 Финансы и 💳 Состояние</h3><div class="contract-detail-value">Рассрочка: ${Number(c.totalCost||0).toLocaleString('ru-RU')} ₽</div><div class="contract-detail-value mt-1">Себестоимость: ${Number(c.costPrice||0).toLocaleString('ru-RU')} ₽</div><div class="contract-detail-value mt-1">Месячный: ${Number(c.monthlyPay||0).toLocaleString('ru-RU')} ₽</div><div class="contract-detail-value mt-1">Оплачено: ${Number(metrics.totalPaid + Number(c.downPayment||0)).toLocaleString('ru-RU')} ₽</div><div class="contract-detail-value mt-1">Остаток: ${Number(metrics.rest).toLocaleString('ru-RU')} ₽</div><div class="contract-detail-value mt-1">Просрочка: ${Number(metrics.overdueSum).toLocaleString('ru-RU')} ₽</div></div>
         </div>
         <div class="contract-detail-footer-actions">
           <button class="contract-action primary" onclick="closeContractDetail(); openPayModal('${escapeHtml(c.id)}')">＋ Внести оплату</button>
@@ -5171,10 +5559,9 @@
       let totalCostPrice = 0;
 
       allContracts.forEach(c => {
-        if (c.shopPaid) {
-          totalDownPayments += Number(c.downPayment || 0);
-          totalCostPrice += Number(c.costPrice || 0);
-        }
+        // Предоплата учитывается в кассе только после отметки «Д».
+        if (isStorePaid(c)) totalDownPayments += Number(c.downPayment || 0);
+        if (isStorePaid(c)) totalCostPrice += Number(c.costPrice || 0);
         const insts = c.installments || {};
         Object.values(insts).forEach(p => {
           totalInstallments += Number(p.amount || 0);
@@ -5187,7 +5574,7 @@
       });
 
       let totalInvested = 0;
-      let totalDividends = 0;
+      let totalExternalDividends = 0;
       let totalWithdrawn = 0;
       let totalStartingCapital = 0;
       
@@ -5199,18 +5586,21 @@
             const e = rep.entries[inv.id];
             if (e) {
               totalInvested += Number(e.invested || 0);
-              totalDividends += Number(e.dividends || 0);
+              // Дивиденды владельца уже отражены в расходах и не должны
+              // повторно вычитаться из кассы. Для внешних инвесторов
+              // дивиденды остаются отдельным движением из кассы.
+              if (!inv.isOwner) totalExternalDividends += Number(e.dividends || 0);
               totalWithdrawn += Number(e.withdrawn || 0);
             }
           });
         }
         if (idx === 0 && rep && rep.startingCapital) {
           initInvestors.forEach(inv => {
-            totalStartingCapital += Number(rep.startingCapital[inv.id] || 0);
+            totalStartingCapital += Number(inv.initialCapital || 0);
           });
         }
       });
-      const investImpact = totalInvested - totalDividends - totalWithdrawn + totalStartingCapital;
+      const investImpact = totalInvested - totalExternalDividends - totalWithdrawn + totalStartingCapital;
 
       let totalKassa = totalDownPayments + totalInstallments - totalCostPrice - sumTaken + sumPut - totalIncomeExpenses + investImpact;
       document.getElementById('kassaTotal').innerText = totalKassa.toLocaleString('ru-RU') + ' ₽';
@@ -5377,7 +5767,11 @@
       } else if (activeTab === 'clients') {
         renderClients(q);
       } else if (activeTab === 'income') {
-        const filtered = allIncomeExpenses.filter(e => (e.note && e.note.toLowerCase().includes(q)));
+        const filtered = allIncomeExpenses.filter(e =>
+          (e.note && e.note.toLowerCase().includes(q)) ||
+          (e.account && String(e.account).toLowerCase().includes(q)) ||
+          (e.date && String(e.date).includes(q))
+        );
         if (filtered.length === 0 && q.length > 0) {
           document.getElementById('incomeTableBody').innerHTML = '<tr><td colspan="12" class="text-center text-gray-500 py-4">Нет совпадений по расходам</td></tr>';
         } else {
@@ -5418,7 +5812,9 @@
         incomeExpenses: allIncomeExpenses,
         accounts: customAccounts,
         investors: initInvestors,
-        monthlyReports: initMonthlyReports
+        monthlyReports: initMonthlyReports,
+        fieldVisitRecords: fieldVisitRecords,
+        partners: allPartners
       };
       const blob = new Blob([JSON.stringify(exportObject, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
@@ -5448,6 +5844,8 @@
               customAccounts = data.accounts || customAccounts;
               if (data.investors) initInvestors = data.investors;
               if (data.monthlyReports) initMonthlyReports = data.monthlyReports;
+              if (data.fieldVisitRecords && typeof data.fieldVisitRecords === 'object') fieldVisitRecords = data.fieldVisitRecords;
+              if (Array.isArray(data.partners)) allPartners = data.partners;
             }
             saveToStorage();
           }
@@ -5475,6 +5873,9 @@
         id: 'inv_' + Date.now(),
         name: 'Новый инвестор',
         percent: 50,
+        percentHistory: {},
+        initialCapital: 0,
+        initialCapitalStartKey: (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; })(),
         isOwner: false
       });
       saveInitData();
@@ -5490,9 +5891,65 @@
       pushToCloud();
     };
 
+    window.updateInvestorInitialCapital = function(idx, value) {
+      const investor = initInvestors[idx];
+      if (!investor) return;
+      investor.initialCapital = Math.max(0, Number(value) || 0);
+      saveInitData();
+      recalculateInit();
+      saveInitData();
+      renderInitPage();
+      pushToCloud();
+    };
+
     window.updateInvestorPercent = function(idx, value) {
       if (initInvestors[idx].isOwner) return;
-      initInvestors[idx].percent = Math.min(100, Math.max(0, Number(value) || 0));
+      const investor = initInvestors[idx];
+      const oldPercent = Math.min(100, Math.max(0, Number(investor.percent) || 0));
+      const newPercent = Math.min(100, Math.max(0, Number(value) || 0));
+      if (newPercent === oldPercent) return;
+
+      // Процент является условием конкретного месяца, а не одной глобальной
+      // переменной. Поэтому каждый уже существующий месяц получает снимок
+      // старого процента, а новый процент начинает действовать только с
+      // текущего незакрытого месяца (либо со следующего месяца, если текущий
+      // уже зафиксирован). История задним числом не пересчитывается.
+      if (!investor.percentHistory || typeof investor.percentHistory !== 'object') {
+        investor.percentHistory = {};
+      }
+
+      Object.entries(initMonthlyReports).forEach(([key, rep]) => {
+        const entry = rep?.entries?.[investor.id];
+        if (!entry) return;
+        if (entry.profitPercent === undefined || entry.profitPercent === null) {
+          entry.profitPercent = oldPercent;
+        }
+        if (!investor.percentHistory[key]) investor.percentHistory[key] = entry.profitPercent;
+      });
+
+      investor.percent = newPercent;
+
+      const now = new Date();
+      let targetYear = now.getFullYear();
+      let targetMonth = now.getMonth() + 1;
+      const currentKey = `${targetYear}-${String(targetMonth).padStart(2, '0')}`;
+      const currentReport = initMonthlyReports[currentKey];
+
+      // Закрытый месяц нельзя менять. В этом случае новый процент начинает
+      // действовать со следующего календарного месяца.
+      if (currentReport?.stopped) {
+        targetMonth += 1;
+        if (targetMonth > 12) { targetMonth = 1; targetYear += 1; }
+      }
+
+      const targetKey = `${targetYear}-${String(targetMonth).padStart(2, '0')}`;
+      investor.percentHistory[targetKey] = newPercent;
+
+      const targetReport = initMonthlyReports[targetKey];
+      if (targetReport?.entries?.[investor.id] && !targetReport.stopped) {
+        targetReport.entries[investor.id].profitPercent = newPercent;
+      }
+
       saveInitData();
       recalculateInit();
       saveInitData();
@@ -5523,8 +5980,8 @@
       if (prompt('Введите "СБРОС" для подтверждения:') !== 'СБРОС') return;
       saveState();
       initInvestors = [
-        { id: 'owner', name: 'Владелец', percent: 100, isOwner: true },
-        { id: 'inv_' + Date.now(), name: 'Инвестор 1', percent: 50, isOwner: false }
+        { id: 'owner', name: 'Владелец', percent: 100, isOwner: true, initialCapital: 0 },
+        { id: 'inv_' + Date.now(), name: 'Инвестор 1', percent: 50, percentHistory: {}, isOwner: false, initialCapital: 0, initialCapitalStartKey: (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; })() }
       ];
       initMonthlyReports = {};
       allAccounting = allAccounting.filter(a => !a._investorId);
@@ -5567,6 +6024,9 @@
               ? `<span class="font-bold">${inv.name}</span>`
               : `<input type="text" value="${inv.name}" onchange="updateInvestorName(${idx}, this.value)" style="width:100%;">`
             }
+          </td>
+          <td>
+            <input type="number" min="0" value="${Number(inv.initialCapital || 0)}" onchange="updateInvestorInitialCapital(${idx}, this.value)" style="width:120px;">
           </td>
           <td>
             ${inv.isOwner 
@@ -5612,7 +6072,7 @@
           rep.entries[inv.id] = {
             invested: 0, dividends: 0, withdrawn: 0,
             profitActual: 0, factPercent: 0, stopValue: null,
-            addedPercent: 0, capital: 0, capitalStart: 0
+            addedPercent: 0, capital: 0, capitalStart: 0, profitPercent: inv.isOwner ? 100 : (inv.percentHistory?.[key] !== undefined ? Number(inv.percentHistory[key]) : Number(inv.percent) || 0)
           };
         }
       });
@@ -5669,46 +6129,77 @@
       pushToCloud();
     };
 
+    function getContractProfitRate(contract) {
+      const total = Number(contract?.totalCost) || 0;
+      const cost = Number(contract?.costPrice) || 0;
+      if (total <= 0) return 0;
+      const profit = Math.max(0, total - cost);
+      return profit / total;
+    }
+
     function getProfitByMonth(year, month) {
       let totalProfit = 0;
+
       allContracts.forEach(c => {
-        const monthsCount = Number(c.monthsCount) || 0;
-        const cost = Number(c.costPrice) || 0;
-        const monthlyPay = Number(c.monthlyPay) || 0;
-        if (monthsCount <= 0 || monthlyPay <= 0) return;
-        const profitPerPayment = monthlyPay - (cost / monthsCount);
-        
-        const installments = c.installments || {};
-        Object.values(installments).forEach(p => {
-          if (!p || !p.date) return;
-          const parts = String(p.date).split('-');
-          if (parts.length < 2) return;
-          const py = Number(parts[0]);
-          const pm = Number(parts[1]);
-          if (py === year && pm === month) {
-            totalProfit += profitPerPayment;
+        const margin = getContractProfitRate(c);
+        if (margin <= 0) return;
+
+        // Первоначальный взнос — реальный платёж и поэтому участвует
+        // в прибыли того месяца, в котором он был внесён.
+        const downPayment = Number(c.downPayment) || 0;
+        if (downPayment > 0) {
+          const dateValue = c.downPaymentDate || c.buyDate || c.createdAt;
+          const d = dashParseDate(dateValue);
+          if (d && d.getFullYear() === year && d.getMonth() + 1 === month) {
+            totalProfit += downPayment * margin;
           }
+        }
+
+        // Каждый фактически внесённый взнос даёт прибыль только на реально
+        // полученную сумму, а не на полный плановый месячный платёж.
+        Object.values(c.installments || {}).forEach(p => {
+          if (!p || !p.date) return;
+          const d = dashParseDate(p.date);
+          if (!d || d.getFullYear() !== year || d.getMonth() + 1 !== month) return;
+          const amount = Number(p.amount) || 0;
+          if (amount > 0) totalProfit += amount * margin;
         });
       });
+
       return totalProfit;
     }
 
     function recalculateInit() {
       const keys = Object.keys(initMonthlyReports).sort();
-      
+
+      // Нормализуем структуру старых записей, не удаляя пользовательские данные.
       keys.forEach((key) => {
         const report = initMonthlyReports[key];
         if (!report || typeof report !== 'object') return;
         if (!report.entries || typeof report.entries !== 'object') report.entries = {};
+        if (!report.startingCapital || typeof report.startingCapital !== 'object') report.startingCapital = {};
+
         initInvestors.forEach(inv => {
+          if (!inv.isOwner && (!inv.percentHistory || typeof inv.percentHistory !== 'object')) inv.percentHistory = {};
           if (!report.entries[inv.id] || typeof report.entries[inv.id] !== 'object') {
             report.entries[inv.id] = {
-              invested: 0, dividends: 0, withdrawn: 0,
+              invested: 0, dividends: 0, withdrawn: 0, reinvested: 0,
               profitActual: 0, factPercent: 0, stopValue: null,
-              addedPercent: 0, capital: 0, capitalStart: 0
+              addedPercent: 0, capital: 0, capitalStart: 0, profitPercent: null
             };
           }
           const entry = report.entries[inv.id];
+          if (entry.reinvested === undefined) entry.reinvested = 0;
+          if (entry.profitPercent === undefined || entry.profitPercent === null) {
+            const historicalPercent = !inv.isOwner && inv.percentHistory[key] !== undefined
+              ? Number(inv.percentHistory[key])
+              : (inv.isOwner ? 100 : Number(inv.percent) || 0);
+            entry.profitPercent = historicalPercent;
+          }
+          if (!inv.isOwner && inv.percentHistory[key] === undefined) {
+            inv.percentHistory[key] = Number(entry.profitPercent) || 0;
+          }
+          if (entry.addedPercent === undefined) entry.addedPercent = 0;
           entry.profitActual = 0;
           entry.factPercent = 0;
           entry.capital = 0;
@@ -5716,130 +6207,215 @@
           entry._baseProfit = 0;
         });
       });
-      
-      let previousCapitais = {};
-      let pendingProfit = {};
-      
+
+      // Начальный капитал хранится у самого инвестора и не является
+      // месячным показателем. Для старых данных один раз переносим прежний
+      // стартовый капитал из первого найденного месяца в карточку инвестора.
       initInvestors.forEach(inv => {
-        previousCapitais[inv.id] = 0;
-        pendingProfit[inv.id] = 0;
+        if (inv.initialCapital === undefined || inv.initialCapital === null) {
+          let legacyStart = 0;
+          for (const key of keys) {
+            const v = Number(initMonthlyReports[key]?.startingCapital?.[inv.id]);
+            if (v > 0) { legacyStart = v; break; }
+          }
+          inv.initialCapital = legacyStart;
+        }
       });
-      
+      initInvestors.forEach(inv => {
+        if (!inv.initialCapitalStartKey) {
+          let legacyKey = null;
+          for (const key of keys) {
+            const v = Number(initMonthlyReports[key]?.startingCapital?.[inv.id]);
+            if (v > 0) { legacyKey = key; break; }
+          }
+          inv.initialCapitalStartKey = legacyKey || keys[0] || null;
+        }
+      });
+
+      let previousCapitals = {};
+      initInvestors.forEach(inv => { previousCapitals[inv.id] = 0; });
+      const initialApplied = {};
+      initInvestors.forEach(inv => { initialApplied[inv.id] = false; });
+
       keys.forEach((key) => {
         const report = initMonthlyReports[key];
         if (!report || typeof report !== 'object') return;
         if (typeof report.year !== 'number' || typeof report.month !== 'number') return;
-        
+
         const year = report.year;
         const month = report.month;
-        
+
         initInvestors.forEach(inv => {
           const entry = report.entries[inv.id];
-          const manualStart = report.startingCapital && report.startingCapital[inv.id] !== undefined 
-            ? Number(report.startingCapital[inv.id]) || 0 
-            : null;
-          
-          if (manualStart !== null && Object.keys(previousCapitais).every(k => previousCapitais[k] === 0)) {
-            entry.capitalStart = manualStart;
+          const startKey = inv.initialCapitalStartKey || keys[0] || null;
+          if (!initialApplied[inv.id] && key === startKey) {
+            // Карточка инвестора задаёт разовый стартовый капитал. Он
+            // используется только один раз и не является месячным полем.
+            entry.capitalStart = Math.max(0, Number(inv.initialCapital) || 0);
+            initialApplied[inv.id] = true;
+          } else if (!initialApplied[inv.id] && !startKey) {
+            entry.capitalStart = Math.max(0, Number(inv.initialCapital) || 0);
+            initialApplied[inv.id] = true;
           } else {
-            entry.capitalStart = (previousCapitais[inv.id] || 0) + (pendingProfit[inv.id] || 0);
+            entry.capitalStart = previousCapitals[inv.id] || 0;
           }
         });
-        
+
+        // Реальная прибыль месяца строится только из реально полученных денег
+        // по договорам: платёж × доля прибыли договора.
         const totalProfitMonth = getProfitByMonth(year, month);
-        
+
+        // Доля прибыли зависит от фактически работающего капитала каждого участника.
         let totalCapitalForProfit = 0;
         initInvestors.forEach(inv => {
           const entry = report.entries[inv.id];
-          const cfs = Math.max(0, (entry.capitalStart || 0) + Number(entry.invested || 0) - Number(entry.withdrawn || 0));
+          const cfs = Math.max(
+            0,
+            (entry.capitalStart || 0) +
+            Number(entry.invested || 0) -
+            Number(entry.dividends || 0) -
+            Number(entry.withdrawn || 0)
+          );
           totalCapitalForProfit += cfs;
         });
-        
+
+        const owner = initInvestors.find(i => i.isOwner);
+        const ownerId = owner?.id;
         let ownerProfitFromInvestors = 0;
-        let ownerId = initInvestors.find(i => i.isOwner)?.id;
-        
+
         initInvestors.forEach(inv => {
           const entry = report.entries[inv.id];
-          const cfs = Math.max(0, (entry.capitalStart || 0) + Number(entry.invested || 0) - Number(entry.withdrawn || 0));
-          const share = totalCapitalForProfit > 0 ? (cfs / totalCapitalForProfit) : 0;
-          const profitBase = totalProfitMonth * share;
-          
+          const cfs = Math.max(
+            0,
+            (entry.capitalStart || 0) +
+            Number(entry.invested || 0) -
+            Number(entry.dividends || 0) -
+            Number(entry.withdrawn || 0)
+          );
+          const capitalShare = totalCapitalForProfit > 0 ? cfs / totalCapitalForProfit : 0;
+          const profitAllocatedToThisCapital = totalProfitMonth * capitalShare;
+
           if (inv.isOwner) {
-            entry._baseProfit = profitBase;
+            // Прибыль от собственной доли капитала.
+            entry._baseProfit = profitAllocatedToThisCapital;
           } else {
-            const p = Number(inv.percent) || 0;
-            const invProfit = profitBase * (p / 100);
-            const ownerCut = profitBase * ((100 - p) / 100);
-            entry._baseProfit = invProfit;
-            ownerProfitFromInvestors += ownerCut;
+            // Процент из карточки инвестора — это договорная доля
+            // инвестора именно от прибыли, например 50%, 40%, 30%.
+            const investorPercent = Math.min(100, Math.max(0, Number(entry.profitPercent ?? inv.percent) || 0));
+            const investorProfit = profitAllocatedToThisCapital * (investorPercent / 100);
+            const ownerProfit = profitAllocatedToThisCapital * ((100 - investorPercent) / 100);
+
+            entry._baseProfit = investorProfit;
+            ownerProfitFromInvestors += ownerProfit;
           }
         });
-        
+
         if (ownerId && report.entries[ownerId]) {
-          report.entries[ownerId]._baseProfit = (report.entries[ownerId]._baseProfit || 0) + ownerProfitFromInvestors;
+          report.entries[ownerId]._baseProfit =
+            (report.entries[ownerId]._baseProfit || 0) + ownerProfitFromInvestors;
         }
-        
+
+        // Сначала формируем базовую прибыль по договорной доле.
+        // «Добавить %» — это ДОПОЛНИТЕЛЬНАЯ сумма от капитала,
+        // а не замена базовой прибыли.
+        let totalAddedProfit = 0;
+
         initInvestors.forEach(inv => {
           const entry = report.entries[inv.id];
-          if (!report.stopped) {
-            entry.profitActual = entry._baseProfit || 0;
-            const cfs = Math.max(1, (entry.capitalStart || 0) + Number(entry.invested || 0) - Number(entry.withdrawn || 0));
-            entry.factPercent = (entry.profitActual / cfs) * 100;
+          const baseProfit = Number(entry._baseProfit || 0);
+
+          if (inv.isOwner) {
+            entry.profitActual = baseProfit;
           } else {
-            entry.factPercent = (entry.stopValue !== null && entry.stopValue !== undefined) 
-              ? Number(entry.stopValue) 
-              : 0;
-            entry.profitActual = entry._baseProfit || 0;
+            const cfs = Math.max(
+              0,
+              (entry.capitalStart || 0) +
+              Number(entry.invested || 0) -
+              Number(entry.withdrawn || 0)
+            );
+            // В поле «Добавить %» пользователь указывает желаемый
+            // ИТОГОВЫЙ процент. Добавляется только разница между ним и
+            // фактическим базовым процентом. Например: факт 3%, введено 5%
+            // => доплата составляет только 2%.
+            const targetPercent = Math.max(0, Number(entry.addedPercent) || 0);
+            const baseFactPercent = cfs > 0 ? (baseProfit / cfs) * 100 : 0;
+            const extraPercent = Math.max(0, targetPercent - baseFactPercent);
+            const addedProfit = cfs * (extraPercent / 100);
+
+            entry.profitActual = baseProfit + addedProfit;
+            totalAddedProfit += addedProfit;
           }
         });
-        
+
+        // Дополнительная выплата инвесторам уменьшается только из прибыли владельца.
         if (ownerId && report.entries[ownerId]) {
-          const ownerEntry = report.entries[ownerId];
-          initInvestors.forEach(inv => {
-            if (inv.isOwner) return;
-            const entry = report.entries[inv.id];
-            const added = Number(entry.addedPercent) || 0;
-            if (added === 0) return;
-            const cfs = Math.max(0, (entry.capitalStart || 0) + Number(entry.invested || 0) - Number(entry.withdrawn || 0));
-            const newProfit = cfs * (added / 100);
-            const diff = newProfit - (entry._baseProfit || 0);
-            entry.profitActual = newProfit;
-            entry.factPercent = added;
-            ownerEntry.profitActual = (ownerEntry.profitActual || 0) - diff;
-          });
+          report.entries[ownerId].profitActual =
+            Number(report.entries[ownerId].profitActual || 0) - totalAddedProfit;
         }
-        
+
         initInvestors.forEach(inv => {
           const entry = report.entries[inv.id];
-          const cs = entry.capitalStart || 0;
+          const cfs = Math.max(
+            0,
+            (entry.capitalStart || 0) +
+            Number(entry.invested || 0) -
+            Number(entry.dividends || 0) -
+            Number(entry.withdrawn || 0)
+          );
+
+          // Реальный процент прибыли от работающего капитала.
+          entry.factPercent = cfs > 0 ? (Number(entry.profitActual || 0) / cfs) * 100 : 0;
+
+          // Если месяц зафиксирован, сохраняем зафиксированный процент.
+          if (report.stopped && entry.stopValue !== null && entry.stopValue !== undefined) {
+            entry.factPercent = Number(entry.stopValue) || 0;
+          }
+        });
+
+        // ВАЖНО: прибыль относится к месяцу, в котором она заработана,
+        // но в капитал текущего месяца НЕ добавляется.
+        // Она становится частью стартового капитала следующего месяца.
+        // Пример: прибыль сентября -> капитал октября.
+        // Это соответствует логике Excel.
+        initInvestors.forEach(inv => {
+          const entry = report.entries[inv.id];
+          const cs = Number(entry.capitalStart || 0);
           const invested = Number(entry.invested || 0);
           const dividends = Number(entry.dividends || 0);
           const withdrawn = Number(entry.withdrawn || 0);
+
+          // Капитал текущего месяца показывается БЕЗ прибыли этого же месяца.
           entry.capital = cs + invested - dividends - withdrawn;
         });
-        
-        previousCapitais = {};
-        pendingProfit = {};
+
+        // Для следующего месяца переносим капитал текущего месяца +
+        // прибыль текущего месяца. Поэтому сентябрьская прибыль попадёт
+        // именно в стартовый капитал октября, а не сентября.
+        previousCapitals = {};
         initInvestors.forEach(inv => {
-          previousCapitais[inv.id] = report.entries[inv.id].capital || 0;
-          pendingProfit[inv.id] = report.entries[inv.id].profitActual || 0;
+          const entry = report.entries[inv.id];
+          previousCapitals[inv.id] =
+            Number(entry.capital || 0) + Number(entry.profitActual || 0);
         });
-        
-        let totalCapitalEnd = 0, totalProfitEnd = 0;
+
+        let totalCapitalEnd = 0;
+        let totalProfitEnd = 0;
         initInvestors.forEach(inv => {
-          totalCapitalEnd += report.entries[inv.id].capital || 0;
-          totalProfitEnd += report.entries[inv.id].profitActual || 0;
+          totalCapitalEnd += Number(report.entries[inv.id].capital || 0);
+          totalProfitEnd += Number(report.entries[inv.id].profitActual || 0);
         });
-        report.overallProfitPercent = totalCapitalEnd > 0 ? (totalProfitEnd / totalCapitalEnd) * 100 : 0;
+        report.overallProfitPercent = totalCapitalEnd > 0
+          ? (totalProfitEnd / totalCapitalEnd) * 100
+          : 0;
       });
-      
+
       saveInitData();
     }
 
     window.updateMonthlyEntry = function(year, month, investorId, field, value) {
       const report = getMonthlyReport(year, month);
       if (!report.entries[investorId]) {
-        report.entries[investorId] = { invested: 0, dividends: 0, withdrawn: 0, profitActual: 0, factPercent: 0, stopValue: null, addedPercent: 0, capital: 0, capitalStart: 0 };
+        report.entries[investorId] = { invested: 0, dividends: 0, withdrawn: 0, profitActual: 0, factPercent: 0, stopValue: null, addedPercent: 0, reinvested: 0, capital: 0, capitalStart: 0 };
       }
       const numVal = Number(value) || 0;
       report.entries[investorId][field] = numVal;
@@ -5856,6 +6432,18 @@
       const report = getMonthlyReport(year, month);
       if (!report.startingCapital) report.startingCapital = {};
       report.startingCapital[investorId] = Number(value) || 0;
+      recalculateInit();
+      saveInitData();
+      renderInitPage();
+      pushToCloud();
+    };
+
+    window.updateReinvested = function(year, month, investorId, value) {
+      const report = getMonthlyReport(year, month);
+      if (!report.entries[investorId]) return;
+      const requested = Math.max(0, Number(value) || 0);
+      const available = Math.max(0, Number(report.entries[investorId].profitActual || 0));
+      report.entries[investorId].reinvested = Math.min(requested, available);
       recalculateInit();
       saveInitData();
       renderInitPage();
@@ -5978,6 +6566,7 @@
         txt += `${inv.name}${inv.isOwner ? ' (Вы)' : ''}:\n`;
         txt += `  Капитал: ${Number(e.capital || 0).toLocaleString('ru-RU')} ₽\n`;
         txt += `  Вложил: ${Number(e.invested || 0).toLocaleString('ru-RU')} ₽\n`;
+        txt += `  Реинвестировал: ${Number(e.reinvested || 0).toLocaleString('ru-RU')} ₽\n`;
         txt += `  Дивиденды: ${Number(e.dividends || 0).toLocaleString('ru-RU')} ₽\n`;
         txt += `  Снял: ${Number(e.withdrawn || 0).toLocaleString('ru-RU')} ₽\n`;
         txt += `  Прибыль: ${Number(e.profitActual || 0).toLocaleString('ru-RU')} ₽\n`;
@@ -6060,7 +6649,7 @@
           const shareOfCapital = totalCap > 0 ? (Number(entry.capital || 0) / totalCap) * 100 : 0;
           const shareOfProfit = inv.isOwner
             ? (totalProfit > 0 ? (Number(entry.profitActual || 0) / totalProfit) * 100 : 0)
-            : (Number(inv.percent) || 0);
+            : (Number(entry.profitPercent ?? inv.percent) || 0);
           
           const factDisplay = report.stopped
             ? (entry.stopValue !== null && entry.stopValue !== undefined ? Number(entry.stopValue).toFixed(2) : Number(entry.factPercent || 0).toFixed(2))
@@ -6069,22 +6658,12 @@
           const factClass = Number(entry.factPercent) > 0 ? 'fact-percent-positive' : 'fact-percent-zero';
           const capitalClass = Number(entry.capital) < 0 ? 'capital-negative' : '';
           
-          const startCapRow = isFirstMonth ? `
-            <tr style="background:#faf5ff;">
-              <td colspan="10" style="text-align:left; font-size:10px; color:#6b7280; padding:3px 8px;">
-                💰 Стартовый капитал <b>${inv.name}</b>: 
-                <input type="number" value="${(report.startingCapital && report.startingCapital[inv.id]) || 0}" 
-                  onchange="updateStartingCapital(${year},${month},'${inv.id}', this.value)" 
-                  style="width:120px; margin-left:6px;" min="0">
-                <span style="margin-left:10px; color:#7c3aed;">Капитал на начало месяца: ${Number(entry.capitalStart || 0).toLocaleString('ru-RU')} ₽</span>
-              </td>
-            </tr>` : '';
-          
-          tableRows += startCapRow + `
+          tableRows += `
             <tr class="${inv.isOwner ? 'owner-row' : 'investor-row'}">
               <td class="font-bold text-left">${inv.name}${inv.isOwner ? ' (Вы)' : ''}</td>
               <td class="${capitalClass}">${Number(entry.capital || 0).toLocaleString('ru-RU')}</td>
               <td><input type="number" value="${entry.invested || 0}" onchange="updateMonthlyEntry(${year},${month},'${inv.id}','invested',this.value)" min="0"></td>
+              <td><input type="number" value="${entry.reinvested || 0}" onchange="updateReinvested(${year},${month},'${inv.id}',this.value)" min="0"></td>
               <td><input type="number" value="${entry.dividends || 0}" onchange="updateMonthlyEntry(${year},${month},'${inv.id}','dividends',this.value)" min="0"></td>
               <td><input type="number" value="${entry.withdrawn || 0}" onchange="updateMonthlyEntry(${year},${month},'${inv.id}','withdrawn',this.value)" min="0"></td>
               <td class="font-bold text-blue-700">${shareOfCapital.toFixed(2)}%</td>
@@ -6097,7 +6676,7 @@
               </td>
               <td class="${factClass}">${factDisplay}%</td>
               <td>
-                <input type="number" value="${entry.addedPercent || 0}" onchange="applyAddedPercent(${year},${month},'${inv.id}',this.value)" min="0" step="0.1" ${inv.isOwner ? 'disabled' : ''}>
+                <input type="number" value="${entry.addedPercent || 0}" onchange="applyAddedPercent(${year},${month},'${inv.id}',this.value)" min="0" step="0.1" title="Желаемый итоговый процент: добавляется только разница с фактическим процентом" ${inv.isOwner ? 'disabled' : ''}>
               </td>
             </tr>
           `;
@@ -6107,7 +6686,7 @@
           <tr class="total-row">
             <td class="font-bold">ИТОГО</td>
             <td class="font-bold">${totalCap.toLocaleString('ru-RU')}</td>
-            <td colspan="3"></td>
+            <td colspan="4"></td>
             <td class="font-bold">100%</td>
             <td class="font-bold text-green-700">${totalProfit.toLocaleString('ru-RU')}</td>
             <td colspan="3"></td>
@@ -6134,13 +6713,14 @@
                   <th>Имена</th>
                   <th>Капитал</th>
                   <th>Вложил</th>
+                  <th>Реинвестировал</th>
                   <th>Дивиденды</th>
                   <th>Снял с вклада</th>
                   <th>Доля в капитале</th>
                   <th>Прибыль факт</th>
                   <th>Стоп</th>
                   <th>Факт %</th>
-                  <th>Добавить %</th>
+                  <th>Доп. % от капитала</th>
                 </tr>
               </thead>
               <tbody>
