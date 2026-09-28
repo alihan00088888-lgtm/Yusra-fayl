@@ -1116,6 +1116,40 @@
       .dashboard-date-input { flex:1; min-width:0; width:100%; }
     }
 
+
+/* YUSRA: только окно договора и документы */
+#modal .yusra-contract-shell{min-width:0;overscroll-behavior:contain}
+#modal .yusra-contract-head{display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:-24px;z-index:3;background:white;padding:6px 0 12px}
+#modal .yusra-contract-head h2{margin:0;min-width:0}
+#modal .yusra-close{width:42px;height:42px;flex-shrink:0;border-radius:10px;background:#f1f5f9;font-size:25px}
+#modal #contractForm input:not([type=checkbox]):not([type=file]){min-width:0;max-width:100%;width:100%;box-sizing:border-box}
+.yusra-passports{margin-top:10px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.yusra-passport-slot{min-width:0;border:1px solid #cbd5e1;border-radius:9px;background:#fff;padding:9px}
+.yusra-passport-slot strong{font-size:11px;display:block;margin-bottom:6px}
+.yusra-passport-preview{width:54px;height:48px;object-fit:contain;border-radius:5px;background:#f1f5f9;display:none}
+.yusra-passport-actions{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.yusra-passport-actions button,.yusra-passport-actions label,.yusra-doc-btn{border:1px solid #cbd5e1;border-radius:7px;padding:7px 9px;background:#f8fafc;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;min-height:36px}
+.yusra-passport-actions input[type=file]{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
+.yusra-doc-overlay{position:fixed;inset:0;z-index:110;background:rgba(15,23,42,.8);display:flex;align-items:center;justify-content:center;padding:12px}
+.yusra-doc-overlay[hidden],.yusra-passport-actions button[hidden]{display:none!important}
+.yusra-doc-panel{background:#fff;border-radius:13px;padding:15px;width:min(100%,620px);max-height:94dvh;overflow:auto}
+.yusra-doc-panel img,.yusra-doc-panel canvas{max-width:100%;max-height:55dvh;object-fit:contain;display:block;margin:8px auto;touch-action:pan-x pan-y}
+.yusra-doc-panel .yusra-crop-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.yusra-doc-panel input[type=range]{width:100%}
+@media(max-width:640px){
+ #modal{padding:0!important;align-items:stretch!important;overflow:hidden}
+ #modal .yusra-contract-shell{width:100%;max-width:none;max-height:100dvh;height:100dvh;border-radius:0;padding:12px!important;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch}
+ #modal .yusra-contract-head{top:-12px;margin:-12px -12px 12px;padding:13px 12px;border-bottom:1px solid #e2e8f0}
+ #modal .yusra-contract-head h2{font-size:16px;line-height:1.25}
+ #modal #contractForm,#modal #contractForm>div{min-width:0;max-width:100%}
+ #modal #contractForm .grid{grid-template-columns:minmax(0,1fr)!important}
+ #modal #contractForm .grid>*{grid-column:auto!important;min-width:0}
+ #modal #contractForm .bg-slate-50,#modal #contractForm .bg-blue-50,#modal #contractForm .bg-gray-50{padding:12px!important}
+ #modal #contractForm input:not([type=checkbox]):not([type=file]){min-height:43px;font-size:16px}
+ #modal #contractForm>div:last-child{position:sticky;bottom:-12px;background:white;padding:12px 0;z-index:2}
+ #modal #contractForm>div:last-child button{min-height:46px;flex:1;padding:8px!important}
+ .yusra-passports{grid-template-columns:minmax(0,1fr)}
+}
   </style>
 </head>
 <body class="bg-slate-100 text-gray-800 text-xs min-h-screen">
@@ -1933,8 +1967,8 @@
 
   <!-- МОДАЛЬНЫЕ ОКНА -->
   <div id="modal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-xl p-6 max-w-4xl w-full max-h-[95vh] overflow-y-auto shadow-2xl">
-      <h2 id="modalTitle" class="text-xl font-bold mb-4 border-b-2 pb-2 text-blue-700 uppercase tracking-tight">Новый договор</h2>
+    <div class="yusra-contract-shell bg-white rounded-xl p-6 max-w-4xl w-full max-h-[95vh] overflow-y-auto shadow-2xl">
+      <div class="yusra-contract-head"><h2 id="modalTitle" class="text-xl font-bold border-b-2 pb-2 text-blue-700 uppercase tracking-tight">Новый договор</h2><button type="button" class="yusra-close" onclick="closeModal()" aria-label="Закрыть">×</button></div>
       
       <div id="errorBanner" class="hidden mb-4 p-3 bg-red-100 text-red-700 rounded-lg font-bold text-center border border-red-300">
         ⚠️ Ошибка в расчетах! Проверьте соответствие сумм или себестоимость.
@@ -1956,6 +1990,11 @@
             <input type="text" id="phone" placeholder="Телефон *" required class="p-2 border rounded-md outline-none">
             <input type="text" id="extraPhone" placeholder="Доп. номер" class="p-2 border rounded-md outline-none">
             <input type="text" id="address" placeholder="Адрес проживания" class="p-2 border rounded-md col-span-3 outline-none">
+          </div>
+          <div class="yusra-passports" id="yusraClientPassports">
+            <div class="yusra-passport-slot" data-side="front"><strong>Паспорт — лицевая сторона</strong><div class="yusra-passport-actions"><img class="yusra-passport-preview" alt="Лицевая сторона"><label>＋ Добавить / заменить<input type="file" accept="image/*" onchange="yusraChoosePassport(event,'front')"></label><button type="button" onclick="yusraPreviewPassport('front')" hidden>Открыть</button><button type="button" onclick="yusraRemovePassport('front')" hidden>Удалить</button></div></div>
+            <div class="yusra-passport-slot" data-side="back"><strong>Паспорт получателя</strong><div class="yusra-passport-actions"><img class="yusra-passport-preview" alt="Паспорт получателя"><label>＋ Добавить / заменить<input type="file" accept="image/*" onchange="yusraChoosePassport(event,'back')"></label><button type="button" onclick="yusraPreviewPassport('back')" hidden>Открыть</button><button type="button" onclick="yusraRemovePassport('back')" hidden>Удалить</button></div></div>
+            <div class="yusra-passport-slot" data-side="contract"><strong>Фото договора</strong><div class="yusra-passport-actions"><img class="yusra-passport-preview" alt="Фото договора"><label>＋ Добавить / заменить<input type="file" accept="image/*" onchange="yusraChoosePassport(event,'contract')"></label><button type="button" onclick="yusraPreviewPassport('contract')" hidden>Открыть</button><button type="button" onclick="yusraRemovePassport('contract')" hidden>Удалить</button></div></div>
           </div>
         </div>
 
@@ -2024,6 +2063,11 @@
     </div>
   </div>
 
+
+  <div id="yusraDocOverlay" class="yusra-doc-overlay" hidden role="dialog" aria-modal="true" aria-label="Просмотр документа">
+    <div class="yusra-doc-panel"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><strong id="yusraDocTitle">Паспорт</strong><button type="button" class="yusra-doc-btn" onclick="yusraCloseDoc()">Закрыть ×</button></div>
+    <div id="yusraDocContent"></div></div>
+  </div>
   <div id="payModal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-xl p-5 max-w-sm w-full shadow-2xl border-t-4 border-green-500">
       <h3 class="font-black text-xs uppercase text-slate-500 mb-4 tracking-widest">Регистрация оплаты</h3>
@@ -2156,7 +2200,7 @@
     // FIREBASE
     // ================================================================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDuPqMwudSodv37VjNCNmVg71ES09AmyW0",
@@ -4751,9 +4795,129 @@
       return !hasError;
     };
 
+    // Фото отдельно от основного документа Firestore (лимит 1 МиБ); финансовые данные не изменяются.
+    const yusraSides = ['front','back','contract'];
+    let yusraDraft = {front:null,back:null,contract:null};
+    let yusraDirty = new Set();
+    let yusraPhotoSession = 0;
+    const yusraPhotoDoc = (id,side) => doc(db,'yusra_data','passport_'+id+'_'+side);
+    const yusraPhotoTitle = side => side === 'front' ? 'Лицевая сторона' : side === 'back' ? 'Паспорт получателя' : 'Фото договора';
+    function yusraRenderDraft(){
+      yusraSides.forEach(side=>{
+        const slot=document.querySelector('#yusraClientPassports [data-side="'+side+'"]');
+        const photo=yusraDraft[side];
+        const img=slot.querySelector('img'); img.src=photo||''; img.style.display=photo?'block':'none';
+        slot.querySelectorAll('button').forEach(b=>b.hidden=!photo);
+      });
+    }
+    async function yusraFetchPhoto(id,side){
+      const snap=await getDoc(yusraPhotoDoc(id,side));
+      return snap.exists() ? (snap.data().image||null) : null;
+    }
+    async function yusraLoadDraft(id){
+      const session=++yusraPhotoSession;
+      yusraDraft={front:null,back:null,contract:null}; yusraDirty.clear(); yusraRenderDraft();
+      if(!id)return;
+      try{
+        const photos=await Promise.all(yusraSides.map(side=>yusraFetchPhoto(id,side)));
+        if(session!==yusraPhotoSession)return;
+        yusraSides.forEach((side,i)=>{if(!yusraDirty.has(side))yusraDraft[side]=photos[i]});
+        yusraRenderDraft();
+      }catch(e){if(session===yusraPhotoSession)alert('Не удалось получить фотографии из Firebase: '+e.message)}
+    }
+    async function yusraCommitPhotos(id){
+      for(const side of yusraDirty){
+        if(yusraDraft[side])await setDoc(yusraPhotoDoc(id,side),{image:yusraDraft[side],updatedAt:Date.now()});
+        else await deleteDoc(yusraPhotoDoc(id,side));
+      }
+      yusraDirty.clear();
+    }
+    window.yusraCloseDoc=function(){document.getElementById('yusraDocOverlay').hidden=true;document.getElementById('yusraDocContent').replaceChildren()};
+    function yusraShowPhoto(photo,title){
+      const box=document.getElementById('yusraDocContent');box.replaceChildren();
+      document.getElementById('yusraDocTitle').textContent=title;
+      const img=document.createElement('img');img.src=photo;img.alt=title;img.style.cursor='zoom-in';
+      img.onclick=()=>{img.style.maxHeight=img.style.maxHeight==='none'?'55dvh':'none';img.style.maxWidth=img.style.maxWidth==='none'?'100%':'none';img.style.cursor=img.style.maxHeight==='none'?'zoom-out':'zoom-in'};
+      box.append(img);document.getElementById('yusraDocOverlay').hidden=false;
+    }
+    window.yusraPreviewPassport=side=>{if(yusraDraft[side])yusraShowPhoto(yusraDraft[side],(side === 'contract' ? 'Фото договора' : yusraPhotoTitle(side)))};
+    window.yusraRemovePassport=side=>{if(confirm('Удалить фотографию '+yusraPhotoTitle(side).toLowerCase()+'?')){yusraDraft[side]=null;yusraDirty.add(side);yusraRenderDraft()}};
+    // Простейшая оценка границ по отличию от цвета углов; ручная коррекция обязательна.
+    function yusraGuessBounds(canvas){
+      const ctx=canvas.getContext('2d',{willReadFrequently:true}),w=canvas.width,h=canvas.height;
+      const d=ctx.getImageData(0,0,w,h).data;
+      const corner=[[0,0],[w-1,0],[0,h-1],[w-1,h-1]];
+      const bg=[0,1,2].map(k=>corner.reduce((sum,[x,y])=>sum+d[(y*w+x)*4+k],0)/4);
+      let x0=w,y0=h,x1=0,y1=0,count=0;
+      for(let y=0;y<h;y+=3)for(let x=0;x<w;x+=3){const i=(y*w+x)*4;const delta=Math.abs(d[i]-bg[0])+Math.abs(d[i+1]-bg[1])+Math.abs(d[i+2]-bg[2]);if(delta>105){x0=Math.min(x0,x);y0=Math.min(y0,y);x1=Math.max(x1,x);y1=Math.max(y1,y);count++}}
+      if(count<w*h/300||count>w*h/7)return [0,0,100,100];
+      const pad=3;return [Math.max(0,Math.floor(x0/w*100)-pad),Math.max(0,Math.floor(y0/h*100)-pad),Math.min(100,Math.ceil(x1/w*100)+pad),Math.min(100,Math.ceil(y1/h*100)+pad)];
+    }
+    function yusraDecode(file){return new Promise((resolve,reject)=>{
+      const url=URL.createObjectURL(file),img=new Image();
+      img.onload=()=>{URL.revokeObjectURL(url);resolve(img)};img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('Формат изображения не поддерживается'))};img.src=url;
+    })}
+    async function yusraCropFile(file){
+      if(!file||!file.type.startsWith('image/'))throw Error('Выберите фотографию');
+      const img=await yusraDecode(file);
+      const scale=Math.min(1,1800/Math.max(img.naturalWidth,img.naturalHeight));
+      const base=document.createElement('canvas');base.width=Math.round(img.naturalWidth*scale);base.height=Math.round(img.naturalHeight*scale);
+      base.getContext('2d').drawImage(img,0,0,base.width,base.height);
+      const sample=document.createElement('canvas');sample.width=Math.max(1,Math.round(base.width*Math.min(1,450/Math.max(base.width,base.height))));sample.height=Math.max(1,Math.round(base.height*sample.width/base.width));
+      sample.getContext('2d').drawImage(base,0,0,sample.width,sample.height);
+      const guess=yusraGuessBounds(sample);
+      return new Promise((resolve,reject)=>{
+        const box=document.getElementById('yusraDocContent');box.replaceChildren();document.getElementById('yusraDocTitle').textContent='Обрезка документа';
+        const note=document.createElement('p');note.textContent='Проверьте границы документа. При необходимости скорректируйте ползунками.';note.style.fontSize='12px';box.append(note);
+        const preview=document.createElement('canvas');box.append(preview);
+        const grid=document.createElement('div');grid.className='yusra-crop-grid';box.append(grid);
+        const labels=['Слева','Сверху','Справа','Снизу'];const ranges=guess.map((v,i)=>{const wrap=document.createElement('label');wrap.style.fontSize='12px';wrap.textContent=labels[i];const input=document.createElement('input');input.type='range';input.min='0';input.max='100';input.value=String(v);wrap.append(input);grid.append(wrap);return input});
+        const controls=document.createElement('div');controls.style='display:flex;gap:8px;justify-content:flex-end;margin-top:12px';
+        const cancel=document.createElement('button');cancel.type='button';cancel.className='yusra-doc-btn';cancel.textContent='Отмена';
+        const save=document.createElement('button');save.type='button';save.className='yusra-doc-btn';save.textContent='Сохранить фото';save.style.background='#2563eb';save.style.color='white';controls.append(cancel,save);box.append(controls);
+        const draw=()=>{const [l,t,r,b]=ranges.map(x=>Number(x.value));const ctx=preview.getContext('2d');preview.width=sample.width;preview.height=sample.height;ctx.drawImage(sample,0,0);ctx.strokeStyle='#22c55e';ctx.lineWidth=3;ctx.strokeRect(l/100*preview.width,t/100*preview.height,(r-l)/100*preview.width,(b-t)/100*preview.height)};
+        ranges.forEach(x=>x.oninput=draw);draw();document.getElementById('yusraDocOverlay').hidden=false;
+        cancel.onclick=()=>{yusraCloseDoc();resolve(null)};
+        save.onclick=()=>{const [l,t,r,b]=ranges.map(x=>Number(x.value));if(r-l<8||b-t<8){alert('Проверьте границы документа');return}
+          const sx=Math.round(l/100*base.width),sy=Math.round(t/100*base.height),sw=Math.round((r-l)/100*base.width),sh=Math.round((b-t)/100*base.height);
+          const out=document.createElement('canvas');const resize=Math.min(1,1600/Math.max(sw,sh));out.width=Math.max(1,Math.round(sw*resize));out.height=Math.max(1,Math.round(sh*resize));out.getContext('2d').drawImage(base,sx,sy,sw,sh,0,0,out.width,out.height);
+          let result=out.toDataURL('image/jpeg',.82);if(result.length>650000)result=out.toDataURL('image/jpeg',.70);
+          if(result.length>850000){alert('Фотография слишком большая. Попробуйте более плотную обрезку.');return}
+          yusraCloseDoc();resolve(result)
+        };
+      });
+    }
+    window.yusraChoosePassport=async function(event,side){
+      const file=event.target.files&&event.target.files[0];event.target.value='';if(!file)return;
+      const session=yusraPhotoSession;
+      try{const photo=await yusraCropFile(file);if(photo&&session===yusraPhotoSession){yusraDraft[side]=photo;yusraDirty.add(side);yusraRenderDraft()}}
+      catch(e){alert('Ошибка обработки фотографии: '+e.message)}
+    };
+    window.yusraDetailOpen=async function(id,side){
+      try{const photo=await yusraFetchPhoto(id,side);if(photo)yusraShowPhoto(photo,(side === 'contract' ? 'Фото договора' : yusraPhotoTitle(side)));else alert('Фотография отсутствует')}
+      catch(e){alert('Не удалось открыть фотографию: '+e.message)}
+    };
+    window.yusraDetailReplace=function(id,side){
+      const input=document.createElement('input');input.type='file';input.accept='image/*';
+      input.onchange=async()=>{if(!input.files?.[0])return;try{const photo=await yusraCropFile(input.files[0]);if(!photo)return;await setDoc(yusraPhotoDoc(id,side),{image:photo,updatedAt:Date.now()});window.openContractDetail(id)}catch(e){alert('Не удалось сохранить фото: '+e.message)}};
+      input.click();
+    };
+    window.yusraDetailDelete=async function(id,side){if(!confirm('Удалить фотографию документа?'))return;try{await deleteDoc(yusraPhotoDoc(id,side));window.openContractDetail(id)}catch(e){alert('Не удалось удалить фото: '+e.message)}};
+    function yusraDetailBlock(id){
+      const safe=escapeHtml(id);
+      return `<div class="contract-detail-card wide"><h3>📷 Фотографии документов</h3><div id="yusraDetailPhotoStatus" style="font-size:11px;margin-bottom:7px">Проверка фотографий…</div><div class="yusra-passport-actions">${yusraSides.map(side=>`<div style="border:1px solid #e2e8f0;border-radius:8px;padding:7px;min-width:0;flex:1 1 180px"><strong style="font-size:11px">${yusraPhotoTitle(side)}</strong><div id="yusraDetailStatus_${side}" style="font-size:10px;margin:5px 0">Загрузка…</div><button type="button" onclick="yusraDetailOpen('${safe}','${side}')">Открыть</button> <button type="button" onclick="yusraDetailReplace('${safe}','${side}')">Заменить / добавить</button> <button type="button" onclick="yusraDetailDelete('${safe}','${side}')">Удалить</button></div>`).join('')}</div></div>`;
+    }
+    async function yusraUpdateDetailStatus(id){
+      const overall=document.getElementById('yusraDetailPhotoStatus');
+      try{const photos=await Promise.all(yusraSides.map(side=>yusraFetchPhoto(id,side)));if(!overall||!overall.isConnected)return;
+        overall.textContent=photos.some(Boolean)?'Фотографии есть':'Фотографии ещё не добавлены';
+        yusraSides.forEach((side,i)=>{const el=document.getElementById('yusraDetailStatus_'+side);if(el)el.textContent=photos[i]?'✓ Загружено':'Не загружено'});
+      }catch(e){if(overall)overall.textContent='Ошибка загрузки фотографий: '+e.message}
+    }
     const modal = document.getElementById('modal');
     window.openCreateModal = function() {
       document.getElementById('contractForm').reset();
+      yusraLoadDraft('');
       document.getElementById('editDocId').value = '';
       document.getElementById('modalTitle').innerText = 'Оформление нового договора';
       document.getElementById('downPayment').value = 0;
@@ -4774,6 +4938,7 @@
       const contract = allContracts.find(c => c.id === id);
       if(!contract) return;
       document.getElementById('editDocId').value = id;
+      yusraLoadDraft(id);
       document.getElementById('modalTitle').innerText = `Редактирование №${contract.contractNum}`;
       document.getElementById('fio').value = contract.fio || '';
       document.getElementById('birthDate').value = contract.birthDate || '';
@@ -4803,13 +4968,17 @@
       modal.classList.remove('hidden');
     };
 
-    document.getElementById('contractForm').addEventListener('submit', (e) => {
+    document.getElementById('contractForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!validateFinance()) return;
       
+      const editId = document.getElementById('editDocId').value;
+      const pendingPhotoId = editId || 'doc_' + Date.now();
+      const saveButton = document.getElementById('saveBtn');
+      saveButton.disabled=true;
+      try{await yusraCommitPhotos(pendingPhotoId)}catch(err){alert('Фото не сохранено в Firebase. Договор не изменён: '+err.message);saveButton.disabled=false;return}
       saveState();
 
-      const editId = document.getElementById('editDocId').value;
       const formData = {
         fio: document.getElementById('fio').value,
         birthDate: document.getElementById('birthDate').value || '',
@@ -4849,7 +5018,7 @@
       } else {
         const maxNum = allContracts.reduce((max, c) => (c.contractNum > max ? c.contractNum : max), 0);
         allContracts.push({
-          id: 'doc_' + Date.now(),
+          id: pendingPhotoId,
           contractNum: maxNum + 1,
           installments: {},
           ...formData
@@ -4857,6 +5026,7 @@
       }
       saveToStorage();
       closeModal();
+      saveButton.disabled=false;
     });
 
     document.getElementById('payForm').addEventListener('submit', (e) => {
@@ -5198,6 +5368,7 @@
           <div class="contract-detail-card wide"><h3>👥 Поручитель</h3><div class="contract-detail-value">${escapeHtml(c.guarantorFio || '—')}</div><div class="contract-detail-value mt-1">📞 ${escapeHtml(c.guarantorPhone || '—')}</div><div class="contract-detail-value mt-1">Доп. телефон: ${escapeHtml(c.guarantorExtraPhone || '—')}</div><div class="contract-detail-value mt-1">Паспорт: ${escapeHtml(c.guarantorPassport || '—')}</div><div class="contract-detail-value mt-1">Дата рождения: ${escapeHtml(c.guarantorBirthDate || '—')}</div><div class="contract-detail-value mt-1">Адрес: ${escapeHtml(c.guarantorAddress || '—')}</div></div>
           <div class="contract-detail-card wide"><h3>📋 Договор и 📦 Товар</h3><div class="contract-detail-value">№${escapeHtml(c.contractNum)}</div><div class="contract-detail-value mt-1">Дата покупки: ${escapeHtml(c.buyDate || '—')}</div><div class="contract-detail-value mt-1">График: ${escapeHtml(c.payDate || '—')}</div><div class="contract-detail-value mt-1">Товар: ${escapeHtml(c.product || '—')}</div><div class="contract-detail-value mt-1">Магазин: ${escapeHtml(c.store || '—')}</div><div class="contract-detail-value mt-1">«Д»: ${c.shopPaid ? '✅ Оплачено' : '—'}</div></div>
           <div class="contract-detail-card wide"><h3>💰 Финансы и 💳 Состояние</h3><div class="contract-detail-value">Рассрочка: ${Number(c.totalCost||0).toLocaleString('ru-RU')} ₽</div><div class="contract-detail-value mt-1">Себестоимость: ${Number(c.costPrice||0).toLocaleString('ru-RU')} ₽</div><div class="contract-detail-value mt-1">Месячный: ${Number(c.monthlyPay||0).toLocaleString('ru-RU')} ₽</div><div class="contract-detail-value mt-1">Оплачено: ${Number(metrics.totalPaid + Number(c.downPayment||0)).toLocaleString('ru-RU')} ₽</div><div class="contract-detail-value mt-1">Остаток: ${Number(metrics.rest).toLocaleString('ru-RU')} ₽</div><div class="contract-detail-value mt-1">Просрочка: ${Number(metrics.overdueSum).toLocaleString('ru-RU')} ₽</div></div>
+          ${yusraDetailBlock(c.id)}
         </div>
         <div class="contract-detail-footer-actions">
           <button class="contract-action primary" onclick="closeContractDetail(); openPayModal('${escapeHtml(c.id)}')">＋ Внести оплату</button>
@@ -5208,6 +5379,7 @@
           <button class="contract-action whatsapp" onclick="openContractWhatsApp('${escapeHtml(c.id)}')">💬 WhatsApp</button>
         </div>`;
       modal.classList.remove('hidden');
+      yusraUpdateDetailStatus(id);
     };
 
     const accModal = document.getElementById('accModal');
