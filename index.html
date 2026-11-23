@@ -61,22 +61,6 @@
       margin: 2px; font-size: 10px; font-weight: bold;
     }
 
-    .payment-circles { display:flex; flex-wrap:wrap; gap:5px; align-items:center; }
-    .payment-circle { width:18px; height:18px; border-radius:9999px; display:inline-flex; align-items:center; justify-content:center; font-size:8px; font-weight:900; border:1px solid rgba(15,23,42,.10); cursor:default; flex:0 0 auto; }
-    .payment-circle.paid { background:#22c55e; color:#fff; }
-    .payment-circle.today { background:#3b82f6; color:#fff; }
-    .payment-circle.three-days { background:#facc15; color:#713f12; }
-    .payment-circle.overdue { background:#ef4444; color:#fff; }
-    .payment-circle.future { background:#e5e7eb; color:#64748b; }
-    .payment-legend { display:flex; flex-wrap:wrap; gap:8px 12px; margin-top:7px; font-size:10px; color:#64748b; }
-    .payment-legend-item { display:inline-flex; align-items:center; gap:4px; }
-    .payment-legend-dot { width:10px; height:10px; border-radius:9999px; display:inline-block; border:1px solid rgba(15,23,42,.10); }
-    .payment-legend-dot.paid { background:#22c55e; }
-    .payment-legend-dot.today { background:#3b82f6; }
-    .payment-legend-dot.three-days { background:#facc15; }
-    .payment-legend-dot.overdue { background:#ef4444; }
-    .payment-legend-dot.future { background:#e5e7eb; }
-
     .payment-circles { display:flex; align-items:center; flex-wrap:wrap; gap:4px; margin-top:6px; }
     .payment-circle { width:20px; height:20px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:9px; font-weight:800; color:#fff; border:2px solid rgba(255,255,255,.9); box-shadow:0 1px 2px rgba(15,23,42,.15); cursor:default; }
     .payment-circle.paid { background:#22c55e; }
@@ -1011,6 +995,33 @@
     @media (max-width: 900px) { .fieldwork-stats { grid-template-columns:repeat(2,minmax(0,1fr)); } .fieldwork-list { grid-template-columns:1fr; } }
     @media (max-width: 640px) { .fieldwork-hero { padding:16px; border-radius:16px; } .fieldwork-title { font-size:21px; } .fieldwork-stats { gap:8px; } .fieldwork-stat { padding:11px; } .fieldwork-stat-value { font-size:17px; } .fieldwork-actions { grid-template-columns:repeat(2,minmax(0,1fr)); } .fieldwork-info-grid { grid-template-columns:1fr 1fr; } }
 
+
+    /* === Неплательщики: вкладка «Перенос» === */
+    .debtors-switcher { display:flex; gap:7px; padding:5px; background:#f1f5f9; border:1px solid #e2e8f0; border-radius:14px; width:max-content; max-width:100%; }
+    .debtors-switch-btn { border:0; background:transparent; color:#64748b; border-radius:10px; padding:9px 13px; font-size:11px; font-weight:900; cursor:pointer; transition:.15s; }
+    .debtors-switch-btn.active { background:#fff; color:#0f172a; box-shadow:0 3px 10px rgba(15,23,42,.08); }
+    .debtors-switch-count { display:inline-flex; min-width:20px; height:20px; align-items:center; justify-content:center; padding:0 5px; margin-left:4px; border-radius:999px; background:#e2e8f0; font-size:9px; }
+    .debtors-switch-btn.active:first-child .debtors-switch-count { background:#fee2e2; color:#b91c1c; }
+    .debtors-switch-btn.active:last-child .debtors-switch-count { background:#dbeafe; color:#1d4ed8; }
+    .debtors-summary-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:9px; }
+    .debtors-summary-card { background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:12px; box-shadow:0 5px 16px rgba(15,23,42,.045); }
+    .debtors-summary-label { color:#64748b; font-size:8px; font-weight:900; text-transform:uppercase; letter-spacing:.05em; }
+    .debtors-summary-value { margin-top:4px; color:#0f172a; font-size:19px; font-weight:900; }
+    .debtors-summary-value.red { color:#dc2626; }
+    .debtors-summary-value.green { color:#15803d; }
+    .debtors-transfer-summary { display:flex; justify-content:space-between; gap:10px; align-items:center; background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:13px 15px; box-shadow:0 5px 16px rgba(15,23,42,.045); }
+    .debtors-transfer-title { font-size:16px; font-weight:900; color:#0f172a; }
+    .debtors-transfer-card { padding:11px 13px; border-bottom:1px solid #eef2f7; display:flex; justify-content:space-between; gap:10px; align-items:center; flex-wrap:wrap; }
+    .debtors-transfer-card:last-child { border-bottom:0; }
+    .debtors-transfer-main { min-width:0; flex:1; }
+    .debtors-transfer-name { font-size:12px; font-weight:900; color:#0f172a; }
+    .debtors-transfer-meta { margin-top:3px; color:#64748b; font-size:9px; line-height:1.4; }
+    .debtors-transfer-actions { display:flex; flex-wrap:wrap; gap:5px; }
+    .debtors-transfer-action { border:1px solid #e2e8f0; background:#fff; color:#334155; border-radius:8px; padding:6px 8px; font-size:9px; font-weight:900; cursor:pointer; }
+    .debtors-transfer-action.return { background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; }
+    .debtors-transfer-action.extend { background:#fef3c7; color:#92400e; border-color:#fde68a; }
+    @media (max-width:768px) { .debtors-summary-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .debtors-summary-value { font-size:16px; } .debtors-switcher { width:100%; } .debtors-switch-btn { flex:1; } }
+
     /* === Главная: финансовый дашборд === */
     .dashboard-shell { display:flex; flex-direction:column; gap:18px; }
     .dashboard-hero {
@@ -1150,7 +1161,206 @@
  #modal #contractForm>div:last-child button{min-height:46px;flex:1;padding:8px!important}
  .yusra-passports{grid-template-columns:minmax(0,1fr)}
 }
-  </style>
+
+    /* === YUSRA UI polish: единая визуальная система === */
+    :root {
+      --yusra-bg:#f1f5f9;
+      --yusra-surface:#ffffff;
+      --yusra-border:#e2e8f0;
+      --yusra-text:#0f172a;
+      --yusra-muted:#64748b;
+      --yusra-accent:#2563eb;
+      --yusra-radius:16px;
+    }
+    html { scroll-behavior:smooth; }
+    body {
+      background:
+        radial-gradient(circle at 100% 0%, rgba(37,99,235,.055), transparent 30%),
+        var(--yusra-bg) !important;
+      color:var(--yusra-text);
+    }
+    button, input, select, textarea { -webkit-tap-highlight-color:transparent; }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, a:focus-visible {
+      outline:3px solid rgba(37,99,235,.22);
+      outline-offset:2px;
+    }
+    .sticky.top-0 {
+      background:rgba(255,255,255,.92) !important;
+      backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);
+      border-color:rgba(226,232,240,.9) !important;
+      box-shadow:0 4px 20px rgba(15,23,42,.07) !important;
+    }
+    .dashboard-card, .contracts-toolbar, .contracts-table-shell,
+    .schedule-contract-list, .client-card, .fieldwork-card, .fieldwork-stat {
+      border-color:#dfe7f1;
+    }
+    .dashboard-card, .contracts-toolbar, .contracts-table-shell {
+      box-shadow:0 8px 24px rgba(15,23,42,.055);
+    }
+    .dashboard-card:hover, .contracts-toolbar:hover {
+      border-color:#cbd5e1;
+    }
+    .dashboard-metric {
+      transition:transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+    }
+    .dashboard-metric:hover {
+      transform:translateY(-2px);
+      box-shadow:0 12px 28px rgba(15,23,42,.09);
+    }
+    .dashboard-quick-btn, .client-contract-action, .contracts-reset {
+      transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease, background .15s ease;
+    }
+    .dashboard-quick-btn:active, .client-contract-action:active, .contracts-reset:active {
+      transform:translateY(0);
+    }
+    .app-sidebar {
+      box-shadow:12px 0 34px rgba(15,23,42,.14);
+    }
+    .app-sidebar .tab-btn {
+      transition:background .15s ease, color .15s ease, transform .15s ease;
+    }
+    .app-sidebar .tab-btn:hover { transform:translateX(2px); }
+    .contracts-table-shell, .schedule-contract-list, .client-history-table-wrap {
+      scrollbar-color:#cbd5e1 transparent;
+      scrollbar-width:thin;
+    }
+    .contracts-table-shell::-webkit-scrollbar,
+    .schedule-contract-list::-webkit-scrollbar,
+    .client-history-table-wrap::-webkit-scrollbar { height:8px; width:8px; }
+    .contracts-table-shell::-webkit-scrollbar-thumb,
+    .schedule-contract-list::-webkit-scrollbar-thumb,
+    .client-history-table-wrap::-webkit-scrollbar-thumb {
+      background:#cbd5e1; border-radius:999px;
+    }
+    .dashboard-row:hover { background:#f8fafc; }
+    @media (max-width:640px) {
+      .sticky.top-0 { padding-top:env(safe-area-inset-top); }
+      .dashboard-shell { gap:12px; }
+      .dashboard-section-head { padding:12px 13px; }
+      .dashboard-row { padding:9px 13px; }
+      .dashboard-installment { padding:12px; }
+      .dashboard-big-box { padding:12px; }
+      .dashboard-quick-btn { min-height:44px; }
+      .menu-toggle { box-shadow:0 3px 10px rgba(15,23,42,.08); }
+    }
+
+  
+    /* === YUSRA V2: визуальное обновление без изменения бизнес-логики === */
+    :root {
+      --y-bg:#f3f6fb; --y-panel:#fff; --y-line:#e5eaf1; --y-text:#0f172a;
+    }
+    body { background:var(--y-bg) !important; color:var(--y-text); }
+    .yusra-topbar {
+      background:rgba(255,255,255,.94); border-bottom:1px solid #e2e8f0;
+      box-shadow:0 4px 22px rgba(15,23,42,.07); backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+    }
+    .yusra-topbar-inner {
+      max-width:1600px; margin:0 auto; min-height:68px; padding:9px 14px;
+      display:grid; grid-template-columns:auto minmax(260px,1fr) auto;
+      align-items:center; gap:14px;
+    }
+    .yusra-brand-group,.yusra-topbar-tools,.yusra-primary-action { display:flex; align-items:center; gap:9px; min-width:0; }
+    .yusra-brand { min-width:130px; line-height:1; }
+    .yusra-brand-name { font-size:18px; font-weight:950; letter-spacing:.12em; color:#0f172a; }
+    .yusra-brand-caption { margin-top:5px; font-size:8px; font-weight:800; letter-spacing:.08em; color:#94a3b8; text-transform:uppercase; }
+    .yusra-history { display:flex; padding:3px; border:1px solid #e5e7eb; background:#f8fafc; border-radius:10px; }
+    .yusra-history button { width:30px; height:28px; border:0; border-radius:7px; font-size:17px; font-weight:900; color:#475569; background:transparent; }
+    .yusra-history button:not(:disabled):hover { background:#fff; color:#2563eb; }
+    .yusra-history button:disabled { opacity:.35; }
+    .yusra-search {
+      height:42px; min-width:0; width:min(100%,460px); margin:0 auto;
+      display:flex; align-items:center; gap:8px; padding:0 11px;
+      background:#f8fafc; border:1px solid #dbe3ee; border-radius:12px; color:#94a3b8;
+      transition:.15s;
+    }
+    .yusra-search:focus-within { background:#fff; border-color:#93c5fd; box-shadow:0 0 0 3px rgba(59,130,246,.10); }
+    .yusra-search > span { font-size:20px; line-height:1; }
+    .yusra-search input { min-width:0; width:100%; border:0; outline:0; background:transparent; color:#0f172a; font-size:11px; font-weight:700; }
+    .yusra-search kbd { flex:0 0 auto; padding:3px 6px; border:1px solid #dbe3ee; border-bottom-width:2px; border-radius:6px; background:#fff; color:#94a3b8; font-size:8px; font-weight:900; }
+    .yusra-sync { white-space:nowrap; }
+    .yusra-data-actions { display:flex; gap:4px; padding:3px; border:1px solid #e5e7eb; border-radius:10px; background:#f8fafc; }
+    .yusra-data-actions button { width:30px; height:28px; border:0; border-radius:7px; background:transparent; color:#475569; font-weight:900; cursor:pointer; }
+    .yusra-data-actions button:hover { background:#fff; color:#2563eb; }
+    .yusra-primary-action { justify-content:flex-end; }
+    .yusra-primary-action > button:not(.hidden) {
+      min-height:42px; padding:0 14px; border:0; border-radius:11px; background:#2563eb; color:#fff;
+      font-size:10px; font-weight:900; box-shadow:0 5px 14px rgba(37,99,235,.22); cursor:pointer;
+    }
+    .yusra-primary-action > button:not(.hidden):hover { filter:brightness(.96); transform:translateY(-1px); }
+    .yusra-primary-action > #addAccIncomeBtn:not(.hidden) { background:#16a34a; }
+    .yusra-primary-action > #addAccExpenseBtn:not(.hidden) { background:#dc2626; }
+    .yusra-primary-action > #addTakenBtn:not(.hidden) { background:#d97706; }
+    .yusra-primary-action > #addIncomeExpBtn:not(.hidden) { background:#0d9488; }
+
+    .dashboard-shell { max-width:1600px; margin:0 auto; }
+    .dashboard-hero { border-radius:20px !important; box-shadow:0 12px 32px rgba(15,23,42,.09) !important; }
+    .dashboard-grid { gap:10px !important; }
+    .dashboard-metric {
+      min-height:122px; border-radius:15px !important; border:1px solid #e5eaf1 !important;
+      background:#fff !important; box-shadow:0 5px 18px rgba(15,23,42,.045) !important;
+      position:relative; overflow:hidden;
+    }
+    .dashboard-metric:before { content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:#cbd5e1; }
+    .dashboard-metric:nth-child(1):before { background:#dc2626; }
+    .dashboard-metric:nth-child(2):before { background:#2563eb; }
+    .dashboard-metric:nth-child(3):before { background:#f59e0b; }
+    .dashboard-metric:nth-child(4):before { background:#16a34a; }
+    .dashboard-metric:nth-child(5):before { background:#ef4444; }
+    .dashboard-metric:nth-child(6):before { background:#8b5cf6; }
+    .dashboard-card,.contracts-toolbar,.contracts-table-shell {
+      border-color:#e5eaf1 !important; border-radius:16px !important; box-shadow:0 6px 22px rgba(15,23,42,.045) !important;
+    }
+    .dashboard-section-title { font-size:12px !important; }
+    .dashboard-big-box {
+      border:1px solid #e5eaf1 !important; background:linear-gradient(180deg,#fff,#f8fafc) !important;
+      border-radius:13px !important; min-height:94px;
+    }
+    .dashboard-big-value { font-weight:950 !important; }
+    .dashboard-row { border-bottom:1px solid #f0f3f7 !important; }
+    .dashboard-quick-btn { min-height:48px; border-radius:12px !important; background:#f8fafc !important; }
+
+    .contracts-toolbar { padding:16px !important; }
+    .contracts-page-title { font-size:22px !important; }
+    .contracts-table thead th { background:#111827 !important; }
+    .contracts-table tbody tr:nth-child(even) { background:#fbfdff; }
+    .contracts-table tbody tr:hover { background:#f0f7ff !important; }
+
+    .app-sidebar {
+      width:300px !important; background:rgba(255,255,255,.97) !important;
+      backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+      box-shadow:14px 0 40px rgba(15,23,42,.16) !important;
+    }
+    .app-sidebar .tab-btn { min-height:44px !important; border-radius:11px !important; }
+    .app-sidebar .tab-btn.active { box-shadow:inset 4px 0 0 #2563eb !important; }
+
+    #partnersTabContent > div,#incomeTabContent > div,#initTabContent > div,
+    #accountingTabContent > div,#takenTabContent > div:first-child,#printTabContent > div {
+      border-radius:16px !important; border-color:#e5eaf1 !important;
+      box-shadow:0 6px 22px rgba(15,23,42,.045) !important;
+    }
+    .client-card,.fieldwork-card { box-shadow:0 5px 18px rgba(15,23,42,.045) !important; }
+
+    @media (max-width:900px) {
+      .yusra-topbar-inner { grid-template-columns:1fr auto; }
+      .yusra-topbar-tools { grid-column:1 / -1; grid-row:2; }
+      .yusra-search { width:100%; }
+      .yusra-primary-action { grid-column:2; grid-row:1; }
+      .yusra-sync { display:none; }
+    }
+    @media (max-width:640px) {
+      .yusra-topbar-inner { padding:8px; gap:7px; min-height:60px; }
+      .yusra-brand-caption,.yusra-history,.yusra-data-actions { display:none; }
+      .yusra-brand-name { font-size:16px; }
+      .yusra-primary-action > button:not(.hidden) { min-height:40px; padding:0 10px; font-size:9px; }
+      .yusra-search { height:40px; }
+      .dashboard-grid { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+      .dashboard-metric { min-height:108px; }
+      .dashboard-metric-note { font-size:8px !important; }
+      .contracts-page-title { font-size:19px !important; }
+    }
+</style>
 </head>
 <body class="bg-slate-100 text-gray-800 text-xs min-h-screen">
 
@@ -1162,56 +1372,44 @@
   </div>
 
   <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
-  <div class="sticky top-0 z-40 bg-white shadow-md border-b no-print">
-    <div class="p-3 max-w-[100vw] flex flex-wrap justify-between items-center gap-4">
-      
-      <div class="flex items-center gap-2 flex-wrap">
+  <div class="yusra-topbar sticky top-0 z-40 no-print">
+    <div class="yusra-topbar-inner">
+      <div class="yusra-brand-group">
         <button type="button" id="menuToggle" class="menu-toggle no-print" onclick="toggleSidebar()" aria-label="Открыть меню" aria-expanded="false">☰</button>
-        <div class="flex bg-slate-200 rounded-lg p-1 gap-1">
-          <button type="button" id="undoBtn" onclick="undo()" disabled title="Шаг назад (Ctrl+Z)" 
-            class="px-3 py-1.5 rounded text-xs font-bold text-gray-400 bg-gray-100 cursor-not-allowed transition">
-            ↺ Назад
-          </button>
-          <button type="button" id="redoBtn" onclick="redo()" disabled title="Шаг вперед (Ctrl+Y)" 
-            class="px-3 py-1.5 rounded text-xs font-bold text-gray-400 bg-gray-100 cursor-not-allowed transition">
-            ↻ Вперед
-          </button>
+        <div class="yusra-brand">
+          <div class="yusra-brand-name">YUSRA</div>
+          <div class="yusra-brand-caption">учёт · договоры · финансы</div>
         </div>
+        <div class="yusra-history">
+          <button type="button" id="undoBtn" onclick="undo()" disabled title="Шаг назад (Ctrl+Z)" aria-label="Шаг назад">↶</button>
+          <button type="button" id="redoBtn" onclick="redo()" disabled title="Шаг вперед (Ctrl+Y)" aria-label="Шаг вперед">↷</button>
+        </div>
+      </div>
 
-        <button type="button" onclick="exportData()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-3 py-1.5 rounded-lg text-xs transition shadow-sm">
-          💾 Скачать базу
-        </button>
-        <input type="file" id="importFile" onchange="importData(event)" class="hidden" accept=".json">
-        <button type="button" onclick="document.getElementById('importFile').click()" class="bg-slate-600 hover:bg-slate-700 text-white font-medium px-3 py-1.5 rounded-lg text-xs transition shadow-sm">
-          📂 Загрузить базу
-        </button>
-
-        <div id="syncIndicator" class="sync-indicator synced" title="Статус синхронизации с облаком">
+      <div class="yusra-topbar-tools">
+        <label class="yusra-search" for="searchInput">
+          <span>⌕</span>
+          <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Поиск по YUSRA…" autocomplete="off">
+          <kbd>Ctrl K</kbd>
+        </label>
+        <div id="syncIndicator" class="sync-indicator synced yusra-sync" title="Статус синхронизации с облаком">
           <span class="sync-dot"></span>
           <span id="syncText">Синхронизировано</span>
         </div>
-
-        <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Поиск..." class="p-1.5 border rounded-lg w-40 focus:ring-2 focus:ring-blue-400 outline-none">
+        <div class="yusra-data-actions">
+          <button type="button" onclick="exportData()" title="Скачать базу" aria-label="Скачать базу">⇩</button>
+          <input type="file" id="importFile" onchange="importData(event)" class="hidden" accept=".json">
+          <button type="button" onclick="document.getElementById('importFile').click()" title="Загрузить базу" aria-label="Загрузить базу">⇧</button>
+        </div>
       </div>
 
-      <div class="flex items-center gap-2">
-        <button type="button" id="addContractBtn" onclick="openCreateModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1.5 rounded-lg shadow transition">
-          + Новый Договор
-        </button>
-        <button type="button" id="addAccIncomeBtn" onclick="openAccModal('income')" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-lg shadow transition">
-          ＋ Поступление
-        </button>
-        <button type="button" id="addAccExpenseBtn" onclick="openAccModal('expense')" class="hidden bg-red-600 hover:bg-red-700 text-white font-bold px-3 py-1.5 rounded-lg shadow transition">
-          − Расход
-        </button>
-        <button type="button" id="addTakenBtn" onclick="openTakenModal()" class="hidden bg-amber-600 hover:bg-amber-700 text-white font-bold px-3 py-1.5 rounded-lg shadow transition">
-          + Запись Взяли / Положили
-        </button>
-        <button type="button" id="addIncomeExpBtn" onclick="openIncomeExpModal()" class="hidden bg-teal-600 hover:bg-teal-700 text-white font-bold px-3 py-1.5 rounded-lg shadow transition">
-          + Добавить расход
-        </button>
+      <div class="yusra-primary-action">
+        <button type="button" id="addContractBtn" onclick="openCreateModal()">＋ Новый договор</button>
+        <button type="button" id="addAccIncomeBtn" onclick="openAccModal('income')" class="hidden">＋ Поступление</button>
+        <button type="button" id="addAccExpenseBtn" onclick="openAccModal('expense')" class="hidden">− Расход</button>
+        <button type="button" id="addTakenBtn" onclick="openTakenModal()" class="hidden">＋ Взяли / Положили</button>
+        <button type="button" id="addIncomeExpBtn" onclick="openIncomeExpModal()" class="hidden">＋ Добавить расход</button>
       </div>
-
     </div>
   </div>
 
@@ -1607,14 +1805,53 @@
 
     <!-- ================= Лист 6: Неплательщики ================= -->
     <div id="debtorsTabContent" class="hidden space-y-4">
-      <div class="bg-white shadow-xl rounded-xl p-4 border">
-        <div class="flex justify-between items-center mb-3">
-          <div>
-            <h2 class="text-xl font-bold text-red-600">🚫 Неплательщики (просрочка)</h2>
-            <div id="debtorsSummary" class="text-xs text-slate-500 font-semibold mt-1"></div>
+      <div class="debtors-switcher no-print">
+        <button type="button" id="debtorsViewBtn" class="debtors-switch-btn active" onclick="setDebtorsView('debtors')">
+          🚫 Неплательщики <span id="debtorsViewCount" class="debtors-switch-count">0</span>
+        </button>
+        <button type="button" id="debtorsTransferViewBtn" class="debtors-switch-btn" onclick="setDebtorsView('transfer')">
+          ↪ Перенос <span id="debtorsTransferCount" class="debtors-switch-count">0</span>
+        </button>
+      </div>
+
+      <div id="debtorsMainView">
+        <div class="debtors-summary-grid">
+          <div class="debtors-summary-card">
+            <div class="debtors-summary-label">Неплательщиков</div>
+            <div id="debtorsCountStat" class="debtors-summary-value red">0</div>
+          </div>
+          <div class="debtors-summary-card">
+            <div class="debtors-summary-label">Общая просрочка</div>
+            <div id="debtorsOverdueStat" class="debtors-summary-value red">0 ₽</div>
+          </div>
+          <div class="debtors-summary-card">
+            <div class="debtors-summary-label">Оплатили сегодня</div>
+            <div id="debtorsPaidCountStat" class="debtors-summary-value">0</div>
+          </div>
+          <div class="debtors-summary-card">
+            <div class="debtors-summary-label">Поступило сегодня</div>
+            <div id="debtorsPaidAmountStat" class="debtors-summary-value green">0 ₽</div>
           </div>
         </div>
-        <div id="debtorsClientsList" class="client-list"></div>
+        <div class="bg-white shadow-xl rounded-xl p-4 border">
+          <div class="flex justify-between items-center mb-3">
+            <div>
+              <h2 class="text-xl font-bold text-red-600">🚫 Неплательщики (просрочка)</h2>
+              <div id="debtorsSummary" class="text-xs text-slate-500 font-semibold mt-1"></div>
+            </div>
+          </div>
+          <div id="debtorsClientsList" class="client-list"></div>
+        </div>
+      </div>
+
+      <div id="debtorsTransferView" class="hidden">
+        <div class="debtors-transfer-summary">
+          <div>
+            <div class="debtors-transfer-title">↪ Перенесённые клиенты</div>
+            <div id="debtorsTransferSummary" class="text-xs text-slate-500 font-semibold mt-1"></div>
+          </div>
+        </div>
+        <div id="debtorsTransferList" class="client-list bg-white border rounded-xl"></div>
       </div>
     </div>
 
@@ -2356,6 +2593,7 @@
             investors: initInvestors,
             monthlyReports: initMonthlyReports,
             fieldVisitRecords: fieldVisitRecords,
+            debtorsTransfers: debtorsTransfers,
             partners: allPartners,
             updatedAt: Date.now()
           });
@@ -2377,6 +2615,7 @@
       if (data.investors) initInvestors = data.investors;
       if (data.monthlyReports) initMonthlyReports = data.monthlyReports;
       if (data.fieldVisitRecords && typeof data.fieldVisitRecords === 'object') fieldVisitRecords = data.fieldVisitRecords;
+      if (data.debtorsTransfers && typeof data.debtorsTransfers === 'object') debtorsTransfers = data.debtorsTransfers;
       if (Array.isArray(data.partners)) allPartners = data.partners;
 
       localStorage.setItem('contracts_db', JSON.stringify(allContracts));
@@ -2387,6 +2626,7 @@
       localStorage.setItem('investors_db', JSON.stringify(initInvestors));
       localStorage.setItem('monthly_reports_db', JSON.stringify(initMonthlyReports));
       localStorage.setItem('field_visit_records_db', JSON.stringify(fieldVisitRecords));
+      localStorage.setItem('debtors_transfer_db', JSON.stringify(debtorsTransfers));
       localStorage.setItem('partners_db', JSON.stringify(allPartners));
 
       try {
@@ -4215,12 +4455,23 @@
             </div>
             <div class="schedule-contract-segment">
               <a href="${waHref}" ${waAttrs} class="schedule-contract-action" title="Открыть WhatsApp">💬 WhatsApp</a>
+              ${isDebtors ? `<button type="button" class="debtors-transfer-action" onclick="openDebtorTransfer(this.dataset.transferKey)" data-transfer-key="${escapeHtml(debtorTransferKey(client))}" title="Перенести">↪ Перенести</button>` : ''}
             </div>
           </div>`;
       });
       html += '</div>';
       container.innerHTML = html;
     }
+
+    // Проверка даты переноса раз в минуту. Никаких изменений договора не делает.
+    setInterval(() => {
+      if (activeTab === 'debtors' && Object.keys(debtorsTransfers).length) {
+        const before = JSON.stringify(debtorsTransfers);
+        cleanupDebtorTransfers();
+        if (before !== JSON.stringify(debtorsTransfers)) renderDebtorsClients();
+      }
+    }, 60000);
+
     // ================================================================
     // ВЫЕЗД
     // ================================================================
@@ -4674,20 +4925,6 @@
       renderClientList('todayClientsList', clients, 'Нет клиентов, которые должны оплатить сегодня', todayStr, 'today');
     }
 
-    function buildThreeDaysWhatsAppMessage(client, dateStr) {
-      const monthInfo = client.monthInfo || getMonthStatus(client);
-      const payment = Number(client.unpaidMonthAmount || client.monthlyPay || 0);
-      const overdueSum = monthInfo.months.reduce((sum, m) => sum + (m.status === 'overdue' && !m.isPaid ? Number(m.dueAmount || m.amount || 0) : 0), 0);
-      const rest = Number(client.rest || 0);
-      const name = String(client.fio || '').trim();
-      let message = `السلام عليكم ورحمة الله\nМир вам\n\n`;
-      message += `Уважаемый${name ? ` ${name}` : ''}, напоминаем, что через 3 дня необходимо внести платёж.\n`;
-      message += `💰 Сумма платежа: ${payment.toLocaleString('ru-RU')} ₽\n`;
-      if (dateStr) message += `📅 Дата платежа: ${dateStr}\n`;
-      if (overdueSum > 0) message += `⚠️ Просрочка: ${overdueSum.toLocaleString('ru-RU')} ₽\n`;
-      message += `📊 Остаток: ${rest.toLocaleString('ru-RU')} ₽`;
-      return message;
-    }
 
     function renderThreeDaysClients() {
       const today = new Date();
@@ -4704,16 +4941,267 @@
       renderClientList('threeDaysClientsList', clients, 'Нет клиентов, которым нужно оплатить через 3 дня', threeDaysStr, 'threeDays');
     }
 
-    function renderDebtorsClients() {
-      const clients = getDebtors();
-      const totalOverdue = clients.reduce((sum, client) => {
-        const info = client.monthInfo || getMonthStatus(client);
-        return sum + info.months.reduce((inner, m) => inner + (m.status === 'overdue' && !m.isPaid ? Number(m.dueAmount || m.amount || 0) : 0), 0);
-      }, 0);
-      const summary = document.getElementById('debtorsSummary');
-      if (summary) summary.textContent = `${clients.length} клиентов · ${totalOverdue.toLocaleString('ru-RU')} ₽ просрочено`;
-      renderClientList('debtorsClientsList', clients, 'Нет клиентов с просрочкой', '', 'debtors');
+
+    // ================================================================
+    // НЕПЛАТЕЛЬЩИКИ — ВРЕМЕННЫЙ ПЕРЕНОС
+    // Перенос не меняет договор, статус, долг или финансовые расчёты.
+    // Это только отдельная рабочая отметка.
+    // ================================================================
+    let debtorsView = 'debtors';
+    let debtorsTransfers = {};
+    try {
+      const savedDebtorTransfers = localStorage.getItem('debtors_transfer_db');
+      debtorsTransfers = savedDebtorTransfers ? JSON.parse(savedDebtorTransfers) : {};
+      if (!debtorsTransfers || typeof debtorsTransfers !== 'object') debtorsTransfers = {};
+    } catch (e) { debtorsTransfers = {}; }
+
+    function saveDebtorTransfers() {
+      localStorage.setItem('debtors_transfer_db', JSON.stringify(debtorsTransfers));
+      if (typeof pushToCloud === 'function') pushToCloud();
     }
+
+    function debtorTransferKey(client) {
+      return `${String(client?.contractNum || '')}|${String(client?.fio || '').trim().toLocaleLowerCase('ru-RU')}`;
+    }
+
+    function debtorToday() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+
+    function debtorFormatDate(value) {
+      const p = String(value || '').slice(0,10).split('-');
+      return p.length === 3 ? `${p[2]}.${p[1]}.${p[0]}` : String(value || '—');
+    }
+
+    function debtorFindContractByKey(key) {
+      return allContracts.find(c => debtorTransferKey(c) === key) || null;
+    }
+
+    function debtorContractStillOverdue(contract) {
+      if (!contract) return false;
+      const metrics = calculateContractMetrics(contract);
+      if (metrics.isClosed) return false;
+      const info = getMonthStatus(contract);
+      const overdue = info.months.reduce((sum,m) => {
+        return sum + (m.status === 'overdue' && !m.isPaid ? Number(m.dueAmount || m.amount || 0) : 0);
+      }, 0);
+      return overdue >= 1000;
+    }
+
+    function cleanupDebtorTransfers() {
+      let changed = false;
+      const today = debtorToday();
+
+      Object.keys(debtorsTransfers).forEach(key => {
+        const item = debtorsTransfers[key] || {};
+        const contract = debtorFindContractByKey(key);
+
+        // Если долг погашен во время переноса — удаляем отметку полностью.
+        if (!debtorContractStillOverdue(contract)) {
+          delete debtorsTransfers[key];
+          changed = true;
+          return;
+        }
+
+        // В дату возврата перенос заканчивается. Дальше клиент снова
+        // проходит обычную проверку «Неплательщиков».
+        if (item.returnDate && String(item.returnDate).slice(0,10) <= today) {
+          delete debtorsTransfers[key];
+          changed = true;
+        }
+      });
+
+      if (changed) {
+        localStorage.setItem('debtors_transfer_db', JSON.stringify(debtorsTransfers));
+        if (typeof pushToCloud === 'function') pushToCloud();
+      }
+    }
+
+    function isDebtorTransferred(client) {
+      return !!debtorsTransfers[debtorTransferKey(client)];
+    }
+
+    function debtorRefreshCounters(visibleClients) {
+      const count = visibleClients.length;
+      const overdue = visibleClients.reduce((sum,c) => sum + Number(c.overdueSum || 0), 0);
+      document.getElementById('debtorsViewCount')?.replaceChildren(document.createTextNode(String(count)));
+      document.getElementById('debtorsCountStat')?.replaceChildren(document.createTextNode(String(count)));
+      document.getElementById('debtorsOverdueStat')?.replaceChildren(document.createTextNode(Math.round(overdue).toLocaleString('ru-RU') + ' ₽'));
+
+      const transferCount = Object.keys(debtorsTransfers).length;
+      document.getElementById('debtorsTransferCount')?.replaceChildren(document.createTextNode(String(transferCount)));
+    }
+
+    window.setDebtorsView = function(view) {
+      debtorsView = view === 'transfer' ? 'transfer' : 'debtors';
+      document.getElementById('debtorsViewBtn')?.classList.toggle('active', debtorsView === 'debtors');
+      document.getElementById('debtorsTransferViewBtn')?.classList.toggle('active', debtorsView === 'transfer');
+      document.getElementById('debtorsMainView')?.classList.toggle('hidden', debtorsView !== 'debtors');
+      document.getElementById('debtorsTransferView')?.classList.toggle('hidden', debtorsView !== 'transfer');
+      renderDebtorsClients();
+    };
+
+    window.openDebtorTransfer = function(key) {
+      key = String(key || '');
+      const client = debtorFindContractByKey(key);
+      if (!client) return;
+      const current = debtorsTransfers[key] || {};
+      const today = debtorToday();
+
+      const modal = document.createElement('div');
+      modal.id = 'debtorTransferModal';
+      modal.className = 'fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4';
+      modal.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-5">
+          <div class="flex justify-between items-start gap-3">
+            <div>
+              <div class="text-lg font-black text-slate-900">↪ Перенести клиента</div>
+              <div class="text-xs text-slate-500 mt-1">${escapeHtml(client.fio || '')} · №${escapeHtml(client.contractNum || '')}</div>
+            </div>
+            <button type="button" class="w-9 h-9 rounded-lg bg-slate-100 text-xl" onclick="this.closest('#debtorTransferModal').remove()">×</button>
+          </div>
+          <div class="mt-4 text-xs font-bold text-slate-600">С даты</div>
+          <input id="debtorTransferFrom" type="date" value="${escapeHtml(current.fromDate || today)}" class="w-full mt-1 border rounded-lg px-3 py-2 text-sm">
+          <div class="mt-3 text-xs font-bold text-slate-600">Дата возврата</div>
+          <input id="debtorTransferTo" type="date" value="${escapeHtml(current.returnDate || today)}" class="w-full mt-1 border rounded-lg px-3 py-2 text-sm">
+          <div class="mt-2 text-[10px] text-slate-400">Если клиент погасит долг раньше этой даты, он автоматически исчезнет и из «Переноса», и из «Неплательщиков».</div>
+          <div class="flex justify-end gap-2 mt-5">
+            <button type="button" class="px-3 py-2 rounded-lg bg-slate-100 text-xs font-bold" onclick="this.closest('#debtorTransferModal').remove()">Отмена</button>
+            <button type="button" class="px-3 py-2 rounded-lg bg-blue-600 text-white text-xs font-bold" onclick="saveDebtorTransfer('${String(key).replace(/\\/g,'\\\\').replace(/'/g,"\\'")}')">Сохранить</button>
+          </div>
+        </div>`;
+      document.body.appendChild(modal);
+    };
+
+    window.saveDebtorTransfer = function(key) {
+      const fromDate = document.getElementById('debtorTransferFrom')?.value || debtorToday();
+      const returnDate = document.getElementById('debtorTransferTo')?.value || fromDate;
+      if (returnDate < fromDate) {
+        alert('Дата возврата не может быть раньше даты переноса.');
+        return;
+      }
+      debtorsTransfers[key] = { fromDate, returnDate, updatedAt: Date.now() };
+      saveDebtorTransfers();
+      document.getElementById('debtorTransferModal')?.remove();
+      renderDebtorsClients();
+    };
+
+    window.returnDebtorTransfer = function(key) {
+      if (!debtorsTransfers[key]) return;
+      delete debtorsTransfers[key];
+      saveDebtorTransfers();
+      renderDebtorsClients();
+    };
+
+    window.extendDebtorTransfer = function(key) {
+      const item = debtorsTransfers[key];
+      const client = debtorFindContractByKey(key);
+      if (!item || !client) return;
+
+      const base = new Date(`${item.returnDate || debtorToday()}T00:00:00`);
+      base.setDate(base.getDate() + 1);
+      const next = `${base.getFullYear()}-${String(base.getMonth()+1).padStart(2,'0')}-${String(base.getDate()).padStart(2,'0')}`;
+
+      const modal = document.createElement('div');
+      modal.id = 'debtorTransferModal';
+      modal.className = 'fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4';
+      modal.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-5">
+          <div class="text-lg font-black text-slate-900">Продлить перенос</div>
+          <div class="text-xs text-slate-500 mt-1">${escapeHtml(client.fio || '')}</div>
+          <input id="debtorTransferTo" type="date" value="${next}" class="w-full mt-4 border rounded-lg px-3 py-2 text-sm">
+          <div class="flex justify-end gap-2 mt-5">
+            <button type="button" class="px-3 py-2 rounded-lg bg-slate-100 text-xs font-bold" onclick="this.closest('#debtorTransferModal').remove()">Отмена</button>
+            <button type="button" class="px-3 py-2 rounded-lg bg-blue-600 text-white text-xs font-bold" onclick="extendDebtorTransferSave('${String(key).replace(/\\/g,'\\\\').replace(/'/g,"\\'")}')">Сохранить</button>
+          </div>
+        </div>`;
+      document.body.appendChild(modal);
+    };
+
+    window.extendDebtorTransferSave = function(key) {
+      const to = document.getElementById('debtorTransferTo')?.value || '';
+      if (!to) return;
+      debtorsTransfers[key].returnDate = to;
+      debtorsTransfers[key].updatedAt = Date.now();
+      saveDebtorTransfers();
+      document.getElementById('debtorTransferModal')?.remove();
+      renderDebtorsClients();
+    };
+
+    function renderDebtorTransfers() {
+      cleanupDebtorTransfers();
+      const container = document.getElementById('debtorsTransferList');
+      if (!container) return;
+
+      const items = Object.entries(debtorsTransfers).map(([key,item]) => {
+        const client = debtorFindContractByKey(key);
+        return {key,item,client};
+      }).filter(x => x.client && debtorContractStillOverdue(x.client));
+
+      const sum = items.reduce((s,x) => s + Number(x.client.overdueSum || 0), 0);
+      const summary = document.getElementById('debtorsTransferSummary');
+      if (summary) summary.textContent = `${items.length} клиентов · общая просрочка ${Math.round(sum).toLocaleString('ru-RU')} ₽`;
+
+      if (!items.length) {
+        container.innerHTML = '<div class="debtors-transfer-empty">Сейчас перенесённых клиентов нет.</div>';
+        return;
+      }
+
+      container.innerHTML = items.sort((a,b) => String(a.item.returnDate).localeCompare(String(b.item.returnDate))).map(({key,item,client}) => `
+        <div class="debtors-transfer-card">
+          <div class="debtors-transfer-main">
+            <div class="debtors-transfer-name">${escapeHtml(client.fio || '—')} · №${escapeHtml(client.contractNum || '—')}</div>
+            <div class="debtors-transfer-meta">
+              Просрочка: <b class="text-red-600">${Math.round(Number(client.overdueSum || 0)).toLocaleString('ru-RU')} ₽</b>
+              · Перенос: ${debtorFormatDate(item.fromDate)}
+              · Возврат: <b>${debtorFormatDate(item.returnDate)}</b>
+            </div>
+          </div>
+          <div class="debtors-transfer-actions">
+            <button type="button" class="debtors-transfer-action extend" onclick="extendDebtorTransfer('${String(key).replace(/\\/g,'\\\\').replace(/'/g,"\\'")}')">Продлить</button>
+            <button type="button" class="debtors-transfer-action return" onclick="returnDebtorTransfer('${String(key).replace(/\\/g,'\\\\').replace(/'/g,"\\'")}')">Вернуть</button>
+          </div>
+        </div>`).join('');
+    }
+
+    function renderDebtorsClients() {
+      cleanupDebtorTransfers();
+
+      const allDebtors = getDebtors();
+      const clients = allDebtors.filter(client => !isDebtorTransferred(client));
+
+      const totalOverdue = clients.reduce((sum, client) => {
+        return sum + Number(client.overdueSum || 0);
+      }, 0);
+
+      const summary = document.getElementById('debtorsSummary');
+      if (summary) summary.textContent = `${clients.length} клиентов · ${Math.round(totalOverdue).toLocaleString('ru-RU')} ₽ просрочено`;
+
+      debtorRefreshCounters(clients);
+
+      // «Оплатили сегодня» — только фактически отмеченные сегодня платежи.
+      const today = debtorToday();
+      let paidCount = 0;
+      let paidAmount = 0;
+      allContracts.forEach(contract => {
+        const info = getMonthStatus(contract);
+        (info.months || []).forEach(m => {
+          const paid = !!m.isPaid;
+          const paidDate = String(m.paidDate || m.paymentDate || m.datePaid || '').slice(0,10);
+          if (paid && paidDate === today) {
+            paidCount++;
+            paidAmount += Number(m.dueAmount || m.amount || 0);
+          }
+        });
+      });
+      document.getElementById('debtorsPaidCountStat')?.replaceChildren(document.createTextNode(String(paidCount)));
+      document.getElementById('debtorsPaidAmountStat')?.replaceChildren(document.createTextNode(Math.round(paidAmount).toLocaleString('ru-RU') + ' ₽'));
+
+      renderClientList('debtorsClientsList', clients, 'Нет клиентов с просрочкой', '', 'debtors');
+      renderDebtorTransfers();
+    }
+
 
     function getDebtors() {
       const result = [];
@@ -5178,10 +5666,6 @@
       return dateObj.toLocaleDateString('ru-RU');
     }
 
-    function getContractSearchText(c) {
-      return [c.fio,c.phone,c.extraPhone,c.contractNum,c.product,c.store,c.guarantorFio,c.guarantorPhone,c.address]
-        .map(v => String(v || '').toLowerCase()).join(' ');
-    }
 
     function getContractSortValue(c, sortKey) {
       const m = calculateContractMetrics(c);
@@ -6959,6 +7443,19 @@
       }
     }
 
+
+    // Удобный быстрый поиск: Ctrl/Cmd+K.
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        const search = document.getElementById('searchInput');
+        if (search) {
+          search.focus();
+          search.select();
+        }
+      }
+    });
+
     // ================================================================
     // СТАРТ
     // ================================================================
@@ -6975,6 +7472,14 @@
     }
 
     initSync();
-  </script>
+  
+    document.addEventListener('keydown', function(e) {
+      if (e.key === '/' && !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)) {
+        e.preventDefault();
+        const input = document.getElementById('searchInput');
+        if (input) input.focus();
+      }
+    });
+</script>
 </body>
-  </html>
+          </html>
